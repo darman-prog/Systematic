@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Build
+dist/
+
+# Entorno (nunca versionar valores reales)
+.env
+.env.*
+!.env.example
+
+# Binarios fuente del material de estudio (solo se versionan los .md derivados)
+BancoDeInformacion/**/*.pdf
+BancoDeInformacion/**/*.pptx
+BancoDeInformacion/**/*.docx
+
+# Sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Artefactos de tests
+coverage/
+playwright-report/
+test-results/

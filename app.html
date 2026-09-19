@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz BD2 — Repaso interactivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) {
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Segoe UI", "Tahoma", "Geneva", "Verdana", "sans-serif"] }
+          }
+        }
+      };
+    }
+  </script>
+  <style>
+    .hidden { display: none !important; }
+    .study-item:not(.revealed) .oculto { filter: blur(6px); pointer-events: none; user-select: none; }
+    .btn { cursor: pointer; }
+    .star-btn { cursor: pointer; }
+    .btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
+    .star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible {
+      outline: 2px solid #60a5fa; outline-offset: 2px;
+    }
+    .feedback { animation: fadeInUp 0.28s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .anim-in { animation: fadeInUp 0.28s ease-out; }
+    @keyframes shakeX { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+    .shake { animation: shakeX 0.4s ease; }
+    @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .timer-low { animation: pulseSoft 1s infinite; }
+    .score-ring {
+      width: 9.5rem; height: 9.5rem; border-radius: 9999px; margin: 0 auto 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      background: conic-gradient(var(--ring-color, #38bdf8) calc(var(--pct, 0) * 1%), #1e293b 0);
+      transition: background 0.6s ease;
+    }
+    .score-ring-inner {
+      width: 7.5rem; height: 7.5rem; border-radius: 9999px; background: #0f172a;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; font-weight: bold; color: #f8fafc;
+    }
+  </style>
+  <style type="text/tailwindcss">
+    @layer components {
+      .mode-card { @apply flex flex-col items-start gap-1 bg-slate-900 border border-slate-700 hover:border-blue-500 hover:-translate-y-0.5 rounded-xl p-4 text-left transition; }
+      .card { @apply bg-slate-800/90 border border-slate-700 rounded-2xl p-5 sm:p-7 shadow-xl w-full; }
+      .subtitle { @apply text-slate-400 leading-relaxed mb-5 text-sm sm:text-base; }
+      .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed; }
+      .btn-primary { @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 text-sm sm:text-base; }
+      .btn-secondary { @apply bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-600 px-5 py-3 text-sm sm:text-base; }
+      .btn-ghost { @apply bg-transparent hover:bg-slate-700/60 text-slate-300 border border-slate-700 px-4 py-2.5 text-sm; }
+      .btn-sm { @apply px-3 py-2 text-xs sm:text-sm; }
+      .link-btn { @apply text-blue-400 hover:underline text-xs font-semibold px-1.5 cursor-pointer bg-transparent border-0; }
+      .badge { @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap; }
+      .chip { @apply rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs sm:text-sm text-slate-300 transition hover:border-blue-500 hover:text-white cursor-pointer; }
+      .chip-on { @apply bg-blue-600 border-blue-500 text-white font-semibold; }
+      .section-title { @apply text-xs sm:text-sm font-bold text-slate-300 border-b border-slate-700 pb-2 mt-7 mb-3 uppercase tracking-wide; }
+      .stat-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center; }
+      .stat-value { @apply text-lg sm:text-xl font-bold text-sky-400; }
+      .stat-label { @apply text-xs text-slate-400 mt-1; }
+      .stat-input { @apply w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-100 text-xs; }
+      .progress-track { @apply h-2 bg-slate-950 rounded-full overflow-hidden; }
+      .progress-fill { @apply h-full bg-gradient-to-r from-blue-600 to-sky-400 rounded-full transition-all duration-300; }
+      .option { @apply flex items-center gap-3 w-full text-left rounded-xl border-2 border-transparent bg-slate-700 hover:bg-slate-600 px-4 py-3.5 text-sm sm:text-base transition cursor-pointer; }
+      .option-correct { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
+      .option-wrong { @apply bg-rose-900 border-rose-500 text-rose-100; }
+      .opt-key { @apply flex-none w-7 h-7 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center; }
+      .option-correct .opt-key { @apply bg-emerald-500 text-emerald-950; }
+      .option-wrong .opt-key { @apply bg-rose-500 text-rose-950; }
+      .feedback { @apply mt-5 p-4 rounded-xl bg-slate-950 text-sm leading-relaxed; }
+      .feedback-ok { @apply border-l-4 border-emerald-500; }
+      .feedback-bad { @apply border-l-4 border-rose-500; }
+      .feedback-neutro { @apply border-l-4 border-slate-500; }
+      .code-block { @apply font-mono text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3.5 overflow-x-auto whitespace-pre leading-relaxed; }
+      .kw { @apply text-blue-400 font-bold; }
+      .str { @apply text-amber-400; }
+      .hueco { @apply inline-block min-w-[80px] text-center border-2 border-dashed border-slate-600 bg-slate-800 rounded-lg px-2 py-0.5 mx-0.5 font-mono text-blue-300 cursor-pointer align-middle; }
+      .hueco-lleno { @apply bg-blue-800 border-blue-500 border-solid text-white; }
+      .hueco-ok { @apply bg-emerald-800 border-emerald-500 border-solid text-emerald-100; }
+      .hueco-mal { @apply bg-rose-900 border-rose-500 border-solid text-rose-100; }
+      .pieza { @apply bg-slate-700 border-2 border-slate-600 hover:border-blue-500 rounded-lg px-3.5 py-2 font-mono text-xs sm:text-sm cursor-grab select-none; }
+      .pieza-sel { @apply bg-blue-700 border-blue-500 text-white; }
+      .bloque { @apply flex items-center gap-3 bg-slate-900 border border-slate-600 rounded-xl px-3 py-2.5 font-mono text-xs sm:text-sm; }
+      .bloque-ok { @apply bg-emerald-900/60 border-emerald-600 text-emerald-100; }
+      .bloque-mal { @apply bg-rose-900/60 border-rose-600 text-rose-100; }
+      .btn-mini { @apply w-8 h-8 shrink-0 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-slate-200 text-xs flex items-center justify-center transition cursor-pointer; }
+      .star-btn { @apply text-2xl leading-none px-1 text-slate-500 hover:text-yellow-400 transition bg-transparent border-0; }
+      .star-on { @apply text-yellow-400; }
+      .er-card { @apply bg-slate-950 border border-slate-600 rounded-xl overflow-hidden text-xs flex-1 min-w-0; }
+      .er-head { @apply bg-blue-700 text-white px-3 py-1.5 font-bold; }
+      .er-row { @apply px-3 py-1 border-t border-slate-800 flex justify-between gap-4; }
+      .er-pk { @apply text-yellow-400 font-bold; }
+      .er-fk { @apply text-pink-400 font-bold; }
+      .er-pkfk { @apply text-orange-400 font-bold; }
+      .history-row { @apply grid grid-cols-[1fr_auto_auto] sm:grid-cols-[1fr_auto_auto_auto] gap-3 items-center bg-slate-950 rounded-xl px-4 py-2.5 text-xs sm:text-sm mb-2; }
+      .history-best { @apply border border-emerald-600; }
+      .topic-row { @apply grid grid-cols-[90px_1fr_44px] sm:grid-cols-[110px_1fr_52px] gap-3 items-center text-xs sm:text-sm; }
+      .topic-bar { @apply h-2.5 bg-slate-950 rounded-full overflow-hidden; }
+      .topic-bar-fill { @apply h-full rounded-full; }
+      .topic-score { @apply text-right text-slate-400; }
+      .peor-row { @apply flex gap-3 items-center bg-slate-950 rounded-xl px-4 py-2.5 text-xs sm:text-sm; }
+      .review-item { @apply bg-slate-950 border border-slate-700 border-l-4 rounded-xl p-4; }
+      .review-ok { @apply border-l-emerald-500; }
+      .review-bad { @apply border-l-rose-500; }
+      .tag { @apply inline-flex items-center text-xs font-bold px-2 py-1 rounded-md whitespace-nowrap; }
+      .tag-ok { @apply bg-emerald-800 text-emerald-100; }
+      .tag-bad { @apply bg-rose-900 text-rose-100; }
+      .tag-simulacro { @apply bg-violet-700 text-violet-100; }
+      .tag-practica { @apply bg-blue-800 text-blue-100; }
+      .study-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
+      .study-option { @apply px-4 py-2.5 rounded-lg bg-slate-800 border border-transparent text-sm; }
+      .study-option-ok { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
+      .study-answer { @apply bg-emerald-900/50 border border-emerald-700 text-emerald-100 font-mono text-xs sm:text-sm rounded-xl p-3 mb-3; }
+      .study-exp { @apply p-3 rounded-lg bg-slate-800/60 border-l-4 border-blue-500 text-xs sm:text-sm leading-relaxed text-slate-300; }
+      .search-input { @apply w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus:border-blue-500; }
+      .match-item { @apply w-full text-left rounded-xl border-2 border-slate-600 bg-slate-900 hover:border-blue-500 px-3 py-2.5 text-xs sm:text-sm transition cursor-pointer; }
+      .match-sel { @apply border-blue-500 bg-blue-900/60 text-white; }
+      .match-ok { @apply border-emerald-500 bg-emerald-900/60 text-emerald-100 cursor-default opacity-90; }
+      .match-err { @apply border-rose-500 bg-rose-900/70 text-rose-100; }
+      .flash-card { @apply bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 min-h-[16rem] flex flex-col justify-center; }
+      .glosario-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex justify-center items-start p-4 sm:p-6 font-sans">
+
+<div id="safelist" class="hidden option-correct option-wrong hueco-lleno hueco-ok hueco-mal pieza-sel bloque-ok bloque-mal match-sel match-ok match-err star-on feedback-ok feedback-bad feedback-neutro review-ok review-bad tag-ok tag-bad tag-simulacro tag-practica study-option-ok history-best chip-on sm:inline-flex" aria-hidden="true"></div>
+
+<div id="sin-estilos" style="display:none" class="fixed top-0 inset-x-0 z-50 bg-amber-500 text-slate-900 text-center text-xs sm:text-sm font-semibold py-2">
+  Sin conexión: no se pudieron cargar los estilos de Tailwind. La app funciona igual, pero sin diseño.
+</div>
+
+<div class="app w-full max-w-3xl">
+
+  <section id="screen-start" class="card">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">Quiz de Base de Datos</h1>
+    <p class="subtitle">
+      Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
+      Preguntas y opciones aleatorias, con explicación en cada respuesta.
+    </p>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+      <button class="mode-card col-span-2 sm:col-span-4 bg-amber-950/40 border-amber-600 hover:border-amber-400" onclick="irRepaso()">
+        <span class="text-2xl">🔥</span>
+        <span class="font-bold">RepasoQuiz — Preguntas garantizadas</span>
+        <span class="text-xs text-amber-200/90">Las preguntas reales de las capturas (salen sí o sí en el quiz). Mismo orden y redacción del examen.</span>
+      </button>
+      <button class="mode-card" onclick="irConfig()">
+        <span class="text-2xl">🎯</span>
+        <span class="font-bold">Configurar práctica</span>
+        <span class="text-xs text-slate-400">Elige tema, tipo, dificultad y cantidad</span>
+      </button>
+      <button class="mode-card" onclick="startStudy()">
+        <span class="text-2xl">📖</span>
+        <span class="font-bold">Modo Estudio</span>
+        <span class="text-xs text-slate-400">Todas las preguntas con su solución</span>
+      </button>
+      <button class="mode-card" onclick="startFlashcards()">
+        <span class="text-2xl">🃏</span>
+        <span class="font-bold">Flashcards</span>
+        <span class="text-xs text-slate-400">Memoriza con tarjetas y autoevaluación</span>
+      </button>
+      <button class="mode-card" onclick="startGlosario()">
+        <span class="text-2xl">📚</span>
+        <span class="font-bold">Glosario SQL</span>
+        <span class="text-xs text-slate-400">Términos y ejemplos por categoría</span>
+      </button>
+    </div>
+    <div id="tip-dia" class="mt-3"></div>
+    <div class="mt-3">
+      <button class="btn btn-ghost hidden" id="btn-debiles" onclick="practicarDebiles()">🧠 Repasar débiles</button>
+    </div>
+    <h3 class="section-title">Práctica rápida</h3>
+    <div class="flex flex-wrap gap-2 mb-3">
+      <button class="btn btn-primary btn-sm" onclick="practicarArrastre()">🧩 Solo arrastrar y soltar</button>
+      <button class="btn btn-secondary btn-sm" onclick="practicarCasos()">🧠 Casos técnicos</button>
+      <button class="btn btn-secondary btn-sm hidden" id="btn-vencidas" onclick="practicarVencidas()">⏰ Repaso espaciado</button>
+    </div>
+    <div id="tipos-panel" class="flex flex-wrap gap-2"></div>
+    <div id="stats-panel"></div>
+    <h3 class="section-title">Historial de intentos</h3>
+    <div id="history-section"></div>
+    <div class="flex gap-2 justify-end flex-wrap mt-2">
+      <button class="btn btn-ghost btn-sm" onclick="exportarDatos()">⬇ Exportar progreso</button>
+      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">⬆ Importar</button>
+      <input type="file" id="import-file" accept=".json,application/json" class="hidden" onchange="importarDatos(this)">
+      <button class="btn btn-ghost btn-sm" onclick="clearHistory()">Borrar historial</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetProgreso()">Reiniciar progreso</button>
+    </div>
+  </section>
+
+  <section id="screen-repaso" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">🔥 RepasoQuiz</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <p class="subtitle">Preguntas reales tomadas de las capturas del quiz (<b>CapturasInfo</b> — 10/09/2026). Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
+    <div id="repaso-list"></div>
+    <div class="flex flex-wrap gap-3 justify-center mt-6">
+      <button class="btn btn-primary" onclick="iniciarRepasoQuiz()">Comenzar RepasoQuiz (<span id="repaso-n">10</span> preguntas)</button>
+      <button class="btn btn-secondary" onclick="estudioGarantizadas()">📖 Ver soluciones</button>
+      <button class="btn btn-ghost" onclick="flashcardsGarantizadas()">🃏 Flashcards</button>
+    </div>
+  </section>
+
+  <section id="screen-config" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
+      <h1 class="text-xl sm:text-2xl font-bold">Configurar práctica</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <div id="config-groups"></div>
+    <div class="flex items-center gap-3 flex-wrap my-5">
+      <label class="text-sm text-slate-300">Cantidad:
+        <input type="number" id="cfg-cantidad" min="1" value="10" class="stat-input ml-2 w-20">
+      </label>
+      <button class="btn btn-ghost btn-sm" onclick="usarTodas()">Usar todas (<span id="cfg-max">0</span>)</button>
+    </div>
+    <div class="flex flex-col gap-2.5 mb-4 text-sm text-slate-300">
+      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-priorizar" checked onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Priorizar preguntas débiles (repetición espaciada)</label>
+      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-debiles" onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Solo preguntas débiles</label>
+      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-marcadas" onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Solo marcadas ⭐</label>
+    </div>
+    <p class="text-sm text-slate-400" id="cfg-resumen"></p>
+    <div class="flex flex-wrap gap-3 justify-center mt-6">
+      <button class="btn btn-primary w-full sm:w-auto" id="btn-comenzar" onclick="comenzarPractica()">Comenzar práctica</button>
+      <button class="btn btn-secondary w-full sm:w-auto" onclick="comenzarSimulacro()">🎯 Simulacro (10 preg · 20 min)</button>
+    </div>
+  </section>
+
+  <section id="screen-quiz" class="card hidden">
+    <div class="flex flex-wrap items-center gap-2 mb-4">
+      <span class="badge bg-slate-700" id="progress">Pregunta 1</span>
+      <span class="badge" id="topic-badge">Tema</span>
+      <span class="badge bg-slate-700" id="type-badge">Tipo</span>
+      <span class="badge hidden" id="dif-badge"></span>
+      <span class="badge hidden bg-amber-900 text-amber-200" id="timer-badge">20:00</span>
+      <span class="badge hidden bg-violet-700 text-violet-100" id="simulacro-badge">Simulacro</span>
+      <span class="badge hidden bg-amber-600 text-white" id="repaso-badge">🔥 RepasoQuiz garantizadas</span>
+      <span class="ml-auto flex items-center gap-1">
+        <button class="star-btn" id="star-btn" onclick="toggleMarcadaActual()" title="Marcar pregunta" aria-label="Marcar pregunta">☆</button>
+        <button class="btn btn-ghost btn-sm hidden" id="pause-btn" onclick="alternarPausa()" title="Pausar" aria-label="Pausar simulacro">⏸</button>
+        <button class="btn btn-ghost btn-sm" onclick="salir()" title="Salir" aria-label="Salir de la ronda">✕</button>
+      </span>
+    </div>
+    <div class="progress-track mb-5"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div id="question-area"></div>
+    <div class="feedback hidden" id="feedback-box" role="status" aria-live="polite"></div>
+
+    <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3">
+      <button id="skip-btn" class="btn btn-ghost w-full sm:w-auto" onclick="saltarPregunta()">⏭ Saltar</button>
+      <button id="next-btn" class="btn btn-primary w-full sm:w-auto" style="display:none" onclick="next()">Siguiente</button>
+    </div>
+    <p class="text-center text-slate-500 text-xs mt-4">Atajos: <b>1</b> <b>2</b> <b>3</b> para responder · <b>Enter</b> para continuar</p>
+  </section>
+
+  <section id="screen-results" class="card hidden"></section>
+
+  <section id="screen-study" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">Modo Estudio</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa ⭐ para marcar las que quieras priorizar.</p>
+    <input class="search-input" id="study-search" type="search" placeholder="Buscar por texto, tema, código o explicación..." oninput="renderStudy(this.value)">
+    <div id="study-filtros" class="flex flex-wrap gap-2 mb-3"></div>
+    <p class="text-xs text-slate-500 mb-3" id="study-count"></p>
+    <div id="study-list"></div>
+  </section>
+
+  <section id="screen-flashcards" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">🃏 Flashcards</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <div id="flash-area"></div>
+  </section>
+
+  <section id="screen-glosario" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">📚 Glosario SQL</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>
+    <input class="search-input" id="glosario-search" type="search" placeholder="Buscar término, definición o ejemplo..." oninput="renderGlosario(this.value)">
+    <div id="glosario-filtros" class="flex flex-wrap gap-2 mb-3"></div>
+    <p class="text-xs text-slate-500 mb-3" id="glosario-count"></p>
+    <div id="glosario-list"></div>
+  </section>
+
+</div>
+
+<div id="pause-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6">
+  <div class="card max-w-sm text-center">
+    <h2 class="text-2xl font-bold mb-2">Simulacro en pausa</h2>
+    <p class="text-slate-400 text-sm mb-6">El temporizador está detenido.</p>
+    <button class="btn btn-primary w-full" onclick="alternarPausa()">Reanudar</button>
+    <button class="btn btn-ghost w-full mt-3" onclick="salir()">Salir del simulacro</button>
+  </div>
+</div>
+
+<script src="banco-preguntas.js"></script>
+<script src="glosario.js"></script>
+<script>
+  const banco = window.BANCO || [];
+  const glosario = window.GLOSARIO || { categorias: [], terminos: [], tips: [] };
+  const KEY_PROGRESO = "quizBD2.progreso";
+  const KEY_HISTORIAL = "quizBD2.historial";
+  const KEY_ACTIVIDAD = "quizBD2.actividad";
+  const KEY_META = "quizBD2.meta";
+  const INTERVALOS_DIAS = [0, 1, 3, 7, 16];
+
+  const TOPIC_COLORS = {
+    "DML": "#38bdf8",
+    "DDL": "#a78bfa",
+    "Integridad": "#f472b6",
+    "Índices": "#facc15",
+    "Modelado": "#34d399",
+    "Consultas": "#fb923c",
+    "Funciones": "#22d3ee"
+  };
+  const TIPO_LABELS = {
+    multiple: "Opción múltiple",
+    multi: "Selección múltiple",
+    vf: "Verdadero / Falso",
+    codigo: "Lee el código",
+    dragdrop: "Arrastrar piezas",
+    ordenar: "Ordenar bloques",
+    desarrollo: "Desarrollo",
+    relacionar: "Relacionar columnas"
+  };
+  const DIF_LABELS = { facil: "Fácil", media: "Media", dificil: "Difícil" };
+  const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar"];
+
+  let progreso = cargarProgreso();
+  let session = null;
+  let flash = null;
+  let estudioTipo = "todos";
+  let estudioSoloReales = false;
+  let dragPid = null;
+  let dragBloqueIndex = null;
+  let filtros = { parciales: new Set(), temas: new Set(), dificultades: new Set(), tipos: new Set(), soloDebiles: false, soloMarcadas: false, priorizar: true };
+
+  const $ = id => document.getElementById(id);
+
+  function escapar(texto) {
+    return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function escaparRegex(texto) {
+    return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "JOIN", "ON", "GROUP BY", "ORDER BY", "WITHIN GROUP", "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE", "CREATE TABLE", "ALTER TABLE", "ADD", "DROP TABLE", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "LISTAGG", "GROUP_CONCAT", "SUBSTR", "SUBSTRING", "CAST", "TO_CHAR", "TO_NUMBER", "VARCHAR2", "NUMBER", "AS", "AND", "OR", "COUNT", "DISTINCT", "INT", "FLOAT", "NULL", "NOT", "CASCADE", "ASC", "HAVING", "SUM", "INTO"];
+
+  function resaltarSQL(sql) {
+    let base = escapar(sql).replace(/'([^']*)'/g, "<span class=\"str\">'$1'</span>");
+    const patron = new RegExp("\\b(" + SQL_KEYWORDS.slice().sort((a, b) => b.length - a.length).map(escaparRegex).join("|") + ")\\b", "g");
+    return base.replace(patron, m => '<span class="kw">' + m + '</span>');
+  }
+
+  function animar(el) {
+    if (!el || !el.classList) return;
+    el.classList.remove("anim-in");
+    void el.offsetWidth;
+    el.classList.add("anim-in");
+  }
+
+  function show(screen) {
+    ["start", "config", "quiz", "results", "study", "flashcards", "glosario", "repaso"].forEach(s =>
+      $("screen-" + s).classList.toggle("hidden", s !== screen)
+    );
+    animar($("screen-" + screen));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function cargarProgreso() {
+    try { return JSON.parse(localStorage.getItem(KEY_PROGRESO)) || {}; } catch (e) { return {}; }
+  }
+
+  function guardarProgreso() {
+    localStorage.setItem(KEY_PROGRESO, JSON.stringify(progreso));
+  }
+
+  function obtenerP(id) {
+    return progreso[id] || { ok: 0, fail: 0, box: 1, last: null, lastOk: null, marked: false };
+  }
+
+  function fechaISO(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function hoyISO() {
+    return fechaISO(new Date());
+  }
+
+  function cargarActividad() {
+    try { return JSON.parse(localStorage.getItem(KEY_ACTIVIDAD)) || {}; } catch (e) { return {}; }
+  }
+
+  function registrarActividad() {
+    const a = cargarActividad();
+    const h = hoyISO();
+    a[h] = (a[h] || 0) + 1;
+    localStorage.setItem(KEY_ACTIVIDAD, JSON.stringify(a));
+  }
+
+  function metaDiaria() {
+    return Math.max(1, parseInt(localStorage.getItem(KEY_META), 10) || 20);
+  }
+
+  function cambiarMeta(valor) {
+    const n = Math.max(1, parseInt(valor, 10) || 20);
+    localStorage.setItem(KEY_META, String(n));
+    renderStats();
+  }
+
+  function calcularRacha() {
+    const a = cargarActividad();
+    const d = new Date();
+    let racha = 0;
+    if (!a[fechaISO(d)]) d.setDate(d.getDate() - 1);
+    while (a[fechaISO(d)]) {
+      racha++;
+      d.setDate(d.getDate() - 1);
+    }
+    return racha;
+  }
+
+  function registrarRespuesta(id, ok) {
+    const p = obtenerP(id);
+    if (ok) { p.ok++; p.box = Math.min(p.box + 1, 5); } else { p.fail++; p.box = 1; }
+    p.last = Date.now();
+    p.lastOk = ok;
+    progreso[id] = p;
+    guardarProgreso();
+    registrarActividad();
+  }
+
+  function toggleMarked(id) {
+    const p = obtenerP(id);
+    p.marked = !p.marked;
+    progreso[id] = p;
+    guardarProgreso();
+    return p.marked;
+  }
+
+  function esDebil(p) {
+    return p.fail > 0 && (!p.lastOk || p.box <= 2);
+  }
+
+  function vencida(p) {
+    if (!p.last) return true;
+    const dias = INTERVALOS_DIAS[Math.max(1, Math.min(p.box, 5)) - 1];
+    return Date.now() - p.last >= dias * 86400000;
+  }
+
+  function cargarHistorial() {
+    try { return JSON.parse(localStorage.getItem(KEY_HISTORIAL)) || []; } catch (e) { return []; }
+  }
+
+  function clearHistory() {
+    localStorage.removeItem(KEY_HISTORIAL);
+    renderHistory();
+    renderStats();
+  }
+
+  function resetProgreso() {
+    if (!confirm("¿Borrar todo el progreso (aciertos, fallos, marcas y racha)?")) return;
+    progreso = {};
+    localStorage.removeItem(KEY_PROGRESO);
+    localStorage.removeItem(KEY_ACTIVIDAD);
+    renderStats();
+    renderHistory();
+  }
+
+  function exportarDatos() {
+    const datos = {
+      app: "quiz-bd2",
+      version: 1,
+      exportado: new Date().toISOString(),
+      progreso: cargarProgreso(),
+      historial: cargarHistorial(),
+      actividad: cargarActividad(),
+      meta: metaDiaria()
+    };
+    const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "progreso-quiz-bd2-" + hoyISO() + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importarDatos(input) {
+    const archivo = input.files && input.files[0];
+    if (!archivo) return;
+    const lector = new FileReader();
+    lector.onload = () => {
+      try {
+        const datos = JSON.parse(lector.result);
+        if (!datos || datos.app !== "quiz-bd2" || typeof datos.progreso !== "object") throw new Error("formato");
+        if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
+        progreso = datos.progreso || {};
+        localStorage.setItem(KEY_PROGRESO, JSON.stringify(progreso));
+        if (datos.historial) localStorage.setItem(KEY_HISTORIAL, JSON.stringify(datos.historial));
+        if (datos.actividad) localStorage.setItem(KEY_ACTIVIDAD, JSON.stringify(datos.actividad));
+        if (datos.meta) localStorage.setItem(KEY_META, String(datos.meta));
+        goHome();
+        alert("Progreso importado correctamente.");
+      } catch (e) {
+        alert("El archivo no es válido. Debe ser un JSON exportado desde esta app.");
+      } finally {
+        input.value = "";
+      }
+    };
+    lector.readAsText(archivo);
+  }
+
+  function inicializarFiltros() {
+    filtros.parciales = new Set(banco.map(q => q.parcial));
+    filtros.temas = new Set(banco.map(q => q.tema));
+    filtros.dificultades = new Set(["facil", "media", "dificil"]);
+    filtros.tipos = new Set(TIPOS);
+  }
+
+  function valoresDe(clave) {
+    if (clave === "parciales") return [...new Set(banco.map(q => q.parcial))];
+    if (clave === "temas") return [...new Set(banco.map(q => q.tema))];
+    if (clave === "dificultades") return ["facil", "media", "dificil"];
+    return TIPOS;
+  }
+
+  function contarPor(clave, valor) {
+    if (clave === "parciales") return banco.filter(q => q.parcial === valor).length;
+    if (clave === "temas") return banco.filter(q => q.tema === valor).length;
+    if (clave === "dificultades") return banco.filter(q => q.dificultad === valor).length;
+    return banco.filter(q => q.tipo === valor).length;
+  }
+
+  function leerOpciones() {
+    filtros.soloDebiles = $("cfg-solo-debiles").checked;
+    filtros.soloMarcadas = $("cfg-solo-marcadas").checked;
+    filtros.priorizar = $("cfg-priorizar").checked;
+  }
+
+  function preguntasFiltradas() {
+    leerOpciones();
+    return banco.filter(q =>
+      filtros.parciales.has(q.parcial) &&
+      filtros.temas.has(q.tema) &&
+      filtros.dificultades.has(q.dificultad) &&
+      filtros.tipos.has(q.tipo) &&
+      (!filtros.soloDebiles || esDebil(obtenerP(q.id))) &&
+      (!filtros.soloMarcadas || obtenerP(q.id).marked)
+    );
+  }
+
+  function renderConfig() {
+    const grupos = [
+      { clave: "parciales", titulo: "Parcial", etiqueta: v => v },
+      { clave: "temas", titulo: "Tema", etiqueta: v => v },
+      { clave: "dificultades", titulo: "Dificultad", etiqueta: v => DIF_LABELS[v] || v },
+      { clave: "tipos", titulo: "Tipo de pregunta", etiqueta: v => TIPO_LABELS[v] || v }
+    ];
+    let html = "";
+    grupos.forEach(g => {
+      html += '<div class="mb-5"><div class="flex items-center gap-2 mb-2.5"><span class="font-semibold text-sm text-slate-300">' + g.titulo +
+        '</span><span class="ml-auto"></span><button class="link-btn" onclick="toggleFiltroTodos(\'' + g.clave + '\', true)">Todos</button>' +
+        '<button class="link-btn" onclick="toggleFiltroTodos(\'' + g.clave + '\', false)">Ninguno</button></div><div class="flex flex-wrap gap-2">';
+      valoresDe(g.clave).forEach(v => {
+        const activa = filtros[g.clave].has(v);
+        html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" onclick="toggleFiltro(\'' + g.clave + '\',\'' + v + '\')">' +
+          g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
+      });
+      html += '</div></div>';
+    });
+    $("config-groups").innerHTML = html;
+    actualizarResumen();
+  }
+
+  function toggleFiltro(clave, valor) {
+    if (filtros[clave].has(valor)) filtros[clave].delete(valor);
+    else filtros[clave].add(valor);
+    renderConfig();
+  }
+
+  function toggleFiltroTodos(clave, activar) {
+    filtros[clave] = activar ? new Set(valoresDe(clave)) : new Set();
+    renderConfig();
+  }
+
+  function actualizarResumen() {
+    leerOpciones();
+    const qs = preguntasFiltradas();
+    $("cfg-max").textContent = qs.length;
+    const input = $("cfg-cantidad");
+    input.max = qs.length || 1;
+    const actual = parseInt(input.value, 10);
+    if (!actual || actual > qs.length) input.value = qs.length || 1;
+    $("cfg-resumen").textContent = qs.length + " preguntas coinciden con los filtros.";
+    $("btn-comenzar").disabled = qs.length === 0;
+  }
+
+  function usarTodas() {
+    const qs = preguntasFiltradas();
+    $("cfg-cantidad").value = qs.length || 1;
+    actualizarResumen();
+  }
+
+  function irConfig() {
+    renderConfig();
+    show("config");
+  }
+
+  function ordenarPrioridad(lista) {
+    const grupos = [[], [], []];
+    lista.forEach(q => {
+      const p = obtenerP(q.id);
+      const g = esDebil(p) ? 0 : vencida(p) ? 1 : 2;
+      grupos[g].push(q);
+    });
+    return grupos.reduce((acc, g) => acc.concat(shuffle(g)), []);
+  }
+
+  function prepararItem(item, barajar) {
+    if (barajar === undefined) barajar = true;
+    const copia = Object.assign({}, item);
+    if (item.tipo === "dragdrop") {
+      copia.piezasRuntime = barajar ? shuffle(item.piezas.map((text, i) => ({ pid: item.id + "-p" + i, text }))) : item.piezas.map((text, i) => ({ pid: item.id + "-p" + i, text }));
+    } else if (item.tipo === "ordenar") {
+      let barajados = item.bloques.slice();
+      if (barajar) {
+        barajados = shuffle(item.bloques);
+        let intentos = 0;
+        while (barajados.join("|") === item.bloques.join("|") && intentos < 5) {
+          barajados = shuffle(item.bloques);
+          intentos++;
+        }
+      }
+      copia.bloquesRuntime = barajados;
+    } else if (item.tipo === "relacionar") {
+      const paresIdx = item.pares.map((p, i) => ({ idx: i, texto: p[1] }));
+      copia.derecha = barajar ? shuffle(paresIdx) : paresIdx;
+    } else if (item.tipo === "multi") {
+      copia.correctos = item.correctos.slice();
+      if (barajar) {
+        const textosCorrectos = item.correctos.map(i => item.options[i]);
+        copia.options = shuffle(item.options);
+        copia.correctos = textosCorrectos.map(t => copia.options.indexOf(t)).sort((a, b) => a - b);
+      }
+    } else if (item.tipo !== "desarrollo") {
+      if (barajar) {
+        const textoCorrecto = item.options[item.correct];
+        copia.options = shuffle(item.options);
+        copia.correct = copia.options.indexOf(textoCorrecto);
+      }
+    }
+    return copia;
+  }
+
+  function respuestaCorrecta(item) {
+    if (item.tipo === "dragdrop") return item.respuestas.join(" / ");
+    if (item.tipo === "ordenar") return item.bloques.join(" → ");
+    if (item.tipo === "relacionar") return item.pares.map(p => p[0] + " → " + p[1]).join(" | ");
+    if (item.tipo === "desarrollo") return item.solucion;
+    if (item.tipo === "multi") return item.correctos.map(i => item.options[i]).join(" · ");
+    return item.options[item.correct];
+  }
+
+  function diagramaER() {
+    const flecha = '<div class="text-slate-500 text-xl font-bold text-center px-2"><span class="md:hidden">↓</span><span class="hidden md:inline">→</span></div>';
+    return '<div class="my-5">' +
+      '<p class="text-xs uppercase tracking-wide text-slate-400 mb-2 font-bold">Esquema de referencia</p>' +
+      '<div class="flex flex-col md:flex-row items-stretch md:items-center gap-2">' +
+        tarjetaER("Profesor", [["PK", "ID_Profesor"], ["", "nombre"]]) +
+        flecha +
+        tarjetaER("Horas (tabla puente)", [["PK·FK", "ID_Profesor"], ["PK·FK", "ID_Asignatura"]]) +
+        flecha +
+        tarjetaER("Asignatura", [["PK", "ID_Asignatura"], ["", "nombre"]]) +
+      '</div>' +
+      '<p class="text-xs text-slate-500 mt-2">Profesor 1 → N Horas N ← 1 Asignatura (relación muchos a muchos resuelta por la tabla puente)</p>' +
+    '</div>';
+  }
+
+  function tarjetaER(titulo, filas) {
+    return '<div class="er-card">' +
+      '<div class="er-head">' + titulo + '</div>' +
+      filas.map(f => {
+        const clase = f[0] === "PK" ? "er-pk" : f[0] === "PK·FK" ? "er-pkfk" : "er-fk";
+        return '<div class="er-row"><span class="' + clase + '">' + (f[0] || "") + '</span><span class="font-mono">' + f[1] + '</span></div>';
+      }).join("") +
+    '</div>';
+  }
+
+  function startSession(items, modo, conTimer) {
+    clearTimer();
+    if (!items || !items.length) return;
+    const barajar = modo !== "repaso";
+    const preparadas = items.map(it => prepararItem(it, barajar));
+    session = { items: preparadas, idx: 0, answers: {}, modo, inicio: Date.now(), finalizada: false, pausado: false };
+    show("quiz");
+    $("timer-badge").classList.toggle("hidden", !conTimer);
+    $("simulacro-badge").classList.toggle("hidden", modo !== "simulacro");
+    $("repaso-badge").classList.toggle("hidden", modo !== "repaso");
+    $("pause-btn").classList.toggle("hidden", modo !== "simulacro");
+    $("pause-overlay").classList.add("hidden");
+    renderQuestion();
+    if (conTimer) iniciarTimer(20 * 60);
+  }
+
+  function comenzarPractica() {
+    const qs = preguntasFiltradas();
+    if (!qs.length) return;
+    const cant = Math.min(parseInt($("cfg-cantidad").value, 10) || qs.length, qs.length);
+    const lista = filtros.priorizar ? ordenarPrioridad(qs) : shuffle(qs);
+    startSession(lista.slice(0, cant), "practica", false);
+  }
+
+  function comenzarSimulacro() {
+    const qs = preguntasFiltradas();
+    if (!qs.length) return;
+    const lista = shuffle(qs).slice(0, Math.min(10, qs.length));
+    startSession(lista, "simulacro", true);
+  }
+
+  function practicarDebiles() {
+    const debiles = banco.filter(q => esDebil(obtenerP(q.id)));
+    if (!debiles.length) return;
+    startSession(shuffle(debiles).slice(0, 10), "practica", false);
+  }
+
+  function practicarTipo(tipo) {
+    const lista = banco.filter(q => q.tipo === tipo);
+    if (!lista.length) return;
+    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+  }
+
+  function practicarArrastre() {
+    const lista = banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar");
+    if (!lista.length) return;
+    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+  }
+
+  function practicarCasos() {
+    const lista = banco.filter(q => q.caso);
+    if (!lista.length) return;
+    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+  }
+
+  function practicarVencidas() {
+    const lista = banco.filter(q => vencida(obtenerP(q.id)));
+    if (!lista.length) return;
+    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+  }
+
+  function preguntasReales() {
+    return banco.filter(q => q.real);
+  }
+
+  function irRepaso() {
+    const reales = preguntasReales();
+    $("repaso-n").textContent = reales.length;
+    $("repaso-list").innerHTML = reales.map((q, i) => {
+      const p = obtenerP(q.id);
+      const marca = (p.ok + p.fail) === 0 ? "·" : (p.lastOk ? "✔" : "✖");
+      const color = (p.ok + p.fail) === 0 ? "text-slate-500" : (p.lastOk ? "text-emerald-400" : "text-rose-400");
+      return '<div class="peor-row mb-2"><span class="text-slate-500 font-bold">P' + (i + 1) + '</span>' +
+        '<span class="flex-1 text-slate-300 leading-snug">' + escapar(q.q.length > 85 ? q.q.slice(0, 85) + "…" : q.q) + '</span>' +
+        '<span class="text-xs text-slate-400 hidden sm:inline">' + (TIPO_LABELS[q.tipo] || q.tipo) + '</span>' +
+        '<span class="' + color + ' font-bold">' + marca + '</span></div>';
+    }).join("");
+    show("repaso");
+  }
+
+  function iniciarRepasoQuiz() {
+    const reales = preguntasReales();
+    if (!reales.length) return;
+    startSession(reales.slice(), "repaso", false);
+  }
+
+  function flashcardsGarantizadas() {
+    const items = preguntasReales().map(it =>
+      it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: it.bloques.slice() }) : it
+    );
+    if (!items.length) return;
+    flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };
+    show("flashcards");
+    renderFlashcard();
+  }
+
+  function renderTiposPanel() {
+    const panel = $("tipos-panel");
+    if (!panel) return;
+    const conteos = {};
+    banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
+    panel.innerHTML = TIPOS.filter(t => conteos[t]).map(t =>
+      '<button class="chip" onclick="practicarTipo(\'' + t + '\')">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
+    ).join("");
+  }
+
+  function renderQuestion() {
+    const item = session.items[session.idx];
+    const n = session.items.length;
+    $("progress").textContent = "Pregunta " + (session.idx + 1) + " de " + n + " · " + Math.round(((session.idx + 1) / n) * 100) + "%";
+    const tb = $("topic-badge");
+    tb.textContent = item.tema;
+    tb.style.background = TOPIC_COLORS[item.tema] || "#3b82f6";
+    tb.style.color = "#0f172a";
+    $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · 🔥 real" : "");
+    const db = $("dif-badge");
+    const coloresDif = { facil: ["#065f46", "#a7f3d0"], media: ["#78350f", "#fde68a"], dificil: ["#881337", "#fecdd3"] };
+    const cd = coloresDif[item.dificultad] || ["#334155", "#e2e8f0"];
+    db.textContent = DIF_LABELS[item.dificultad] || "";
+    db.classList.remove("hidden");
+    db.style.background = cd[0];
+    db.style.color = cd[1];
+    $("progress-fill").style.width = ((session.idx / n) * 100) + "%";
+    actualizarEstrella(item.id);
+    const fb = $("feedback-box");
+    fb.style.display = "none";
+    fb.className = "feedback hidden";
+    $("next-btn").style.display = "none";
+    $("skip-btn").style.display = "inline-flex";
+
+    const area = $("question-area");
+    if (item.tipo === "dragdrop") renderDragdrop(item, area);
+    else if (item.tipo === "ordenar") renderOrdenar(item, area);
+    else if (item.tipo === "desarrollo") renderDesarrollo(item, area);
+    else if (item.tipo === "relacionar") renderRelacionar(item, area);
+    else if (item.tipo === "multi") renderMulti(item, area);
+    else renderOpciones(item, area);
+
+    animar(area);
+    if (item.tipo === "desarrollo" && session.modo === "simulacro") mostrarBotonSiguiente();
+  }
+
+  function renderOpciones(item, area) {
+    let html = bloqueCaso(item);
+    html += '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-4" id="question-text"></div>';
+    if (item.diagrama) html += diagramaER();
+    if (item.datos) html += tablaDatos(item.datos);
+    if (item.tipo === "codigo" && item.codigo) html += '<pre class="code-block mb-4" id="code-block"></pre>';
+    html += '<div class="flex flex-col gap-3" id="options-container"></div>';
+    area.innerHTML = html;
+    $("question-text").textContent = item.q;
+    if (item.tipo === "codigo" && item.codigo) $("code-block").innerHTML = resaltarSQL(item.codigo);
+    const cont = $("options-container");
+    item.options.forEach((opt, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "option";
+      const tecla = item.tipo === "vf" ? (/^verdad/i.test(opt) ? "V" : "F") : String(idx + 1);
+      btn.innerHTML = '<span class="opt-key">' + tecla + '</span><span>' + escapar(opt) + '</span>';
+      btn.onclick = () => responderOpcion(idx);
+      cont.appendChild(btn);
+    });
+  }
+
+  function responderOpcion(idx) {
+    if (session.answers[session.idx]) return;
+    const item = session.items[session.idx];
+    const buttons = document.querySelectorAll("#options-container .option");
+    buttons.forEach(b => b.disabled = true);
+    const ok = idx === item.correct;
+    if (ok) {
+      buttons[idx].classList.add("option-correct");
+    } else {
+      buttons[idx].classList.add("option-wrong");
+      buttons[item.correct].classList.add("option-correct");
+      buttons[idx].classList.add("shake");
+    }
+    session.answers[session.idx] = { ok, selected: item.options[idx], expected: item.options[item.correct] };
+    registrarRespuesta(item.id, ok);
+    mostrarResultadoPregunta(item, ok);
+  }
+
+  function renderMulti(item, area) {
+    session.multi = { item, sel: {}, bloqueado: false };
+    area.innerHTML =
+      bloqueCaso(item) +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-2" id="question-text"></div>' +
+      '<p class="text-xs text-sky-300 mb-3">☑ Seleccione una o más de una: marca todas las correctas y luego pulsa Comprobar.</p>' +
+      (item.diagrama ? diagramaER() : "") +
+      (item.datos ? tablaDatos(item.datos) : "") +
+      '<div class="flex flex-col gap-3 mt-4" id="multi-container"></div>' +
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-multi" onclick="comprobarMulti()">Comprobar</button></div>';
+    $("question-text").textContent = item.q;
+    pintarMulti();
+  }
+
+  function pintarMulti() {
+    const e = session.multi;
+    if (!e) return;
+    $("multi-container").innerHTML = e.item.options.map((opt, idx) => {
+      let clase = "option";
+      if (e.bloqueado) {
+        const esCorrecta = e.item.correctos.indexOf(idx) !== -1;
+        const estaSel = !!e.sel[idx];
+        if (esCorrecta) clase += " option-correct";
+        if (estaSel && !esCorrecta) clase += " option-wrong";
+      } else if (e.sel[idx]) {
+        clase += " pieza-sel";
+      }
+      return '<button class="' + clase + '" ' + (e.bloqueado ? "disabled" : "") + ' onclick="toggleMulti(' + idx + ')">' +
+        '<span class="opt-key">' + (e.sel[idx] ? "☑" : "☐") + '</span><span>' + escapar(opt) + '</span></button>';
+    }).join("");
+    const btn = $("btn-comprobar-multi");
+    if (btn) btn.disabled = e.bloqueado || Object.keys(e.sel).length === 0;
+  }
+
+  function toggleMulti(idx) {
+    const e = session.multi;
+    if (!e || e.bloqueado || session.answers[session.idx]) return;
+    if (e.sel[idx]) delete e.sel[idx];
+    else e.sel[idx] = true;
+    pintarMulti();
+  }
+
+  function comprobarMulti() {
+    const e = session.multi;
+    if (!e || e.bloqueado || session.answers[session.idx]) return;
+    const item = e.item;
+    const sel = Object.keys(e.sel).map(Number).sort((a, b) => a - b);
+    const ok = sel.length === item.correctos.length && sel.every((v, i) => v === item.correctos[i]);
+    e.bloqueado = true;
+    pintarMulti();
+    session.answers[session.idx] = {
+      ok,
+      selected: sel.length ? sel.map(i => item.options[i]).join(" + ") : "(ninguna)",
+      expected: item.correctos.map(i => item.options[i]).join(" + ")
+    };
+    registrarRespuesta(item.id, ok);
+    mostrarResultadoPregunta(item, ok);
+  }
+
+  function mostrarResultadoPregunta(item, ok) {
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' +
+        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — la respuesta era: <b>" + escapar(respuestaCorrecta(item)) + "</b>") +
+        '</div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function mostrarBotonSiguiente() {
+    const ultima = session.idx === session.items.length - 1;
+    const btn = $("next-btn");
+    btn.textContent = ultima ? (session.modo === "simulacro" ? "Finalizar simulacro" : "Ver resultados") : "Siguiente";
+    btn.style.display = "inline-flex";
+    $("skip-btn").style.display = "none";
+  }
+
+  function saltarPregunta() {
+    if (!session || session.answers[session.idx]) return;
+    const item = session.items[session.idx];
+    session.answers[session.idx] = { ok: false, skipped: true, selected: "(Sin responder)", expected: respuestaCorrecta(item) };
+    if (item.tipo === "dragdrop" && session.drag) {
+      session.drag.bloqueado = true;
+      pintarDragdrop();
+    } else if (item.tipo === "ordenar" && session.orden) {
+      session.orden.bloqueado = true;
+      pintarOrden();
+    } else if (item.tipo === "relacionar" && session.rel) {
+      session.rel.bloqueado = true;
+      pintarRelacionar();
+    } else if (item.tipo === "multi" && session.multi) {
+      session.multi.bloqueado = true;
+      pintarMulti();
+    } else if (item.tipo === "desarrollo" && session.desarrollo) {
+      session.desarrollo.evaluada = true;
+      const ev = $("dev-eval");
+      if (ev) ev.innerHTML = '<span class="text-xs text-slate-400">Pregunta saltada</span>';
+    }
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback feedback-neutro";
+      fb.innerHTML = '<div class="font-bold mb-2">⏭ Pregunta saltada — la respuesta era: <b>' + escapar(respuestaCorrecta(item)) + '</b></div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function next() {
+    if (!session) return;
+    const item = session.items[session.idx];
+    if (item.tipo === "desarrollo" && session.modo === "simulacro" && !session.answers[session.idx]) {
+      const ta = $("dev-texto");
+      const texto = ta ? ta.value : "";
+      session.answers[session.idx] = { ok: null, selected: texto || "(sin escribir)", expected: item.solucion, tipo: "desarrollo", texto };
+    }
+    if (session.idx < session.items.length - 1) {
+      session.idx++;
+      renderQuestion();
+    } else {
+      finalizar();
+    }
+  }
+
+  function salir() {
+    if (!confirm("¿Salir? Se perderá el avance de esta ronda.")) return;
+    clearTimer();
+    session = null;
+    $("pause-overlay").classList.add("hidden");
+    goHome();
+  }
+
+  function toggleMarcadaActual() {
+    const item = session.items[session.idx];
+    actualizarEstrella(item.id, toggleMarked(item.id));
+  }
+
+  function actualizarEstrella(id, estado) {
+    const marcada = typeof estado === "boolean" ? estado : obtenerP(id).marked;
+    const btn = $("star-btn");
+    btn.textContent = marcada ? "★" : "☆";
+    btn.classList.toggle("star-on", marcada);
+  }
+
+  function iniciarTimer(segundos) {
+    session.restante = segundos;
+    actualizarTimer();
+    session.timerId = setInterval(() => {
+      session.restante--;
+      actualizarTimer();
+      if (session.restante <= 0) {
+        clearTimer();
+        finalizar();
+      }
+    }, 1000);
+  }
+
+  function actualizarTimer() {
+    const m = Math.floor(session.restante / 60);
+    const s = session.restante % 60;
+    const badge = $("timer-badge");
+    badge.textContent = "⏱ " + m + ":" + String(s).padStart(2, "0");
+    badge.classList.toggle("timer-low", session.restante <= 60);
+  }
+
+  function clearTimer() {
+    if (session && session.timerId) {
+      clearInterval(session.timerId);
+      session.timerId = null;
+    }
+  }
+
+  function alternarPausa() {
+    if (!session || session.modo !== "simulacro" || session.finalizada) return;
+    session.pausado = !session.pausado;
+    $("pause-overlay").classList.toggle("hidden", !session.pausado);
+    $("pause-btn").textContent = session.pausado ? "▶" : "⏸";
+    if (session.pausado) {
+      clearTimer();
+    } else if (session.restante > 0) {
+      iniciarTimer(session.restante);
+    }
+  }
+
+  function bloqueCaso(item) {
+    return item.caso
+      ? '<div class="bg-amber-950/50 border-l-4 border-amber-500 rounded-xl p-3.5 text-xs sm:text-sm text-amber-100 leading-relaxed mb-4"><b>Caso técnico:</b> ' + escapar(item.caso) + '</div>'
+      : "";
+  }
+
+  function tablaDatos(datos) {
+    return datos.map(d =>
+      '<div class="my-3"><p class="text-xs font-bold text-slate-400 mb-1 font-mono">' + d.tabla + '</p>' +
+        '<div class="overflow-x-auto rounded-xl border border-slate-700"><table class="w-full text-xs">' +
+          '<thead><tr class="bg-slate-800">' + d.columnas.map(c => '<th class="px-3 py-1.5 text-left font-mono font-bold text-slate-300">' + c + '</th>').join("") + '</tr></thead>' +
+          '<tbody>' + d.filas.map(f => '<tr class="border-t border-slate-800">' + f.map(v => '<td class="px-3 py-1.5 font-mono">' + escapar(v) + '</td>').join("") + '</tr>').join("") + '</tbody>' +
+        '</table></div></div>'
+    ).join("");
+  }
+
+  function renderRelacionar(item, area) {
+    session.rel = {
+      item,
+      pares: item.pares,
+      derecha: item.derecha,
+      emparejados: new Array(item.pares.length).fill(false),
+      usadosDerecha: {},
+      seleccion: null,
+      errorIdx: null,
+      fallos: 0,
+      bloqueado: false
+    };
+    area.innerHTML =
+      bloqueCaso(item) +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+      (item.diagrama ? diagramaER() : "") +
+      (item.datos ? tablaDatos(item.datos) : "") +
+      '<p class="text-xs text-slate-400 mb-3">Toca un elemento de la izquierda y luego su pareja de la derecha.</p>' +
+      '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+        '<div id="match-izq" class="flex flex-col gap-2"></div>' +
+        '<div id="match-der" class="flex flex-col gap-2"></div>' +
+      '</div>';
+    pintarRelacionar();
+  }
+
+  function pintarRelacionar() {
+    const e = session.rel;
+    $("match-izq").innerHTML = e.pares.map((p, i) => {
+      let clase = "match-item";
+      if (e.emparejados[i]) clase += " match-ok";
+      else if (e.seleccion === i) clase += " match-sel";
+      return '<button class="' + clase + '" data-i="' + i + '" ' + (e.emparejados[i] || e.bloqueado ? "disabled" : "") + ' onclick="clickMatchIzq(' + i + ')">' + escapar(p[0]) + '</button>';
+    }).join("");
+    $("match-der").innerHTML = e.derecha.map(d => {
+      const usado = e.usadosDerecha[d.idx] !== undefined;
+      let clase = "match-item";
+      if (usado) clase += " match-ok";
+      if (e.errorIdx === d.idx) clase += " match-err";
+      return '<button class="' + clase + '" data-idx="' + d.idx + '" ' + (usado || e.bloqueado ? "disabled" : "") + ' onclick="clickMatchDer(' + d.idx + ')">' + escapar(d.texto) + '</button>';
+    }).join("");
+  }
+
+  function clickMatchIzq(i) {
+    const e = session.rel;
+    if (!e || e.bloqueado || e.emparejados[i] || session.answers[session.idx]) return;
+    e.seleccion = e.seleccion === i ? null : i;
+    e.errorIdx = null;
+    pintarRelacionar();
+  }
+
+  function clickMatchDer(idx) {
+    const e = session.rel;
+    if (!e || e.bloqueado || e.usadosDerecha[idx] !== undefined || e.seleccion === null || session.answers[session.idx]) return;
+    if (e.seleccion === idx) {
+      e.emparejados[e.seleccion] = true;
+      e.usadosDerecha[idx] = e.seleccion;
+      e.seleccion = null;
+      e.errorIdx = null;
+      pintarRelacionar();
+      if (e.emparejados.every(Boolean)) terminarRelacionar();
+    } else {
+      e.fallos++;
+      e.errorIdx = idx;
+      e.seleccion = null;
+      pintarRelacionar();
+    }
+  }
+
+  function terminarRelacionar() {
+    const e = session.rel;
+    if (!e || session.answers[session.idx] || e.bloqueado) return;
+    e.bloqueado = true;
+    const item = e.item;
+    const ok = e.fallos === 0;
+    pintarRelacionar();
+    session.answers[session.idx] = {
+      ok,
+      selected: item.pares.map(p => p[0] + " → " + p[1]).join(" | "),
+      expected: item.pares.map(p => p[0] + " → " + p[1]).join(" | ")
+    };
+    registrarRespuesta(item.id, ok);
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' + (ok ? "✅ ¡Todas las parejas correctas!" : "❌ Hubo " + e.fallos + " intento(s) fallido(s)") + '</div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function renderDragdrop(item, area) {
+    session.drag = {
+      item,
+      piezas: item.piezasRuntime,
+      slots: new Array(item.respuestas.length).fill(null),
+      seleccion: null,
+      resultado: null,
+      bloqueado: false
+    };
+    area.innerHTML =
+      bloqueCaso(item) +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+      (item.diagrama ? diagramaER() : "") +
+      (item.datos ? tablaDatos(item.datos) : "") +
+      '<p class="text-xs text-slate-400 mb-3">Arrastra cada pieza a su hueco, o toca una pieza y luego el hueco. Toca un hueco lleno para devolver la pieza.</p>' +
+      '<pre class="code-block" id="drag-code"></pre>' +
+      '<div id="piezas-pool" class="flex flex-wrap gap-2.5 mt-4 min-h-[44px]"></div>' +
+      '<p id="drag-contador" class="text-xs text-slate-400 mt-2"></p>' +
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar" disabled>Comprobar</button></div>';
+    const pre = $("drag-code");
+    pre.addEventListener("click", e => {
+      const h = e.target.closest(".hueco");
+      if (h) clickHueco(parseInt(h.dataset.slot, 10));
+    });
+    pre.addEventListener("dragover", e => {
+      if (!session.drag.bloqueado) e.preventDefault();
+    });
+    pre.addEventListener("drop", e => {
+      const h = e.target.closest(".hueco");
+      if (h && dragPid && !session.drag.bloqueado) {
+        e.preventDefault();
+        colocarPieza(dragPid, parseInt(h.dataset.slot, 10));
+        dragPid = null;
+      }
+    });
+    const pool = $("piezas-pool");
+    pool.addEventListener("click", e => {
+      const p = e.target.closest(".pieza");
+      if (p) clickPieza(p.dataset.pid);
+    });
+    $("btn-comprobar").onclick = () => comprobarDragdrop();
+    pintarDragdrop();
+  }
+
+  function piezaTexto(pid) {
+    const p = session.drag.piezas.find(x => x.pid === pid);
+    return p ? p.text : "";
+  }
+
+  function piezasUsadas() {
+    return session.drag.slots.filter(Boolean);
+  }
+
+  function pintarDragdrop() {
+    const estado = session.drag;
+    let html = resaltarSQL(estado.item.codigo);
+    html = html.replace(/\{(\d)\}/g, (m, n) => {
+      const i = parseInt(n, 10) - 1;
+      const pid = estado.slots[i];
+      let clase = "hueco";
+      if (pid) clase += " hueco-lleno";
+      if (estado.resultado) clase += estado.resultado[i] ? " hueco-ok" : " hueco-mal";
+      return '<span class="' + clase + '" data-slot="' + i + '">' + (pid ? escapar(piezaTexto(pid)) : "&nbsp;&nbsp;&nbsp;&nbsp;") + '</span>';
+    });
+    $("drag-code").innerHTML = html;
+    const usadas = piezasUsadas();
+    const pool = $("piezas-pool");
+    pool.innerHTML = estado.piezas.filter(p => usadas.indexOf(p.pid) === -1).map(p =>
+      '<div class="pieza' + (estado.seleccion === p.pid ? " pieza-sel" : "") + '" draggable="true" data-pid="' + p.pid + '" ondragstart="iniciarArrastre(event, \'' + p.pid + '\')">' + escapar(p.text) + '</div>'
+    ).join("") || '<span class="text-sm text-slate-400">Todas las piezas están colocadas.</span>';
+    const contador = $("drag-contador");
+    if (contador) {
+      contador.textContent = "Huecos: " + usadas.length + " / " + estado.slots.length + " · Piezas en la bandeja: " + (estado.piezas.length - usadas.length);
+    }
+    $("btn-comprobar").disabled = usadas.length !== estado.slots.length || estado.bloqueado;
+  }
+
+  function iniciarArrastre(event, pid) {
+    if (session.drag.bloqueado) return;
+    dragPid = pid;
+    event.dataTransfer.setData("text/plain", pid);
+  }
+
+  function clickPieza(pid) {
+    if (session.drag.bloqueado) return;
+    session.drag.seleccion = session.drag.seleccion === pid ? null : pid;
+    pintarDragdrop();
+  }
+
+  function clickHueco(i) {
+    if (session.drag.bloqueado) return;
+    const estado = session.drag;
+    if (estado.slots[i]) {
+      estado.slots[i] = null;
+      estado.seleccion = null;
+    } else if (estado.seleccion) {
+      colocarPieza(estado.seleccion, i);
+      return;
+    }
+    pintarDragdrop();
+  }
+
+  function colocarPieza(pid, i) {
+    const estado = session.drag;
+    estado.slots.forEach((s, j) => { if (s === pid) estado.slots[j] = null; });
+    estado.slots[i] = pid;
+    estado.seleccion = null;
+    pintarDragdrop();
+  }
+
+  function comprobarDragdrop() {
+    const estado = session.drag;
+    const item = estado.item;
+    if (session.answers[session.idx] || estado.bloqueado || piezasUsadas().length !== estado.slots.length) return;
+    const seleccion = estado.slots.map(pid => piezaTexto(pid));
+    const ok = seleccion.every((t, i) => t === item.respuestas[i]);
+    estado.bloqueado = true;
+    if (session.modo !== "simulacro") {
+      estado.resultado = estado.slots.map((pid, i) => piezaTexto(pid) === item.respuestas[i]);
+    }
+    pintarDragdrop();
+    session.answers[session.idx] = { ok, selected: seleccion.join(" / "), expected: item.respuestas.join(" / ") };
+    registrarRespuesta(item.id, ok);
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' +
+        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — el orden correcto era: <b>" + escapar(item.respuestas.join(" / ")) + "</b>") +
+        '</div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function renderOrdenar(item, area) {
+    session.orden = { item, orden: item.bloquesRuntime.slice(), resultado: null, bloqueado: false };
+    area.innerHTML =
+      bloqueCaso(item) +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+      (item.diagrama ? diagramaER() : "") +
+      (item.datos ? tablaDatos(item.datos) : "") +
+      '<p class="text-xs text-slate-400 mb-3">Usa ▲▼ o arrastra los bloques hasta lograr el orden correcto.</p>' +
+      '<div id="bloques" class="flex flex-col gap-2"></div>' +
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-orden" onclick="comprobarOrden()">Comprobar</button></div>';
+    pintarOrden();
+  }
+
+  function pintarOrden() {
+    const estado = session.orden;
+    $("bloques").innerHTML = estado.orden.map((texto, i) => {
+      let clase = "bloque";
+      if (estado.resultado) clase += estado.resultado[i] ? " bloque-ok" : " bloque-mal";
+      return '<div class="' + clase + '" draggable="' + (estado.bloqueado ? "false" : "true") + '" data-i="' + i + '" ondragstart="iniciarArrastreBloque(event,' + i + ')" ondragover="event.preventDefault()" ondrop="soltarBloque(event,' + i + ')">' +
+        '<div class="flex gap-1">' +
+          '<button class="btn-mini" onclick="moverBloque(' + i + ',-1)" ' + (i === 0 || estado.bloqueado ? "disabled" : "") + '>▲</button>' +
+          '<button class="btn-mini" onclick="moverBloque(' + i + ',1)" ' + (i === estado.orden.length - 1 || estado.bloqueado ? "disabled" : "") + '>▼</button>' +
+        '</div>' +
+        '<span class="flex-1 min-w-0">' + escapar(texto) + '</span>' +
+      '</div>';
+    }).join("");
+  }
+
+  function moverBloque(i, dir) {
+    const estado = session.orden;
+    if (estado.bloqueado) return;
+    const j = i + dir;
+    if (j < 0 || j >= estado.orden.length) return;
+    const tmp = estado.orden[i];
+    estado.orden[i] = estado.orden[j];
+    estado.orden[j] = tmp;
+    pintarOrden();
+  }
+
+  function iniciarArrastreBloque(event, i) {
+    if (session.orden.bloqueado) return;
+    dragBloqueIndex = i;
+    event.dataTransfer.setData("text/plain", String(i));
+  }
+
+  function soltarBloque(event, i) {
+    event.preventDefault();
+    const estado = session.orden;
+    if (estado.bloqueado || dragBloqueIndex === null || dragBloqueIndex === i) return;
+    const movido = estado.orden.splice(dragBloqueIndex, 1)[0];
+    estado.orden.splice(i, 0, movido);
+    dragBloqueIndex = null;
+    pintarOrden();
+  }
+
+  function comprobarOrden() {
+    const estado = session.orden;
+    if (!estado || session.answers[session.idx] || estado.bloqueado) return;
+    const item = estado.item;
+    const ok = estado.orden.every((t, i) => t === item.bloques[i]);
+    estado.bloqueado = true;
+    if (session.modo !== "simulacro") {
+      estado.resultado = estado.orden.map((t, i) => t === item.bloques[i]);
+    }
+    pintarOrden();
+    session.answers[session.idx] = { ok, selected: estado.orden.join(" → "), expected: item.bloques.join(" → ") };
+    registrarRespuesta(item.id, ok);
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' +
+        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — el orden correcto era:") +
+        '</div><ol class="list-decimal list-inside font-mono text-xs mb-3">' + item.bloques.map(b => "<li>" + escapar(b) + "</li>").join("") + '</ol><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function renderDesarrollo(item, area) {
+    session.desarrollo = { item, texto: "", revelada: false, evaluada: false };
+    area.innerHTML =
+      bloqueCaso(item) +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+      (item.diagrama ? diagramaER() : "") +
+      (item.datos ? tablaDatos(item.datos) : "") +
+      '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-blue-500 mb-4"></textarea>' +
+      '<div id="dev-solucion" class="hidden"></div>' +
+      '<div id="dev-eval" class="flex flex-wrap gap-3 mt-3"></div>' +
+      (session.modo === "simulacro" ? "" : '<div class="mt-3" id="dev-ver"><button class="btn btn-secondary" onclick="revelarSolucion()">Ver solución modelo</button></div>');
+    const ta = $("dev-texto");
+    ta.addEventListener("input", () => { if (session.desarrollo) session.desarrollo.texto = ta.value; });
+  }
+
+  function analizarClaves(item, texto) {
+    if (!item.claves || !item.claves.length) return "";
+    const t = String(texto || "").toUpperCase().replace(/\s+/g, " ");
+    const chips = item.claves.map(c => {
+      const ok = t.indexOf(c.toUpperCase()) !== -1;
+      return '<span class="tag ' + (ok ? "tag-ok" : "tag-bad") + '">' + (ok ? "✓ " : "✗ ") + escapar(c) + '</span>';
+    }).join(" ");
+    return '<div class="mt-3"><p class="text-xs text-slate-400 mb-2">Elementos que debería incluir tu respuesta:</p><div class="flex flex-wrap gap-2">' + chips + '</div></div>';
+  }
+
+  function revelarSolucion() {
+    const d = session.desarrollo;
+    if (!d || d.revelada) return;
+    d.revelada = true;
+    const cont = $("dev-solucion");
+    cont.innerHTML = '<p class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Solución modelo</p><pre class="code-block">' + resaltarSQL(d.item.solucion) + '</pre>' + analizarClaves(d.item, d.texto);
+    cont.classList.remove("hidden");
+    const btnVer = $("dev-ver");
+    if (btnVer) btnVer.classList.add("hidden");
+    $("dev-eval").innerHTML =
+      '<button class="btn btn-primary" onclick="autoevaluarDev(true)">Me acerqué</button>' +
+      '<button class="btn btn-secondary" onclick="autoevaluarDev(false)">No pude</button>';
+  }
+
+  function autoevaluarDev(ok) {
+    const d = session.desarrollo;
+    if (!d || d.evaluada || session.answers[session.idx]) return;
+    d.evaluada = true;
+    const item = d.item;
+    session.answers[session.idx] = { ok, selected: d.texto || "(sin escribir)", expected: item.solucion, tipo: "desarrollo" };
+    registrarRespuesta(item.id, ok);
+    $("dev-eval").innerHTML = '<span class="tag ' + (ok ? "tag-ok" : "tag-bad") + '">Autoevaluación: ' + (ok ? "Me acerqué" : "No pude") + '</span>';
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' + (ok ? "✅ ¡Bien!" : "❌ Sigue practicando") + '</div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
+  function finalizar() {
+    clearTimer();
+    if (!session) return;
+    session.finalizada = true;
+    const items = session.items;
+    const calificables = items.filter(it => it.tipo !== "desarrollo");
+    let aciertos = 0;
+    const porTema = {};
+    calificables.forEach(item => {
+      const i = items.indexOf(item);
+      const a = session.answers[i];
+      porTema[item.tema] = porTema[item.tema] || { ok: 0, total: 0 };
+      porTema[item.tema].total++;
+      if (a && a.ok) {
+        aciertos++;
+        porTema[item.tema].ok++;
+      }
+    });
+    const totalCal = calificables.length || 1;
+    const pct = Math.round((aciertos / totalCal) * 100);
+    const falladas = calificables.filter(item => {
+      const a = session.answers[items.indexOf(item)];
+      return !(a && a.ok);
+    });
+    const desarrollos = items.filter(it => it.tipo === "desarrollo");
+    const segundos = Math.max(0, Math.round((Date.now() - session.inicio) / 1000));
+    const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
+    session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
+    guardarIntento(aciertos, totalCal, session.modo);
+    pintarResultados(false);
+    show("results");
+  }
+
+  function respuestaHTML(item, texto, esCorrecta) {
+    if (item.tipo === "relacionar") {
+      return '<ul class="flex flex-col gap-1 text-xs sm:text-sm">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
+    }
+    if (item.tipo === "ordenar" && esCorrecta) {
+      return '<ol class="list-decimal list-inside font-mono text-xs flex flex-col gap-1">' + item.bloques.map(b => "<li>" + escapar(b) + "</li>").join("") + '</ol>';
+    }
+    if (item.tipo === "desarrollo") return '<pre class="code-block">' + escapar(texto) + '</pre>';
+    return '<span>' + escapar(texto) + '</span>';
+  }
+
+  function pintarResultados(verTodas) {
+    if (!session || !session.resultado) return;
+    const r = session.resultado;
+    const mensaje = r.aciertos === r.totalCal
+      ? "¡Perfecto! Dominas todos los conceptos."
+      : r.pct >= 70
+        ? "¡Muy bien! Repasa las fallas para afinar los detalles."
+        : "Buen intento. Lee las explicaciones y repite el repaso.";
+
+    const colorAnillo = r.pct >= 80 ? "#10b981" : r.pct >= 60 ? "#38bdf8" : r.pct >= 40 ? "#fbbf24" : "#f43f5e";
+    let html = '<div class="text-center mb-6">' +
+      '<div class="score-ring anim-in" style="--pct:' + r.pct + '; --ring-color:' + colorAnillo + '"><div class="score-ring-inner">' + r.pct + '%</div></div>' +
+      '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "repaso" ? " en el RepasoQuiz." : ".") + '</p>' +
+      (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +
+      '<p class="text-xs text-slate-400 mt-2">⏱ Tiempo: ' + r.tiempo + '</p>' +
+      '<p class="text-slate-400 mt-2 text-sm">' + mensaje + '</p>' +
+    '</div>';
+
+    html += '<h3 class="section-title">Desglose por tema</h3><div class="flex flex-col gap-2.5">' +
+      Object.keys(r.porTema).map(tema => {
+        const d = r.porTema[tema];
+        const p = Math.round((d.ok / d.total) * 100);
+        return '<div class="topic-row">' +
+          '<span class="text-slate-300">' + tema + '</span>' +
+          '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + p + '%; background:' + (TOPIC_COLORS[tema] || "#3b82f6") + '"></div></div>' +
+          '<span class="topic-score">' + d.ok + '/' + d.total + '</span>' +
+        '</div>';
+      }).join("") +
+    '</div>';
+
+    const lista = verTodas ? r.calificables : r.falladas;
+    if (lista.length) {
+      html += '<h3 class="section-title">' + (verTodas ? "Todas las preguntas (" + r.calificables.length + ")" : "Preguntas falladas (" + r.falladas.length + ")") + '</h3><div class="flex flex-col gap-3">';
+      lista.forEach(item => {
+        const i = r.items.indexOf(item);
+        const a = session.answers[i];
+        const ok = !!(a && a.ok);
+        html += '<div class="review-item ' + (ok ? "review-ok" : "review-bad") + '">' +
+          '<div class="font-semibold leading-relaxed mb-2">' + escapar(item.q) + '</div>' +
+          '<div class="flex items-start gap-2 text-sm mb-1.5"><span class="tag tag-bad mt-0.5">Tu respuesta</span><div class="flex-1 min-w-0">' + respuestaHTML(item, a ? a.selected : "Sin responder", false) + '</div></div>' +
+          (ok ? "" : '<div class="flex items-start gap-2 text-sm mb-1.5"><span class="tag tag-ok mt-0.5">Correcta</span><div class="flex-1 min-w-0">' + respuestaHTML(item, a ? a.expected : respuestaCorrecta(item), true) + '</div></div>') +
+          '<div class="mt-3 pt-3 border-t border-dashed border-slate-700 text-sm text-slate-300 leading-relaxed">' + item.exp + '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    if (r.desarrollos.length) {
+      html += '<h3 class="section-title">Preguntas de desarrollo</h3><div class="flex flex-col gap-3">';
+      r.desarrollos.forEach(item => {
+        const i = r.items.indexOf(item);
+        const a = session.answers[i] || {};
+        const pendiente = a.skipped || a.ok === null || a.ok === undefined;
+        html += '<div class="review-item review-bad">' +
+          '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+          '<div class="flex items-start gap-2 text-sm mb-2"><span class="tag tag-bad mt-0.5">Tu respuesta</span><div class="flex-1 min-w-0"><pre class="code-block">' + escapar(a.selected || "(sin escribir)") + '</pre></div></div>' +
+          '<div class="text-sm mb-2"><span class="tag tag-ok">Solución modelo</span></div>' +
+          '<pre class="code-block">' + resaltarSQL(item.solucion) + '</pre>' +
+          '<div class="mt-3 text-sm text-slate-300 leading-relaxed">' + item.exp + '</div>' +
+          '<div class="mt-3" id="eval-' + item.id + '">' +
+            (pendiente
+              ? '<p class="text-xs text-slate-400 mb-2">Autoevaluación (no afecta el puntaje):</p><div class="flex gap-3 flex-wrap"><button class="btn btn-primary btn-sm" onclick="autoevaluarResultado(\'' + item.id + '\', true)">Me acerqué</button><button class="btn btn-secondary btn-sm" onclick="autoevaluarResultado(\'' + item.id + '\', false)">No pude</button></div>'
+              : '<span class="tag ' + (a.ok ? "tag-ok" : "tag-bad") + '">Autoevaluación: ' + (a.ok ? "Me acerqué" : "No pude") + '</span>') +
+          '</div>' +
+        '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
+      (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" onclick="repetirFalladas()">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
+      (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" onclick="pintarResultados(' + !verTodas + ')">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
+      '<button class="btn btn-secondary w-full sm:w-auto" onclick="repetirMisma()">Repetir ronda</button>' +
+      '<button class="btn btn-ghost w-full sm:w-auto" onclick="goHome()">Inicio</button>' +
+    '</div>';
+
+    $("screen-results").innerHTML = html;
+    animar($("screen-results"));
+  }
+
+  function autoevaluarResultado(id, ok) {
+    const i = session.items.findIndex(it => it.id === id);
+    if (i >= 0 && session.answers[i]) session.answers[i].ok = ok;
+    registrarRespuesta(id, ok);
+    const cont = $("eval-" + id);
+    if (cont) cont.innerHTML = '<span class="tag ' + (ok ? "tag-ok" : "tag-bad") + '">Autoevaluación: ' + (ok ? "Me acerqué" : "No pude") + '</span>';
+  }
+
+  function repetirFalladas() {
+    if (session && session.resultado && session.resultado.falladas.length) {
+      startSession(session.resultado.falladas, "practica", false);
+    }
+  }
+
+  function repetirMisma() {
+    startSession(session.items, session.modo, session.modo === "simulacro");
+  }
+
+  function guardarIntento(score, total, modo) {
+    const historial = cargarHistorial();
+    historial.unshift({ date: Date.now(), score, total, modo: modo || "practica" });
+    localStorage.setItem(KEY_HISTORIAL, JSON.stringify(historial.slice(0, 15)));
+  }
+
+  function renderHistory() {
+    const historial = cargarHistorial();
+    const box = $("history-section");
+    if (!historial.length) {
+      box.innerHTML = '<p class="text-sm text-slate-400">Aún no hay intentos registrados. ¡Empieza con una práctica o el simulacro!</p>';
+      return;
+    }
+    const mejor = Math.max.apply(null, historial.map(h => h.score / h.total));
+    box.innerHTML = historial.slice(0, 6).map(h => {
+      const pct = Math.round((h.score / h.total) * 100);
+      const d = new Date(h.date);
+      const fecha = d.toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) +
+        " · " + d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
+      const esRepaso = h.modo === "repaso";
+      const esSim = h.modo === "simulacro" || esRepaso;
+      const modo = esRepaso ? "RepasoQuiz" : esSim ? "Simulacro" : "Práctica";
+      return '<div class="history-row' + (h.score / h.total === mejor ? " history-best" : "") + '">' +
+        '<span class="text-slate-400">' + fecha + '</span>' +
+        '<span class="tag tag-' + (esSim ? "simulacro" : "practica") + ' hidden sm:inline-flex">' + modo + '</span>' +
+        '<span>' + h.score + '/' + h.total + '</span>' +
+        '<span class="text-sky-400 font-bold">' + pct + '%</span>' +
+      '</div>';
+    }).join("");
+  }
+
+  function tarjetaStat(valor, etiqueta, color) {
+    return '<div class="stat-card"><div class="stat-value" style="color:' + (color || "#38bdf8") + '">' + valor + '</div><div class="stat-label">' + etiqueta + '</div></div>';
+  }
+
+  function renderStats() {
+    if (!banco.length) return;
+    let ok = 0, fail = 0, respondidas = 0, debiles = 0;
+    banco.forEach(q => {
+      const p = obtenerP(q.id);
+      ok += p.ok;
+      fail += p.fail;
+      if (p.ok + p.fail > 0) respondidas++;
+      if (esDebil(p)) debiles++;
+    });
+    const precision = (ok + fail) ? Math.round((ok / (ok + fail)) * 100) : 0;
+    const historial = cargarHistorial();
+    const mejor = historial.length ? Math.max.apply(null, historial.map(h => Math.round((h.score / h.total) * 100))) : null;
+    const racha = calcularRacha();
+    const hoy = cargarActividad()[hoyISO()] || 0;
+    const meta = metaDiaria();
+    const pctMeta = Math.min(100, Math.round((hoy / meta) * 100));
+
+    let html = '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">' +
+      tarjetaStat(precision + "%", "Precisión global", "#38bdf8") +
+      tarjetaStat(respondidas + " / " + banco.length, "Respondidas", "#a78bfa") +
+      tarjetaStat(racha + " 🔥", "Racha (días)", "#fbbf24") +
+      tarjetaStat(mejor === null ? "—" : mejor + "%", "Mejor puntaje", "#34d399") +
+    '</div>';
+
+    html += '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5">' +
+      '<div class="flex items-center justify-between gap-3 flex-wrap">' +
+        '<span class="text-sm font-semibold text-slate-300">🎯 Meta de hoy</span>' +
+        '<label class="text-xs text-slate-400 flex items-center gap-2">meta diaria:' +
+          '<input id="meta-input" type="number" min="1" value="' + meta + '" onchange="cambiarMeta(this.value)" class="stat-input">' +
+        '</label>' +
+      '</div>' +
+      '<div class="progress-track mt-3 mb-2"><div class="progress-fill" style="width:' + pctMeta + '%"></div></div>' +
+      '<p class="text-xs text-slate-400">' + hoy + ' de ' + meta + ' preguntas hoy · racha de ' + racha + ' día(s) · ' + debiles + ' débil(es) por repasar</p>' +
+    '</div>';
+
+    html += '<h3 class="section-title">Evolución</h3>' +
+      '<div id="grafica-wrap" class="hidden"><canvas id="grafica" class="w-full h-48 bg-slate-900 border border-slate-700 rounded-xl"></canvas></div>' +
+      '<p id="grafica-vacia" class="text-sm text-slate-400">Completa al menos 2 rondas para ver tu evolución.</p>';
+
+    const temas = [...new Set(banco.map(q => q.tema))];
+    let hayAvance = false;
+    let filas = "";
+    temas.forEach(t => {
+      const qs = banco.filter(q => q.tema === t);
+      let tOk = 0, tFail = 0;
+      qs.forEach(q => { const p = obtenerP(q.id); tOk += p.ok; tFail += p.fail; });
+      if (tOk + tFail > 0) hayAvance = true;
+      const pct = (tOk + tFail) ? Math.round((tOk / (tOk + tFail)) * 100) : 0;
+      filas += '<div class="topic-row">' +
+        '<span class="text-slate-300">' + t + '</span>' +
+        '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + pct + '%; background:' + (TOPIC_COLORS[t] || "#3b82f6") + '"></div></div>' +
+        '<span class="topic-score">' + pct + '%</span>' +
+      '</div>';
+    });
+    html += '<h3 class="section-title">Avance por tema</h3>' +
+      (hayAvance ? '<div class="flex flex-col gap-2.5">' + filas + '</div>' : '<p class="text-sm text-slate-400">Responde preguntas para ver tu avance.</p>');
+
+    let filasDif = "";
+    ["facil", "media", "dificil"].forEach(d => {
+      const qs = banco.filter(q => q.dificultad === d);
+      let tOk = 0, tFail = 0;
+      qs.forEach(q => { const p = obtenerP(q.id); tOk += p.ok; tFail += p.fail; });
+      const pctD = (tOk + tFail) ? Math.round((tOk / (tOk + tFail)) * 100) : 0;
+      const color = d === "facil" ? "#34d399" : d === "media" ? "#fbbf24" : "#f87171";
+      filasDif += '<div class="topic-row">' +
+        '<span class="text-slate-300">' + (DIF_LABELS[d] || d) + '</span>' +
+        '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + pctD + '%; background:' + color + '"></div></div>' +
+        '<span class="topic-score">' + pctD + '%</span>' +
+      '</div>';
+    });
+    html += '<h3 class="section-title">Avance por dificultad</h3>' +
+      (hayAvance ? '<div class="flex flex-col gap-2.5">' + filasDif + '</div>' : '<p class="text-sm text-slate-400">Responde preguntas para ver tu avance.</p>');
+
+    const peores = banco.map(q => ({ q, fail: obtenerP(q.id).fail })).filter(x => x.fail > 0).sort((a, b) => b.fail - a.fail).slice(0, 5);
+    if (peores.length) {
+      html += '<h3 class="section-title">Más falladas</h3><div class="flex flex-col gap-2">';
+      peores.forEach(x => {
+        html += '<div class="peor-row"><span class="flex-1 text-slate-300 leading-snug">' + escapar(x.q.length > 95 ? x.q.slice(0, 95) + "…" : x.q) + '</span><span class="text-rose-300 font-bold whitespace-nowrap">' + x.fail + ' fallo' + (x.fail > 1 ? "s" : "") + '</span></div>';
+      });
+      html += '</div>';
+    }
+
+    $("stats-panel").innerHTML = html;
+    const nParciales = new Set(banco.map(q => q.parcial)).size;
+    $("stat-total").textContent = banco.length;
+    $("stat-parciales").textContent = nParciales;
+    $("stat-parciales-txt").textContent = nParciales === 1 ? "parcial" : "parciales";
+    $("stat-temas").textContent = new Set(banco.map(q => q.tema)).size;
+    const vencidasCount = banco.filter(q => vencida(obtenerP(q.id))).length;
+    const btnVencidas = $("btn-vencidas");
+    if (btnVencidas) {
+      btnVencidas.classList.toggle("hidden", !vencidasCount);
+      btnVencidas.textContent = "⏰ Repaso espaciado (" + vencidasCount + ")";
+    }
+    $("btn-debiles").classList.toggle("hidden", !debiles);
+    dibujarGrafica();
+  }
+
+  function dibujarGrafica() {
+    const canvas = $("grafica");
+    const wrap = $("grafica-wrap");
+    const vacia = $("grafica-vacia");
+    if (!canvas) return;
+    const historial = cargarHistorial().slice(0, 12).reverse();
+    if (historial.length < 2) {
+      if (wrap) wrap.classList.add("hidden");
+      if (vacia) vacia.classList.remove("hidden");
+      return;
+    }
+    if (wrap) wrap.classList.remove("hidden");
+    if (vacia) vacia.classList.add("hidden");
+    const dpr = window.devicePixelRatio || 1;
+    const ancho = canvas.clientWidth || 600;
+    const alto = 180;
+    canvas.width = ancho * dpr;
+    canvas.height = alto * dpr;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, ancho, alto);
+    const pad = 32;
+    const datos = historial.map(h => Math.round((h.score / h.total) * 100));
+    const x = i => pad + (i * (ancho - pad * 2)) / (datos.length - 1);
+    const y = v => alto - pad - (v / 100) * (alto - pad * 2);
+    ctx.font = "10px sans-serif";
+    [0, 50, 100].forEach(v => {
+      ctx.strokeStyle = "#334155";
+      ctx.beginPath();
+      ctx.moveTo(pad, y(v));
+      ctx.lineTo(ancho - pad, y(v));
+      ctx.stroke();
+      ctx.fillStyle = "#64748b";
+      ctx.fillText(v + "%", 4, y(v) + 3);
+    });
+    ctx.strokeStyle = "#38bdf8";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    datos.forEach((v, i) => { i ? ctx.lineTo(x(i), y(v)) : ctx.moveTo(x(i), y(v)); });
+    ctx.stroke();
+    ctx.fillStyle = "#38bdf8";
+    datos.forEach((v, i) => {
+      ctx.beginPath();
+      ctx.arc(x(i), y(v), 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function goHome() {
+    show("start");
+    renderStats();
+    renderHistory();
+    renderTiposPanel();
+    renderTip();
+  }
+
+  function startStudy() {
+    estudioTipo = "todos";
+    estudioSoloReales = false;
+    renderStudy("");
+    const search = $("study-search");
+    if (search) search.value = "";
+    renderStudyFiltros();
+    show("study");
+  }
+
+  function toggleEstudioReales() {
+    estudioSoloReales = !estudioSoloReales;
+    renderStudy($("study-search").value);
+    renderStudyFiltros();
+  }
+
+  function estudioGarantizadas() {
+    startStudy();
+    estudioSoloReales = true;
+    renderStudy("");
+    renderStudyFiltros();
+  }
+
+  function renderStudyFiltros() {
+    const cont = $("study-filtros");
+    if (!cont) return;
+    const tipos = ["todos"].concat(TIPOS);
+    let html = tipos.map(t => {
+      const etiqueta = t === "todos" ? "Todos" : (TIPO_LABELS[t] || t);
+      const cuenta = t === "todos" ? banco.length : banco.filter(q => q.tipo === t).length;
+      return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" onclick="cambiarEstudioTipo(\'' + t + '\')">' + etiqueta + ' · ' + cuenta + '</button>';
+    }).join("");
+    const nReales = banco.filter(q => q.real).length;
+    if (nReales) {
+      html += '<button class="chip' + (estudioSoloReales ? " chip-on" : "") + '" onclick="toggleEstudioReales()">🔥 Garantizadas · ' + nReales + '</button>';
+    }
+    cont.innerHTML = html;
+  }
+
+  function cambiarEstudioTipo(tipo) {
+    estudioTipo = tipo;
+    renderStudy($("study-search").value);
+    renderStudyFiltros();
+  }
+
+  function respuestaEstudio(item) {
+    if (item.tipo === "dragdrop") return '<div class="study-answer">' + escapar(item.respuestas.join("  |  ")) + '</div>';
+    if (item.tipo === "relacionar") return '<ul class="flex flex-col gap-1 text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
+    if (item.tipo === "ordenar") return '<ol class="list-decimal list-inside flex flex-col gap-1 font-mono text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.bloques.map(b => '<li>' + escapar(b) + '</li>').join("") + '</ol>';
+    if (item.tipo === "desarrollo") return '<pre class="code-block mb-3">' + resaltarSQL(item.solucion) + '</pre>';
+    if (item.tipo === "multi") {
+      return '<div class="flex flex-col gap-2 mb-3">' + item.options.map((o, j) => {
+        const esOk = item.correctos.indexOf(j) !== -1;
+        return '<div class="study-option' + (esOk ? " study-option-ok" : "") + '">' + (esOk ? "✔ " : "✗ ") + escapar(o) + '</div>';
+      }).join("") + '</div>';
+    }
+    return '<div class="flex flex-col gap-2 mb-3">' + item.options.map((o, j) => '<div class="study-option' + (j === item.correct ? " study-option-ok" : "") + '">' + escapar(o) + '</div>').join("") + '</div>';
+  }
+
+  function renderStudy(filtro) {
+    const f = String(filtro || "").trim().toLowerCase();
+    const lista = banco.filter(item => {
+      if (estudioTipo !== "todos" && item.tipo !== estudioTipo) return false;
+      if (estudioSoloReales && !item.real) return false;
+      if (!f) return true;
+      const campos = [item.q, item.exp || "", item.codigo || "", item.tema, item.parcial, item.caso || "", (item.options || []).join(" "), (item.respuestas || []).join(" "), (item.bloques || []).join(" "), item.solucion || "", (item.pares || []).map(p => p[0] + " " + p[1]).join(" "), (item.claves || []).join(" ")];
+      return campos.join(" ").toLowerCase().includes(f);
+    });
+    $("study-list").innerHTML = lista.map(item => {
+      const marcada = obtenerP(item.id).marked;
+      const codigo = item.codigo && item.tipo === "dragdrop" ? item.codigo.replace(/\{\d\}/g, "____") : item.codigo;
+      return '<div class="study-item" id="study-' + item.id + '">' +
+        '<div class="flex items-center justify-between gap-2 flex-wrap mb-2">' +
+          '<div class="flex items-center gap-2 flex-wrap">' +
+            '<span class="badge" style="background:' + (TOPIC_COLORS[item.tema] || "#3b82f6") + '; color:#0f172a">' + item.tema + '</span>' +
+            '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + (item.real ? ' · <b class="text-amber-300">🔥 garantizada</b>' : "") + '</span>' +
+          '</div>' +
+          '<button class="star-btn' + (marcada ? " star-on" : "") + '" onclick="toggleMarcadaEstudio(\'' + item.id + '\')">' + (marcada ? "★" : "☆") + '</button>' +
+        '</div>' +
+        bloqueCaso(item) +
+        '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
+        (item.diagrama ? diagramaER() : "") +
+        (item.datos ? tablaDatos(item.datos) : "") +
+        (codigo && item.tipo !== "dragdrop" ? '<pre class="code-block mb-3">' + resaltarSQL(codigo) + '</pre>' : "") +
+        (codigo && item.tipo === "dragdrop" ? '<pre class="code-block mb-3">' + resaltarSQL(codigo) + '</pre>' : "") +
+        '<div class="oculto">' + respuestaEstudio(item) + '<div class="study-exp">' + item.exp + '</div></div>' +
+        '<button class="btn btn-secondary btn-sm mt-3" onclick="toggleStudy(this)">Mostrar respuesta</button>' +
+      '</div>';
+    }).join("") || '<p class="text-sm text-slate-400">Sin resultados para esa búsqueda.</p>';
+    const contador = $("study-count");
+    if (contador) contador.textContent = lista.length + " pregunta(s) encontradas";
+  }
+
+  function toggleStudy(btn) {
+    const item = btn.closest(".study-item");
+    const revealed = item.classList.toggle("revealed");
+    btn.textContent = revealed ? "Ocultar respuesta" : "Mostrar respuesta";
+  }
+
+  function toggleMarcadaEstudio(id) {
+    toggleMarked(id);
+    renderStudy($("study-search").value);
+  }
+
+  let glosarioCat = "todas";
+
+  function renderTip() {
+    const cont = $("tip-dia");
+    if (!cont) return;
+    if (!glosario.tips || !glosario.tips.length) { cont.innerHTML = ""; return; }
+    const tip = glosario.tips[Math.floor(Math.random() * glosario.tips.length)];
+    cont.innerHTML = '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 text-sm text-slate-300 leading-relaxed"><b class="text-amber-300">💡 Tip:</b> ' + tip + '</div>';
+  }
+
+  function startGlosario() {
+    glosarioCat = "todas";
+    renderGlosario("");
+    const s = $("glosario-search");
+    if (s) s.value = "";
+    renderGlosarioFiltros();
+    show("glosario");
+  }
+
+  function renderGlosarioFiltros() {
+    const cont = $("glosario-filtros");
+    if (!cont) return;
+    const cats = [{ id: "todas", corto: "Todas", nombre: "Todas" }].concat(glosario.categorias);
+    cont.innerHTML = cats.map(c => {
+      const cuenta = c.id === "todas" ? glosario.terminos.length : glosario.terminos.filter(t => t.categoria === c.id).length;
+      return '<button class="chip' + (glosarioCat === c.id ? " chip-on" : "") + '" onclick="cambiarGlosarioCat(\'' + c.id + '\')">' + (c.corto || c.nombre) + ' · ' + cuenta + '</button>';
+    }).join("");
+  }
+
+  function cambiarGlosarioCat(id) {
+    glosarioCat = id;
+    const s = $("glosario-search");
+    renderGlosario(s ? s.value : "");
+    renderGlosarioFiltros();
+  }
+
+  function renderGlosario(filtro) {
+    const f = String(filtro || "").trim().toLowerCase();
+    const lista = glosario.terminos.filter(t =>
+      (glosarioCat === "todas" || t.categoria === glosarioCat) &&
+      (!f || (t.termino + " " + t.definicion + " " + (t.ejemplo || "")).toLowerCase().includes(f))
+    );
+    $("glosario-list").innerHTML = lista.map(t => {
+      const cat = glosario.categorias.find(c => c.id === t.categoria) || { nombre: t.categoria, color: "#3b82f6" };
+      return '<div class="glosario-item mb-3">' +
+        '<div class="flex items-center gap-2 flex-wrap mb-1.5">' +
+          '<span class="badge" style="background:' + cat.color + ';color:#0f172a">' + escapar(cat.nombre) + '</span>' +
+          '<span class="font-bold text-sky-300 font-mono">' + escapar(t.termino) + '</span>' +
+        '</div>' +
+        '<p class="text-sm text-slate-300 leading-relaxed">' + escapar(t.definicion) + '</p>' +
+        (t.ejemplo ? '<pre class="code-block mt-2.5">' + resaltarSQL(t.ejemplo) + '</pre>' : '') +
+      '</div>';
+    }).join("") || '<p class="text-sm text-slate-400">Sin resultados para esa búsqueda.</p>';
+    const cont = $("glosario-count");
+    if (cont) cont.textContent = lista.length + " término(s)";
+  }
+
+  function startFlashcards() {
+    const items = ordenarPrioridad(banco).map(it =>
+      it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: shuffle(it.bloques) }) : it
+    );
+    flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };
+    show("flashcards");
+    renderFlashcard();
+  }
+
+  function renderFlashcard() {
+    if (!flash) return;
+    const cont = $("flash-area");
+    if (flash.idx >= flash.items.length) {
+      cont.innerHTML =
+        '<div class="flash-card text-center">' +
+          '<div class="text-4xl mb-3">🎉</div>' +
+          '<h2 class="text-xl font-bold mb-2">Ronda de flashcards terminada</h2>' +
+          '<p class="text-slate-300 mb-1">✅ Sabías: <b>' + flash.aciertos + '</b></p>' +
+          '<p class="text-slate-300 mb-6">❌ No sabías: <b>' + flash.fallos + '</b></p>' +
+          '<div class="flex flex-wrap gap-3 justify-center">' +
+            '<button class="btn btn-primary" onclick="startFlashcards()">Otra ronda</button>' +
+            '<button class="btn btn-ghost" onclick="goHome()">Inicio</button>' +
+          '</div>' +
+        '</div>';
+      return;
+    }
+    const item = flash.items[flash.idx];
+    let frente = bloqueCaso(item) + '<div class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-3">' + item.parcial + ' · ' + item.tema + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + '</div>' +
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed">' + escapar(item.q) + '</div>';
+    if (item.datos) frente += tablaDatos(item.datos);
+    if (item.codigo && item.tipo === "codigo") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo) + '</pre>';
+    if (item.codigo && item.tipo === "dragdrop") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo.replace(/\{\d\}/g, "____")) + '</pre>';
+    if (item.tipo === "ordenar") frente += '<div class="mt-4 flex flex-col gap-2">' + (item.frenteOrden || shuffle(item.bloques)).map(b => '<div class="bloque">' + escapar(b) + '</div>').join("") + '</div>';
+
+    let reves = "";
+    if (flash.volteada) {
+      reves = '<hr class="border-slate-700 my-4">' + respuestaEstudio(item) + '<div class="study-exp">' + item.exp + '</div>';
+    }
+
+    cont.innerHTML =
+      '<div class="flex items-center justify-between mb-4 flex-wrap gap-2 text-sm text-slate-400">' +
+        '<span>Tarjeta ' + (flash.idx + 1) + ' de ' + flash.items.length + '</span>' +
+        '<span>✅ ' + flash.aciertos + ' · ❌ ' + flash.fallos + '</span>' +
+      '</div>' +
+      '<div class="flash-card">' + frente + reves + '</div>' +
+      '<div class="mt-5 flex flex-col sm:flex-row gap-3">' +
+        (flash.volteada
+          ? '<button class="btn btn-primary flex-1" onclick="responderFlash(true)">Sabía</button>' +
+            '<button class="btn btn-secondary flex-1" onclick="responderFlash(false)">No sabía</button>'
+          : '<button class="btn btn-primary flex-1" onclick="voltearFlash()">Voltear</button>') +
+        '<button class="btn btn-ghost" onclick="saltarFlash()">Saltar</button>' +
+      '</div>';
+  }
+
+  function voltearFlash() {
+    flash.volteada = true;
+    renderFlashcard();
+  }
+
+  function responderFlash(ok) {
+    const item = flash.items[flash.idx];
+    registrarRespuesta(item.id, ok);
+    if (ok) flash.aciertos++;
+    else flash.fallos++;
+    flash.idx++;
+    flash.volteada = false;
+    renderFlashcard();
+  }
+
+  function saltarFlash() {
+    flash.idx++;
+    flash.volteada = false;
+    renderFlashcard();
+  }
+
+  document.addEventListener("keydown", e => {
+    if ($("screen-quiz").classList.contains("hidden") || !session) return;
+    const item = session.items[session.idx];
+    const answered = !!session.answers[session.idx];
+    if (answered) {
+      if (e.key === "Enter") next();
+      return;
+    }
+    if (item.tipo === "multi") {
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= item.options.length) toggleMulti(n - 1);
+      return;
+    }
+    if (!["multiple", "vf", "codigo"].includes(item.tipo)) return;
+    if (item.tipo === "vf") {
+      const k = e.key.toLowerCase();
+      if (k === "v" || k === "f") {
+        const j = item.options.findIndex(o => (/^verdad/i.test(o) ? "v" : "f") === k);
+        if (j >= 0) responderOpcion(j);
+        return;
+      }
+    }
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= item.options.length) responderOpcion(n - 1);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && session && session.modo === "simulacro" && !session.pausado && !session.finalizada) {
+      alternarPausa();
+    }
+  });
+
+  if (!window.tailwind) {
+    $("sin-estilos").style.display = "block";
+  }
+
+  if (banco.length) {
+    inicializarFiltros();
+    renderConfig();
+    renderStats();
+    renderHistory();
+    renderTiposPanel();
+    renderTip();
+  }
+</script>
+</body>
+</html>
