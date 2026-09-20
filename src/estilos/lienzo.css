@@ -7,6 +7,7 @@
 #lienzo-diagrama { position: relative; width: 100%; min-height: 320px; border: 1px solid var(--study-border); border-radius: 12px; background: var(--study-surface); overflow: hidden; touch-action: none; }
 #edges-diagrama { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 #edges-diagrama line { stroke: var(--study-accent); stroke-width: 2; }
+#edges-diagrama .flecha-punta { fill: var(--study-accent); }
 .nodo-puesto { position: absolute; min-width: 96px; max-width: 180px; background: var(--study-surface-2); border: 2px solid var(--study-border); border-radius: 8px; padding: 8px 22px 8px 10px; font-size: 0.85rem; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; color: var(--study-text); }
 .nodo-puesto.seleccionado { border-color: var(--study-accent); box-shadow: 0 0 0 2px rgba(155, 184, 201, 0.35); }
 .nodo-fijo { border-style: solid; background: var(--study-surface-3); }

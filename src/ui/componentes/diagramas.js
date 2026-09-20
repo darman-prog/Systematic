@@ -550,6 +550,7 @@ export function crearDiagramasUI({
     const lienzo = $("lienzo-diagrama");
     if (!svg || !lienzo || !est) return;
     svg.innerHTML = "";
+    inyectarMarcador();
     lienzo.querySelectorAll(".etiqueta-arista").forEach(el => el.remove());
     const dirigido = esDirigido((item || {}).subtipo);
     const mapa = {};
@@ -593,18 +594,17 @@ export function crearDiagramasUI({
     if (h) h.textContent = texto;
   }
 
+  // Inyecta (una vez por render) el marker de punta de flecha usado por los subtipos
+  // dirigidos. Debe llamarse tras crear o limpiar el SVG (ver dibujarAristas).
   function inyectarMarcador() {
     const svg = $("edges-diagrama");
     if (!svg || svg.querySelector("#flecha-diagrama")) return;
-    svg.innerHTML =
+    svg.insertAdjacentHTML(
+      "afterbegin",
       '<defs><marker id="flecha-diagrama" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto">' +
-      '<path d="M0,0 L8,4 L0,8 z" fill="#9BB8C9"></path></marker></defs>';
+      '<path d="M0,0 L8,4 L0,8 z" class="flecha-punta"></path></marker></defs>'
+    );
   }
-
-  function exponerAPI() {
-    inyectarMarcador();
-  }
-  exponerAPI();
 
   return {
     renderDiagrama,

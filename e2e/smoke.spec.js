@@ -208,15 +208,21 @@ test.describe('Systematic — smoke', () => {
     // Verifica que hay miembros en el pool (para UML clases)
     const miembrosPool = page.locator('#pool-miembros .pieza');
     const numMiembros = await miembrosPool.count();
+    // Coloca dos nodos (la conexión dirigida requiere un par).
+    await page.locator('#pool-diagrama .pieza').first().click();
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
     if (numMiembros > 0) {
-      // Coloca al menos un nodo
-      await page.locator('#pool-diagrama .pieza').first().click();
-      await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
       // Asigna un miembro al nodo
       await miembrosPool.first().click();
       await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
       await expect(page.locator('#lienzo-diagrama .nodo-miembros')).toBeVisible();
     }
+    await page.locator('#pool-diagrama .pieza').first().click();
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(2);
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
+    await page.locator('#lienzo-diagrama .nodo-puesto').nth(1).click();
+    await page.locator('#tipos-diagrama [data-arista="herencia"]').click();
+    await expect(page.locator('#edges-diagrama line[marker-end="url(#flecha-diagrama)"]')).toHaveCount(1);
     // Comprueba: no debe romper y debe mostrar detalle legible (nombres, no "[object Object]").
     await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
     await expect(page.locator('#feedback-box')).toBeVisible();
