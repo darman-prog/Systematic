@@ -4,7 +4,7 @@ import {
   aplicarRespuesta, esDebil, vencida, metaDiaria, hoyISO, calcularRacha
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
-import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros } from "./core/gamificacion.js";
+import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros, multiplicadorSupervivencia, xpContrarreloj } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/quiz.js";
@@ -83,7 +83,23 @@ function registrarRespuesta(id, ok) {
   progreso[id] = aplicarRespuesta(obtenerP(id), ok);
   guardarProgreso();
   registrarActividad();
-  const ganado = xpDeRespuesta(ok, progreso[id]);
+  let ganado = xpDeRespuesta(ok, progreso[id]);
+  if (session && session.modo === "contrarreloj") {
+    clearTimerPregunta();
+    if (ok) ganado = xpContrarreloj(true, Date.now() - session.preguntaInicio, ganado);
+  }
+  if (session && session.modo === "supervivencia") {
+    if (ok) {
+      session.combo++;
+      session.mejorCombo = Math.max(session.mejorCombo, session.combo);
+      ganado = Math.round(ganado * multiplicadorSupervivencia(session.combo));
+    } else {
+      session.vidas--;
+      session.combo = 0;
+      if (session.vidas <= 0) session.gameOver = true;
+      quiz.pintarVidas();
+    }
+  }
   if (ganado) sumarXp(ganado);
   const metaCumplida = (cargarActividad()[hoyISO()] || 0) >= cargarMeta();
   if (metaCumplida) xpEventoUnico("meta-" + hoyISO(), XP_EVENTOS.metaDiaria);
@@ -419,20 +435,60 @@ function irConfig() {
 
 // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/sesiones.js (testeables).
 
+// Timer por pregunta del modo Contrarreloj (spec 003): 30s o fallo.
+function iniciarTimerPregunta() {
+  if (!session || session.modo !== "contrarreloj") return;
+  session.tRestante = session.tPorPregunta;
+  session.preguntaInicio = Date.now();
+  actualizarTimerPregunta();
+  session.timerPreguntaId = setInterval(() => {
+    session.tRestante--;
+    actualizarTimerPregunta();
+    if (session.tRestante <= 0) {
+      clearTimerPregunta();
+      quiz.expirarPregunta();
+    }
+  }, 1000);
+}
+
+function actualizarTimerPregunta() {
+  const badge = $("timer-pregunta");
+  if (!badge) return;
+  badge.textContent = "⚡ " + Math.max(0, session.tRestante) + "s";
+  badge.classList.toggle("timer-low", session.tRestante <= 10);
+}
+
+function clearTimerPregunta() {
+  if (session && session.timerPreguntaId) {
+    clearInterval(session.timerPreguntaId);
+    session.timerPreguntaId = null;
+  }
+}
+
 function startSession(items, modo, conTimer) {
   clearTimer();
+  clearTimerPregunta();
   if (!items || !items.length) return;
   const barajar = modo !== "repaso";
   const preparadas = items.map(it => prepararItem(it, barajar));
   session = { items: preparadas, idx: 0, answers: {}, modo, inicio: Date.now(), finalizada: false, pausado: false };
+  if (modo === "contrarreloj") { session.tPorPregunta = 30; session.tRestante = 30; }
+  if (modo === "supervivencia") { session.vidas = 3; session.combo = 0; session.mejorCombo = 0; }
   show("quiz");
   $("timer-badge").classList.toggle("hidden", !conTimer);
   $("simulacro-badge").classList.toggle("hidden", modo !== "simulacro");
   $("repaso-badge").classList.toggle("hidden", modo !== "repaso");
+  const mb = $("modo-badge");
+  mb.textContent = modo === "contrarreloj" ? "⚡ Contrarreloj" : modo === "supervivencia" ? "❤️ Supervivencia" : "";
+  mb.classList.toggle("hidden", !mb.textContent);
+  $("vidas-badge").classList.toggle("hidden", modo !== "supervivencia");
+  $("timer-pregunta").classList.toggle("hidden", modo !== "contrarreloj");
   $("pause-btn").classList.toggle("hidden", modo !== "simulacro");
   $("pause-overlay").classList.add("hidden");
   quiz.renderQuestion();
+  if (modo === "supervivencia") quiz.pintarVidas();
   if (conTimer) iniciarTimer(20 * 60);
+  if (modo === "contrarreloj") iniciarTimerPregunta();
 }
 
 function comenzarPractica() {
@@ -448,6 +504,18 @@ function comenzarSimulacro() {
   if (!qs.length) return;
   const lista = shuffle(qs).slice(0, Math.min(10, qs.length));
   startSession(lista, "simulacro", true);
+}
+
+function startContrarreloj() {
+  // El desarrollo se autoevalúa sin prisa: se excluye del modo contrarreloj.
+  const lista = shuffle(banco.filter(q => q.tipo !== "desarrollo")).slice(0, 10);
+  if (!lista.length) return;
+  startSession(lista, "contrarreloj", false);
+}
+
+function startSupervivencia() {
+  if (!banco.length) return;
+  startSession(shuffle(banco), "supervivencia", false);
 }
 
 function practicarDebiles() {
@@ -523,17 +591,19 @@ function next() {
     const texto = ta ? ta.value : "";
     session.answers[session.idx] = { ok: null, selected: texto || "(sin escribir)", expected: item.solucion, tipo: "desarrollo", texto };
   }
-  if (session.idx < session.items.length - 1) {
-    session.idx++;
-    quiz.renderQuestion();
-  } else {
+  if (session.gameOver || session.idx >= session.items.length - 1) {
     finalizar();
+    return;
   }
+  session.idx++;
+  quiz.renderQuestion();
+  if (session.modo === "contrarreloj") iniciarTimerPregunta();
 }
 
 function salir() {
   if (!confirm("¿Salir? Se perderá el avance de esta ronda.")) return;
   clearTimer();
+  clearTimerPregunta();
   session = null;
   $("pause-overlay").classList.add("hidden");
   goHome();
@@ -607,6 +677,9 @@ function finalizar() {
   const segundos = Math.max(0, Math.round((Date.now() - session.inicio) / 1000));
   const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
   session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
+  if (session.modo === "supervivencia") {
+    session.resultado.supervivencia = { jugadas: Object.keys(session.answers).length, mejorCombo: session.mejorCombo || 0 };
+  }
   guardarIntento(aciertos, totalCal, session.modo);
   revisarLogros({
     simulacroPerfecto: totalCal > 0 && pct === 100 && (session.modo === "simulacro" || session.modo === "repaso")
@@ -843,7 +916,9 @@ const ACCIONES = {
   responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
   revelarSolucion: () => quiz.revelarSolucion(),
   saltarFlash: () => flashcards.saltarFlash(),
-  saltarPregunta: () => quiz.saltarPregunta(),
+  saltarPregunta: () => { quiz.saltarPregunta(); if (session && session.modo === "contrarreloj") clearTimerPregunta(); },
+  startContrarreloj: () => startContrarreloj(),
+  startSupervivencia: () => startSupervivencia(),
   salir: () => salir(),
   seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
   startApuntes: () => startApuntes(),

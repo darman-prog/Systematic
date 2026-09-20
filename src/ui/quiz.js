@@ -169,11 +169,33 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
 
   function mostrarBotonSiguiente() {
     const session = ctx.session;
-    const ultima = session.idx === session.items.length - 1;
+    const ultima = session.gameOver || session.idx === session.items.length - 1;
     const btn = $("next-btn");
     btn.textContent = ultima ? (session.modo === "simulacro" ? "Finalizar simulacro" : "Ver resultados") : "Siguiente";
     btn.style.display = "inline-flex";
     $("skip-btn").style.display = "none";
+  }
+
+  // Indicador de vidas y combo del modo Supervivencia.
+  function pintarVidas() {
+    const session = ctx.session;
+    const badge = $("vidas-badge");
+    if (!badge || !session || session.modo !== "supervivencia") return;
+    badge.textContent = "❤️".repeat(Math.max(0, session.vidas)) + " · combo " + session.combo;
+  }
+
+  // Fin del tiempo en Contrarreloj: cuenta como fallo y revela la respuesta.
+  function expirarPregunta() {
+    const session = ctx.session;
+    if (!session || session.finalizada || session.answers[session.idx]) return;
+    const item = session.items[session.idx];
+    session.answers[session.idx] = { ok: false, timeout: true, selected: "(Tiempo agotado)", expected: respuestaCorrecta(item) };
+    registrarRespuesta(item.id, false);
+    const fb = $("feedback-box");
+    fb.className = "feedback feedback-bad";
+    fb.innerHTML = '<div class="font-bold mb-2">⏱ Tiempo agotado — la respuesta era: <b>' + escapar(respuestaCorrecta(item)) + "</b></div><div>" + item.exp + "</div>";
+    fb.style.display = "block";
+    mostrarBotonSiguiente();
   }
 
   function saltarPregunta() {
@@ -632,6 +654,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     soltarBloque,
     comprobarOrden,
     revelarSolucion,
-    autoevaluarDev
+    autoevaluarDev,
+    pintarVidas,
+    expirarPregunta
   };
 }

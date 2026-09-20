@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { XP_EVENTOS, xpDeRespuesta, nivelDe, progresoDeNivel, evaluarLogros } from "./gamificacion.js";
+import { XP_EVENTOS, xpDeRespuesta, nivelDe, progresoDeNivel, evaluarLogros, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./gamificacion.js";
 
 describe("xpDeRespuesta", () => {
   it("premia el acierto completo en preguntas nuevas", () => {
@@ -42,6 +42,46 @@ describe("niveles", () => {
   });
 });
 
+describe("multiplicadorSupervivencia", () => {
+  it("escala el XP con el combo", () => {
+    expect(multiplicadorSupervivencia(0)).toBe(1);
+    expect(multiplicadorSupervivencia(2)).toBe(1);
+    expect(multiplicadorSupervivencia(3)).toBe(1.5);
+    expect(multiplicadorSupervivencia(5)).toBe(1.5);
+    expect(multiplicadorSupervivencia(6)).toBe(2);
+    expect(multiplicadorSupervivencia(10)).toBe(3);
+    expect(multiplicadorSupervivencia(15)).toBe(3);
+  });
+});
+
+describe("xpContrarreloj", () => {
+  it("duplica las respuestas rápidas", () => {
+    expect(xpContrarreloj(true, 5000, 10)).toBe(20);
+  });
+
+  it("mantiene la base con 10s o más", () => {
+    expect(xpContrarreloj(true, 10000, 10)).toBe(10);
+    expect(xpContrarreloj(true, 15000, 10)).toBe(10);
+  });
+
+  it("no premia el fallo ni tiempos inválidos", () => {
+    expect(xpContrarreloj(false, 3000, 10)).toBe(0);
+    expect(xpContrarreloj(true, 0, 10)).toBe(10);
+  });
+});
+
+describe("estrellasDeMision", () => {
+  it("asigna estrellas por umbrales de precisión", () => {
+    expect(estrellasDeMision(0)).toBe(0);
+    expect(estrellasDeMision(49)).toBe(0);
+    expect(estrellasDeMision(50)).toBe(1);
+    expect(estrellasDeMision(74)).toBe(1);
+    expect(estrellasDeMision(75)).toBe(2);
+    expect(estrellasDeMision(99)).toBe(2);
+    expect(estrellasDeMision(100)).toBe(3);
+  });
+});
+
 describe("evaluarLogros", () => {
   const base = { racha: 0, respuestas: 0, precision: 0, simulacroPerfecto: false, metaCumplida: false };
 
@@ -60,6 +100,12 @@ describe("evaluarLogros", () => {
   it("desbloquea simulacro perfecto y meta cumplida", () => {
     expect(evaluarLogros({}, { ...base, simulacroPerfecto: true }).map(l => l.id)).toEqual(["simulacro-perfecto"]);
     expect(evaluarLogros({}, { ...base, metaCumplida: true }).map(l => l.id)).toEqual(["meta-cumplida"]);
+  });
+
+  it("desbloquea misiones perfectas y colección de estrellas", () => {
+    expect(evaluarLogros({}, { ...base, misionPerfecta: true }).map(l => l.id)).toEqual(["mision-perfecta"]);
+    expect(evaluarLogros({}, { ...base, estrellasTotales: 10 }).map(l => l.id)).toEqual(["coleccionista"]);
+    expect(evaluarLogros({}, { ...base, estrellasTotales: 9 })).toEqual([]);
   });
 
   it("no vuelve a desbloquear logros ya obtenidos", () => {

@@ -35,6 +35,16 @@
         <span class="font-bold">RepasoQuiz — Preguntas garantizadas</span>
         <span class="text-xs text-amber-200/90">Las preguntas reales de parciales anteriores. Mismo orden y redacción del examen.</span>
       </button>
+      <button class="mode-card" data-action="startContrarreloj">
+        <span class="text-2xl">⚡</span>
+        <span class="font-bold">Contrarreloj</span>
+        <span class="text-xs text-slate-400">10 preguntas · 30 segundos cada una</span>
+      </button>
+      <button class="mode-card" data-action="startSupervivencia">
+        <span class="text-2xl">❤️</span>
+        <span class="font-bold">Supervivencia</span>
+        <span class="text-xs text-slate-400">3 vidas · encadena aciertos y multiplica tu XP</span>
+      </button>
       <button class="mode-card" data-action="irConfig">
         <span class="text-2xl">🎯</span>
         <span class="font-bold">Configurar práctica</span>
@@ -131,6 +141,9 @@
       <span class="badge hidden bg-amber-900 text-amber-200" id="timer-badge">20:00</span>
       <span class="badge hidden bg-violet-700 text-violet-100" id="simulacro-badge">Simulacro</span>
       <span class="badge hidden bg-amber-600 text-white" id="repaso-badge">🔥 RepasoQuiz garantizadas</span>
+      <span class="badge hidden bg-slate-700" id="modo-badge"></span>
+      <span class="badge hidden bg-rose-900 text-rose-100" id="vidas-badge"></span>
+      <span class="badge hidden bg-sky-900 text-sky-100" id="timer-pregunta">⚡ 30s</span>
       <span class="ml-auto flex items-center gap-1">
         <button class="star-btn" id="star-btn" data-action="toggleMarcadaActual" title="Marcar pregunta" aria-label="Marcar pregunta">☆</button>
         <button class="btn btn-ghost btn-sm hidden" id="pause-btn" data-action="alternarPausa" title="Pausar" aria-label="Pausar simulacro">⏸</button>

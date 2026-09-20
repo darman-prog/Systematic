@@ -67,6 +67,22 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#apuntes-count')).toContainText('0 apunte(s)');
   });
 
+  test('contrarreloj y supervivencia inician con sus indicadores', async ({ page }) => {
+    await page.on('dialog', d => d.accept());
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click();
+    await page.getByRole('button', { name: /Contrarreloj/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    await expect(page.locator('#modo-badge')).toContainText('Contrarreloj');
+    await expect(page.locator('#timer-pregunta')).toBeVisible();
+    await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
+    await expect(page.locator('#screen-start')).toBeVisible();
+    await page.getByRole('button', { name: /Supervivencia/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    await expect(page.locator('#modo-badge')).toContainText('Supervivencia');
+    await expect(page.locator('#vidas-badge')).toContainText('❤️');
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();
