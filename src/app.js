@@ -534,9 +534,9 @@ function jugarCaso(id) {
 function comprobarCaso() {
   if (!casoActual || !casoEstado) return;
   const res = evaluarDiagrama(casoActual.diagrama, casoEstado);
-  let rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
-  // Misma vara que el quiz: un diagrama con elementos de más no puede ser "éxito".
-  if (res.sobrantes > 0 && rating === "exito") rating = "parcial";
+  // Vara deliberadamente indulgente (decisión en spec 003): el rating de casos es por
+  // porcentaje (≥80 éxito) y no exige exactitud total como el quiz, para no castigar el tanteo.
+  const rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
   const resultado = { rating, detalle: res };
   
   // Guardar resultado

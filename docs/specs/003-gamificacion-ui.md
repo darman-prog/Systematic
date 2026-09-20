@@ -92,6 +92,10 @@ construcción: tipos esperados con acentos distintos a los que ofrece el lienzo
 con texto repetido que colapsaban en una sola clave (ASW-031/032, CASO-ASW-01/02), guardas
 ofrecidas por el modal que no incluían las declaradas (CASO-ISW-02) y `nodosFijos` dentro del
 pool. Se corrigió el motor (comparación normalizada y detalle por nombre), el validador
-(tipos ofrecidos, miembros únicos, fijos fuera del pool), los datos y el feedback de quiz/casos;
-el rating de casos ahora penaliza sobrantes como el quiz. Cobertura: unitarios que resuelven
-cada diagrama/caso real tal como lo ofrece el lienzo.
+(tipos ofrecidos, miembros únicos, fijos fuera del pool), los datos y el feedback de quiz/casos.
+Cobertura: unitarios que resuelven cada diagrama/caso real tal como lo ofrece el lienzo.
+
+Decisión de producto: el rating del modo Casos es deliberadamente indulgente — se calcula por
+porcentaje (`≥80` éxito, `≥50` parcial) y **no** exige exactitud total como el quiz ni penaliza
+elementos sobrantes, para no castigar el tanteo en un modo de exploración guiada. Los sobrantes
+sí aparecen en el detalle para que el estudiante los corrija.
