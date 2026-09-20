@@ -446,7 +446,7 @@ const preguntas = [
     q: "Modela un sistema de archivos: una clase Carpeta que contiene múltiples Archivos. La Carpeta gestiona el ciclo de vida de los Archivos (si eliminas la carpeta, se eliminan los archivos). Usa composición.",
     nodosPool: ["Carpeta", "Archivo"],
     miembrosPool: [
-      { texto: "tamano", de: "Archivo" },
+      { texto: "tamaño", de: "Archivo" },
       { texto: "extension", de: "Archivo" },
       { texto: "nombre", de: "Carpeta" },
       { texto: "agregarArchivo()", de: "Carpeta" }
@@ -463,10 +463,10 @@ const preguntas = [
     dificultad: "dificil",
     tipo: "diagrama",
     subtipo: "uml-clases",
-    q: "Modela el patrón Composite para un sistema de archivos: una interfaz comun Componente con metodo tamano(), una clase Archivo (hoja) que implementa Componente, y una clase Carpeta (compuesto) que contiene una lista de Componentes y también implementa Componente.",
+    q: "Modela el patrón Composite para un sistema de archivos: una interfaz común Componente con método tamaño(), una clase Archivo (hoja) que implementa Componente, y una clase Carpeta (compuesto) que contiene una lista de Componentes y también implementa Componente.",
     nodosPool: ["Componente", "Archivo", "Carpeta"],
     miembrosPool: [
-      { texto: "tamano()", de: "Componente" },
+      { texto: "tamaño()", de: "Componente" },
       { texto: "peso: int", de: "Archivo" },
       { texto: "hijos: Componente[]", de: "Carpeta" },
       { texto: "agregar()", de: "Carpeta" }
