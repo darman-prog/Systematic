@@ -5,6 +5,7 @@ import {
   TIPOS, TIPO_LABELS, DIF_LABELS,
   bloqueCaso, colorTema, diagramaER, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
@@ -47,7 +48,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
     }).join("");
     const nReales = ctx.banco.filter(q => q.real).length;
     if (nReales) {
-      html += '<button class="chip' + (estudioSoloReales ? " chip-on" : "") + '" data-action="toggleEstudioReales">🔥 Garantizadas · ' + nReales + '</button>';
+      html += '<button class="chip flex items-center gap-1.5' + (estudioSoloReales ? " chip-on" : "") + '" data-action="toggleEstudioReales">' + icono("llama", "icono-sm") + ' Garantizadas · ' + nReales + '</button>';
     }
     cont.innerHTML = html;
   }
@@ -75,7 +76,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
         '<div class="flex items-center justify-between gap-2 flex-wrap mb-2">' +
           '<div class="flex items-center gap-2 flex-wrap">' +
             '<span class="badge" style="background:' + colorTema(ctx.materia, item.tema) + '; color:#0f172a">' + item.tema + '</span>' +
-            '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + (item.real ? ' · <b class="text-amber-300">🔥 garantizada</b>' : "") + '</span>' +
+            '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + (item.real ? ' · <b class="text-amber-300">garantizada</b>' : "") + '</span>' +
           '</div>' +
           '<button class="star-btn' + (marcada ? " star-on" : "") + '" data-action="toggleMarcadaEstudio" data-id="' + item.id + '">' + (marcada ? "★" : "☆") + '</button>' +
         '</div>' +

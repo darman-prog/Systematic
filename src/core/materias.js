@@ -1,4 +1,4 @@
-// Registro de materias de la app. El contenido vive en src/datos/<materia>/.
+﻿// Registro de materias de la app. El contenido vive en src/datos/<materia>/.
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import bd2Glosario from "../datos/bd2/glosario.js";
 import bd2Escenarios from "../datos/bd2/escenarios.js";
@@ -19,7 +19,7 @@ export const MATERIAS = [
   {
     id: "bd2",
     nombre: "Base de Datos 2",
-    icono: "🗄️",
+    icono: "datos",
     descripcion: "SQL, modelado, índices, integridad y consultas.",
     color: "#9BB8C9",
     preguntas: bd2Preguntas,
@@ -33,7 +33,7 @@ export const MATERIAS = [
   {
     id: "isw",
     nombre: "Ingeniería de Software",
-    icono: "📋",
+    icono: "apuntes",
     descripcion: "Procesos, Scrum, requerimientos y diseño de software.",
     color: "#B5A9CF",
     preguntas: iswPreguntas,
@@ -45,7 +45,7 @@ export const MATERIAS = [
   {
     id: "asw",
     nombre: "Arquitectura de Software",
-    icono: "🏛️",
+    icono: "escenarios",
     descripcion: "POO, principios de diseño, SOLID y patrones.",
     color: "#9FBEA9",
     preguntas: aswPreguntas,

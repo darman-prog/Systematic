@@ -19,6 +19,15 @@ import { pintarListaEscenarios, pintarEscenario } from "./ui/escenarios.js";
 import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/diagramas.js";
 import { crearDiagramasUI } from "./ui/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/casos.js";
+import { icono } from "./ui/iconos.js";
+
+// Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
+function pintarIconos(raiz) {
+  (raiz || document).querySelectorAll("[data-icono]").forEach(el => {
+    el.outerHTML = icono(el.dataset.icono, el.getAttribute("class") || "");
+  });
+}
+pintarIconos();
 
 // Materia activa y datos asociados (se definen al seleccionar materia en el home).
 let materia = null;
@@ -207,7 +216,7 @@ function sumarXp(cantidad) {
   escribirJSON(localStorage, "sys.xp", nuevo);
   const despues = progresoDeNivel(nuevo);
   if (despues.nivel > antes.nivel) {
-    toast("🌟 ¡Nivel " + despues.nivel + " alcanzado!");
+    toast(icono("nivel", "icono-sm") + " ¡Nivel " + despues.nivel + " alcanzado!");
     confeti();
   }
   renderPerfil();
@@ -266,7 +275,7 @@ function revisarLogros(extra) {
   if (!nuevos.length) return;
   nuevos.forEach(l => {
     actuales[l.id] = l.fecha;
-    toast(l.icono + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)");
+    toast(icono(l.icono, "icono-sm") + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)");
   });
   escribirJSON(localStorage, "sys.logros", actuales);
   sumarXp(nuevos.length * XP_EVENTOS.logro);
@@ -285,7 +294,7 @@ function renderPerfil() {
       '<div class="perfil-datos">' +
         '<div class="text-sm"><b>' + xp + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
         '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
-        '<div class="perfil-mini">🔥 Racha: ' + racha + ' día(s) · 🏅 ' + insignias + ' logro(s) desbloqueado(s)</div>' +
+        '<div class="perfil-mini">Racha: ' + racha + ' día(s) · ' + insignias + ' logro(s) desbloqueado(s)</div>' +
       '</div>' +
     '</div>';
 }
@@ -300,7 +309,7 @@ function toast(mensaje) {
   const el = document.createElement("div");
   el.className = "toast";
   el.setAttribute("role", "status");
-  el.textContent = mensaje;
+  el.innerHTML = mensaje;
   zona.appendChild(el);
   setTimeout(() => el.classList.add("toast-out"), 2800);
   setTimeout(() => el.remove(), 3300);
@@ -466,7 +475,7 @@ function iniciarTimerPregunta() {
 function actualizarTimerPregunta() {
   const badge = $("timer-pregunta");
   if (!badge) return;
-  badge.textContent = "⚡ " + Math.max(0, session.tRestante) + "s";
+  badge.innerHTML = icono("rayo", "icono-sm") + "<span>" + Math.max(0, session.tRestante) + "s</span>";
   badge.classList.toggle("timer-low", session.tRestante <= 10);
 }
 
@@ -491,8 +500,12 @@ function startSession(items, modo, conTimer) {
   $("simulacro-badge").classList.toggle("hidden", modo !== "simulacro");
   $("repaso-badge").classList.toggle("hidden", modo !== "repaso");
   const mb = $("modo-badge");
-  mb.textContent = modo === "contrarreloj" ? "⚡ Contrarreloj" : modo === "supervivencia" ? "❤️ Supervivencia" : "";
-  mb.classList.toggle("hidden", !mb.textContent);
+  mb.innerHTML = modo === "contrarreloj"
+    ? icono("contrarreloj", "icono-sm") + "<span>Contrarreloj</span>"
+    : modo === "supervivencia"
+      ? icono("supervivencia", "icono-sm") + "<span>Supervivencia</span>"
+      : "";
+  mb.classList.toggle("hidden", !mb.innerHTML);
   $("vidas-badge").classList.toggle("hidden", modo !== "supervivencia");
   $("timer-pregunta").classList.toggle("hidden", modo !== "contrarreloj");
   $("pause-btn").classList.toggle("hidden", modo !== "simulacro");
@@ -767,7 +780,7 @@ function actualizarTimer() {
   const m = Math.floor(session.restante / 60);
   const s = session.restante % 60;
   const badge = $("timer-badge");
-  badge.textContent = "⏱ " + m + ":" + String(s).padStart(2, "0");
+  badge.innerHTML = icono("reloj", "icono-sm") + "<span>" + m + ":" + String(s).padStart(2, "0") + "</span>";
   badge.classList.toggle("timer-low", session.restante <= 60);
 }
 
@@ -782,7 +795,7 @@ function alternarPausa() {
   if (!session || session.modo !== "simulacro" || session.finalizada) return;
   session.pausado = !session.pausado;
   $("pause-overlay").classList.toggle("hidden", !session.pausado);
-  $("pause-btn").textContent = session.pausado ? "▶" : "⏸";
+  $("pause-btn").innerHTML = icono(session.pausado ? "seguir" : "pausa", "icono-sm");
   if (session.pausado) {
     clearTimer();
   } else if (session.restante > 0) {
@@ -883,8 +896,8 @@ function renderMaterias() {
     const detalles = pendiente
       ? "Contenido en preparación"
       : n + " preguntas" + (m.glosario.terminos.length ? " · " + m.glosario.terminos.length + " términos" : "");
-    return '<button class="mode-card" data-action="seleccionarMateria" data-materia="' + m.id + '" style="border-left:4px solid ' + m.color + '">' +
-      '<span class="text-2xl">' + m.icono + '</span>' +
+    return '<button class="materia-card" data-action="seleccionarMateria" data-materia="' + m.id + '" style="border-left:4px solid ' + m.color + '">' +
+      '<span class="icono icono-lg text-slate-300">' + icono(m.icono) + '</span>' +
       '<span class="font-bold">' + m.nombre + '</span>' +
       '<span class="text-xs text-slate-400">' + m.descripcion + '</span>' +
       '<span class="text-xs ' + (pendiente ? "text-amber-300" : "text-emerald-300") + '">' + detalles + '</span>' +
@@ -918,11 +931,14 @@ function seleccionarMateria(id) {
 function renderMateriaUI() {
   document.title = materia.nombre + " — Systematic";
   const nombre = $("materia-nombre");
-  const icono = $("materia-icono");
+  const iconoSpan = $("materia-icono");
   if (nombre) nombre.textContent = materia.nombre;
-  if (icono) icono.textContent = materia.icono;
+  if (iconoSpan) {
+    iconoSpan.classList.add("icono", "icono-lg");
+    iconoSpan.innerHTML = icono(materia.icono);
+  }
   const gloTitulo = $("glosario-titulo");
-  if (gloTitulo) gloTitulo.textContent = "📚 Glosario";
+  if (gloTitulo) gloTitulo.textContent = "Glosario";
   const cardRepaso = $("card-repaso");
   if (cardRepaso) cardRepaso.classList.toggle("hidden", !banco.some(q => q.real));
 }

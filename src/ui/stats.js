@@ -3,6 +3,7 @@
 // callback `obtenerP`, historial, actividad y meta ya normalizada); no lee localStorage.
 import { calcularRacha, esDebil, hoyISO, vencida } from "../core/progreso.js";
 import { DIF_LABELS, colorTema, escapar } from "./helpers.js";
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
@@ -40,7 +41,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
     $("stat-total").textContent = "0";
     $("stat-parciales").textContent = "0";
     $("stat-temas").textContent = "0";
-    $("stats-panel").innerHTML = '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5 text-sm text-amber-200">🚧 Contenido en preparación: esta materia todavía no tiene preguntas. Vuelve pronto.</div>';
+    $("stats-panel").innerHTML = '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5 text-sm text-amber-200 flex items-center gap-2">' + icono("aviso", "icono-sm") + '<span>Contenido en preparación: esta materia todavía no tiene preguntas. Vuelve pronto.</span></div>';
     const bd = $("btn-debiles");
     const bv = $("btn-vencidas");
     if (bd) bd.classList.add("hidden");
@@ -64,13 +65,13 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
   let html = '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">' +
     tarjetaStat(precision + "%", "Precisión global", "#38bdf8") +
     tarjetaStat(respondidas + " / " + banco.length, "Respondidas", "#a78bfa") +
-    tarjetaStat(racha + " 🔥", "Racha (días)", "#fbbf24") +
+    tarjetaStat(String(racha), "Racha (días)", "#fbbf24") +
     tarjetaStat(mejor === null ? "—" : mejor + "%", "Mejor puntaje", "#34d399") +
   '</div>';
 
   html += '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5">' +
     '<div class="flex items-center justify-between gap-3 flex-wrap">' +
-      '<span class="text-sm font-semibold text-slate-300">🎯 Meta de hoy</span>' +
+      '<span class="text-sm font-semibold text-slate-300">Meta de hoy</span>' +
       '<label class="text-xs text-slate-400 flex items-center gap-2">meta diaria:' +
         '<input id="meta-input" type="number" min="1" value="' + meta + '" class="stat-input">' +
       '</label>' +
@@ -138,7 +139,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
   const btnVencidas = $("btn-vencidas");
   if (btnVencidas) {
     btnVencidas.classList.toggle("hidden", !vencidasCount);
-    btnVencidas.textContent = "⏰ Repaso espaciado (" + vencidasCount + ")";
+    btnVencidas.textContent = "Repaso espaciado (" + vencidasCount + ")";
   }
   $("btn-debiles").classList.toggle("hidden", !debiles);
   dibujarGrafica(historial);

@@ -3,6 +3,7 @@
 // callbacks ({ guardarEstado, alComprobar }). Funciona con mouse y toque (Pointer Events +
 // tap-tap); no lee localStorage ni importa datos de materias.
 import { escapar, bloqueCaso } from "./helpers.js";
+import { icono } from "./iconos.js";
 import {
   CONFIG_SUBTIPO, esDirigido, crearTablero, colocarNodo, quitarNodo,
   asignarMiembro, conectar, quitarConexion
@@ -99,12 +100,12 @@ export function crearDiagramasUI({
       '<div id="tipos-diagrama" class="flex flex-wrap gap-2.5 mt-2 items-center" hidden>' +
         "<span>Tipo:</span>" +
         tiposDe(item).map(t => '<button class="pieza" data-arista="' + escapar(t) + '">' + escapar(t) + "</button>").join("") +
-        '<button class="btn-mini" data-action="' + accionCancelarTipo + '">✕</button>' +
+        '<button class="btn-mini" data-action="' + accionCancelarTipo + '" aria-label="Cancelar selección">' + icono("cruz", "icono-sm") + "</button>" +
       "</div>" +
       '<p id="hint-diagrama" class="text-xs text-slate-400 mt-2" role="status"></p>' +
       (resultado
         ? '<div class="mt-4"><div class="font-bold mb-2 ' + (resultado.ok ? "text-emerald-300" : "text-rose-300") + '">' +
-          (resultado.ok ? "✅ ¡Diagrama correcto!" : "❌ Aún no: revisa el detalle") + "</div>" +
+          (resultado.ok ? icono("check", "icono-sm") + " ¡Diagrama correcto!" : icono("cruz", "icono-sm") + " Aún no: revisa el detalle") + "</div>" +
           (resultado.detalle ? '<div class="text-sm text-slate-300">' + escapar(resultado.detalle) + "</div>" : "") + "</div>"
         : "") +
       '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-diagrama" data-action="' + accionComprobar + '" ' +
@@ -438,7 +439,7 @@ export function crearDiagramasUI({
       if (!fijo) {
         const quitar = document.createElement("button");
         quitar.className = "nodo-quitar";
-        quitar.textContent = "✕";
+        quitar.innerHTML = icono("cruz", "icono-sm");
         quitar.setAttribute("aria-label", "Quitar " + nombre);
         quitar.addEventListener("click", ev => {
           ev.stopPropagation();
@@ -542,7 +543,7 @@ export function crearDiagramasUI({
       etiqueta.className = "etiqueta-arista";
       let textoEtiqueta = c.tipo;
       if (c.guarda) textoEtiqueta += " " + c.guarda;
-      etiqueta.textContent = textoEtiqueta + " ✕";
+      etiqueta.innerHTML = escapar(textoEtiqueta) + icono("cruz", "icono-sm");
       etiqueta.title = "Quitar relación";
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";

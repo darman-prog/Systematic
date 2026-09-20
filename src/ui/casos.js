@@ -2,13 +2,14 @@
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
 import { escapar } from "./helpers.js";
 import { resumenDiagrama } from "../core/diagramas.js";
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
 const RATINGS = {
-  exito: { texto: "🎉 ¡Éxito!", clase: "tag-ok" },
-  parcial: { texto: "🤔 Resultado parcial", clase: "tag-practica" },
-  fracaso: { texto: "😖 Fracaso", clase: "tag-bad" }
+  exito: { texto: "¡Éxito!", icono: "check", clase: "tag-ok" },
+  parcial: { texto: "Resultado parcial", icono: "idea", clase: "tag-practica" },
+  fracaso: { texto: "Fracaso", icono: "cruz", clase: "tag-bad" }
 };
 
 export function pintarListaCasos(casos, registros) {
@@ -17,7 +18,7 @@ export function pintarListaCasos(casos, registros) {
   cont.innerHTML = casos.map(c => {
     const registro = registros[c.id];
     const mejor = registro
-      ? (registro.mejorRating === "exito" ? "🏆 Éxito" : registro.mejorRating === "parcial" ? "🤔 Parcial" : "😖 Fracaso")
+      ? (registro.mejorRating === "exito" ? "Éxito" : registro.mejorRating === "parcial" ? "Parcial" : "Fracaso")
       : "Sin jugar";
     return '<div class="apunte-card">' +
       '<div class="apunte-tema">' + escapar(c.tema) + '</div>' +
@@ -41,7 +42,7 @@ export function pintarCaso(caso, estado, resultado) {
     const resumen = resultado.detalle ? resumenDiagrama(resultado.detalle) : [];
     cont.innerHTML =
       '<div class="text-center mb-5">' +
-        '<span class="tag ' + r.clase + '">' + r.texto + '</span>' +
+        '<span class="tag ' + r.clase + '">' + icono(r.icono, "icono-sm") + r.texto + '</span>' +
         '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
         '<p class="text-xs text-slate-400 mt-1">XP ganada por elementos correctos incluida</p>' +
       '</div>' +

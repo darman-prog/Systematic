@@ -7,6 +7,7 @@ import {
   animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
 import { evaluarDiagrama, resumenDiagrama } from "../core/diagramas.js";
+import { icono } from "./iconos.js";
 import { crearDiagramasUI } from "./diagramas.js";
 
 const $ = id => document.getElementById(id);
@@ -30,7 +31,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     tb.textContent = item.tema;
     tb.style.background = colorTema(ctx.materia, item.tema);
     tb.style.color = "#0f172a";
-    $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · 🔥 real" : "");
+    $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · real" : "");
     const db = $("dif-badge");
     const coloresDif = { facil: ["#065f46", "#a7f3d0"], media: ["#78350f", "#fde68a"], dificil: ["#881337", "#fecdd3"] };
     const cd = coloresDif[item.dificultad] || ["#334155", "#e2e8f0"];
@@ -105,7 +106,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     area.innerHTML =
       bloqueCaso(item) +
       '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-2" id="question-text"></div>' +
-      '<p class="text-xs text-sky-300 mb-3">☑ Seleccione una o más de una: marca todas las correctas y luego pulsa Comprobar.</p>' +
+      '<p class="text-xs text-sky-300 mb-3">Seleccione una o más de una: marca todas las correctas y luego pulsa Comprobar.</p>' +
       (item.diagrama ? diagramaER() : "") +
       (item.datos ? tablaDatos(item.datos) : "") +
       '<div class="flex flex-col gap-3 mt-4" id="multi-container"></div>' +
@@ -168,7 +169,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       const fb = $("feedback-box");
       fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
       fb.innerHTML = '<div class="font-bold mb-2">' +
-        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — la respuesta era: <b>" + escapar(respuestaCorrecta(item)) + "</b>") +
+        (ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — la respuesta era: <b>" + escapar(respuestaCorrecta(item)) + "</b>") +
         '</div><div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
@@ -189,7 +190,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const session = ctx.session;
     const badge = $("vidas-badge");
     if (!badge || !session || session.modo !== "supervivencia") return;
-    badge.textContent = "❤️".repeat(Math.max(0, session.vidas)) + " · combo " + session.combo;
+    badge.innerHTML = icono("supervivencia", "icono-sm").repeat(Math.max(0, session.vidas)) + "<span> · combo " + session.combo + "</span>";
   }
 
   // Fin del tiempo en Contrarreloj: cuenta como fallo y revela la respuesta.
@@ -201,7 +202,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     registrarRespuesta(item.id, false);
     const fb = $("feedback-box");
     fb.className = "feedback feedback-bad";
-    fb.innerHTML = '<div class="font-bold mb-2">⏱ Tiempo agotado — la respuesta era: <b>' + escapar(respuestaCorrecta(item)) + "</b></div><div>" + item.exp + "</div>";
+    fb.innerHTML = '<div class="font-bold mb-2 flex items-center gap-2">' + icono("reloj", "icono-sm") + "<span>Tiempo agotado — la respuesta era: <b>" + escapar(respuestaCorrecta(item)) + "</b></span></div><div>" + item.exp + "</div>";
     fb.style.display = "block";
     mostrarBotonSiguiente();
   }
@@ -339,7 +340,10 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     if (session.modo !== "simulacro") {
       const fb = $("feedback-box");
       fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
-      fb.innerHTML = '<div class="font-bold mb-2">' + (ok ? "✅ ¡Todas las parejas correctas!" : "❌ Hubo " + e.fallos + " intento(s) fallido(s)") + '</div><div>' + item.exp + '</div>';
+      fb.innerHTML = '<div class="font-bold mb-2 flex items-center gap-2">' +
+        (ok ? icono("check", "icono-sm") + "<span>¡Todas las parejas correctas!</span>"
+            : icono("cruz", "icono-sm") + "<span>Hubo " + e.fallos + " intento(s) fallido(s)</span>") +
+        '</div><div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
     mostrarBotonSiguiente();
@@ -382,8 +386,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       fb.className = "feedback " + (res.ok ? "feedback-ok" : "feedback-bad");
       fb.innerHTML = '<div class="font-bold mb-2">' +
         (res.ok
-          ? "✅ ¡Diagrama correcto!"
-          : "❌ Aún no: revisa el detalle") +
+          ? icono("check", "icono-sm") + " ¡Diagrama correcto!"
+          : icono("cruz", "icono-sm") + " Aún no: revisa el detalle") +
         '</div>' +
         (resumen.length ? '<ul class="text-sm mb-2 list-disc list-inside">' + resumen.map(l => "<li>" + escapar(l) + "</li>").join("") + "</ul>" : "") +
         '<div>' + item.exp + '</div>';
@@ -532,7 +536,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       const fb = $("feedback-box");
       fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
       fb.innerHTML = '<div class="font-bold mb-2">' +
-        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — el orden correcto era: <b>" + escapar(item.respuestas.join(" / ")) + "</b>") +
+        (ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era: <b>" + escapar(item.respuestas.join(" / ")) + "</b>") +
         '</div><div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
@@ -628,7 +632,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       const fb = $("feedback-box");
       fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
       fb.innerHTML = '<div class="font-bold mb-2">' +
-        (ok ? "✅ ¡Correcto!" : "❌ Incorrecto — el orden correcto era:") +
+        (ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era:") +
         '</div><ol class="list-decimal list-inside font-mono text-xs mb-3">' + item.bloques.map(b => "<li>" + escapar(b) + "</li>").join("") + '</ol><div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
@@ -688,7 +692,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     if (session.modo !== "simulacro") {
       const fb = $("feedback-box");
       fb.className = "feedback " + (ok ? "feedback-ok" : "feedback-bad");
-      fb.innerHTML = '<div class="font-bold mb-2">' + (ok ? "✅ ¡Bien!" : "❌ Sigue practicando") + '</div><div>' + item.exp + '</div>';
+      fb.innerHTML = '<div class="font-bold mb-2 flex items-center gap-2">' + (ok ? icono("check", "icono-sm") + "<span>¡Bien!</span>" : icono("cruz", "icono-sm") + "<span>Sigue practicando</span>") + '</div><div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
     mostrarBotonSiguiente();

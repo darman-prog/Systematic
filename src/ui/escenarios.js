@@ -1,13 +1,14 @@
 // Render de la lista y la ejecución de escenarios multi-paso (spec 003).
 // Funciones puras de render: reciben datos y estado; no leen localStorage.
 import { escapar } from "./helpers.js";
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
 const RATINGS = {
-  exito: { texto: "🎉 ¡Éxito!", clase: "tag-ok" },
-  parcial: { texto: "🤔 Resultado parcial", clase: "tag-practica" },
-  fracaso: { texto: "😖 Fracaso", clase: "tag-bad" }
+  exito: { texto: "¡Éxito!", icono: "check", clase: "tag-ok" },
+  parcial: { texto: "Resultado parcial", icono: "idea", clase: "tag-practica" },
+  fracaso: { texto: "Fracaso", icono: "cruz", clase: "tag-bad" }
 };
 
 export function pintarListaEscenarios(escenarios, registros) {
@@ -16,7 +17,7 @@ export function pintarListaEscenarios(escenarios, registros) {
   cont.innerHTML = escenarios.map(e => {
     const registro = registros[e.id];
     const mejor = registro
-      ? (registro.mejorRating === "exito" ? "🏆 Éxito" : registro.mejorRating === "parcial" ? "🤔 Parcial" : "😖 Fracaso")
+      ? (registro.mejorRating === "exito" ? "Éxito" : registro.mejorRating === "parcial" ? "Parcial" : "Fracaso")
       : "Sin jugadas";
     return '<div class="apunte-card">' +
       '<div class="apunte-tema">' + escapar(e.tema) + '</div>' +
@@ -38,7 +39,7 @@ export function pintarEscenario(escenario, estado) {
     const finalTexto = estado.rating === "exito" ? escenario.finales.exito : estado.rating === "parcial" ? escenario.finales.parcial : escenario.finales.fracaso;
     cont.innerHTML =
       '<div class="text-center mb-5">' +
-        '<span class="tag ' + r.clase + '">' + r.texto + '</span>' +
+        '<span class="tag ' + r.clase + '">' + icono(r.icono, "icono-sm") + r.texto + '</span>' +
         '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
         '<p class="text-xs text-slate-400 mt-1">Puntuación: ' + estado.puntos + ' pts · XP por buenas decisiones incluida</p>' +
       '</div>' +

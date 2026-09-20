@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -22,87 +22,109 @@
 
   <section id="screen-start" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-2">
-      <h1 class="brand-title text-2xl sm:text-3xl font-bold"><span id="materia-icono">🗄️</span> <span id="materia-nombre">Base de Datos 2</span></h1>
+      <h1 class="brand-title text-2xl sm:text-3xl font-bold"><span id="materia-icono"></span> <span id="materia-nombre">Base de Datos 2</span></h1>
       <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
     </div>
     <p class="subtitle">
       Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
       Preguntas y opciones aleatorias, con explicación en cada respuesta.
     </p>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-      <button id="card-repaso" class="mode-card col-span-2 sm:col-span-4 bg-amber-950/40 border-amber-600 hover:border-amber-400" data-action="irRepaso">
-        <span class="text-2xl">🔥</span>
-        <span class="font-bold">RepasoQuiz — Preguntas garantizadas</span>
-        <span class="text-xs text-amber-200/90">Las preguntas reales de parciales anteriores. Mismo orden y redacción del examen.</span>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+      <button id="card-repaso" class="mode-card sm:col-span-2 bg-amber-950/40 border-amber-700 hover:border-amber-500" data-action="irRepaso">
+        <span class="icono icono-lg" data-icono="repaso"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">RepasoQuiz — Preguntas garantizadas</span>
+          <span class="mode-desc block">Las preguntas reales de parciales anteriores. Mismo orden y redacción del examen.</span>
+        </span>
       </button>
-      <button class="mode-card" data-action="startContrarreloj">
-        <span class="text-2xl">⚡</span>
-        <span class="font-bold">Contrarreloj</span>
-        <span class="text-xs text-slate-400">10 preguntas · 30 segundos cada una</span>
-      </button>
-      <button class="mode-card" data-action="startSupervivencia">
-        <span class="text-2xl">❤️</span>
-        <span class="font-bold">Supervivencia</span>
-        <span class="text-xs text-slate-400">3 vidas · encadena aciertos y multiplica tu XP</span>
-      </button>
-      <button class="mode-card" data-action="irConfig">
-        <span class="text-2xl">🎯</span>
-        <span class="font-bold">Configurar práctica</span>
-        <span class="text-xs text-slate-400">Elige tema, tipo, dificultad y cantidad</span>
+      <button class="mode-card mode-primaria" data-action="irConfig">
+        <span class="icono icono-lg" data-icono="practica"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Configurar práctica</span>
+          <span class="mode-desc block">Elige tema, tipo, dificultad y cantidad</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startStudy">
-        <span class="text-2xl">📖</span>
-        <span class="font-bold">Modo Estudio</span>
-        <span class="text-xs text-slate-400">Todas las preguntas con su solución</span>
+        <span class="icono icono-lg" data-icono="estudio"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Modo Estudio</span>
+          <span class="mode-desc block">Todas las preguntas con su solución</span>
+        </span>
+      </button>
+      <button class="mode-card" data-action="startContrarreloj">
+        <span class="icono icono-lg" data-icono="contrarreloj"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Contrarreloj</span>
+          <span class="mode-desc block">10 preguntas · 30 segundos cada una</span>
+        </span>
+      </button>
+      <button class="mode-card" data-action="startSupervivencia">
+        <span class="icono icono-lg" data-icono="supervivencia"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Supervivencia</span>
+          <span class="mode-desc block">3 vidas · encadena aciertos y multiplica tu XP</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startApuntes">
-        <span class="text-2xl">📝</span>
-        <span class="font-bold">Apuntes</span>
-        <span class="text-xs text-slate-400">Resúmenes curados por tema</span>
+        <span class="icono icono-lg" data-icono="apuntes"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Apuntes</span>
+          <span class="mode-desc block">Resúmenes curados por tema</span>
+        </span>
       </button>
       <button class="mode-card" data-action="irMisiones">
-        <span class="text-2xl">🗺️</span>
-        <span class="font-bold">Misiones</span>
-        <span class="text-xs text-slate-400">Gana estrellas por tema, nodo a nodo</span>
+        <span class="icono icono-lg" data-icono="misiones"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Misiones</span>
+          <span class="mode-desc block">Gana estrellas por tema, nodo a nodo</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startEscenarios">
-        <span class="text-2xl">🎲</span>
-        <span class="font-bold">Escenarios</span>
-        <span class="text-xs text-slate-400">Toma decisiones y vive las consecuencias</span>
+        <span class="icono icono-lg" data-icono="escenarios"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Escenarios</span>
+          <span class="mode-desc block">Toma decisiones y vive las consecuencias</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startCasos">
-        <span class="text-2xl">🧩</span>
-        <span class="font-bold">Casos</span>
-        <span class="text-xs text-slate-400">Construye diagramas a partir de casos reales</span>
+        <span class="icono icono-lg" data-icono="casos"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Casos</span>
+          <span class="mode-desc block">Construye diagramas a partir de casos reales</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startFlashcards">
-        <span class="text-2xl">🃏</span>
-        <span class="font-bold">Flashcards</span>
-        <span class="text-xs text-slate-400">Memoriza con tarjetas y autoevaluación</span>
+        <span class="icono icono-lg" data-icono="flashcards"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Flashcards</span>
+          <span class="mode-desc block">Memoriza con tarjetas y autoevaluación</span>
+        </span>
       </button>
       <button class="mode-card" data-action="startGlosario">
-        <span class="text-2xl">📚</span>
-        <span class="font-bold">Glosario</span>
-        <span class="text-xs text-slate-400">Términos y ejemplos por categoría</span>
+        <span class="icono icono-lg" data-icono="glosario"></span>
+        <span class="min-w-0">
+          <span class="mode-titulo block">Glosario</span>
+          <span class="mode-desc block">Términos y ejemplos por categoría</span>
+        </span>
       </button>
     </div>
     <div id="tip-dia" class="mt-3"></div>
     <div class="mt-3">
-      <button class="btn btn-ghost hidden" id="btn-debiles" data-action="practicarDebiles">🧠 Repasar débiles</button>
+      <button class="btn btn-ghost hidden" id="btn-debiles" data-action="practicarDebiles">Repasar débiles</button>
     </div>
     <h2 class="section-title">Práctica rápida</h2>
     <div class="flex flex-wrap gap-2 mb-3">
-      <button class="btn btn-primary btn-sm" data-action="practicarArrastre">🧩 Solo arrastrar y soltar</button>
-      <button class="btn btn-secondary btn-sm" data-action="practicarCasos">🧠 Casos técnicos</button>
-      <button class="btn btn-secondary btn-sm hidden" id="btn-vencidas" data-action="practicarVencidas">⏰ Repaso espaciado</button>
+      <button class="btn btn-primary btn-sm" data-action="practicarArrastre">Solo arrastrar y soltar</button>
+      <button class="btn btn-secondary btn-sm" data-action="practicarCasos">Casos técnicos</button>
+      <button class="btn btn-secondary btn-sm hidden" id="btn-vencidas" data-action="practicarVencidas">Repaso espaciado</button>
     </div>
     <div id="tipos-panel" class="flex flex-wrap gap-2"></div>
     <div id="stats-panel"></div>
     <h2 class="section-title">Historial de intentos</h2>
     <div id="history-section"></div>
     <div class="flex gap-2 justify-end flex-wrap mt-2">
-      <button class="btn btn-ghost btn-sm" data-action="exportarDatos">⬇ Exportar progreso</button>
-      <button class="btn btn-ghost btn-sm" data-action="importarArchivo">⬆ Importar</button>
+      <button class="btn btn-ghost btn-sm" data-action="exportarDatos">Exportar progreso</button>
+      <button class="btn btn-ghost btn-sm" data-action="importarArchivo">Importar</button>
       <input type="file" id="import-file" accept=".json,application/json" class="hidden">
       <button class="btn btn-ghost btn-sm" data-action="clearHistory">Borrar historial</button>
       <button class="btn btn-ghost btn-sm" data-action="resetProgreso">Reiniciar progreso</button>
@@ -111,14 +133,14 @@
 
   <section id="screen-repaso" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🔥 RepasoQuiz</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">RepasoQuiz</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Preguntas reales de parciales anteriores de esta materia. Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
     <div id="repaso-list"></div>
     <div class="flex flex-wrap gap-3 justify-center mt-6">
       <button class="btn btn-primary" data-action="iniciarRepasoQuiz">Comenzar RepasoQuiz (<span id="repaso-n">10</span> preguntas)</button>
-      <button class="btn btn-secondary" data-action="estudioGarantizadas">📖 Ver soluciones</button>
+      <button class="btn btn-secondary" data-action="estudioGarantizadas">Ver soluciones</button>
       <button class="btn btn-ghost" data-action="flashcardsGarantizadas">🃏 Flashcards</button>
     </div>
   </section>
@@ -138,31 +160,36 @@
     <div class="flex flex-col gap-2.5 mb-4 text-sm text-slate-300">
       <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-priorizar" checked class="w-4 h-4 accent-blue-600"> Priorizar preguntas débiles (repetición espaciada)</label>
       <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-debiles" class="w-4 h-4 accent-blue-600"> Solo preguntas débiles</label>
-      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-marcadas" class="w-4 h-4 accent-blue-600"> Solo marcadas ⭐</label>
+      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-marcadas" class="w-4 h-4 accent-blue-600"> Solo marcadas</label>
     </div>
     <p class="text-sm text-slate-400" id="cfg-resumen"></p>
     <div class="flex flex-wrap gap-3 justify-center mt-6">
       <button class="btn btn-primary w-full sm:w-auto" id="btn-comenzar" data-action="comenzarPractica">Comenzar práctica</button>
-      <button class="btn btn-secondary w-full sm:w-auto" data-action="comenzarSimulacro">🎯 Simulacro (10 preg · 20 min)</button>
+      <button class="btn btn-secondary w-full sm:w-auto" data-action="comenzarSimulacro">Simulacro (10 preg · 20 min)</button>
     </div>
   </section>
 
   <section id="screen-quiz" class="card hidden">
     <div class="flex flex-wrap items-center gap-2 mb-4">
-      <span class="badge bg-slate-700" id="progress">Pregunta 1</span>
-      <span class="badge" id="topic-badge">Tema</span>
-      <span class="badge bg-slate-700" id="type-badge">Tipo</span>
-      <span class="badge hidden" id="dif-badge"></span>
-      <span class="badge hidden bg-amber-900 text-amber-200" id="timer-badge">20:00</span>
-      <span class="badge hidden bg-violet-700 text-violet-100" id="simulacro-badge">Simulacro</span>
-      <span class="badge hidden bg-amber-600 text-white" id="repaso-badge">🔥 RepasoQuiz garantizadas</span>
-      <span class="badge hidden bg-slate-700" id="modo-badge"></span>
-      <span class="badge hidden bg-rose-900 text-rose-100" id="vidas-badge"></span>
-      <span class="badge hidden bg-sky-900 text-sky-100" id="timer-pregunta">⚡ 30s</span>
+      <div class="text-sm text-slate-400 min-w-0 flex-1 truncate">
+        <b class="text-slate-200" id="progress">Pregunta 1</b>
+        <span class="mx-1.5 text-slate-600" aria-hidden="true">·</span>
+        <span class="inline-block w-2 h-2 rounded-full align-middle" id="topic-dot" aria-hidden="true"></span>
+        <span id="topic-badge">Tema</span>
+        <span class="mx-1.5 text-slate-600" aria-hidden="true">·</span>
+        <span id="type-badge">Tipo</span>
+        <span id="dif-badge" class="hidden"></span>
+      </div>
+      <span class="badge hidden" id="timer-badge"><span data-icono="reloj"></span>20:00</span>
+      <span class="badge hidden" id="simulacro-badge">Simulacro</span>
+      <span class="badge hidden" id="repaso-badge">RepasoQuiz</span>
+      <span class="badge hidden" id="modo-badge"></span>
+      <span class="badge hidden" id="vidas-badge"></span>
+      <span class="badge hidden" id="timer-pregunta"><span data-icono="rayo"></span>30s</span>
       <span class="ml-auto flex items-center gap-1">
         <button class="star-btn" id="star-btn" data-action="toggleMarcadaActual" title="Marcar pregunta" aria-label="Marcar pregunta">☆</button>
-        <button class="btn btn-ghost btn-sm hidden" id="pause-btn" data-action="alternarPausa" title="Pausar" aria-label="Pausar simulacro">⏸</button>
-        <button class="btn btn-ghost btn-sm" data-action="salir" title="Salir" aria-label="Salir de la ronda">✕</button>
+        <button class="btn btn-ghost btn-sm hidden" id="pause-btn" data-action="alternarPausa" title="Pausar" aria-label="Pausar simulacro"></button>
+        <button class="btn btn-ghost btn-sm" data-action="salir" title="Salir" aria-label="Salir de la ronda"><span class="icono icono-sm" data-icono="cerrar"></span></button>
       </span>
     </div>
     <div class="progress-track mb-5"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
@@ -171,7 +198,7 @@
     <div class="feedback hidden" id="feedback-box" role="status" aria-live="polite"></div>
 
     <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3">
-      <button id="skip-btn" class="btn btn-ghost w-full sm:w-auto" data-action="saltarPregunta">⏭ Saltar</button>
+      <button id="skip-btn" class="btn btn-ghost w-full sm:w-auto" data-action="saltarPregunta"><span class="icono icono-sm" data-icono="saltar"></span>Saltar</button>
       <button id="next-btn" class="btn btn-primary w-full sm:w-auto" style="display:none" data-action="next">Siguiente</button>
     </div>
     <p class="text-center text-slate-500 text-xs mt-4">Atajos: <b>1</b> <b>2</b> <b>3</b> para responder · <b>Enter</b> para continuar</p>
@@ -184,7 +211,7 @@
       <h1 class="text-xl sm:text-2xl font-bold">Modo Estudio</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
-    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa ⭐ para marcar las que quieras priorizar.</p>
+    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa la estrella para marcar las que quieras priorizar.</p>
     <input class="search-input" id="study-search" type="search" placeholder="Buscar por texto, tema, código o explicación...">
     <div id="study-filtros" class="flex flex-wrap gap-2 mb-3"></div>
     <p class="text-xs text-slate-500 mb-3" id="study-count"></p>
@@ -193,7 +220,7 @@
 
   <section id="screen-apuntes" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">📝 Apuntes</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">Apuntes</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Resúmenes curados a partir del material de la materia. Busca o filtra por tema.</p>
@@ -205,7 +232,7 @@
 
   <section id="screen-misiones" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🗺️ Misiones</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">Misiones</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Completa misiones por tema y gana hasta 3 estrellas según tu precisión. Cada nodo se desbloquea con al menos 1 estrella del anterior.</p>
@@ -214,7 +241,7 @@
 
   <section id="screen-escenarios" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🎲 Escenarios</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">Escenarios</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Casos reales de la materia: decide, recibe consecuencias y llega a un final. Tu mejor resultado queda guardado.</p>
@@ -231,7 +258,7 @@
 
   <section id="screen-casos" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🧩 Casos de Diagramación</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">Casos de Diagramación</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Construye diagramas a partir de casos reales. Tu mejor resultado queda guardado.</p>
@@ -248,7 +275,7 @@
 
   <section id="screen-flashcards" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🃏 Flashcards</h1>
+      <h1 class="text-xl sm:text-2xl font-bold">Flashcards</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <div id="flash-area"></div>
@@ -256,7 +283,7 @@
 
   <section id="screen-glosario" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold" id="glosario-titulo">📚 Glosario</h1>
+      <h1 class="text-xl sm:text-2xl font-bold" id="glosario-titulo">Glosario</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>

@@ -2,6 +2,7 @@
 // Recibe la sesión vía `ctx` y el callback de persistencia; no lee localStorage.
 import { respuestaCorrecta } from "../core/sesiones.js";
 import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "./helpers.js";
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
@@ -32,9 +33,9 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     let html = '<div class="text-center mb-6">' +
       '<div class="score-ring anim-in" style="--pct:' + r.pct + '; --ring-color:' + colorAnillo + '"><div class="score-ring-inner">' + r.pct + '%</div></div>' +
       '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "repaso" ? " en el RepasoQuiz." : session.modo === "supervivencia" ? " en Supervivencia." : ".") + '</p>' +
-      (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2">❤️ Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</p>' : "") +
+      (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
       (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +
-      '<p class="text-xs text-slate-400 mt-2">⏱ Tiempo: ' + r.tiempo + '</p>' +
+      '<p class="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">' + icono("reloj", "icono-sm") + '<span>Tiempo: ' + r.tiempo + '</span></p>' +
       '<p class="text-slate-400 mt-2 text-sm">' + mensaje + '</p>' +
     '</div>';
 
@@ -90,7 +91,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     }
 
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
-      (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">🗺️ Volver al mapa</button>' : "") +
+      (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">Volver al mapa</button>' : "") +
       (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
       (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
       '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +

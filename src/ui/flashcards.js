@@ -2,6 +2,7 @@
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
 import { shuffle } from "../core/sesiones.js";
+import { icono } from "./iconos.js";
 import {
   TIPO_LABELS,
   bloqueCaso, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
@@ -38,10 +39,10 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     if (flash.idx >= flash.items.length) {
       cont.innerHTML =
         '<div class="flash-card text-center">' +
-          '<div class="text-4xl mb-3">🎉</div>' +
+          '<div class="flex justify-center mb-3 text-amber-300">' + icono("medalla", "icono-lg") + '</div>' +
           '<h2 class="text-xl font-bold mb-2">Ronda de flashcards terminada</h2>' +
-          '<p class="text-slate-300 mb-1">✅ Sabías: <b>' + flash.aciertos + '</b></p>' +
-          '<p class="text-slate-300 mb-6">❌ No sabías: <b>' + flash.fallos + '</b></p>' +
+          '<p class="text-slate-300 mb-1 flex items-center justify-center gap-1.5">' + icono("check", "icono-sm") + 'Sabías: <b>' + flash.aciertos + '</b></p>' +
+          '<p class="text-slate-300 mb-6 flex items-center justify-center gap-1.5">' + icono("cruz", "icono-sm") + 'No sabías: <b>' + flash.fallos + '</b></p>' +
           '<div class="flex flex-wrap gap-3 justify-center">' +
             '<button class="btn btn-primary" data-action="startFlashcards">Otra ronda</button>' +
             '<button class="btn btn-ghost" data-action="goHome">Inicio</button>' +
@@ -66,7 +67,7 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     cont.innerHTML =
       '<div class="flex items-center justify-between mb-4 flex-wrap gap-2 text-sm text-slate-400">' +
         '<span>Tarjeta ' + (flash.idx + 1) + ' de ' + flash.items.length + '</span>' +
-        '<span>✅ ' + flash.aciertos + ' · ❌ ' + flash.fallos + '</span>' +
+        '<span class="flex items-center gap-2">' + icono("check", "icono-sm") + ' ' + flash.aciertos + ' · ' + icono("cruz", "icono-sm") + ' ' + flash.fallos + '</span>' +
       '</div>' +
       '<div class="flash-card">' + frente + reves + '</div>' +
       '<div class="mt-5 flex flex-col sm:flex-row gap-3">' +

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+﻿import { test, expect } from '@playwright/test';
 import bd2Preguntas from '../src/datos/bd2/preguntas.js';
 import iswPreguntas from '../src/datos/isw/preguntas.js';
 import aswPreguntas from '../src/datos/asw/preguntas.js';
@@ -7,7 +7,7 @@ test.describe('Systematic — smoke', () => {
   test('el home lista 3 materias con su estado de contenido', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Systematic' })).toBeVisible();
-    const cards = page.locator('#materias-list .mode-card');
+    const cards = page.locator('#materias-list .materia-card');
     await expect(cards).toHaveCount(3);
     await expect(cards.nth(0)).toContainText('Base de Datos 2');
     await expect(cards.nth(0)).toContainText(bd2Preguntas.length + ' preguntas');
@@ -23,7 +23,7 @@ test.describe('Systematic — smoke', () => {
     const errores = [];
     page.on('pageerror', e => errores.push(String(e)));
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await expect(page.locator('#screen-start')).toBeVisible();
     await expect(page.locator('#stat-total')).toHaveText(String(bd2Preguntas.length));
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
@@ -41,7 +41,7 @@ test.describe('Systematic — smoke', () => {
 
   test('modo estudio, flashcards y glosario cargan', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.getByRole('button', { name: /Modo Estudio/ }).click();
     await expect(page.locator('#study-list .study-item').first()).toBeVisible();
     await page.locator('#screen-study').getByRole('button', { name: '← Inicio' }).click();
@@ -60,7 +60,7 @@ test.describe('Systematic — smoke', () => {
 
   test('apuntes: botón presente y estado vacío sin contenido', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.getByRole('button', { name: /Apuntes/ }).click();
     await expect(page.locator('#screen-apuntes')).toBeVisible();
     await expect(page.locator('#apuntes-list')).toContainText('Aún no hay apuntes');
@@ -70,7 +70,7 @@ test.describe('Systematic — smoke', () => {
   test('contrarreloj y supervivencia inician con sus indicadores', async ({ page }) => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.locator('#screen-start').getByRole('button', { name: /Contrarreloj/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#modo-badge')).toContainText('Contrarreloj');
@@ -84,13 +84,14 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#screen-start').getByRole('button', { name: /Supervivencia/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#modo-badge')).toContainText('Supervivencia');
-    await expect(page.locator('#vidas-badge')).toContainText('❤️');
+    await expect(page.locator('#vidas-badge')).toContainText('combo');
+    await expect(page.locator('#vidas-badge .icono')).not.toHaveCount(0);
   });
 
   test('misiones: mapa con nodos secuenciales y misión jugable', async ({ page }) => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.getByRole('button', { name: /Misiones/ }).click();
     await expect(page.locator('#screen-misiones')).toBeVisible();
     const nodos = page.locator('#misiones-lista .mision-nodo');
@@ -104,7 +105,7 @@ test.describe('Systematic — smoke', () => {
 
   test('escenarios: lista, decisiones y pantalla de juego', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
     await expect(page.locator('#screen-escenarios')).toBeVisible();
     await expect(page.locator('#escenarios-lista .apunte-card').first()).toBeVisible();
@@ -121,7 +122,7 @@ test.describe('Systematic — smoke', () => {
     page.on('pageerror', e => errores.push(String(e)));
     await page.on('dialog', d => d.accept());
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     // Clic en la pestaña "Ninguno" de tipos para aislar solo el tipo diagrama.
     await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
@@ -159,7 +160,7 @@ test.describe('Systematic — smoke', () => {
 
   test('lienzo de diagrama operable solo con teclado', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click(); // BD2
+    await page.locator('#materias-list .materia-card').first().click(); // BD2
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
     await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
@@ -196,7 +197,7 @@ test.describe('Systematic — smoke', () => {
 
   test('constructor UML con miembros: ASW muestra preguntas de diagrama de clases', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').nth(2).click(); // ASW
+    await page.locator('#materias-list .materia-card').nth(2).click(); // ASW
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
     await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
@@ -225,7 +226,7 @@ test.describe('Systematic — smoke', () => {
 
   test('casos de diagramación: lista y juego', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click(); // BD2
+    await page.locator('#materias-list .materia-card').first().click(); // BD2
     await page.locator('[data-action="startCasos"]').first().click();
     await expect(page.locator('#screen-casos')).toBeVisible();
     await expect(page.locator('#casos-lista .apunte-card').first()).toBeVisible();
@@ -253,10 +254,10 @@ test.describe('Systematic — smoke', () => {
 
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     await page.getByRole('button', { name: '← Materias' }).click();
     await expect(page.locator('#screen-materias')).toBeVisible();
-    await page.locator('#materias-list .mode-card').nth(1).click();
+    await page.locator('#materias-list .materia-card').nth(1).click();
     await expect(page.locator('#materia-nombre')).toHaveText('Ingeniería de Software');
     const total = await page.locator('#stat-total').textContent();
     expect(parseInt(total, 10)).toBeGreaterThan(0);
@@ -273,7 +274,7 @@ test.describe('Systematic — smoke', () => {
       localStorage.setItem('quizBD2.meta', '30');
     });
     await page.goto('/');
-    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#materias-list .materia-card').first().click();
     const almacenado = await page.evaluate(() => ({
       progreso: JSON.parse(localStorage.getItem('sys.progreso.bd2') || 'null'),
       meta: localStorage.getItem('sys.meta.bd2'),

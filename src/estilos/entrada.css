@@ -64,11 +64,22 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
        font-size: 1.75rem; font-weight: bold; color: var(--study-text);
     }
 
+/* Iconos SVG (spec 005): set propio de trazo, heredan currentColor. */
+.icono { width: 20px; height: 20px; flex: none; }
+.icono-sm { width: 16px; height: 16px; }
+.icono-lg { width: 22px; height: 22px; }
+
 /* Componentes (antes <style type="text/tailwindcss"> en app.html) */
 
     @layer components {
-      .mode-card { @apply flex flex-col items-start gap-1 bg-slate-900 border border-slate-700 hover:border-blue-500 hover:-translate-y-0.5 rounded-xl p-4 text-left transition; box-shadow: var(--study-shadow); }
-      .card { @apply bg-slate-800/90 border border-slate-700 rounded-2xl p-5 sm:p-7 shadow-xl w-full; }
+      .mode-card { @apply flex items-center gap-3 bg-slate-900 border border-slate-700 hover:border-slate-600 hover:bg-slate-800/70 rounded-xl p-4 text-left transition; }
+      .mode-card .mode-titulo { @apply font-semibold; }
+      .mode-card .mode-desc { @apply text-xs text-slate-400; }
+      .mode-primaria { @apply sm:col-span-2 border-blue-500/60 bg-slate-800/70; }
+      .mode-primaria .mode-titulo { @apply text-base; }
+      .mode-primaria .icono { color: var(--study-accent); }
+      .materia-card { @apply flex flex-col items-start gap-1 bg-slate-900 border border-slate-700 hover:border-slate-500 rounded-xl p-4 text-left transition; }
+      .card { @apply bg-slate-800/90 border border-slate-700 rounded-xl p-5 sm:p-7 w-full; }
       .subtitle { @apply text-slate-400 leading-relaxed mb-5 text-sm sm:text-base; max-width: 70ch; }
       .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed; }
       .btn-primary { @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 text-sm sm:text-base; color: var(--study-bg); }
@@ -76,10 +87,10 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
       .btn-ghost { @apply bg-transparent hover:bg-slate-700/60 text-slate-300 border border-slate-700 px-4 py-2.5 text-sm; }
       .btn-sm { @apply px-3 py-2 text-xs sm:text-sm; }
       .link-btn { @apply text-blue-400 hover:underline text-xs font-semibold px-1.5 cursor-pointer bg-transparent border-0; }
-      .badge { @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap; }
+      .badge { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap; }
       .chip { @apply rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs sm:text-sm text-slate-300 transition hover:border-blue-500 hover:text-white cursor-pointer; }
       .chip-on { @apply bg-blue-600 border-blue-500 text-white font-semibold; }
-      .section-title { @apply text-xs sm:text-sm font-bold text-slate-300 border-b border-slate-700 pb-2 mt-7 mb-3 uppercase tracking-wide; }
+      .section-title { @apply text-xs sm:text-sm font-bold text-slate-400 mt-7 mb-3 uppercase tracking-wide; }
       .stat-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center; }
       .stat-value { @apply text-lg sm:text-xl font-bold text-sky-400; }
       .stat-label { @apply text-xs text-slate-400 mt-1; }
@@ -150,7 +161,7 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
 .apunte-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
 .apunte-tema { @apply text-xs font-bold uppercase tracking-wide text-slate-400 mb-1; }
 .apunte-titulo { @apply text-lg font-bold text-sky-300 mb-2; }
-.apunte-fuente { @apply text-xs text-slate-500 mt-3 pt-3 border-t border-dashed border-slate-700; }
+.apunte-fuente { @apply text-xs text-slate-500 mt-3 pt-3 border-t border-slate-700; }
 .apunte-contenido { @apply text-sm text-slate-300 leading-relaxed; }
 .apunte-contenido h1 { @apply text-lg font-bold text-slate-100 mt-4 mb-2; }
 .apunte-contenido h2 { @apply text-base font-bold text-slate-100 mt-4 mb-2; }
@@ -171,7 +182,7 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
 /* Single study atmosphere: calm contrast, no pure white/black, and quiet browser surfaces. */
 .brand-title { color: var(--study-accent); font-size: 1.75rem; line-height: 1.15; }
 @media (min-width: 640px) { .brand-title { font-size: 2.25rem; } }
-.card { background: var(--study-surface); border-color: var(--study-border); box-shadow: var(--study-shadow); }
+.card { background: var(--study-surface); border-color: var(--study-border); }
 .mode-card { background: var(--study-surface); border-color: var(--study-border); }
 .btn-secondary, .btn-ghost { border-color: var(--study-border); }
 .search-input, .stat-input { background: var(--study-surface-2); border-color: var(--study-border); color: var(--study-text); }
@@ -205,7 +216,7 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
 #confeti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
 
 /* Constructor de diagramas: lienzo SVG, nodos arrastrables y etiquetas de arista. */
-#lienzo-diagrama { position: relative; width: 100%; min-height: 320px; border: 2px dashed var(--study-border); border-radius: 12px; background: var(--study-surface); overflow: hidden; touch-action: none; }
+#lienzo-diagrama { position: relative; width: 100%; min-height: 320px; border: 1px solid var(--study-border); border-radius: 12px; background: var(--study-surface); overflow: hidden; touch-action: none; }
 #edges-diagrama { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 #edges-diagrama line { stroke: var(--study-accent); stroke-width: 2; }
 .nodo-puesto { position: absolute; min-width: 96px; max-width: 180px; background: var(--study-surface-2); border: 2px solid var(--study-border); border-radius: 8px; padding: 8px 22px 8px 10px; font-size: 0.85rem; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; color: var(--study-text); }

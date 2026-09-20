@@ -1,5 +1,6 @@
 // Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
+import { icono } from "./iconos.js";
 
 const $ = id => document.getElementById(id);
 
@@ -21,14 +22,14 @@ export function pintarMisiones(nodos) {
   cont.innerHTML = nodos.map((n, i) => {
     const estrellas = "★".repeat(n.estrellas) + "☆".repeat(3 - n.estrellas);
     const disponible = n.estado === "disponible";
-    const icono = n.estado === "bloqueada" ? "🔒" : n.estrellas === 3 ? "🏅" : "📍";
+    const clave = n.estado === "bloqueada" ? "bloqueada" : n.estrellas === 3 ? "medalla" : "punto";
     return '<button class="mision-nodo' + (disponible ? " mision-disponible" : "") + (n.estado === "bloqueada" ? " mision-bloqueada" : "") + '"' +
       (disponible ? ' data-action="iniciarMision" data-tema="' + n.tema + '"' : " disabled") + '>' +
       '<span class="mision-num">' + (i + 1) + '</span>' +
       '<span class="flex-1 min-w-0 text-left"><span class="font-bold">' + n.tema + '</span>' +
       '<span class="text-xs text-slate-400 block">' + (n.mejorPct ? "Mejor precisión: " + n.mejorPct + "%" : "Sin intentos") + '</span></span>' +
       '<span class="mision-estrellas">' + estrellas + '</span>' +
-      '<span class="text-xl">' + icono + '</span>' +
+      '<span class="' + (n.estado === "bloqueada" ? "text-slate-500" : "text-slate-300") + '">' + icono(clave, "icono-lg") + '</span>' +
     '</button>';
   }).join("") || '<p class="text-sm text-slate-400">Esta materia aún no tiene temas para misiones.</p>';
 }
