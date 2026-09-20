@@ -3,7 +3,7 @@
 // callback `obtenerP`, historial, actividad y meta ya normalizada); no lee localStorage.
 import { calcularRacha, esDebil, hoyISO, vencida } from "../../core/progreso.js";
 import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
-import { icono } from "../iconos.js";
+import { estadoVacio, aviso } from "../componentes/estados.js";
 
 const $ = id => document.getElementById(id);
 
@@ -14,7 +14,7 @@ function tarjetaStat(valor, etiqueta, color) {
 export function renderHistory(historial) {
   const box = $("history-section");
   if (!historial.length) {
-    box.innerHTML = '<p class="text-sm text-slate-400">Aún no hay intentos registrados. ¡Empieza con una práctica o el simulacro!</p>';
+    box.innerHTML = estadoVacio("Aún no hay intentos registrados. ¡Empieza con una práctica o el simulacro!");
     return;
   }
   const mejor = Math.max.apply(null, historial.map(h => h.score / h.total));
@@ -41,7 +41,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
     $("stat-total").textContent = "0";
     $("stat-parciales").textContent = "0";
     $("stat-temas").textContent = "0";
-    $("stats-panel").innerHTML = '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5 text-sm text-amber-200 flex items-center gap-2">' + icono("aviso", "icono-sm") + '<span>Contenido en preparación: esta materia todavía no tiene preguntas. Vuelve pronto.</span></div>';
+    $("stats-panel").innerHTML = aviso("Contenido en preparación: esta materia todavía no tiene preguntas. Vuelve pronto.");
     const bd = $("btn-debiles");
     const bv = $("btn-vencidas");
     if (bd) bd.classList.add("hidden");

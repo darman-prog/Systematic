@@ -1,6 +1,7 @@
 ﻿// Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
 import { icono } from "../iconos.js";
+import { estadoVacio } from "../componentes/estados.js";
 
 const $ = id => document.getElementById(id);
 
@@ -31,5 +32,5 @@ export function pintarMisiones(nodos) {
       '<span class="mision-estrellas">' + estrellas + '</span>' +
       '<span class="' + (n.estado === "bloqueada" ? "text-slate-500" : "text-slate-300") + '">' + icono(clave, "icono-lg") + '</span>' +
     '</button>';
-  }).join("") || '<p class="text-sm text-slate-400">Esta materia aún no tiene temas para misiones.</p>';
+  }).join("") || estadoVacio("Esta materia aún no tiene temas para misiones.");
 }

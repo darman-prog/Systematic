@@ -2,6 +2,8 @@
 // Funciones puras de render: reciben datos y estado; no leen localStorage.
 import { escapar } from "../helpers.js";
 import { icono } from "../iconos.js";
+import { tarjeta } from "../componentes/tarjetas.js";
+import { estadoVacio } from "../componentes/estados.js";
 
 const $ = id => document.getElementById(id);
 
@@ -19,16 +21,14 @@ export function pintarListaEscenarios(escenarios, registros) {
     const mejor = registro
       ? (registro.mejorRating === "exito" ? "Éxito" : registro.mejorRating === "parcial" ? "Parcial" : "Fracaso")
       : "Sin jugadas";
-    return '<div class="apunte-card">' +
-      '<div class="apunte-tema">' + escapar(e.tema) + '</div>' +
-      '<div class="apunte-titulo">' + escapar(e.titulo) + '</div>' +
-      '<p class="text-sm text-slate-300 mb-3">' + escapar(e.intro) + '</p>' +
-      '<div class="flex items-center justify-between gap-3 flex-wrap">' +
-        '<span class="text-xs text-slate-400">Mejor resultado: ' + mejor + '</span>' +
-        '<button class="btn btn-primary btn-sm" data-action="jugarEscenario" data-id="' + e.id + '">Jugar escenario</button>' +
-      '</div>' +
-    '</div>';
-  }).join("") || '<p class="text-sm text-slate-400">Aún no hay escenarios para esta materia.</p>';
+    return tarjeta({
+      tema: e.tema,
+      titulo: e.titulo,
+      cuerpo: '<p class="text-sm text-slate-300 mb-3">' + escapar(e.intro) + '</p>',
+      pie: '<span class="text-xs text-slate-400">Mejor resultado: ' + mejor + '</span>' +
+        '<button class="btn btn-primary btn-sm" data-action="jugarEscenario" data-id="' + e.id + '">Jugar escenario</button>'
+    });
+  }).join("") || estadoVacio("Aún no hay escenarios para esta materia.");
 }
 
 export function pintarEscenario(escenario, estado) {

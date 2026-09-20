@@ -3,6 +3,7 @@
 import { respuestaCorrecta } from "../../core/sesiones.js";
 import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "../helpers.js";
 import { icono } from "../iconos.js";
+import { anilloPuntaje } from "../componentes/anillo.js";
 
 const $ = id => document.getElementById(id);
 
@@ -31,7 +32,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
 
     const colorAnillo = r.pct >= 80 ? "#10b981" : r.pct >= 60 ? "#38bdf8" : r.pct >= 40 ? "#fbbf24" : "#f43f5e";
     let html = '<div class="text-center mb-6">' +
-      '<div class="score-ring anim-in" style="--pct:' + r.pct + '; --ring-color:' + colorAnillo + '"><div class="score-ring-inner">' + r.pct + '%</div></div>' +
+      anilloPuntaje(r.pct, colorAnillo) +
       '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "repaso" ? " en el RepasoQuiz." : session.modo === "supervivencia" ? " en Supervivencia." : ".") + '</p>' +
       (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
       (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +
