@@ -57,7 +57,7 @@ export function crearDiagramasUI({
     return nuevo;
   }
 
-  function renderDiagrama(item, area, resultado) {
+  function renderDiagrama(item, area) {
     let estadoActual = estado();
     if (!estadoActual || estadoActual.preguntaId !== item.id) {
       estadoActual = guardar(crearTablero(item));
@@ -104,11 +104,6 @@ export function crearDiagramasUI({
         '<button class="btn-mini" data-action="' + accionCancelarTipo + '" aria-label="Cancelar selección">' + icono("cruz", "icono-sm") + "</button>" +
       "</div>" +
       '<p id="hint-diagrama" class="text-xs text-slate-400 mt-2" role="status"></p>' +
-      (resultado
-        ? '<div class="mt-4"><div class="font-bold mb-2 ' + (resultado.ok ? "text-emerald-300" : "text-rose-300") + '">' +
-          (resultado.ok ? icono("check", "icono-sm") + " ¡Diagrama correcto!" : icono("cruz", "icono-sm") + " Aún no: revisa el detalle") + "</div>" +
-          (resultado.detalle ? '<div class="text-sm text-slate-300">' + escapar(resultado.detalle) + "</div>" : "") + "</div>"
-        : "") +
       '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-diagrama" data-action="' + accionComprobar + '" ' +
         (bloqueado ? "disabled" : "") + ">Comprobar</button></div>";
     activarPool(area);

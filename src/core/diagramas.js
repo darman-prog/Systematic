@@ -305,6 +305,22 @@ export function resumenDiagrama(res) {
   return lineas;
 }
 
+// Convierte el resultado de evaluarDiagrama en un plan de corrección accionable: cuántos
+// aciertos hay, qué conexiones crear, cuáles eliminar y qué miembros reubicar, en ese orden.
+// El detalle ya trae los pares formateados ("A → B (tipo guarda)"); aquí solo se les da
+// el verbo de acción para que el estudiante sepa exactamente qué hacer con cada error.
+export function planCorreccion(res) {
+  const d = res && res.detalle;
+  const total = (res && res.totalEsperado) || 0;
+  const correctas = ((res && res.correctas) || 0) + ((res && res.miembrosOk) || 0);
+  return {
+    aciertos: total > 0 ? { correctas, total } : null,
+    porCrear: (d ? d.faltantes : []).map(x => "Crea: " + x),
+    porQuitar: (d ? d.sobrantes : []).map(x => "Elimina: " + x),
+    porMover: (d ? d.miembrosMal : []).map(x => "Ubica: " + x)
+  };
+}
+
 export function resumenDiagramaAccesible(res) {
   const d = res && res.detalle;
   if (!d) return { announcements: [], summary: "", progress: { correctas: 0, total: 0, porcentaje: 0 } };

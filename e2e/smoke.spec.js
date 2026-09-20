@@ -241,6 +241,9 @@ test.describe('Systematic — smoke', () => {
     await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
     await expect(page.locator('#feedback-box')).toBeVisible();
     await expect(page.locator('#feedback-box')).not.toContainText('[object Object]');
+    // Un solo veredicto en la página y plan de corrección estructurado.
+    await expect(page.getByText('Aún no: revisa el detalle')).toHaveCount(1);
+    await expect(page.locator('#feedback-box')).toContainText('Falta crear');
     await expect(page.locator('#next-btn')).toBeVisible();
   });
 

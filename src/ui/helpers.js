@@ -111,3 +111,21 @@ export function respuestaEstudio(item, keywords) {
   }
   return '<div class="flex flex-col gap-2 mb-3">' + item.options.map((o, j) => '<div class="study-option' + (j === item.correct ? " study-option-ok" : "") + '">' + escapar(o) + '</div>').join("") + '</div>';
 }
+
+// Renderiza el plan de corrección (core/diagramas.js → planCorreccion) como secciones
+// con pasos numerados: aciertos, qué crear, qué eliminar y qué reubicar. La línea de
+// aciertos solo aparece cuando el diagrama aún no está completo. Compartido por quiz y casos.
+export function seccionesCorreccion(plan) {
+  const partes = [];
+  if (plan.aciertos && plan.aciertos.correctas < plan.aciertos.total) {
+    partes.push('<p class="text-sm mb-2">Acertaste <b>' + plan.aciertos.correctas + " de " + plan.aciertos.total + "</b> elementos.</p>");
+  }
+  const seccion = (titulo, items) => items.length
+    ? '<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">' + titulo + "</p>" +
+      '<ol class="list-decimal list-inside text-sm mb-3 space-y-0.5">' + items.map(i => "<li>" + escapar(i) + "</li>").join("") + "</ol>"
+    : "";
+  partes.push(seccion("Falta crear", plan.porCrear));
+  partes.push(seccion("Elimina", plan.porQuitar));
+  partes.push(seccion("Ubica", plan.porMover));
+  return partes.join("");
+}

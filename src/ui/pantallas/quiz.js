@@ -4,9 +4,9 @@
 import { respuestaCorrecta } from "../../core/sesiones.js";
 import {
   TIPO_LABELS, DIF_LABELS,
-  animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, sqlKeywordsDe, tablaDatos
+  animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, seccionesCorreccion, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
-import { evaluarDiagrama, resumenDiagrama } from "../../core/diagramas.js";
+import { evaluarDiagrama, planCorreccion, resumenDiagrama } from "../../core/diagramas.js";
 import { icono } from "../iconos.js";
 import { crearDiagramasUI } from "../componentes/diagramas.js";
 
@@ -370,8 +370,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const estado = session.diagrama;
     if (!item || item.tipo !== "diagrama" || !estado || session.answers[session.idx]) return;
     const res = evaluarDiagrama(item, estado);
+    const plan = planCorreccion(res);
     const resumen = resumenDiagrama(res);
-    const respuesta = { ok: res.ok, detalle: resumen.join(" · ") };
     session.answers[session.idx] = {
       ok: res.ok,
       selected: res.ok
@@ -380,7 +380,9 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       expected: "El diagrama esperado del tema"
     };
     registrarRespuesta(item.id, res.ok);
-    diagramas.renderDiagrama(item, $("question-area"), respuesta);
+    // El veredicto vive solo en el feedback-box (como los demás tipos); el lienzo
+    // conserva el diagrama sin duplicar el resumen. En simulacro no hay feedback.
+    diagramas.renderDiagrama(item, $("question-area"));
     if (session.modo !== "simulacro") {
       const fb = $("feedback-box");
       fb.className = "feedback " + (res.ok ? "feedback-ok" : "feedback-bad");
@@ -388,8 +390,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
         (res.ok
           ? icono("check", "icono-sm") + " ¡Diagrama correcto!"
           : icono("cruz", "icono-sm") + " Aún no: revisa el detalle") +
-        '</div>' +
-        (resumen.length ? '<ul class="text-sm mb-2 list-disc list-inside">' + resumen.map(l => "<li>" + escapar(l) + "</li>").join("") + "</ul>" : "") +
+        "</div>" +
+        seccionesCorreccion(plan) +
         '<div>' + item.exp + '</div>';
       fb.style.display = "block";
     }

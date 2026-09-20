@@ -3,7 +3,7 @@ import {
   SUBTIPOS, CONFIG_SUBTIPO, claveArista, normalizarClave, crearTablero, colocarNodo, quitarNodo,
   asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, esDirigidoTipo,
   validarConexion, ratingDiagrama, resumenDiagrama, resumenDiagramaAccesible, ratingDiagramaAccesible,
-  actualizarPosicion, nombreAccesible
+  planCorreccion, actualizarPosicion, nombreAccesible
 } from "./diagramas.js";
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
@@ -293,6 +293,45 @@ describe("diagramas de actividades con guardas", () => {
     expect(res.ok).toBe(false);
     expect(res.faltantes).toBeGreaterThan(0);
     expect(res.sobrantes).toBeGreaterThan(0);
+  });
+});
+
+describe("planCorreccion", () => {
+  const preguntaPlan = {
+    id: "T-5",
+    subtipo: "uml-clases",
+    nodosPool: ["A", "B"],
+    miembrosPool: [{ texto: "m1", de: "A" }],
+    relacionesEsperadas: [{ de: "B", a: "A", tipo: "herencia" }]
+  };
+
+  it("convierte los errores en pasos accionables con recuento de aciertos", () => {
+    let estado = crearTablero(preguntaPlan);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    estado = conectar(estado, "A", "B", "herencia", true); // dirección invertida → sobrante
+    const plan = planCorreccion(evaluarDiagrama(preguntaPlan, estado));
+    expect(plan.aciertos).toEqual({ correctas: 0, total: 2 });
+    expect(plan.porCrear[0]).toBe("Crea: B → A (herencia)");
+    expect(plan.porQuitar[0]).toBe("Elimina: A → B (herencia)");
+    expect(plan.porMover[0]).toBe("Ubica: m1 → A");
+  });
+
+  it("con el diagrama completo no lista acciones", () => {
+    let estado = crearTablero(preguntaPlan);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    estado = conectar(estado, "B", "A", "herencia", true);
+    estado = asignarMiembro(estado, "m1", "A");
+    const plan = planCorreccion(evaluarDiagrama(preguntaPlan, estado));
+    expect(plan.aciertos).toEqual({ correctas: 2, total: 2 });
+    expect(plan.porCrear).toEqual([]);
+    expect(plan.porQuitar).toEqual([]);
+    expect(plan.porMover).toEqual([]);
+  });
+
+  it("tolera resultados nulos o sin detalle", () => {
+    expect(planCorreccion(null)).toEqual({ aciertos: null, porCrear: [], porQuitar: [], porMover: [] });
   });
 });
 

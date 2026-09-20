@@ -1,7 +1,7 @@
 ﻿// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
-import { escapar } from "../helpers.js";
-import { resumenDiagrama } from "../../core/diagramas.js";
+import { escapar, seccionesCorreccion } from "../helpers.js";
+import { planCorreccion } from "../../core/diagramas.js";
 import { estadoVacio } from "../componentes/estados.js";
 import { tarjeta } from "../componentes/tarjetas.js";
 import { tagRating } from "../componentes/etiquetas.js";
@@ -34,15 +34,14 @@ export function pintarCaso(caso, estado, resultado) {
 
   if (resultado) {
     const finalTexto = resultado.rating === "exito" ? caso.finales.exito : resultado.rating === "parcial" ? caso.finales.parcial : caso.finales.fracaso;
-    const resumen = resultado.detalle ? resumenDiagrama(resultado.detalle) : [];
+    const plan = resultado.detalle ? planCorreccion(resultado.detalle) : null;
     cont.innerHTML =
       '<div class="text-center mb-5">' +
         tagRating(resultado.rating) +
         '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
         '<p class="text-xs text-slate-400 mt-1">XP ganada por elementos correctos incluida</p>' +
       '</div>' +
-      (resumen.length ? '<ul class="text-sm text-slate-300 mb-4 list-disc list-inside">' +
-        resumen.map(l => "<li>" + escapar(l) + "</li>").join("") + '</ul>' : '') +
+      (plan ? seccionesCorreccion(plan) : '') +
       '<div class="apunte-card mb-4">' +
         '<div class="apunte-tema">Explicación</div>' +
         '<div class="text-sm text-slate-300">' + caso.diagrama.exp + '</div>' +
