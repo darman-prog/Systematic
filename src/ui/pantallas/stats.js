@@ -123,9 +123,8 @@ function pintarHistorial(historial, limite, onEmpezar) {
     const d = new Date(h.date);
     const fecha = d.toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) +
       " · " + d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" });
-    const esRepaso = h.modo === "repaso";
-    const esSim = h.modo === "simulacro" || esRepaso;
-    const modo = esRepaso ? "RepasoQuiz" : esSim ? "Simulacro" : "Práctica";
+    const esSim = h.modo === "simulacro";
+    const modo = esSim ? "Simulacro" : "Práctica";
     const esMejor = h.score / h.total === mejor;
     return '<div class="history-row' + (esMejor ? " history-best" : "") + '">' +
       '<div class="history-fecha">' +

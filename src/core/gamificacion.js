@@ -49,7 +49,7 @@ export const LOGROS = [
   { id: "racha-30", icono: "medalla", nombre: "Mes de constancia", descripcion: "Estudia 30 días seguidos", condicion: c => c.racha >= 30 },
   { id: "cien-respuestas", icono: "repetir", nombre: "Cien respuestas", descripcion: "Responde 100 preguntas en total", condicion: c => c.respuestas >= 100 },
   { id: "quinientas-respuestas", icono: "rayo", nombre: "Quinientas respuestas", descripcion: "Responde 500 preguntas en total", condicion: c => c.respuestas >= 500 },
-  { id: "simulacro-perfecto", icono: "practica", nombre: "Simulacro perfecto", descripcion: "100% en un simulacro o RepasoQuiz", condicion: c => c.simulacroPerfecto },
+  { id: "simulacro-perfecto", icono: "practica", nombre: "Simulacro perfecto", descripcion: "100% en un simulacro", condicion: c => c.simulacroPerfecto },
   { id: "meta-cumplida", icono: "sol", nombre: "Meta del día", descripcion: "Cumple tu meta diaria de preguntas", condicion: c => c.metaCumplida },
   { id: "preciso-80", icono: "medalla", nombre: "Precisión fina", descripcion: "80% de precisión con al menos 50 respuestas", condicion: c => c.respuestas >= 50 && c.precision >= 80 },
   { id: "mision-perfecta", icono: "estrella", nombre: "Misión perfecta", descripcion: "Completa una misión con 3 estrellas", condicion: c => c.misionPerfecta },

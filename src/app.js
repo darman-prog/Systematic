@@ -72,7 +72,7 @@ const ctx = {
 };
 
 function show(screen) {
-    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -394,15 +394,13 @@ function startSession(items, modo, conTimer) {
   clearTimer();
   clearTimerPregunta();
   if (!items || !items.length) return;
-  const barajar = modo !== "repaso";
-  const preparadas = items.map(it => prepararItem(it, barajar));
+  const preparadas = items.map(it => prepararItem(it, true));
   session = { items: preparadas, idx: 0, answers: {}, modo, inicio: Date.now(), finalizada: false, pausado: false };
   if (modo === "contrarreloj") { session.tPorPregunta = 30; session.tRestante = 30; }
   if (modo === "supervivencia") { session.vidas = 3; session.combo = 0; session.mejorCombo = 0; }
   show("quiz");
   $("timer-badge").classList.toggle("hidden", !conTimer);
   $("simulacro-badge").classList.toggle("hidden", modo !== "simulacro");
-  $("repaso-badge").classList.toggle("hidden", modo !== "repaso");
   const mb = $("modo-badge");
   mb.innerHTML = modo === "contrarreloj"
     ? icono("contrarreloj", "icono-sm") + "<span>Contrarreloj</span>"
@@ -584,31 +582,6 @@ function practicarVencidas() {
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
-function preguntasReales() {
-  return banco.filter(q => q.real);
-}
-
-function irRepaso() {
-  const reales = preguntasReales();
-  $("repaso-n").textContent = reales.length;
-  $("repaso-list").innerHTML = reales.map((q, i) => {
-    const p = obtenerP(q.id);
-    const marca = (p.ok + p.fail) === 0 ? "·" : (p.lastOk ? "✔" : "✖");
-    const color = (p.ok + p.fail) === 0 ? "text-slate-500" : (p.lastOk ? "text-emerald-400" : "text-rose-400");
-    return '<div class="peor-row mb-2"><span class="text-slate-500 font-bold">P' + (i + 1) + '</span>' +
-      '<span class="flex-1 text-slate-300 leading-snug">' + escapar(q.q.length > 85 ? q.q.slice(0, 85) + "…" : q.q) + '</span>' +
-      '<span class="text-xs text-slate-400 hidden sm:inline">' + (TIPO_LABELS[q.tipo] || q.tipo) + '</span>' +
-      '<span class="' + color + ' font-bold">' + marca + '</span></div>';
-  }).join("");
-  show("repaso");
-}
-
-function iniciarRepasoQuiz() {
-  const reales = preguntasReales();
-  if (!reales.length) return;
-  startSession(reales.slice(), "repaso", false);
-}
-
 function renderTiposPanel() {
   const panel = $("tipos-panel");
   if (!panel) return;
@@ -729,7 +702,7 @@ function finalizar() {
   }
   guardarIntento(aciertos, totalCal, session.modo);
   gamificacion.revisarLogros({
-    simulacroPerfecto: totalCal > 0 && pct === 100 && (session.modo === "simulacro" || session.modo === "repaso")
+    simulacroPerfecto: totalCal > 0 && pct === 100 && session.modo === "simulacro"
   });
   resultados.pintarResultados(false);
   show("results");
@@ -828,8 +801,6 @@ function renderMateriaUI() {
   if (temaMeta) temaMeta.setAttribute("content", materia.color);
   const gloTitulo = $("glosario-titulo");
   if (gloTitulo) gloTitulo.textContent = "Glosario";
-  const cardRepaso = $("card-repaso");
-  if (cardRepaso) cardRepaso.classList.toggle("hidden", !banco.some(q => q.real));
 }
 
 function apuntesDeMateria() {
@@ -959,17 +930,13 @@ const ACCIONES = {
   comenzarSimulacro: () => comenzarSimulacro(),
   comprobarMulti: () => quiz.comprobarMulti(),
   comprobarOrden: () => quiz.comprobarOrden(),
-  estudioGarantizadas: () => estudio.estudioGarantizadas(),
   exportarDatos: () => exportarDatos(),
-  flashcardsGarantizadas: () => flashcards.flashcardsGarantizadas(),
   goHome: () => goHome(),
   importarArchivo: () => $("import-file").click(),
-  iniciarRepasoQuiz: () => iniciarRepasoQuiz(),
   irConfig: () => irConfig(),
   irMaterias: () => irMaterias(),
   iniciarMision: el => iniciarMision(el.dataset.tema),
   irMisiones: () => irMisiones(),
-  irRepaso: () => irRepaso(),
   moverBloque: el => quiz.moverBloque(parseInt(el.dataset.i, 10), parseInt(el.dataset.dir, 10)),
   next: () => next(),
   pintarResultados: el => resultados.pintarResultados(el.dataset.verTodas === "true"),
@@ -1004,7 +971,6 @@ const ACCIONES = {
   startFlashcards: () => flashcards.startFlashcards(),
   startGlosario: () => glosarioUI.startGlosario(),
   startStudy: () => estudio.startStudy(),
-  toggleEstudioReales: () => estudio.toggleEstudioReales(),
   toggleFiltro: el => toggleFiltro(el.dataset.clave, el.dataset.valor),
   toggleFiltroTodos: el => toggleFiltroTodos(el.dataset.clave, el.dataset.activar === "true"),
   toggleMarcadaActual: () => quiz.toggleMarcadaActual(),

@@ -31,7 +31,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     // la dificultad es texto con tinte semántico de la paleta, nunca un resaltado.
     $("topic-dot").style.background = colorTema(ctx.materia, item.tema);
     $("topic-badge").textContent = item.tema;
-    $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · real" : "");
+    $("type-badge").textContent = TIPO_LABELS[item.tipo] || item.tipo;
     const etiquetaDif = DIF_LABELS[item.dificultad] || "";
     const tinteDif = { facil: "var(--study-success)", media: "var(--study-warning)", dificil: "var(--study-error)" };
     $("dif-badge").classList.toggle("hidden", !etiquetaDif);

@@ -36,13 +36,6 @@
       Preguntas y opciones aleatorias, con explicación en cada respuesta.
     </p>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-      <button id="card-repaso" class="mode-card sm:col-span-2 bg-amber-950/40 border-amber-700 hover:border-amber-500" data-action="irRepaso">
-        <span class="icono icono-lg" data-icono="repaso"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">RepasoQuiz — Preguntas garantizadas</span>
-          <span class="mode-desc block">Las preguntas reales de parciales anteriores. Mismo orden y redacción del examen.</span>
-        </span>
-      </button>
       <button class="mode-card mode-primaria" data-action="irConfig">
         <span class="icono icono-lg" data-icono="practica"></span>
         <span class="min-w-0">
@@ -137,20 +130,6 @@
     </div>
   </section>
 
-  <section id="screen-repaso" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">RepasoQuiz</h1>
-      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
-    </div>
-    <p class="subtitle">Preguntas reales de parciales anteriores de esta materia. Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
-    <div id="repaso-list"></div>
-    <div class="flex flex-wrap gap-3 justify-center mt-6">
-      <button class="btn btn-primary" data-action="iniciarRepasoQuiz">Comenzar RepasoQuiz (<span id="repaso-n">10</span> preguntas)</button>
-      <button class="btn btn-secondary" data-action="estudioGarantizadas">Ver soluciones</button>
-      <button class="btn btn-ghost" data-action="flashcardsGarantizadas">🃏 Flashcards</button>
-    </div>
-  </section>
-
   <section id="screen-config" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
       <h1 class="text-xl sm:text-2xl font-bold">Configurar práctica</h1>
@@ -188,7 +167,6 @@
       </div>
       <span class="badge hidden" id="timer-badge"><span data-icono="reloj"></span>20:00</span>
       <span class="badge hidden" id="simulacro-badge">Simulacro</span>
-      <span class="badge hidden" id="repaso-badge">RepasoQuiz</span>
       <span class="badge hidden" id="modo-badge"></span>
       <span class="badge hidden" id="vidas-badge"></span>
       <span class="badge hidden" id="timer-pregunta"><span data-icono="rayo"></span>30s</span>

@@ -108,10 +108,10 @@ funcionales del marcador (★/☆) y de selección múltiple (☑/☐).
 
 ## Hierarchy & surfaces
 
-- El home jerarquiza: RepasoQuiz destacado, "Configurar práctica" primaria a lo ancho y el
-  resto de modos como filas compactas con icono + título + descripción.
+- El home jerarquiza: "Configurar práctica" primaria a lo ancho y el resto de modos como filas
+  compactas con icono + título + descripción.
 - El quiz usa una meta-línea de texto (pregunta · tema · tipo · dificultad) y reserva las pills
-  para estado vivo: temporizador, vidas, simulacro/repaso/modo.
+  para estado vivo: temporizador, vidas, simulacro/modo.
 - Profundidad por superficie tonal y borde: `shadow-xl` solo en overlays y toasts. Hover cambia
   borde/fondo, nunca traslada la card.
 

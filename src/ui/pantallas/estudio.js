@@ -5,18 +5,15 @@ import {
   TIPOS, TIPO_LABELS, DIF_LABELS,
   bloqueCaso, colorTema, diagramaER, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
-import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 
 export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla }) {
   let estudioTipo = "todos";
-  let estudioSoloReales = false;
   const keywords = () => sqlKeywordsDe(ctx.materia);
 
   function startStudy() {
     estudioTipo = "todos";
-    estudioSoloReales = false;
     renderStudy("");
     const search = $("study-search");
     if (search) search.value = "";
@@ -24,32 +21,15 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
     mostrarPantalla("study");
   }
 
-  function toggleEstudioReales() {
-    estudioSoloReales = !estudioSoloReales;
-    renderStudy($("study-search").value);
-    renderStudyFiltros();
-  }
-
-  function estudioGarantizadas() {
-    startStudy();
-    estudioSoloReales = true;
-    renderStudy("");
-    renderStudyFiltros();
-  }
-
   function renderStudyFiltros() {
     const cont = $("study-filtros");
     if (!cont) return;
     const tipos = ["todos"].concat(TIPOS);
-    let html = tipos.map(t => {
+    const html = tipos.map(t => {
       const etiqueta = t === "todos" ? "Todos" : (TIPO_LABELS[t] || t);
       const cuenta = t === "todos" ? ctx.banco.length : ctx.banco.filter(q => q.tipo === t).length;
       return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" data-action="cambiarEstudioTipo" data-tipo="' + t + '">' + etiqueta + ' · ' + cuenta + '</button>';
     }).join("");
-    const nReales = ctx.banco.filter(q => q.real).length;
-    if (nReales) {
-      html += '<button class="chip flex items-center gap-1.5' + (estudioSoloReales ? " chip-on" : "") + '" data-action="toggleEstudioReales">' + icono("llama", "icono-sm") + ' Garantizadas · ' + nReales + '</button>';
-    }
     cont.innerHTML = html;
   }
 
@@ -64,7 +44,6 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
     const f = String(filtro || "").trim().toLowerCase();
     const lista = banco.filter(item => {
       if (estudioTipo !== "todos" && item.tipo !== estudioTipo) return false;
-      if (estudioSoloReales && !item.real) return false;
       if (!f) return true;
       const campos = [item.q, item.exp || "", item.codigo || "", item.tema, item.parcial, item.caso || "", (item.options || []).join(" "), (item.respuestas || []).join(" "), (item.bloques || []).join(" "), item.solucion || "", (item.pares || []).map(p => p[0] + " " + p[1]).join(" "), (item.claves || []).join(" "), (item.nodosPool || []).join(" "), (item.relacionesEsperadas || []).map(r => r.de + " " + r.a + " " + r.tipo).join(" ")];
       return campos.join(" ").toLowerCase().includes(f);
@@ -76,7 +55,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
         '<div class="flex items-center justify-between gap-2 flex-wrap mb-2">' +
           '<div class="flex items-center gap-2 flex-wrap">' +
             '<span class="badge" style="background:' + colorTema(ctx.materia, item.tema) + '; color:#0f172a">' + item.tema + '</span>' +
-            '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + (item.real ? ' · <b class="text-amber-300">garantizada</b>' : "") + '</span>' +
+            '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + '</span>' +
           '</div>' +
           '<button class="star-btn' + (marcada ? " star-on" : "") + '" data-action="toggleMarcadaEstudio" data-id="' + item.id + '">' + (marcada ? "★" : "☆") + '</button>' +
         '</div>' +
@@ -107,8 +86,6 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
 
   return {
     startStudy,
-    toggleEstudioReales,
-    estudioGarantizadas,
     cambiarEstudioTipo,
     renderStudy,
     toggleStudy,

@@ -1,4 +1,4 @@
-﻿// Render e interacción del modo flashcards (incluye la ronda de garantizadas).
+﻿// Render e interacción del modo flashcards.
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
 import { shuffle } from "../../core/sesiones.js";
@@ -18,16 +18,6 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     const items = priorizar(ctx.banco).map(it =>
       it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: shuffle(it.bloques) }) : it
     );
-    flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };
-    mostrarPantalla("flashcards");
-    renderFlashcard();
-  }
-
-  function flashcardsGarantizadas() {
-    const items = ctx.banco.filter(q => q.real).map(it =>
-      it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: it.bloques.slice() }) : it
-    );
-    if (!items.length) return;
     flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };
     mostrarPantalla("flashcards");
     renderFlashcard();
@@ -100,5 +90,5 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     renderFlashcard();
   }
 
-  return { startFlashcards, flashcardsGarantizadas, voltearFlash, responderFlash, saltarFlash };
+  return { startFlashcards, voltearFlash, responderFlash, saltarFlash };
 }
