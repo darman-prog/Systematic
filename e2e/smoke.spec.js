@@ -171,6 +171,8 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#pool-diagrama .pieza').first().focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
+    // El foco se restaura sobre el nodo recién colocado (no se pierde al re-render).
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto').first()).toBeFocused();
     await page.locator('#pool-diagrama .pieza').first().focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(2);
@@ -187,6 +189,11 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#tipos-diagrama [data-arista]').first().focus();
     await page.keyboard.press('Enter');
     await expect(page.locator('#lienzo-diagrama .etiqueta-arista')).toHaveCount(1);
+
+    // Borra la conexión operando su etiqueta (botón) con teclado.
+    await page.locator('#lienzo-diagrama .etiqueta-arista').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#lienzo-diagrama .etiqueta-arista')).toHaveCount(0);
 
     // Escape deselecciona.
     await page.locator('#lienzo-diagrama .nodo-puesto').first().focus();

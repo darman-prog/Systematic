@@ -196,6 +196,7 @@ export function crearDiagramasUI({
             guardar(asignarMiembro(estado(), etiqueta, nodo.dataset.label));
             renderDiagrama(itemActual(), zona());
             setHint("«" + etiqueta + "» asignado a «" + nodo.dataset.label + "».");
+            enfocarPiezaPool("miembro", etiqueta);
           } else {
             setHint("Suelta el miembro sobre una clase para asignarlo (o tócalo y luego toca la clase).");
           }
@@ -237,6 +238,7 @@ export function crearDiagramasUI({
   pintarNodos(item, zona());
   dibujarAristas(item);
   setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
+  enfocarNodo(nombre);
   }
 
   function colocarMiembro(texto) {
@@ -247,6 +249,7 @@ export function crearDiagramasUI({
       guardar(asignarMiembro(est, texto, null));
       renderDiagrama(item, zona());
       setHint("«" + texto + "» devuelto al pool. Toca un miembro y luego la clase destino.");
+      enfocarPiezaPool("miembro", texto);
       return;
     }
     dragPid = "miembro:" + texto;
@@ -259,6 +262,7 @@ export function crearDiagramasUI({
     guardar(quitarNodo(estado(), Array.isArray(item.nodosFijos) ? item.nodosFijos : [], nombre));
     renderDiagrama(item, zona());
     setHint("Nodo retirado.");
+    enfocarPiezaPool("nodo", nombre);
   }
 
   function inicioMoverNodo(e) {
@@ -315,6 +319,7 @@ export function crearDiagramasUI({
       guardar(asignarMiembro(estado(), texto, nombre));
       renderDiagrama(item, zona());
       setHint("«" + texto + "» asignado a «" + nombre + "».");
+      enfocarPiezaPool("miembro", texto);
       return;
     }
     if (dragPid && dragPid.indexOf("nodo:") === 0) {
@@ -388,8 +393,12 @@ export function crearDiagramasUI({
   }
 
   function mostrarSelectorGuarda(de, a, tipo, dirigido, item) {
+    const focoPrevio = document.activeElement;
     const modal = document.createElement("div");
     modal.className = "modal-guarda";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Seleccionar guarda para " + de + " a " + a);
     modal.innerHTML =
       '<div class="modal-guarda-contenido">' +
         "<h3>Seleccionar guarda</h3>" +
@@ -401,13 +410,41 @@ export function crearDiagramasUI({
         '<button class="btn-cancelar" id="cancelar-guarda">Cancelar</button>' +
       "</div>";
     document.body.appendChild(modal);
-    
+
+    const cerrar = () => {
+      modal.remove();
+      if (focoPrevio && typeof focoPrevio.focus === "function") focoPrevio.focus({ preventScroll: true });
+    };
+    const primero = modal.querySelector(".btn-guarda");
+    if (primero) primero.focus();
+
+    modal.addEventListener("keydown", e => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        cerrar();
+        return;
+      }
+      // Trampa de foco: Tab cicla solo entre los botones del diálogo (WCAG 2.1.2).
+      if (e.key !== "Tab") return;
+      const botones = Array.from(modal.querySelectorAll("button"));
+      const idx = botones.indexOf(document.activeElement);
+      if (e.shiftKey && idx <= 0) {
+        e.preventDefault();
+        botones[botones.length - 1].focus();
+      } else if (!e.shiftKey && idx === botones.length - 1) {
+        e.preventDefault();
+        botones[0].focus();
+      }
+    });
+    // Cierre tocando el fondo del overlay (útil en táctil).
+    modal.addEventListener("pointerdown", e => { if (e.target === modal) cerrar(); });
+
     modal.querySelectorAll(".btn-guarda").forEach(btn => {
       btn.addEventListener("click", () => {
         const guarda = btn.dataset.guarda || undefined;
         const est = estado();
         guardar(conectar(est, de, a, tipo, dirigido, guarda));
-        modal.remove();
+        cerrar();
         const tipos = $("tipos-diagrama");
         if (tipos) tipos.hidden = true;
         pintarNodos(item, zona());
@@ -415,10 +452,8 @@ export function crearDiagramasUI({
         setHint("Relación creada" + (guarda ? " con guarda " + guarda : "") + ". Pulsa «Comprobar» cuando el diagrama esté listo.");
       });
     });
-    
-    modal.querySelector("#cancelar-guarda").addEventListener("click", () => {
-      modal.remove();
-    });
+
+    modal.querySelector("#cancelar-guarda").addEventListener("click", cerrar);
   }
 
   function pintarNodos(item, area) {
@@ -572,12 +607,14 @@ export function crearDiagramasUI({
       linea.setAttribute("y2", c2.y);
       if (dirigidoTipo) linea.setAttribute("marker-end", "url(#flecha-diagrama)");
       svg.appendChild(linea);
-      const etiqueta = document.createElement("span");
+      // Botón (no span) para que el borrado de la relación sea accesible por teclado.
+      const etiqueta = document.createElement("button");
+      etiqueta.type = "button";
       etiqueta.className = "etiqueta-arista";
       let textoEtiqueta = c.tipo;
       if (c.guarda) textoEtiqueta += " " + c.guarda;
       etiqueta.innerHTML = escapar(textoEtiqueta) + icono("cruz", "icono-sm");
-      etiqueta.title = "Quitar relación";
+      etiqueta.setAttribute("aria-label", "Quitar relación " + textoEtiqueta + " entre " + c.de + " y " + c.a);
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";
       etiqueta.addEventListener("click", () => {
@@ -593,6 +630,21 @@ export function crearDiagramasUI({
   function setHint(texto) {
     const h = $("hint-diagrama");
     if (h) h.textContent = texto;
+  }
+
+  // Restaura el foco tras un re-render que destruye el elemento enfocado (WCAG 2.4.3).
+  function enfocarNodo(nombre) {
+    const zonaEl = zona();
+    if (!zonaEl) return;
+    const destino = Array.from(zonaEl.querySelectorAll(".nodo-puesto")).find(n => n.dataset.label === nombre);
+    if (destino) destino.focus({ preventScroll: true });
+  }
+
+  function enfocarPiezaPool(atributo, valor) {
+    const zonaEl = zona();
+    if (!zonaEl) return;
+    const destino = Array.from(zonaEl.querySelectorAll(".pieza")).find(p => p.dataset[atributo] === valor);
+    if (destino) destino.focus({ preventScroll: true });
   }
 
   // Inyecta (una vez por render) el marker de punta de flecha usado por los subtipos
