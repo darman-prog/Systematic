@@ -10,19 +10,19 @@ import {
 } from "../../core/diagramas.js";
 
 const $ = id => document.getElementById(id);
-// Área interna (papel) del lienzo: los nodos se posicionan y se dibujan respecto a ella;
-// #lienzo-diagrama es el marco scrollable (en móvil el papel es más grande que el marco).
+// Ãrea interna (papel) del lienzo: los nodos se posicionan y se dibujan respecto a ella;
+// #lienzo-diagrama es el marco scrollable (en mÃ³vil el papel es mÃ¡s grande que el marco).
 const $area = () => document.getElementById("lienzo-area");
 
 // Opciones:
-//   ctx              — sesión del quiz (modo práctica); si no se pasa, usa los getters.
-//   obtenerItem      — () => ítem/pregunta actual (por defecto ctx.session.items[idx]).
-//   obtenerEstado    — () => estado del tablero (por defecto ctx.session.diagrama).
-//   guardarEstado    — callback al mutar el estado (modo casos, sin sesión).
-//   areaId           — id del contenedor donde re-renderizar (por defecto "question-area").
-//   accionComprobar  — data-action del botón comprobar.
-//   accionCancelarTipo — data-action del botón cancelar tipo de relación.
-//   mostrarPregunta  — si false, no pinta bloqueCaso ni el enunciado (modo casos).
+//   ctx              â€” sesiÃ³n del quiz (modo prÃ¡ctica); si no se pasa, usa los getters.
+//   obtenerItem      â€” () => Ã­tem/pregunta actual (por defecto ctx.session.items[idx]).
+//   obtenerEstado    â€” () => estado del tablero (por defecto ctx.session.diagrama).
+//   guardarEstado    â€” callback al mutar el estado (modo casos, sin sesiÃ³n).
+//   areaId           â€” id del contenedor donde re-renderizar (por defecto "question-area").
+//   accionComprobar  â€” data-action del botÃ³n comprobar.
+//   accionCancelarTipo â€” data-action del botÃ³n cancelar tipo de relaciÃ³n.
+//   mostrarPregunta  â€” si false, no pinta bloqueCaso ni el enunciado (modo casos).
 export function crearDiagramasUI({
   ctx,
   guardarEstado,
@@ -86,13 +86,13 @@ export function crearDiagramasUI({
         ? bloqueCaso(item) +
           '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + "</div>" +
           (item.subtipo === "uml-clases" && !item.diagrama
-            ? '<p class="text-xs text-slate-400 mb-3">Lee cada clase y coloca sus atributos y métodos en la clase correcta.</p>'
+            ? '<p class="text-xs text-slate-400 mb-3">Lee cada clase y coloca sus atributos y mÃ©todos en la clase correcta.</p>'
             : "") +
           (item.subtipo === "actividades"
-            ? '<p class="text-xs text-slate-400 mb-3">Los nodos de inicio/fin ya están colocados. Completa acciones y decisiones.</p>'
+            ? '<p class="text-xs text-slate-400 mb-3">Los nodos de inicio/fin ya estÃ¡n colocados. Completa acciones y decisiones.</p>'
             : "")
         : "") +
-      '<p class="text-xs text-slate-400 mb-2">Arrastra una entidad al lienzo (o tócala para colocarla). Para conectar: toca un nodo y luego el otro.</p>' +
+      '<p class="text-xs text-slate-400 mb-2">Arrastra una entidad al lienzo (o tÃ³cala para colocarla). Para conectar: toca un nodo y luego el otro.</p>' +
       '<div id="pool-diagrama" class="flex flex-wrap gap-2.5 mt-1 min-h-[44px]">' +
         pool +
       "</div>" +
@@ -101,12 +101,12 @@ export function crearDiagramasUI({
       '<div id="tipos-diagrama" class="flex flex-wrap gap-2.5 mt-2 items-center" hidden>' +
         "<span>Tipo:</span>" +
         tiposDe(item).map(t => '<button class="pieza" data-arista="' + escapar(t) + '">' + escapar(t) + "</button>").join("") +
-        '<button class="btn-mini" data-action="' + accionCancelarTipo + '" aria-label="Cancelar selección">' + icono("cruz", "icono-sm") + "</button>" +
+        '<button class="btn-mini" data-action="' + accionCancelarTipo + '" aria-label="Cancelar selecciÃ³n">' + icono("cruz", "icono-sm") + "</button>" +
       "</div>" +
       '<p id="hint-diagrama" class="text-xs text-slate-400 mt-2" role="status"></p>' +
       (resultado
         ? '<div class="mt-4"><div class="font-bold mb-2 ' + (resultado.ok ? "text-emerald-300" : "text-rose-300") + '">' +
-          (resultado.ok ? icono("check", "icono-sm") + " ¡Diagrama correcto!" : icono("cruz", "icono-sm") + " Aún no: revisa el detalle") + "</div>" +
+          (resultado.ok ? icono("check", "icono-sm") + " Â¡Diagrama correcto!" : icono("cruz", "icono-sm") + " AÃºn no: revisa el detalle") + "</div>" +
           (resultado.detalle ? '<div class="text-sm text-slate-300">' + escapar(resultado.detalle) + "</div>" : "") + "</div>"
         : "") +
       '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-diagrama" data-action="' + accionComprobar + '" ' +
@@ -165,7 +165,7 @@ export function crearDiagramasUI({
     const origen = e.currentTarget;
     const etiqueta = origen.dataset.nodo || origen.dataset.miembro;
     const esMiembro = !!origen.dataset.miembro;
-    // En táctil el ghost va por encima del dedo para que se vea qué se arrastra.
+    // En tÃ¡ctil el ghost va por encima del dedo para que se vea quÃ© se arrastra.
     const sobreDedo = e.pointerType === "touch";
     const x0 = e.clientX, y0 = e.clientY;
     let movido = false;
@@ -200,10 +200,10 @@ export function crearDiagramasUI({
           if (nodo) {
             guardar(asignarMiembro(estado(), etiqueta, nodo.dataset.label));
             renderDiagrama(itemActual(), zona());
-            setHint("«" + etiqueta + "» asignado a «" + nodo.dataset.label + "».");
+            setHint("Â«" + etiqueta + "Â» asignado a Â«" + nodo.dataset.label + "Â».");
             enfocarPiezaPool("miembro", etiqueta);
           } else {
-            setHint("Suelta el miembro sobre una clase para asignarlo (o tócalo y luego toca la clase).");
+            setHint("Suelta el miembro sobre una clase para asignarlo (o tÃ³calo y luego toca la clase).");
           }
         } else {
           colocarNodoUI(etiqueta, ev.clientX - r.left - 52, ev.clientY - r.top - 18);
@@ -230,7 +230,7 @@ export function crearDiagramasUI({
   if (x !== undefined && y !== undefined) {
     const papel = $area();
     if (papel) {
-      // Ajustar coordenadas para que estén dentro de los límites del papel
+      // Ajustar coordenadas para que estÃ©n dentro de los lÃ­mites del papel
       const maxX = Math.max(0, papel.clientWidth - 110);
       const maxY = Math.max(0, papel.clientHeight - 60);
       const xAjustada = Math.max(4, Math.min(x, maxX));
@@ -242,7 +242,7 @@ export function crearDiagramasUI({
   guardar(nuevoEstado);
   pintarNodos(item, zona());
   dibujarAristas(item);
-  setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
+  setHint("Â«" + nombre + "Â» en el lienzo. Toca un nodo y luego otro para conectarlos.");
   enfocarNodo(nombre);
   const nuevo = Array.from(zona().querySelectorAll(".nodo-puesto")).find(n => n.dataset.label === nombre);
   if (nuevo && nuevo.scrollIntoView) nuevo.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -255,12 +255,12 @@ export function crearDiagramasUI({
     if (est.miembros[texto]) {
       guardar(asignarMiembro(est, texto, null));
       renderDiagrama(item, zona());
-      setHint("«" + texto + "» devuelto al pool. Toca un miembro y luego la clase destino.");
+      setHint("Â«" + texto + "Â» devuelto al pool. Toca un miembro y luego la clase destino.");
       enfocarPiezaPool("miembro", texto);
       return;
     }
     seleccion = "miembro:" + texto;
-    setHint("«" + texto + "» seleccionado. Toca la clase destino.");
+    setHint("Â«" + texto + "Â» seleccionado. Toca la clase destino.");
   }
 
   function quitarNodoUI(nombre) {
@@ -297,7 +297,7 @@ export function crearDiagramasUI({
       n.style.left = nuevoX + "px";
       n.style.top = nuevoY + "px";
       dibujarAristas(itemActual());
-      // Auto-scroll del marco cuando el nodo se acerca a un borde visible (táctil).
+      // Auto-scroll del marco cuando el nodo se acerca a un borde visible (tÃ¡ctil).
       const rMarco = lienzo.getBoundingClientRect();
       const margen = 48;
       let dx = 0, dy = 0;
@@ -319,7 +319,7 @@ export function crearDiagramasUI({
       if (!movido) {
         toqueNodo(n.dataset.label);
       } else {
-        // ? Guardar la nueva posición en el estado usando las coordenadas finales del elemento
+        // âœ… Guardar la nueva posiciÃ³n en el estado usando las coordenadas finales del elemento
         const nuevaX = parseInt(n.style.left);
         const nuevaY = parseInt(n.style.top);
         guardar(actualizarPosicion(estado(), n.dataset.label, nuevaX, nuevaY));
@@ -339,7 +339,7 @@ export function crearDiagramasUI({
       seleccion = null;
       guardar(asignarMiembro(estado(), texto, nombre));
       renderDiagrama(item, zona());
-      setHint("«" + texto + "» asignado a «" + nombre + "».");
+      setHint("Â«" + texto + "Â» asignado a Â«" + nombre + "Â».");
       enfocarPiezaPool("miembro", texto);
       return;
     }
@@ -354,7 +354,7 @@ export function crearDiagramasUI({
       el.classList.add("seleccionado");
       el.setAttribute("aria-pressed", "true");
     }
-    setHint("«" + nombre + "» seleccionado. Toca otro nodo para conectarlo.");
+    setHint("Â«" + nombre + "Â» seleccionado. Toca otro nodo para conectarlo.");
   }
 
   function cancelarSeleccion() {
@@ -374,7 +374,7 @@ export function crearDiagramasUI({
     const primero = seleccion.slice("nodo:".length);
     cancelarSeleccion();
     if (primero === nombre) {
-      setHint("Selección cancelada.");
+      setHint("SelecciÃ³n cancelada.");
       return;
     }
     const tipos = $("tipos-diagrama");
@@ -382,7 +382,7 @@ export function crearDiagramasUI({
     tipos.dataset.de = primero;
     tipos.dataset.a = nombre;
     tipos.hidden = false;
-    setHint("Elige el tipo de relación entre «" + primero + "» y «" + nombre + "».");
+    setHint("Elige el tipo de relaciÃ³n entre Â«" + primero + "Â» y Â«" + nombre + "Â».");
   }
 
   function elegirTipo(tipo) {
@@ -390,7 +390,7 @@ export function crearDiagramasUI({
     const tipos = $("tipos-diagrama");
     if (!item || !tipos || tipos.hidden) return;
     const est = estado();
-    // La dirección depende del tipo de relación, no solo del subtipo (asociación es no dirigida).
+    // La direcciÃ³n depende del tipo de relaciÃ³n, no solo del subtipo (asociaciÃ³n es no dirigida).
     const dirigido = esDirigidoTipo(item.subtipo, tipo);
 
     // Para actividades, permitir seleccionar una guarda
@@ -401,7 +401,7 @@ export function crearDiagramasUI({
       tipos.hidden = true;
       pintarNodos(item, zona());
       dibujarAristas(item);
-      setHint("Relación creada. Pulsa «Comprobar» cuando el diagrama esté listo.");
+      setHint("RelaciÃ³n creada. Pulsa Â«ComprobarÂ» cuando el diagrama estÃ© listo.");
     }
   }
 
@@ -410,7 +410,7 @@ export function crearDiagramasUI({
       .map(r => r && r.guarda)
       .filter(g => typeof g === "string" && g.trim().length);
     const unicas = [...new Set(declaradas)];
-    return unicas.length ? unicas : ["[sí]", "[no]", "[verdadero]", "[falso]"];
+    return unicas.length ? unicas : ["[sÃ­]", "[no]", "[verdadero]", "[falso]"];
   }
 
   function mostrarSelectorGuarda(de, a, tipo, dirigido, item) {
@@ -423,7 +423,7 @@ export function crearDiagramasUI({
     modal.innerHTML =
       '<div class="modal-guarda-contenido">' +
         "<h3>Seleccionar guarda</h3>" +
-        "<p>Elige la condición para esta transición:</p>" +
+        "<p>Elige la condiciÃ³n para esta transiciÃ³n:</p>" +
         '<div class="guardas-opciones">' +
           '<button class="btn-guarda" data-guarda="">Sin guarda</button>' +
           guardasDe(item).map(g => '<button class="btn-guarda" data-guarda="' + escapar(g) + '">' + escapar(g) + "</button>").join("") +
@@ -445,7 +445,7 @@ export function crearDiagramasUI({
         cerrar();
         return;
       }
-      // Trampa de foco: Tab cicla solo entre los botones del diálogo (WCAG 2.1.2).
+      // Trampa de foco: Tab cicla solo entre los botones del diÃ¡logo (WCAG 2.1.2).
       if (e.key !== "Tab") return;
       const botones = Array.from(modal.querySelectorAll("button"));
       const idx = botones.indexOf(document.activeElement);
@@ -457,7 +457,7 @@ export function crearDiagramasUI({
         botones[0].focus();
       }
     });
-    // Cierre tocando el fondo del overlay (útil en táctil).
+    // Cierre tocando el fondo del overlay (Ãºtil en tÃ¡ctil).
     modal.addEventListener("pointerdown", e => { if (e.target === modal) cerrar(); });
 
     modal.querySelectorAll(".btn-guarda").forEach(btn => {
@@ -470,7 +470,7 @@ export function crearDiagramasUI({
         if (tipos) tipos.hidden = true;
         pintarNodos(item, zona());
         dibujarAristas(item);
-        setHint("Relación creada" + (guarda ? " con guarda " + guarda : "") + ". Pulsa «Comprobar» cuando el diagrama esté listo.");
+        setHint("RelaciÃ³n creada" + (guarda ? " con guarda " + guarda : "") + ". Pulsa Â«ComprobarÂ» cuando el diagrama estÃ© listo.");
       });
     });
 
@@ -484,15 +484,15 @@ export function crearDiagramasUI({
     if (!papel) return;
     papel.querySelectorAll(".nodo-puesto,.etiqueta-arista").forEach(el => el.remove());
 
-    // ? USAR POSICIONES DEL ESTADO en lugar de calcular automáticamente
+    // âœ… USAR POSICIONES DEL ESTADO en lugar de calcular automÃ¡ticamente
     est.nodosColocados.forEach((nombre) => {
       const fijo = Array.isArray(item.nodosFijos) && item.nodosFijos.indexOf(nombre) !== -1;
       const n = document.createElement("div");
       n.className = "nodo-puesto" + (fijo ? " nodo-fijo" : "");
       n.dataset.label = nombre;
 
-      // ? Usar posición guardada en el estado, o fallback por si no existe.
-      // Se clampea al papel por si el estado guardado viene de un lienzo más grande.
+      // âœ… Usar posiciÃ³n guardada en el estado, o fallback por si no existe.
+      // Se clampea al papel por si el estado guardado viene de un lienzo mÃ¡s grande.
       const pos = est.posiciones[nombre] || { x: 50, y: 50 };
       const maxX = Math.max(4, papel.clientWidth - 110);
       const maxY = Math.max(4, papel.clientHeight - 60);
@@ -545,7 +545,7 @@ export function crearDiagramasUI({
           seleccion = null;
           guardar(asignarMiembro(estado(), texto, nombre));
           pintarNodos(item, area);
-          setHint("Miembro asignado a «" + nombre + "».");
+          setHint("Miembro asignado a Â«" + nombre + "Â».");
           return;
         }
         inicioMoverNodo(e);
@@ -559,7 +559,7 @@ export function crearDiagramasUI({
         if (e.key === "Escape") {
           e.preventDefault();
           cancelarSeleccion();
-          setHint("Selección cancelada.");
+          setHint("SelecciÃ³n cancelada.");
           return;
         }
         if (!fijo && (e.key === "Delete" || e.key === "Backspace")) {
@@ -578,7 +578,7 @@ export function crearDiagramasUI({
           n.style.left = nuevoX + "px";
           n.style.top = nuevoY + "px";
           dibujarAristas(item);
-          // ? Guardar la nueva posición en el estado (siempre fresco, no el capturado al pintar)
+          // âœ… Guardar la nueva posiciÃ³n en el estado (siempre fresco, no el capturado al pintar)
           guardar(actualizarPosicion(estado(), nombre, nuevoX, nuevoY));
         }
       });
@@ -619,7 +619,7 @@ export function crearDiagramasUI({
       const nDe = mapa[c.de];
       const nA = mapa[c.a];
       if (!nDe || !nA) return;
-      // La dirección se decide por tipo (p. ej. asociación en UML es no dirigida).
+      // La direcciÃ³n se decide por tipo (p. ej. asociaciÃ³n en UML es no dirigida).
       const dirigidoTipo = esDirigidoTipo((item || {}).subtipo, c.tipo);
       const c1 = centro(nDe);
       const c2 = centro(nA);
@@ -630,21 +630,21 @@ export function crearDiagramasUI({
       linea.setAttribute("y2", c2.y);
       if (dirigidoTipo) linea.setAttribute("marker-end", "url(#flecha-diagrama)");
       svg.appendChild(linea);
-      // Botón (no span) para que el borrado de la relación sea accesible por teclado.
+      // BotÃ³n (no span) para que el borrado de la relaciÃ³n sea accesible por teclado.
       const etiqueta = document.createElement("button");
       etiqueta.type = "button";
       etiqueta.className = "etiqueta-arista";
       let textoEtiqueta = c.tipo;
       if (c.guarda) textoEtiqueta += " " + c.guarda;
       etiqueta.innerHTML = escapar(textoEtiqueta) + icono("cruz", "icono-sm");
-      etiqueta.setAttribute("aria-label", "Quitar relación " + textoEtiqueta + " entre " + c.de + " y " + c.a);
+      etiqueta.setAttribute("aria-label", "Quitar relaciÃ³n " + textoEtiqueta + " entre " + c.de + " y " + c.a);
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";
       etiqueta.addEventListener("click", () => {
         guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigidoTipo, c.guarda));
         pintarNodos(item, zona());
         dibujarAristas(item);
-        setHint("Relación eliminada.");
+        setHint("RelaciÃ³n eliminada.");
       });
       papel.appendChild(etiqueta);
     });

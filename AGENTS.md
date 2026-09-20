@@ -48,6 +48,8 @@ apuntes. Sitio estático desplegado en Vercel.
   con revisión humana por lote antes de commitear.
 - Commits: Conventional Commits (`feat`, `fix`, `chore`, `build`, `test`, `docs`), uno por paso
   de plan; skills `workflow` y `uso-eficiente` como referencia.
+- Editar archivos solo con herramientas que preserven UTF-8. Nunca hacer round-trips
+  `Get-Content`/`Set-Content` de PowerShell 5.1: corrompen acentos y símbolos ( UTF-8 → U+FFFD).
 - Sin secretos ni `.env` versionados; sin dependencias CDN en runtime.
 
 ## Deploy
