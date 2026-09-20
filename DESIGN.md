@@ -74,8 +74,25 @@ Cards y controles usan radios de 8-16px, foco visible y objetivos táctiles de a
 Cards de modo, chips, botones, feedback y tarjetas de pregunta comparten superficies y tokens.
 Los estados correcto/incorrecto siempre incluyen texto, icono o estructura además del color.
 
+## Iconography
+
+La iconografía es un set propio de SVG de trazo (`src/ui/iconos.js`): stroke 1.5, viewBox 24,
+`currentColor`, tamaño 16/20/22px. Los iconos acompañan siempre texto con el nombre de la
+acción; nunca sustituyen etiquetas. No se usan emojis como iconos; solo permanecen los glifos
+funcionales del marcador (★/☆) y de selección múltiple (☑/☐).
+
+## Hierarchy & surfaces
+
+- El home jerarquiza: RepasoQuiz destacado, "Configurar práctica" primaria a lo ancho y el
+  resto de modos como filas compactas con icono + título + descripción.
+- El quiz usa una meta-línea de texto (pregunta · tema · tipo · dificultad) y reserva las pills
+  para estado vivo: temporizador, vidas, simulacro/repaso/modo.
+- Profundidad por superficie tonal y borde: `shadow-xl` solo en overlays y toasts. Hover cambia
+  borde/fondo, nunca traslada la card.
+
 ## Do's and Don'ts
 
 - Sí: transiciones breves, movimiento suave, confeti discreto al lograr hitos.
 - Sí: estados vacíos con una próxima acción clara.
 - No: texto con gradiente, saturación alta, flashes, motion obligatorio o gamificación punitiva.
+- No: emojis como iconos, halos de color sin offset, cards idénticas en grilla como estructura.
