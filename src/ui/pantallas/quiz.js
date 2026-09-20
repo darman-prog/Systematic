@@ -27,18 +27,19 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const item = session.items[session.idx];
     const n = session.items.length;
     $("progress").textContent = "Pregunta " + (session.idx + 1) + " de " + n + " · " + Math.round(((session.idx + 1) / n) * 100) + "%";
-    const tb = $("topic-badge");
-    tb.textContent = item.tema;
-    tb.style.background = colorTema(ctx.materia, item.tema);
-    tb.style.color = "#0f172a";
+    // Meta-línea calmada (spec 005/006): el tema lleva un punto de color y el resto es texto;
+    // la dificultad es texto con tinte semántico de la paleta, nunca un resaltado.
+    $("topic-dot").style.background = colorTema(ctx.materia, item.tema);
+    $("topic-badge").textContent = item.tema;
     $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · real" : "");
-    const db = $("dif-badge");
-    const coloresDif = { facil: ["#065f46", "#a7f3d0"], media: ["#78350f", "#fde68a"], dificil: ["#881337", "#fecdd3"] };
-    const cd = coloresDif[item.dificultad] || ["#334155", "#e2e8f0"];
-    db.textContent = DIF_LABELS[item.dificultad] || "";
-    db.classList.remove("hidden");
-    db.style.background = cd[0];
-    db.style.color = cd[1];
+    const etiquetaDif = DIF_LABELS[item.dificultad] || "";
+    const tinteDif = { facil: "var(--study-success)", media: "var(--study-warning)", dificil: "var(--study-error)" };
+    $("dif-badge").classList.toggle("hidden", !etiquetaDif);
+    if (etiquetaDif) {
+      const dt = $("dif-texto");
+      dt.textContent = etiquetaDif;
+      dt.style.color = tinteDif[item.dificultad] || "var(--study-muted)";
+    }
     $("progress-fill").style.width = ((session.idx / n) * 100) + "%";
     actualizarEstrella(item.id);
     const fb = $("feedback-box");
