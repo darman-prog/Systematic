@@ -4,6 +4,9 @@ node_modules/
 # Build
 dist/
 
+# Vercel CLI (link de proyecto local)
+.vercel/
+
 # Entorno (nunca versionar valores reales)
 .env
 .env.*

@@ -122,4 +122,11 @@ reversibles en un commit.
 - Terminado con los 8 criterios de aceptación cumplidos y deploy público verificado.
 
 ## Trazabilidad
-Pendiente (se completa al implementar).
+- Commits: 8f3bfad fundación · 7f91904 Vite+Tailwind · 6434c79 multi-materia · c1e1689 validador ·
+  c68ab5a fix priorización · b5b3e0b e2e smoke · 92e3400 apuntes · 2055cfb contenido ISW ·
+  ec991ed contenido ASW · ce1d564 fix repaso+smoke.
+- Evidencia al cierre de implementación: `npm run validar` (3 materias · 152 preguntas · 79
+  términos) · `npm run test` 42/42 · `npm run e2e` 6/6 (Playwright, build incluido).
+- Pendiente: criterio 7 — deploy y verificación en Vercel (requiere login del usuario, CLI o
+  dashboard). Nota de revisión humana pendiente del contenido generado (ASW: definiciones
+  estándar en polimorfismo y "composición sobre herencia" donde la lámina solo traía el título).
