@@ -138,6 +138,47 @@ export function validarApuntes(apuntes, { existeFuente } = {}) {
   return errores;
 }
 
+export function validarEscenarios(escenarios) {
+  if (escenarios === undefined) return [];
+  if (!esArreglo(escenarios)) return ["[escenarios] debe ser arreglo"];
+  const errores = [];
+  const ids = new Set();
+  escenarios.forEach(e => {
+    const ref = "[escenarios] escenario \"" + (e && e.id || "?") + "\"";
+    if (!e || !textoNoVacio(e.id)) errores.push("[escenarios] escenario sin id");
+    else if (ids.has(e.id)) errores.push(ref + " duplicado");
+    else ids.add(e.id);
+    if (!e || !textoNoVacio(e.titulo)) errores.push(ref + " sin título");
+    if (!e || !textoNoVacio(e.tema)) errores.push(ref + " sin tema");
+    if (!e || !textoNoVacio(e.intro)) errores.push(ref + " sin intro");
+    if (!e || !esArreglo(e.pasos) || e.pasos.length < 2) {
+      errores.push(ref + " debe tener al menos 2 pasos");
+    } else {
+      const idsPasos = new Set(e.pasos.map(p => p.id));
+      e.pasos.forEach(p => {
+        if (!p || !textoNoVacio(p.id)) errores.push(ref + " con paso sin id");
+        if (!p || !textoNoVacio(p.narrativa)) errores.push(ref + " paso \"" + (p && p.id || "?") + "\" sin narrativa");
+        if (!p || !esArreglo(p.opciones) || p.opciones.length < 2) {
+          errores.push(ref + " paso \"" + (p && p.id || "?") + "\" necesita al menos 2 opciones");
+        } else {
+          p.opciones.forEach((o, i) => {
+            const refO = ref + " opción " + i + " del paso \"" + (p && p.id || "?") + "\"";
+            if (!o || !textoNoVacio(o.texto)) errores.push(refO + " sin texto");
+            if (!o || !textoNoVacio(o.feedback)) errores.push(refO + " sin feedback");
+            if (!o || !textoNoVacio(o.siguiente)) errores.push(refO + " sin siguiente");
+            else if (o.siguiente !== "fin" && !idsPasos.has(o.siguiente)) errores.push(refO + " apunta a un paso inexistente: " + o.siguiente);
+            if (!o || !Number.isInteger(o.puntos) || o.puntos < 0 || o.puntos > 2) errores.push(refO + " con puntos inválidos");
+          });
+        }
+      });
+    }
+    if (!e || !e.finales || !textoNoVacio(e.finales.exito) || !textoNoVacio(e.finales.parcial) || !textoNoVacio(e.finales.fracaso)) {
+      errores.push(ref + " con finales incompletos (exito/parcial/fracaso)");
+    }
+  });
+  return errores;
+}
+
 export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   if (!m || !textoNoVacio(m.id)) return ["[materia] sin id"];
   const errores = [];
@@ -145,6 +186,7 @@ export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   (m.preguntas || []).forEach(p => errores.push(...validarPregunta(p, idsVistos)));
   errores.push(...validarGlosario(m.glosario).map(e => `[${m.id}] ${e}`));
   errores.push(...validarApuntes(m.apuntes, { existeFuente }).map(e => `[${m.id}] ${e}`));
+  errores.push(...validarEscenarios(m.escenarios).map(e => `[${m.id}] ${e}`));
   return errores;
 }
 

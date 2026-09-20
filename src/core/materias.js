@@ -1,13 +1,16 @@
 // Registro de materias de la app. El contenido vive en src/datos/<materia>/.
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import bd2Glosario from "../datos/bd2/glosario.js";
+import bd2Escenarios from "../datos/bd2/escenarios.js";
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
 import iswGlosario from "../datos/isw/glosario.js";
 import iswApuntes from "../datos/isw/apuntes.js";
+import iswEscenarios from "../datos/isw/escenarios.js";
 import aswPreguntas from "../datos/asw/preguntas.js";
 import aswGlosario from "../datos/asw/glosario.js";
 import aswApuntes from "../datos/asw/apuntes.js";
+import aswEscenarios from "../datos/asw/escenarios.js";
 
 export const MATERIAS = [
   {
@@ -19,6 +22,7 @@ export const MATERIAS = [
     preguntas: bd2Preguntas,
     glosario: bd2Glosario,
     apuntes: [],
+    escenarios: bd2Escenarios,
     topicColors: bd2TopicColors,
     sqlKeywords: bd2SqlKeywords
   },
@@ -30,7 +34,8 @@ export const MATERIAS = [
     color: "#B5A9CF",
     preguntas: iswPreguntas,
     glosario: iswGlosario,
-    apuntes: iswApuntes
+    apuntes: iswApuntes,
+    escenarios: iswEscenarios
   },
   {
     id: "asw",
@@ -40,7 +45,8 @@ export const MATERIAS = [
     color: "#9FBEA9",
     preguntas: aswPreguntas,
     glosario: aswGlosario,
-    apuntes: aswApuntes
+    apuntes: aswApuntes,
+    escenarios: aswEscenarios
   }
 ];
 

@@ -14,6 +14,8 @@ import { crearEstudioUI } from "./ui/estudio.js";
 import { crearGlosarioUI } from "./ui/glosario.js";
 import { crearFlashcardsUI } from "./ui/flashcards.js";
 import { estadoMisiones, pintarMisiones } from "./ui/misiones.js";
+import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/escenarios.js";
+import { pintarListaEscenarios, pintarEscenario } from "./ui/escenarios.js";
 
 // Materia activa y datos asociados (se definen al seleccionar materia en el home).
 let materia = null;
@@ -25,6 +27,8 @@ let progreso = {};
 let session = null;
 let filtros = { parciales: new Set(), temas: new Set(), dificultades: new Set(), tipos: new Set(), soloDebiles: false, soloMarcadas: false, priorizar: true };
 let apunteTema = "todos";
+let escenarioActual = null;
+let escenarioEstado = null;
 
 const $ = id => document.getElementById(id);
 
@@ -38,7 +42,7 @@ const ctx = {
 };
 
 function show(screen) {
-    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "flashcards", "glosario", "repaso"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -249,7 +253,8 @@ function revisarLogros(extra) {
       simulacroPerfecto: false,
       metaCumplida: false,
       misionPerfecta: false,
-      estrellasTotales: 0
+      estrellasTotales: 0,
+      escenarioExito: false
     },
     extra || {}
   );
@@ -552,6 +557,49 @@ function iniciarMision(tema) {
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
   session.misionTema = tema;
+}
+
+// ===== Escenarios multi-paso (spec 003): decidir → consecuencias → final con rating =====
+
+function startEscenarios() {
+  show("escenarios");
+  pintarListaEscenarios((materia && materia.escenarios) || [], leerJSON(localStorage, "sys.escenarios", {}));
+}
+
+function jugarEscenario(id) {
+  const e = ((materia && materia.escenarios) || []).find(x => x.id === id);
+  if (!e) return;
+  escenarioActual = e;
+  escenarioEstado = iniciarEscenario(e);
+  $("escenario-titulo").textContent = e.titulo;
+  pintarEscenario(e, escenarioEstado);
+  show("escenario");
+}
+
+function decidirEscenario(idx) {
+  if (!escenarioActual || !escenarioEstado) return;
+  escenarioEstado = decidirEscenarioPaso(escenarioActual, escenarioEstado, idx);
+  pintarEscenario(escenarioActual, escenarioEstado);
+}
+
+function continuarEscenario() {
+  if (!escenarioActual || !escenarioEstado) return;
+  escenarioEstado = continuarEscenarioPaso(escenarioActual, escenarioEstado);
+  pintarEscenario(escenarioActual, escenarioEstado);
+  if (!escenarioEstado.terminado) return;
+  const xp = xpDeEscenario(escenarioEstado);
+  if (xp) sumarXp(xp);
+  const registros = leerJSON(localStorage, "sys.escenarios", {});
+  const previo = registros[escenarioActual.id];
+  const orden = { fracaso: 0, parcial: 1, exito: 2 };
+  const jugadas = ((previo && previo.jugadas) || 0) + 1;
+  if (!previo || orden[escenarioEstado.rating] > orden[previo.mejorRating]) {
+    registros[escenarioActual.id] = { mejorRating: escenarioEstado.rating, jugadas };
+  } else {
+    registros[escenarioActual.id] = { mejorRating: previo.mejorRating, jugadas };
+  }
+  escribirJSON(localStorage, "sys.escenarios", registros);
+  revisarLogros({ escenarioExito: escenarioEstado.rating === "exito" });
 }
 
 function practicarDebiles() {
@@ -971,6 +1019,10 @@ const ACCIONES = {
   salir: () => salir(),
   seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
   startApuntes: () => startApuntes(),
+  startEscenarios: () => startEscenarios(),
+  jugarEscenario: el => jugarEscenario(el.dataset.id),
+  decidirEscenario: el => decidirEscenario(parseInt(el.dataset.idx, 10)),
+  continuarEscenario: () => continuarEscenario(),
   startFlashcards: () => flashcards.startFlashcards(),
   startGlosario: () => glosarioUI.startGlosario(),
   startStudy: () => estudio.startStudy(),

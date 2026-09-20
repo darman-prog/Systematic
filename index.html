@@ -65,6 +65,11 @@
         <span class="font-bold">Misiones</span>
         <span class="text-xs text-slate-400">Gana estrellas por tema, nodo a nodo</span>
       </button>
+      <button class="mode-card" data-action="startEscenarios">
+        <span class="text-2xl">🎲</span>
+        <span class="font-bold">Escenarios</span>
+        <span class="text-xs text-slate-400">Toma decisiones y vive las consecuencias</span>
+      </button>
       <button class="mode-card" data-action="startFlashcards">
         <span class="text-2xl">🃏</span>
         <span class="font-bold">Flashcards</span>
@@ -200,6 +205,23 @@
     </div>
     <p class="subtitle">Completa misiones por tema y gana hasta 3 estrellas según tu precisión. Cada nodo se desbloquea con al menos 1 estrella del anterior.</p>
     <div id="misiones-lista"></div>
+  </section>
+
+  <section id="screen-escenarios" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">🎲 Escenarios</h1>
+      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+    </div>
+    <p class="subtitle">Casos de la materia: decide, recibe consecuencias y llega a un final. Tu mejor resultado queda guardado.</p>
+    <div id="escenarios-lista"></div>
+  </section>
+
+  <section id="screen-escenario" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold" id="escenario-titulo">Escenario</h1>
+      <button class="btn btn-ghost btn-sm" data-action="startEscenarios">← Escenarios</button>
+    </div>
+    <div id="escenario-escena"></div>
   </section>
 
   <section id="screen-flashcards" class="card hidden">

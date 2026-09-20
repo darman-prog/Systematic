@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validarPregunta, validarGlosario, validarApuntes, validarTodo } from "./validador.mjs";
+import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarTodo } from "./validador.mjs";
 
 const base = {
   id: "X-001",
@@ -74,6 +74,47 @@ describe("validarApuntes", () => {
     const existe = f => f === "existe.md";
     expect(validarApuntes(apuntes, { existeFuente: existe }).join(" ")).toContain("fuente inexistente");
     expect(validarApuntes([{ ...apuntes[0], fuente: "existe.md" }], { existeFuente: existe })).toEqual([]);
+  });
+});
+
+describe("validarEscenarios", () => {
+  const ok = {
+    id: "ESC-1", titulo: "T", tema: "Caso", intro: "I",
+    pasos: [
+      { id: "p1", narrativa: "N1", opciones: [
+        { texto: "A", feedback: "F", puntos: 2, siguiente: "p2" },
+        { texto: "B", feedback: "F", puntos: 0, siguiente: "fin" }
+      ] },
+      { id: "p2", narrativa: "N2", opciones: [
+        { texto: "A", feedback: "F", puntos: 1, siguiente: "fin" },
+        { texto: "B", feedback: "F", puntos: 0, siguiente: "fin" }
+      ] }
+    ],
+    finales: { exito: "E", parcial: "P", fracaso: "F" }
+  };
+
+  it("acepta un escenario correcto", () => {
+    expect(validarEscenarios([ok])).toEqual([]);
+  });
+
+  it("detecta enlaces a pasos inexistentes y duplicados", () => {
+    const roto = JSON.parse(JSON.stringify(ok));
+    roto.pasos[0].opciones[0].siguiente = "pX";
+    const errores = validarEscenarios([roto, ok]).join(" ");
+    expect(errores).toContain("paso inexistente: pX");
+    expect(errores).toContain("duplicado");
+  });
+
+  it("exige al menos 2 opciones con puntos 0-2 y finales completos", () => {
+    const malo = JSON.parse(JSON.stringify(ok));
+    malo.pasos[0].opciones = [
+      { texto: "A", feedback: "F", puntos: 5, siguiente: "fin" },
+      { texto: "B", feedback: "F", puntos: 0, siguiente: "fin" }
+    ];
+    malo.finales = { exito: "E" };
+    const errores = validarEscenarios([malo]).join(" ");
+    expect(errores).toContain("puntos inválidos");
+    expect(errores).toContain("finales incompletos");
   });
 });
 

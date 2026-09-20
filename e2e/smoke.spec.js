@@ -98,6 +98,20 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#screen-start')).toBeVisible();
   });
 
+  test('escenarios: lista, decisiones y pantalla de juego', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click();
+    await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
+    await expect(page.locator('#screen-escenarios')).toBeVisible();
+    await expect(page.locator('#escenarios-lista .apunte-card').first()).toBeVisible();
+    await page.getByRole('button', { name: /Jugar escenario/ }).first().click();
+    await expect(page.locator('#screen-escenario')).toBeVisible();
+    await page.locator('#escenario-escena .option').first().click();
+    await expect(page.locator('#escenario-escena')).toContainText('Continuar');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.locator('#escenario-escena')).toBeVisible();
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();
