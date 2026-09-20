@@ -47,7 +47,7 @@ export const MATERIAS = [
     nombre: "Arquitectura de Software",
     icono: "escenarios",
     descripcion: "POO, principios de diseño, SOLID y patrones.",
-    color: "#9FBEA9",
+    color: "#8FB3D9",
     preguntas: aswPreguntas,
     glosario: aswGlosario,
     apuntes: aswApuntes,
