@@ -1444,6 +1444,8 @@ import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
     if (icono) icono.textContent = materia.icono;
     const gloTitulo = $("glosario-titulo");
     if (gloTitulo) gloTitulo.textContent = "📚 Glosario";
+    const cardRepaso = $("card-repaso");
+    if (cardRepaso) cardRepaso.classList.toggle("hidden", !banco.some(q => q.real));
   }
 
   let apunteTema = "todos";

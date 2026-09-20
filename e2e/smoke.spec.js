@@ -9,9 +9,11 @@ test.describe('Systematic — smoke', () => {
     await expect(cards.nth(0)).toContainText('Base de Datos 2');
     await expect(cards.nth(0)).toContainText('87 preguntas');
     await expect(cards.nth(1)).toContainText('Ingeniería de Software');
-    await expect(cards.nth(1)).toContainText('Contenido en preparación');
+    await expect(cards.nth(1)).toContainText(/35 preguntas/);
+    await expect(cards.nth(1)).not.toContainText('Contenido en preparación');
     await expect(cards.nth(2)).toContainText('Arquitectura de Software');
-    await expect(cards.nth(2)).toContainText('Contenido en preparación');
+    await expect(cards.nth(2)).toContainText(/30 preguntas/);
+    await expect(cards.nth(2)).not.toContainText('Contenido en preparación');
   });
 
   test('seleccionar BD2 muestra estadísticas y permite practicar', async ({ page }) => {
@@ -62,15 +64,19 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#apuntes-count')).toContainText('0 apunte(s)');
   });
 
-  test('regresar a materias y entrar a una materia vacía', async ({ page }) => {
+  test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();
     await page.getByRole('button', { name: '← Materias' }).click();
     await expect(page.locator('#screen-materias')).toBeVisible();
     await page.locator('#materias-list .mode-card').nth(1).click();
     await expect(page.locator('#materia-nombre')).toHaveText('Ingeniería de Software');
-    await expect(page.locator('#stat-total')).toHaveText('0');
-    await expect(page.locator('#stats-panel')).toContainText('Contenido en preparación');
+    const total = await page.locator('#stat-total').textContent();
+    expect(parseInt(total, 10)).toBeGreaterThan(0);
+    await page.getByRole('button', { name: /Apuntes/ }).click();
+    await expect(page.locator('#screen-apuntes')).toBeVisible();
+    await expect(page.locator('#apuntes-list .apunte-card').first()).toBeVisible();
+    await expect(page.locator('#apuntes-filtros .chip')).not.toHaveCount(0);
   });
 
   test('migra el progreso legacy quizBD2.* a sys.*.bd2', async ({ page }) => {
