@@ -1,6 +1,6 @@
 // Validador de schema del contenido de las materias (preguntas, glosario y apuntes).
 // Sin dependencias del DOM: puede importarse desde los tests.
-import { SUBTIPOS, CONFIG_SUBTIPO, normalizarClave } from "../src/core/diagramas.js";
+import { SUBTIPOS, CONFIG_SUBTIPO, esDirigidoTipo, normalizarClave } from "../src/core/diagramas.js";
 
 export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 // Fuente única con el motor: evita que el contenido declare tipos de arista que el lienzo no ofrece.
@@ -138,6 +138,9 @@ function validarDiagramaCampos(ref, d) {
     err("nodosPool debe tener al menos 2 nodos");
   } else if (d.nodosPool.some(n => !textoNoVacio(n))) {
     err("nodosPool con nodos vacíos");
+  } else {
+    const repetidos = d.nodosPool.filter((n, i) => d.nodosPool.indexOf(n) !== i);
+    if (repetidos.length) err(`nodosPool con nodos repetidos (el pool no se puede asignar por separado): ${repetidos.join(", ")}`);
   }
   if (d.nodosFijos !== undefined) {
     if (!esArreglo(d.nodosFijos)) {
@@ -161,12 +164,23 @@ function validarDiagramaCampos(ref, d) {
           err(`relación ${i + 1} usa un tipo que el lienzo no ofrece: ${r.tipo}`);
         }
       }
-      if (r && d.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
+      if (r && r.de === r.a && !esDirigidoTipo(d.subtipo, r.tipo)) {
+        err(`relación ${i + 1} con auto-conexión (${r.tipo} es no dirigida en ${d.subtipo})`);
+      }
       if (r && r.guarda !== undefined && !textoNoVacio(r.guarda)) err(`relación ${i + 1} con guarda vacía`);
+      if (r && textoNoVacio(r.guarda) && d.subtipo !== "actividades") {
+        err(`relación ${i + 1} con guarda fuera de actividades (el lienzo no ofrece guardas en ${d.subtipo})`);
+      }
     });
   }
-  if (d.tiposArista !== undefined && (!esArreglo(d.tiposArista) || d.tiposArista.length === 0)) {
-    err("tiposArista debe tener al menos 1 tipo");
+  if (d.tiposArista !== undefined) {
+    if (!esArreglo(d.tiposArista) || d.tiposArista.length === 0) {
+      err("tiposArista debe tener al menos 1 tipo");
+    } else {
+      const permitidos = new Set(((CONFIG_SUBTIPO[d.subtipo] || CONFIG_SUBTIPO.er).tiposArista || []).map(normalizarClave));
+      const ajenos = d.tiposArista.filter(t => !permitidos.has(normalizarClave(t)));
+      if (ajenos.length) err(`tiposArista no corresponden al subtipo ${d.subtipo}: ${ajenos.join(", ")}`);
+    }
   }
   if (d.miembrosPool !== undefined) {
     if (!esArreglo(d.miembrosPool)) {
@@ -274,28 +288,8 @@ export function validarEscenarios(escenarios) {
 }
 
 export function validarCasosDiagramacion(casos) {
-  if (casos === undefined) return [];
-  if (!esArreglo(casos)) return ["[casos] debe ser arreglo"];
-  const errores = [];
-  const ids = new Set();
-  casos.forEach(c => {
-    const ref = "[casos] caso \"" + (c && c.id || "?") + "\"";
-    if (!c || !textoNoVacio(c.id)) errores.push("[casos] caso sin id");
-    else if (ids.has(c.id)) errores.push(ref + " duplicado");
-    else ids.add(c.id);
-    if (!c || !textoNoVacio(c.titulo)) errores.push(ref + " sin título");
-    if (!c || !textoNoVacio(c.tema)) errores.push(ref + " sin tema");
-    if (!c || !textoNoVacio(c.caso)) errores.push(ref + " sin narrativa del caso");
-    if (!c || !c.diagrama || typeof c.diagrama !== "object") {
-      errores.push(ref + " sin diagrama");
-    } else {
-      validarDiagramaCampos(ref, Object.assign({ tipo: "diagrama" }, c.diagrama)).forEach(e => errores.push(e));
-    }
-    if (!c || !c.finales || !textoNoVacio(c.finales.exito) || !textoNoVacio(c.finales.parcial) || !textoNoVacio(c.finales.fracaso)) {
-      errores.push(ref + " finales incompletos (exito/parcial/fracaso)");
-    }
-  });
-  return errores;
+  // Misma estructura que los casos de escenarios; una sola implementación evita divergencias.
+  return validarCasos(casos);
 }
 
 export function validarMateria(m, { existeFuente, idsVistos } = {}) {

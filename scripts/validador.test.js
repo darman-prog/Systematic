@@ -158,7 +158,46 @@ describe("validarPregunta tipo diagrama", () => {
     const autoConexion = Object.assign({}, base, {
       relacionesEsperadas: [{ de: "Estudiante", a: "Estudiante", tipo: "1:1" }]
     });
-    expect(validarPregunta(autoConexion, new Set()).join(" ")).toContain("auto-conexión en ER");
+    expect(validarPregunta(autoConexion, new Set()).join(" ")).toContain("auto-conexión");
+  });
+
+  it("rechaza auto-conexión con tipos no dirigidos de cualquier subtipo", () => {
+    const uml = Object.assign({}, base, {
+      subtipo: "casos-uso",
+      nodosPool: ["Usuario", "Sistema"],
+      relacionesEsperadas: [{ de: "Usuario", a: "Usuario", tipo: "asociación" }]
+    });
+    const errores = validarPregunta(uml, new Set()).join(" ");
+    expect(errores).toContain("auto-conexión");
+    expect(errores).toContain("asociación");
+  });
+
+  it("rechaza guardas fuera de actividades y las acepta dentro", () => {
+    const conGuarda = Object.assign({}, base, {
+      subtipo: "uml-clases",
+      nodosPool: ["Base", "Hija"],
+      relacionesEsperadas: [{ de: "Hija", a: "Base", tipo: "herencia", guarda: "[ok]" }]
+    });
+    expect(validarPregunta(conGuarda, new Set()).join(" ")).toContain("guarda fuera de actividades");
+
+    const actividades = Object.assign({}, base, {
+      subtipo: "actividades",
+      nodosPool: ["Validar", "Ejecutar"],
+      relacionesEsperadas: [{ de: "Validar", a: "Ejecutar", tipo: "transición", guarda: "[ok]" }]
+    });
+    expect(validarPregunta(actividades, new Set())).toEqual([]);
+  });
+
+  it("rechaza nodos repetidos en nodosPool", () => {
+    const duplicados = Object.assign({}, base, { nodosPool: ["Estudiante", "Curso", "Estudiante"] });
+    expect(validarPregunta(duplicados, new Set()).join(" ")).toContain("nodosPool con nodos repetidos");
+  });
+
+  it("rechaza tiposArista ajenos al subtipo", () => {
+    const erConHerencia = Object.assign({}, base, { tiposArista: ["1:N", "herencia"] });
+    const errores = validarPregunta(erConHerencia, new Set()).join(" ");
+    expect(errores).toContain("tiposArista no corresponden al subtipo er");
+    expect(errores).toContain("herencia");
   });
 
   it("rechaza aristas que el lienzo no ofrece y miembros repetidos", () => {
