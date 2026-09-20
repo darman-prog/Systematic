@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   SUBTIPOS, CONFIG_SUBTIPO, claveArista, normalizarClave, crearTablero, colocarNodo, quitarNodo,
-  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, ratingDiagrama, resumenDiagrama,
-  actualizarPosicion, nombreAccesible, validarConexion, resumenDiagramaAccesible, ratingDiagramaAccesible
+  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, esDirigidoTipo,
+  validarConexion, ratingDiagrama, resumenDiagrama, resumenDiagramaAccesible, ratingDiagramaAccesible,
+  actualizarPosicion, nombreAccesible
 } from "./diagramas.js";
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
@@ -292,6 +293,49 @@ describe("diagramas de actividades con guardas", () => {
     expect(res.ok).toBe(false);
     expect(res.faltantes).toBeGreaterThan(0);
     expect(res.sobrantes).toBeGreaterThan(0);
+  });
+});
+
+describe("esDirigidoTipo", () => {
+  it("asociacion es no dirigida en uml-clases y casos-uso", () => {
+    expect(esDirigidoTipo("uml-clases", "asociación")).toBe(false);
+    expect(esDirigidoTipo("casos-uso", "asociación")).toBe(false);
+  });
+
+  it("herencia, include y transicion son dirigidas", () => {
+    expect(esDirigidoTipo("uml-clases", "herencia")).toBe(true);
+    expect(esDirigidoTipo("casos-uso", "include")).toBe(true);
+    expect(esDirigidoTipo("actividades", "transición")).toBe(true);
+  });
+
+  it("ER nunca es dirigido y normaliza acentos", () => {
+    expect(esDirigidoTipo("er", "1:N")).toBe(false);
+    expect(esDirigidoTipo("uml-clases", "Asociacion")).toBe(false);
+  });
+
+  it("asociacion bidireccional no se duplica: A-B y B-A colapsan en una conexion", () => {
+    const pregunta = {
+      id: "T-3",
+      subtipo: "uml-clases",
+      nodosPool: ["A", "B"],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "asociación" }]
+    };
+    let estado = crearTablero(pregunta);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    estado = conectar(estado, "A", "B", "asociación", false);
+    estado = conectar(estado, "B", "A", "asociación", false);
+    expect(estado.conexiones).toHaveLength(1);
+    expect(evaluarDiagrama(pregunta, estado).ok).toBe(true);
+  });
+
+  it("auto-conexion con asociacion se rechaza por ser no dirigida", () => {
+    const pregunta = { id: "T-4", subtipo: "uml-clases", nodosPool: ["A"], relacionesEsperadas: [] };
+    let estado = crearTablero(pregunta);
+    estado = colocarNodo(estado, "A");
+    const resultado = validarConexion(estado, "A", "A", "asociación", false);
+    expect(resultado.valida).toBe(false);
+    expect(resultado.error).toBe("auto_conexion_no_dirigida");
   });
 });
 

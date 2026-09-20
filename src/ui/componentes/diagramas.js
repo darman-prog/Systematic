@@ -5,7 +5,7 @@
 import { escapar, bloqueCaso } from "../helpers.js";
 import { icono } from "../iconos.js";
 import {
-  CONFIG_SUBTIPO, esDirigido, crearTablero, colocarNodo, quitarNodo,
+  CONFIG_SUBTIPO, esDirigidoTipo, crearTablero, colocarNodo, quitarNodo,
   asignarMiembro, conectar, quitarConexion, actualizarPosicion
 } from "../../core/diagramas.js";
 
@@ -56,7 +56,6 @@ export function crearDiagramasUI({
   }
 
   function renderDiagrama(item, area, resultado) {
-    const dirigido = esDirigido(item.subtipo);
     let estadoActual = estado();
     if (!estadoActual || estadoActual.preguntaId !== item.id) {
       estadoActual = guardar(crearTablero(item));
@@ -365,8 +364,9 @@ export function crearDiagramasUI({
     const tipos = $("tipos-diagrama");
     if (!item || !tipos || tipos.hidden) return;
     const est = estado();
-    const dirigido = esDirigido(item.subtipo);
-    
+    // La dirección depende del tipo de relación, no solo del subtipo (asociación es no dirigida).
+    const dirigido = esDirigidoTipo(item.subtipo, tipo);
+
     // Para actividades, permitir seleccionar una guarda
     if (item.subtipo === "actividades") {
       mostrarSelectorGuarda(tipos.dataset.de, tipos.dataset.a, tipo, dirigido, item);
@@ -552,7 +552,6 @@ export function crearDiagramasUI({
     svg.innerHTML = "";
     inyectarMarcador();
     lienzo.querySelectorAll(".etiqueta-arista").forEach(el => el.remove());
-    const dirigido = esDirigido((item || {}).subtipo);
     const mapa = {};
     lienzo.querySelectorAll(".nodo-puesto").forEach(n => { mapa[n.dataset.label] = n; });
     const r = lienzo.getBoundingClientRect();
@@ -562,6 +561,8 @@ export function crearDiagramasUI({
       const nDe = mapa[c.de];
       const nA = mapa[c.a];
       if (!nDe || !nA) return;
+      // La dirección se decide por tipo (p. ej. asociación en UML es no dirigida).
+      const dirigidoTipo = esDirigidoTipo((item || {}).subtipo, c.tipo);
       const c1 = centro(nDe);
       const c2 = centro(nA);
       const linea = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -569,7 +570,7 @@ export function crearDiagramasUI({
       linea.setAttribute("y1", c1.y);
       linea.setAttribute("x2", c2.x);
       linea.setAttribute("y2", c2.y);
-      if (dirigido) linea.setAttribute("marker-end", "url(#flecha-diagrama)");
+      if (dirigidoTipo) linea.setAttribute("marker-end", "url(#flecha-diagrama)");
       svg.appendChild(linea);
       const etiqueta = document.createElement("span");
       etiqueta.className = "etiqueta-arista";
@@ -580,7 +581,7 @@ export function crearDiagramasUI({
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";
       etiqueta.addEventListener("click", () => {
-        guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigido, c.guarda));
+        guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigidoTipo, c.guarda));
         pintarNodos(item, zona());
         dibujarAristas(item);
         setHint("Relación eliminada.");
