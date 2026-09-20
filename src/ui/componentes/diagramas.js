@@ -10,6 +10,9 @@ import {
 } from "../../core/diagramas.js";
 
 const $ = id => document.getElementById(id);
+// Área interna (papel) del lienzo: los nodos se posicionan y se dibujan respecto a ella;
+// #lienzo-diagrama es el marco scrollable (en móvil el papel es más grande que el marco).
+const $area = () => document.getElementById("lienzo-area");
 
 // Opciones:
 //   ctx              — sesión del quiz (modo práctica); si no se pasa, usa los getters.
@@ -95,7 +98,7 @@ export function crearDiagramasUI({
         pool +
       "</div>" +
       miembros +
-      '<div id="lienzo-diagrama" class="my-3" tabindex="0" role="group" aria-label="Lienzo del diagrama"><svg id="edges-diagrama"></svg></div>' +
+      '<div id="lienzo-diagrama" class="my-3" tabindex="0" role="group" aria-label="Lienzo del diagrama, desliza para desplazarte"><div id="lienzo-area"><svg id="edges-diagrama"></svg></div></div>' +
       '<div id="tipos-diagrama" class="flex flex-wrap gap-2.5 mt-2 items-center" hidden>' +
         "<span>Tipo:</span>" +
         tiposDe(item).map(t => '<button class="pieza" data-arista="' + escapar(t) + '">' + escapar(t) + "</button>").join("") +
@@ -186,8 +189,9 @@ export function crearDiagramasUI({
         return;
       }
       const lienzo = $("lienzo-diagrama");
-      if (!lienzo) return;
-      const r = lienzo.getBoundingClientRect();
+      const papel = $area();
+      if (!lienzo || !papel) return;
+      const r = papel.getBoundingClientRect();
       if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) {
         if (esMiembro) {
           const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
@@ -218,27 +222,29 @@ export function crearDiagramasUI({
   function colocarNodoUI(nombre, x, y) {
   const item = itemActual();
   if (!item) return;
-  
+
   // Colocar el nodo (crea la entrada en el estado)
   let nuevoEstado = colocarNodo(estado(), nombre);
-  
+
   if (x !== undefined && y !== undefined) {
-    const lienzo = $("lienzo-diagrama");
-    if (lienzo) {
-      // Ajustar coordenadas para que estén dentro de los límites del lienzo
-      const maxX = Math.max(0, lienzo.clientWidth - 110);
-      const maxY = Math.max(0, lienzo.clientHeight - 60);
+    const papel = $area();
+    if (papel) {
+      // Ajustar coordenadas para que estén dentro de los límites del papel
+      const maxX = Math.max(0, papel.clientWidth - 110);
+      const maxY = Math.max(0, papel.clientHeight - 60);
       const xAjustada = Math.max(4, Math.min(x, maxX));
       const yAjustada = Math.max(4, Math.min(y, maxY));
       nuevoEstado = actualizarPosicion(nuevoEstado, nombre, xAjustada, yAjustada);
     }
   }
-  
+
   guardar(nuevoEstado);
   pintarNodos(item, zona());
   dibujarAristas(item);
   setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
   enfocarNodo(nombre);
+  const nuevo = Array.from(zona().querySelectorAll(".nodo-puesto")).find(n => n.dataset.label === nombre);
+  if (nuevo && nuevo.scrollIntoView) nuevo.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
 
   function colocarMiembro(texto) {
@@ -273,18 +279,20 @@ export function crearDiagramasUI({
     e.stopPropagation();
     
     const lienzo = $("lienzo-diagrama");
+    const papel = $area();
+    if (!papel || !lienzo) return;
     const x0 = e.clientX, y0 = e.clientY;
     const l0 = n.offsetLeft, t0 = n.offsetTop;
     let movido = false;
-    
+
     try { n.setPointerCapture(e.pointerId); } catch (_) { /* pointer no capturable */ }
-    
+
     const mover = ev => {
       if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 6) movido = true;
       if (!movido) return;
-      
-      const nuevoX = Math.max(0, Math.min(l0 + ev.clientX - x0, lienzo.clientWidth - n.offsetWidth));
-      const nuevoY = Math.max(0, Math.min(t0 + ev.clientY - y0, lienzo.clientHeight - n.offsetHeight));
+
+      const nuevoX = Math.max(0, Math.min(l0 + ev.clientX - x0, papel.clientWidth - n.offsetWidth));
+      const nuevoY = Math.max(0, Math.min(t0 + ev.clientY - y0, papel.clientHeight - n.offsetHeight));
       n.style.left = nuevoX + "px";
       n.style.top = nuevoY + "px";
       dibujarAristas(itemActual());
@@ -459,22 +467,24 @@ export function crearDiagramasUI({
   function pintarNodos(item, area) {
     const est = estado();
     if (!est) return;
-    const lienzo = $("lienzo-diagrama");
-    const svg = $("edges-diagrama");
-    if (!lienzo || !svg) return;
-    lienzo.querySelectorAll(".nodo-puesto,.etiqueta-arista").forEach(el => el.remove());
-    
+    const papel = $area();
+    if (!papel) return;
+    papel.querySelectorAll(".nodo-puesto,.etiqueta-arista").forEach(el => el.remove());
+
     // ✅ USAR POSICIONES DEL ESTADO en lugar de calcular automáticamente
     est.nodosColocados.forEach((nombre) => {
       const fijo = Array.isArray(item.nodosFijos) && item.nodosFijos.indexOf(nombre) !== -1;
       const n = document.createElement("div");
       n.className = "nodo-puesto" + (fijo ? " nodo-fijo" : "");
       n.dataset.label = nombre;
-      
-      // ✅ Usar posición guardada en el estado, o fallback por si no existe
+
+      // ✅ Usar posición guardada en el estado, o fallback por si no existe.
+      // Se clampea al papel por si el estado guardado viene de un lienzo más grande.
       const pos = est.posiciones[nombre] || { x: 50, y: 50 };
-      n.style.left = pos.x + "px";
-      n.style.top = pos.y + "px";
+      const maxX = Math.max(4, papel.clientWidth - 110);
+      const maxY = Math.max(4, papel.clientHeight - 60);
+      n.style.left = Math.max(4, Math.min(pos.x, maxX)) + "px";
+      n.style.top = Math.max(4, Math.min(pos.y, maxY)) + "px";
       
       // Contenido del nodo
       let contenido = '<span class="nodo-nombre">' + escapar(nombre) + '</span>';
@@ -550,8 +560,8 @@ export function crearDiagramasUI({
         if (deltas[e.key]) {
           e.preventDefault();
           const [dx, dy] = deltas[e.key];
-          const nuevoX = Math.max(0, Math.min(n.offsetLeft + dx, lienzo.clientWidth - n.offsetWidth));
-          const nuevoY = Math.max(0, Math.min(n.offsetTop + dy, lienzo.clientHeight - n.offsetHeight));
+          const nuevoX = Math.max(0, Math.min(n.offsetLeft + dx, papel.clientWidth - n.offsetWidth));
+          const nuevoY = Math.max(0, Math.min(n.offsetTop + dy, papel.clientHeight - n.offsetHeight));
           n.style.left = nuevoX + "px";
           n.style.top = nuevoY + "px";
           dibujarAristas(item);
@@ -559,7 +569,7 @@ export function crearDiagramasUI({
           guardar(actualizarPosicion(est, nombre, nuevoX, nuevoY));
         }
       });
-      lienzo.appendChild(n);
+      papel.appendChild(n);
     });
     actualizarPool(item, area);
   }
@@ -582,16 +592,16 @@ export function crearDiagramasUI({
   function dibujarAristas(item) {
     const est = estado();
     const svg = $("edges-diagrama");
-    const lienzo = $("lienzo-diagrama");
-    if (!svg || !lienzo || !est) return;
+    const papel = $area();
+    if (!svg || !papel || !est) return;
     svg.innerHTML = "";
     inyectarMarcador();
-    lienzo.querySelectorAll(".etiqueta-arista").forEach(el => el.remove());
+    papel.querySelectorAll(".etiqueta-arista").forEach(el => el.remove());
     const mapa = {};
-    lienzo.querySelectorAll(".nodo-puesto").forEach(n => { mapa[n.dataset.label] = n; });
-    const r = lienzo.getBoundingClientRect();
-    svg.setAttribute("width", Math.max(lienzo.clientWidth, 1));
-    svg.setAttribute("height", Math.max(lienzo.clientHeight, r.height || 320));
+    papel.querySelectorAll(".nodo-puesto").forEach(n => { mapa[n.dataset.label] = n; });
+    const r = papel.getBoundingClientRect();
+    svg.setAttribute("width", Math.max(papel.clientWidth, 1));
+    svg.setAttribute("height", Math.max(papel.clientHeight, r.height || 320));
     est.conexiones.forEach(c => {
       const nDe = mapa[c.de];
       const nA = mapa[c.a];
@@ -623,7 +633,7 @@ export function crearDiagramasUI({
         dibujarAristas(item);
         setHint("Relación eliminada.");
       });
-      lienzo.appendChild(etiqueta);
+      papel.appendChild(etiqueta);
     });
   }
 
