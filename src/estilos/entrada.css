@@ -22,10 +22,16 @@
   .btn-secondary { @apply bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-600 px-5 py-3 text-sm sm:text-base; }
   .btn-ghost { @apply bg-transparent hover:bg-slate-700/60 text-slate-300 border border-slate-700 px-4 py-2.5 text-sm; }
   .btn-sm { @apply px-3 py-2 text-xs sm:text-sm; }
-  .link-btn { @apply text-blue-400 hover:underline text-xs font-semibold px-1.5 cursor-pointer bg-transparent border-0; }
+  .link-btn { @apply hover:underline text-xs font-semibold px-1.5 cursor-pointer bg-transparent border-0; color: var(--materia-accent); }
   .badge { @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap; }
-  .chip { @apply rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs sm:text-sm text-slate-300 transition hover:border-blue-500 hover:text-white cursor-pointer; }
-  .chip-on { @apply bg-blue-600 border-blue-500 text-white font-semibold; }
+  .chip { @apply rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs sm:text-sm text-slate-300 transition hover:text-white cursor-pointer; }
+  .chip:hover { border-color: color-mix(in srgb, var(--materia-accent) 55%, #475569); }
+  .chip-on {
+    @apply font-semibold;
+    color: var(--materia-accent);
+    border-color: color-mix(in srgb, var(--materia-accent) 60%, transparent);
+    background: color-mix(in srgb, var(--materia-accent) 18%, transparent);
+  }
   .section-title { @apply text-xs sm:text-sm font-bold text-slate-400 mt-7 mb-3 uppercase tracking-wide; }
   .stat-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center; }
   .stat-value { @apply text-lg sm:text-xl font-bold; color: var(--materia-accent); }
@@ -47,11 +53,11 @@
   .kw { @apply text-blue-400 font-bold; }
   .str { @apply text-amber-400; }
   .hueco { @apply inline-block min-w-[80px] text-center border-2 border-dashed border-slate-600 bg-slate-800 rounded-lg px-2 py-0.5 mx-0.5 font-mono text-blue-300 cursor-pointer align-middle; }
-  .hueco-lleno { @apply bg-blue-800 border-blue-500 border-solid text-white; }
+  .hueco-lleno { @apply border-solid; color: var(--materia-accent); border-color: color-mix(in srgb, var(--materia-accent) 60%, transparent); background: color-mix(in srgb, var(--materia-accent) 18%, transparent); }
   .hueco-ok { @apply bg-emerald-800 border-emerald-500 border-solid text-emerald-100; }
   .hueco-mal { @apply bg-rose-900 border-rose-500 border-solid text-rose-100; }
   .pieza { @apply bg-slate-700 border-2 border-slate-600 hover:border-blue-500 rounded-lg px-3.5 py-2 font-mono text-xs sm:text-sm cursor-grab select-none; }
-  .pieza-sel { @apply bg-blue-700 border-blue-500 text-white; }
+  .pieza-sel { color: var(--materia-accent); border-color: color-mix(in srgb, var(--materia-accent) 60%, transparent); background: color-mix(in srgb, var(--materia-accent) 18%, transparent); }
   .bloque { @apply flex items-center gap-3 bg-slate-900 border border-slate-600 rounded-xl px-3 py-2.5 font-mono text-xs sm:text-sm; }
   .bloque-ok { @apply bg-emerald-900/60 border-emerald-600 text-emerald-100; }
   .bloque-mal { @apply bg-rose-900/60 border-rose-600 text-rose-100; }
@@ -78,17 +84,20 @@
   .tag-ok { @apply bg-emerald-800 text-emerald-100; }
   .tag-bad { @apply bg-rose-900 text-rose-100; }
   .tag-simulacro { @apply bg-violet-700 text-violet-100; }
-  .tag-practica { @apply bg-blue-800 text-blue-100; }
+  .tag-practica { color: var(--materia-accent); background: color-mix(in srgb, var(--materia-accent) 18%, transparent); }
   .study-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
   .study-option { @apply px-4 py-2.5 rounded-lg bg-slate-800 border border-transparent text-sm; }
   .study-option-ok { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
   .study-answer { @apply bg-emerald-900/50 border border-emerald-700 text-emerald-100 font-mono text-xs sm:text-sm rounded-xl p-3 mb-3; }
   .study-exp { @apply p-3 rounded-lg bg-slate-800/60 border-l border-blue-500 text-xs sm:text-sm leading-relaxed text-slate-300; }
   .search-input { @apply w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus:border-blue-500; }
-  .match-item { @apply w-full text-left rounded-xl border-2 border-slate-600 bg-slate-900 hover:border-blue-500 px-3 py-2.5 text-xs sm:text-sm transition cursor-pointer; }
-  .match-sel { @apply border-blue-500 bg-blue-900/60 text-white; }
-  .match-ok { @apply border-emerald-500 bg-emerald-900/60 text-emerald-100 cursor-default opacity-90; }
-  .match-err { @apply border-rose-500 bg-rose-900/70 text-rose-100; }
+  .match-item { @apply w-full text-left rounded-xl border-2 border-slate-600 bg-slate-900 px-3 py-2.5 text-xs sm:text-sm transition cursor-pointer relative; }
+  .match-item:hover { border-color: color-mix(in srgb, var(--materia-accent) 55%, #475569); }
+  /* Estados con doble clase: componentes.css pisa .match-item a igual especificidad. */
+  .match-item.match-sel { color: var(--materia-accent); border-color: var(--materia-accent); background: color-mix(in srgb, var(--materia-accent) 18%, transparent); }
+  .match-item.match-ok { @apply text-emerald-50 cursor-default; border-color: var(--par-color, #34d399); background: color-mix(in srgb, var(--par-color, #34d399) 24%, #064e3b); }
+  .match-item.match-err { @apply border-rose-400 bg-rose-800 text-rose-50; }
+  .match-par { @apply absolute -top-2.5 -left-2.5 w-6 h-6 rounded-full text-[11px] font-bold flex items-center justify-center; background: var(--par-color, #9BB8C9); color: #101418; }
   .flash-card { @apply bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 min-h-[16rem] flex flex-col justify-center; }
   .glosario-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4; }
 }

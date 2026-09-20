@@ -60,10 +60,10 @@ h1, h2 { font-family: var(--fuente-display); letter-spacing: -0.01em; }
 .search-input, .stat-input { background: var(--study-surface-2); border-color: var(--study-border); color: var(--study-text); }
 .option, .match-item, .study-item, .flash-card, .glosario-item, .apunte-card { background: var(--study-surface); border-color: var(--study-border); }
 
-/* Texto oscuro sobre acentos medios (contraste real en la paleta calma). */
-.chip-on, .pieza-sel, .match-sel, .hueco-lleno, .er-head, .tag-simulacro, .tag-practica { color: var(--study-bg); }
+/* Texto oscuro solo sobre acentos sólidos. Los estados de selección (chip-on, pieza-sel,
+   match-sel, hueco-lleno, tag-practica) usan tinte al 18% con texto acento (Anexo A, entrada.css). */
+.er-head, .tag-simulacro { color: var(--study-bg); }
 .tag-simulacro { background: var(--study-accent-strong); }
-.tag-practica { background: var(--study-accent-strong); }
 
 /* Perfil de gamificación y avisos (spec 003) */
 .perfil-card { @apply flex items-center gap-4 bg-slate-900 border border-slate-700 rounded-xl p-4; }
