@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarCasos, validarTodo } from "./validador.mjs";
+import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarCasos, validarCasosDiagramacion, validarTodo } from "./validador.mjs";
 
 const base = {
   id: "X-001",
@@ -187,6 +187,48 @@ describe("validarCasos", () => {
     expect(errores).toContain("sin narrativa del caso");
     expect(errores).toContain("sin diagrama");
     expect(errores).toContain("finales incompletos");
+  });
+});
+
+describe("validarCasosDiagramacion", () => {
+  const caso = {
+    id: "CASO-1",
+    titulo: "Caso de prueba",
+    tema: "Modelado",
+    caso: "Narrativa del caso.",
+    finales: { exito: "E", parcial: "P", fracaso: "F" },
+    diagrama: {
+      subtipo: "er",
+      nodosPool: ["A", "B"],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "1:N" }]
+    }
+  };
+
+  it("omite la validación cuando no hay casos", () => {
+    expect(validarCasosDiagramacion(undefined)).toEqual([]);
+  });
+
+  it("acepta un caso correcto y detecta ids duplicados", () => {
+    expect(validarCasosDiagramacion([caso])).toEqual([]);
+    expect(validarCasosDiagramacion([caso, caso]).join(" ")).toContain("duplicado");
+  });
+
+  it("exige narrativa, diagrama válido y finales completos", () => {
+    const malo = Object.assign({}, caso, { caso: "", diagrama: null, finales: { exito: "E" } });
+    const errores = validarCasosDiagramacion([malo]).join(" ");
+    expect(errores).toContain("sin narrativa del caso");
+    expect(errores).toContain("sin diagrama");
+    expect(errores).toContain("finales incompletos");
+  });
+
+  it("rechaza subtipo inválido y diagramas sin nodos ni relaciones", () => {
+    const malo = Object.assign({}, caso, {
+      diagrama: { subtipo: "flujo", nodosPool: ["A"], relacionesEsperadas: [] }
+    });
+    const errores = validarCasosDiagramacion([malo]).join(" ");
+    expect(errores).toContain("subtipo de diagrama inválido");
+    expect(errores).toContain("al menos 2 nodos");
+    expect(errores).toContain("al menos 1 relación");
   });
 });
 

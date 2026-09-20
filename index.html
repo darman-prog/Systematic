@@ -70,6 +70,11 @@
         <span class="font-bold">Escenarios</span>
         <span class="text-xs text-slate-400">Toma decisiones y vive las consecuencias</span>
       </button>
+      <button class="mode-card" data-action="startCasos">
+        <span class="text-2xl">🧩</span>
+        <span class="font-bold">Casos</span>
+        <span class="text-xs text-slate-400">Construye diagramas a partir de casos reales</span>
+      </button>
       <button class="mode-card" data-action="startFlashcards">
         <span class="text-2xl">🃏</span>
         <span class="font-bold">Flashcards</span>
@@ -212,7 +217,7 @@
       <h1 class="text-xl sm:text-2xl font-bold">🎲 Escenarios</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
-    <p class="subtitle">Casos de la materia: decide, recibe consecuencias y llega a un final. Tu mejor resultado queda guardado.</p>
+    <p class="subtitle">Casos reales de la materia: decide, recibe consecuencias y llega a un final. Tu mejor resultado queda guardado.</p>
     <div id="escenarios-lista"></div>
   </section>
 
@@ -222,6 +227,23 @@
       <button class="btn btn-ghost btn-sm" data-action="startEscenarios">← Escenarios</button>
     </div>
     <div id="escenario-escena"></div>
+  </section>
+
+  <section id="screen-casos" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">🧩 Casos de Diagramación</h1>
+      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+    </div>
+    <p class="subtitle">Construye diagramas a partir de casos reales. Tu mejor resultado queda guardado.</p>
+    <div id="casos-lista"></div>
+  </section>
+
+  <section id="screen-caso" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold" id="caso-titulo">Caso</h1>
+      <button class="btn btn-ghost btn-sm" data-action="startCasos">← Casos</button>
+    </div>
+    <div id="caso-escena"></div>
   </section>
 
   <section id="screen-flashcards" class="card hidden">

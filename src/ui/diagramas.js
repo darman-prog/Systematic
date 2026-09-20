@@ -10,8 +10,28 @@ import {
 
 const $ = id => document.getElementById(id);
 
-export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
+// Opciones:
+//   ctx              — sesión del quiz (modo práctica); si no se pasa, usa los getters.
+//   obtenerItem      — () => ítem/pregunta actual (por defecto ctx.session.items[idx]).
+//   obtenerEstado    — () => estado del tablero (por defecto ctx.session.diagrama).
+//   guardarEstado    — callback al mutar el estado (modo casos, sin sesión).
+//   areaId           — id del contenedor donde re-renderizar (por defecto "question-area").
+//   accionComprobar  — data-action del botón comprobar.
+//   accionCancelarTipo — data-action del botón cancelar tipo de relación.
+//   mostrarPregunta  — si false, no pinta bloqueCaso ni el enunciado (modo casos).
+export function crearDiagramasUI({
+  ctx,
+  guardarEstado,
+  alComprobar,
+  obtenerItem,
+  obtenerEstado,
+  areaId = "question-area",
+  accionComprobar = "comprobarDiagrama",
+  accionCancelarTipo = "cancelarDiagramaTipo",
+  mostrarPregunta = true
+} = {}) {
   let dragPid = null;
+  const zona = () => $(areaId);
 
   function tiposDe(pregunta) {
     if (Array.isArray(pregunta.tiposArista) && pregunta.tiposArista.length) return pregunta.tiposArista;
@@ -20,7 +40,8 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
   }
 
   function estado() {
-    return ctx.session && ctx.session.diagrama;
+    if (obtenerEstado) return obtenerEstado();
+    return ctx && ctx.session && ctx.session.diagrama;
   }
 
   function centro(el) {
@@ -28,7 +49,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
   }
 
   function guardar(nuevo) {
-    if (ctx.session) ctx.session.diagrama = nuevo;
+    if (ctx && ctx.session) ctx.session.diagrama = nuevo;
     if (guardarEstado) guardarEstado(nuevo);
     return nuevo;
   }
@@ -57,14 +78,17 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
         ).join("") +
         "</div>"
       : "";
+    const bloqueado = !!(ctx && ctx.session && ctx.session.answers[ctx.session.idx]);
     area.innerHTML =
-      bloqueCaso(item) +
-      '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + "</div>" +
-      (item.subtipo === "uml-clases" && !item.diagrama
-        ? '<p class="text-xs text-slate-400 mb-3">Lee cada clase y coloca sus atributos y métodos en la clase correcta.</p>'
-        : "") +
-      (item.subtipo === "actividades"
-        ? '<p class="text-xs text-slate-400 mb-3">Los nodos de inicio/fin ya están colocados. Completa acciones y decisiones.</p>'
+      (mostrarPregunta
+        ? bloqueCaso(item) +
+          '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + "</div>" +
+          (item.subtipo === "uml-clases" && !item.diagrama
+            ? '<p class="text-xs text-slate-400 mb-3">Lee cada clase y coloca sus atributos y métodos en la clase correcta.</p>'
+            : "") +
+          (item.subtipo === "actividades"
+            ? '<p class="text-xs text-slate-400 mb-3">Los nodos de inicio/fin ya están colocados. Completa acciones y decisiones.</p>'
+            : "")
         : "") +
       '<p class="text-xs text-slate-400 mb-2">Arrastra una entidad al lienzo (o tócala para colocarla). Para conectar: toca un nodo y luego el otro.</p>' +
       '<div id="pool-diagrama" class="flex flex-wrap gap-2.5 mt-1 min-h-[44px]">' +
@@ -75,7 +99,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
       '<div id="tipos-diagrama" class="flex flex-wrap gap-2.5 mt-2 items-center" hidden>' +
         "<span>Tipo:</span>" +
         tiposDe(item).map(t => '<button class="pieza" data-arista="' + escapar(t) + '">' + escapar(t) + "</button>").join("") +
-        '<button class="btn-mini" data-action="cancelarDiagramaTipo">✕</button>' +
+        '<button class="btn-mini" data-action="' + accionCancelarTipo + '">✕</button>' +
       "</div>" +
       '<p id="hint-diagrama" class="text-xs text-slate-400 mt-2" role="status"></p>' +
       (resultado
@@ -83,8 +107,8 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
           (resultado.ok ? "✅ ¡Diagrama correcto!" : "❌ Aún no: revisa el detalle") + "</div>" +
           (resultado.detalle ? '<div class="text-sm text-slate-300">' + escapar(resultado.detalle) + "</div>" : "") + "</div>"
         : "") +
-      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-diagrama" data-action="comprobarDiagrama" ' +
-        (ctx.session.answers[ctx.session.idx] ? "disabled" : "") + ">Comprobar</button></div>";
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-diagrama" data-action="' + accionComprobar + '" ' +
+        (bloqueado ? "disabled" : "") + ">Comprobar</button></div>";
     activarPool(area);
     activarTipos();
     pintarNodos(item, area);
@@ -144,7 +168,8 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
   }
 
   function itemActual() {
-    const session = ctx.session;
+    if (obtenerItem) return obtenerItem();
+    const session = ctx && ctx.session;
     return session && session.items[session.idx];
   }
 
@@ -152,7 +177,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
     const item = itemActual();
     if (!item) return;
     guardar(colocarNodo(estado(), nombre));
-    pintarNodos(item, $("question-area"));
+    pintarNodos(item, zona());
     posicionarUltimo(x, y);
     dibujarAristas(item);
     setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
@@ -174,7 +199,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
     const est = estado();
     if (est.miembros[texto]) {
       guardar(asignarMiembro(est, texto, null));
-      renderDiagrama(item, $("question-area"));
+      renderDiagrama(item, zona());
       setHint("«" + texto + "» devuelto al pool. Toca un miembro y luego la clase destino.");
       return;
     }
@@ -186,7 +211,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
     const item = itemActual();
     if (!item) return;
     guardar(quitarNodo(estado(), Array.isArray(item.nodosFijos) ? item.nodosFijos : [], nombre));
-    renderDiagrama(item, $("question-area"));
+    renderDiagrama(item, zona());
     setHint("Nodo retirado.");
   }
 
@@ -226,7 +251,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
       const texto = dragPid.slice("miembro:".length);
       dragPid = null;
       guardar(asignarMiembro(estado(), texto, nombre));
-      renderDiagrama(item, $("question-area"));
+      renderDiagrama(item, zona());
       setHint("«" + texto + "» asignado a «" + nombre + "».");
       return;
     }
@@ -279,7 +304,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
     } else {
       guardar(conectar(est, tipos.dataset.de, tipos.dataset.a, tipo, dirigido));
       tipos.hidden = true;
-      pintarNodos(item, $("question-area"));
+      pintarNodos(item, zona());
       dibujarAristas(item);
       setHint("Relación creada. Pulsa «Comprobar» cuando el diagrama esté listo.");
     }
@@ -312,7 +337,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
         modal.remove();
         const tipos = $("tipos-diagrama");
         if (tipos) tipos.hidden = true;
-        pintarNodos(item, $("question-area"));
+        pintarNodos(item, zona());
         dibujarAristas(item);
         setHint("Relación creada" + (guarda ? " con guarda " + guarda : "") + ". Pulsa «Comprobar» cuando el diagrama esté listo.");
       });
@@ -441,7 +466,7 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";
       etiqueta.addEventListener("click", () => {
         guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigido));
-        pintarNodos(item, $("question-area"));
+        pintarNodos(item, zona());
         dibujarAristas(item);
         setHint("Relación eliminada.");
       });

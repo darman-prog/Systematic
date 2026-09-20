@@ -276,6 +276,36 @@ export function validarEscenarios(escenarios) {
   return errores;
 }
 
+export function validarCasosDiagramacion(casos) {
+  if (casos === undefined) return [];
+  if (!esArreglo(casos)) return ["[casos] debe ser arreglo"];
+  const errores = [];
+  const ids = new Set();
+  casos.forEach(c => {
+    const ref = "[casos] caso \"" + (c && c.id || "?") + "\"";
+    if (!c || !textoNoVacio(c.id)) errores.push("[casos] caso sin id");
+    else if (ids.has(c.id)) errores.push(ref + " duplicado");
+    else ids.add(c.id);
+    if (!c || !textoNoVacio(c.titulo)) errores.push(ref + " sin título");
+    if (!c || !textoNoVacio(c.tema)) errores.push(ref + " sin tema");
+    if (!c || !textoNoVacio(c.caso)) errores.push(ref + " sin narrativa del caso");
+    if (!c || !c.diagrama || typeof c.diagrama !== "object") {
+      errores.push(ref + " sin diagrama");
+    } else {
+      const d = c.diagrama;
+      if (!SUBTIPOS_DIAGRAMA.includes(d.subtipo)) errores.push(ref + " subtipo de diagrama inválido: " + d.subtipo);
+      if (!esArreglo(d.nodosPool) || d.nodosPool.length < 2) errores.push(ref + " nodosPool debe tener al menos 2 nodos");
+      if (!esArreglo(d.relacionesEsperadas) || d.relacionesEsperadas.length === 0) {
+        errores.push(ref + " relacionesEsperadas debe tener al menos 1 relación");
+      }
+    }
+    if (!c || !c.finales || !textoNoVacio(c.finales.exito) || !textoNoVacio(c.finales.parcial) || !textoNoVacio(c.finales.fracaso)) {
+      errores.push(ref + " finales incompletos (exito/parcial/fracaso)");
+    }
+  });
+  return errores;
+}
+
 export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   if (!m || !textoNoVacio(m.id)) return ["[materia] sin id"];
   const errores = [];
@@ -284,7 +314,7 @@ export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   errores.push(...validarGlosario(m.glosario).map(e => `[${m.id}] ${e}`));
   errores.push(...validarApuntes(m.apuntes, { existeFuente }).map(e => `[${m.id}] ${e}`));
   errores.push(...validarEscenarios(m.escenarios).map(e => `[${m.id}] ${e}`));
-  errores.push(...validarCasos(m.casos).map(e => `[${m.id}] ${e}`));
+  errores.push(...validarCasosDiagramacion(m.casos).map(e => `[${m.id}] ${e}`));
   return errores;
 }
 

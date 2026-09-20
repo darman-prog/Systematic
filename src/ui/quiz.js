@@ -349,10 +349,14 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     // El estado del lienzo vive en session.diagrama y es idempotente por pregunta:
     // si ya existe para este ítem se conserva el trabajo en re-renders, y si la
     // pregunta cambió se monta un tablero nuevo.
-    if (!ctx.session.diagrama || ctx.session.diagrama.preguntaId !== item.id) {
+    const tablero = ctx.session.diagrama;
+    if (!tablero || tablero.preguntaId !== item.id) {
       ctx.session.diagrama = null;
+      diagramas.renderDiagrama(item, area);
+      return;
     }
-    diagramas.renderDiagrama(item, area);
+    // Mismo ítem ya montado: conserva el lienzo y las posiciones de los nodos.
+    if (!area.querySelector("#lienzo-diagrama")) diagramas.renderDiagrama(item, area);
   }
 
   function comprobarDiagrama() {
@@ -625,12 +629,6 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       fb.style.display = "block";
     }
     mostrarBotonSiguiente();
-  }
-
-  function renderDiagramaPregunta(item, area) {
-    if (!area.querySelector("#lienzo-diagrama")) {
-      diagramas.renderDiagrama(item, area);
-    }
   }
 
   function renderDesarrollo(item, area) {

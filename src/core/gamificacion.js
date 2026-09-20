@@ -54,7 +54,8 @@ export const LOGROS = [
   { id: "preciso-80", icono: "🎖️", nombre: "Precisión fina", descripcion: "80% de precisión con al menos 50 respuestas", condicion: c => c.respuestas >= 50 && c.precision >= 80 },
   { id: "mision-perfecta", icono: "🏅", nombre: "Misión perfecta", descripcion: "Completa una misión con 3 estrellas", condicion: c => c.misionPerfecta },
   { id: "coleccionista", icono: "✨", nombre: "Coleccionista", descripcion: "Acumula 10 estrellas en misiones", condicion: c => c.estrellasTotales >= 10 },
-  { id: "escenario-exito", icono: "🧭", nombre: "Estratega", descripcion: "Termina un escenario con éxito", condicion: c => c.escenarioExito }
+  { id: "escenario-exito", icono: "🧭", nombre: "Estratega", descripcion: "Termina un escenario con éxito", condicion: c => c.escenarioExito },
+  { id: "caso-exito", icono: "🧩", nombre: "Arquitecto", descripcion: "Completa un caso de diagramación con éxito", condicion: c => c.casoExito }
 ];
 
 // Multiplicador XP de Supervivencia según el combo de aciertos encadenados.

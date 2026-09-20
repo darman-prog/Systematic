@@ -2,15 +2,18 @@
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import bd2Glosario from "../datos/bd2/glosario.js";
 import bd2Escenarios from "../datos/bd2/escenarios.js";
+import bd2Casos from "../datos/bd2/casos.js";
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
 import iswGlosario from "../datos/isw/glosario.js";
 import iswApuntes from "../datos/isw/apuntes.js";
 import iswEscenarios from "../datos/isw/escenarios.js";
+import iswCasos from "../datos/isw/casos.js";
 import aswPreguntas from "../datos/asw/preguntas.js";
 import aswGlosario from "../datos/asw/glosario.js";
 import aswApuntes from "../datos/asw/apuntes.js";
 import aswEscenarios from "../datos/asw/escenarios.js";
+import aswCasos from "../datos/asw/casos.js";
 
 export const MATERIAS = [
   {
@@ -23,6 +26,7 @@ export const MATERIAS = [
     glosario: bd2Glosario,
     apuntes: [],
     escenarios: bd2Escenarios,
+    casos: bd2Casos,
     topicColors: bd2TopicColors,
     sqlKeywords: bd2SqlKeywords
   },
@@ -35,7 +39,8 @@ export const MATERIAS = [
     preguntas: iswPreguntas,
     glosario: iswGlosario,
     apuntes: iswApuntes,
-    escenarios: iswEscenarios
+    escenarios: iswEscenarios,
+    casos: iswCasos
   },
   {
     id: "asw",
@@ -46,7 +51,8 @@ export const MATERIAS = [
     preguntas: aswPreguntas,
     glosario: aswGlosario,
     apuntes: aswApuntes,
-    escenarios: aswEscenarios
+    escenarios: aswEscenarios,
+    casos: aswCasos
   }
 ];
 

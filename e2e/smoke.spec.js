@@ -181,6 +181,34 @@ test.describe('Systematic — smoke', () => {
     }
   });
 
+  test('casos de diagramación: lista y juego', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click(); // BD2
+    await page.locator('[data-action="startCasos"]').first().click();
+    await expect(page.locator('#screen-casos')).toBeVisible();
+    await expect(page.locator('#casos-lista .apunte-card').first()).toBeVisible();
+    await page.getByRole('button', { name: /Jugar caso/ }).first().click();
+    await expect(page.locator('#screen-caso')).toBeVisible();
+    await expect(page.locator('#lienzo-diagrama')).toBeVisible();
+
+    // Coloca dos nodos del pool en el lienzo.
+    await page.locator('#pool-diagrama .pieza').first().click();
+    await page.locator('#pool-diagrama .pieza').first().click();
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(2);
+
+    // Conecta el primero con el segundo eligiendo un tipo de relación.
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
+    await page.locator('#lienzo-diagrama .nodo-puesto').nth(1).click();
+    await expect(page.locator('#tipos-diagrama')).toBeVisible();
+    await page.locator('#tipos-diagrama .pieza').first().click();
+    await expect(page.locator('#lienzo-diagrama .etiqueta-arista')).toHaveCount(1);
+
+    // Comprueba y verifica que se muestra el resultado del caso.
+    await page.locator('[data-action="comprobarCaso"]').click();
+    await expect(page.locator('#caso-escena').getByText(/¡Éxito!|Resultado parcial|Fracaso/)).toBeVisible();
+    await expect(page.locator('#caso-escena [data-action="startCasos"]')).toBeVisible();
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();

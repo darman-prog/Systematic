@@ -16,6 +16,9 @@ import { crearFlashcardsUI } from "./ui/flashcards.js";
 import { estadoMisiones, pintarMisiones } from "./ui/misiones.js";
 import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/escenarios.js";
 import { pintarListaEscenarios, pintarEscenario } from "./ui/escenarios.js";
+import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/diagramas.js";
+import { crearDiagramasUI } from "./ui/diagramas.js";
+import { pintarListaCasos, pintarCaso } from "./ui/casos.js";
 
 // Materia activa y datos asociados (se definen al seleccionar materia en el home).
 let materia = null;
@@ -42,7 +45,7 @@ const ctx = {
 };
 
 function show(screen) {
-    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "repaso"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -254,7 +257,8 @@ function revisarLogros(extra) {
       metaCumplida: false,
       misionPerfecta: false,
       estrellasTotales: 0,
-      escenarioExito: false
+      escenarioExito: false,
+      casoExito: false
     },
     extra || {}
   );
@@ -602,6 +606,56 @@ function continuarEscenario() {
   revisarLogros({ escenarioExito: escenarioEstado.rating === "exito" });
 }
 
+// ===== Casos de diagramación (spec 003, H6c) =====
+
+let casoActual = null;
+let casoEstado = null;
+
+function startCasos() {
+  show("casos");
+  const casos = (materia && materia.casos) || [];
+  const registros = leerJSON(localStorage, "sys.casos-diagrama", {});
+  pintarListaCasos(casos, registros);
+}
+
+function jugarCaso(id) {
+  const casos = (materia && materia.casos) || [];
+  const c = casos.find(x => x.id === id);
+  if (!c) return;
+  casoActual = c;
+  casoEstado = crearTablero(c.diagrama);
+  $("caso-titulo").textContent = c.titulo;
+  pintarCaso(c, casoEstado);
+  show("caso");
+  diagramasUI.renderDiagrama(c.diagrama, $("lienzo-caso"));
+}
+
+function comprobarCaso() {
+  if (!casoActual || !casoEstado) return;
+  const res = evaluarDiagrama(casoActual.diagrama, casoEstado);
+  const rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
+  const resultado = { rating, detalle: res };
+  
+  // Guardar resultado
+  const registros = leerJSON(localStorage, "sys.casos-diagrama", {});
+  const previo = registros[casoActual.id];
+  const orden = { fracaso: 0, parcial: 1, exito: 2 };
+  const jugadas = ((previo && previo.jugadas) || 0) + 1;
+  if (!previo || orden[rating] > orden[previo.mejorRating]) {
+    registros[casoActual.id] = { mejorRating: rating, jugadas };
+  } else {
+    registros[casoActual.id] = { mejorRating: previo.mejorRating, jugadas };
+  }
+  escribirJSON(localStorage, "sys.casos-diagrama", registros);
+  
+  // XP y logros
+  const xp = rating === "exito" ? 60 : rating === "parcial" ? 25 : 0;
+  if (xp) sumarXp(xp);
+  if (rating === "exito") revisarLogros({ casoExito: true });
+  
+  pintarCaso(casoActual, casoEstado, resultado);
+}
+
 function practicarDebiles() {
   const debiles = banco.filter(q => esDebil(obtenerP(q.id)));
   if (!debiles.length) return;
@@ -930,6 +984,15 @@ const resultados = crearResultadosUI({ ctx, registrarRespuesta });
 const estudio = crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla: show });
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
 const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla: show });
+const diagramasUI = crearDiagramasUI({
+  obtenerItem: () => casoActual && casoActual.diagrama,
+  obtenerEstado: () => casoEstado,
+  guardarEstado: estado => { casoEstado = estado; },
+  areaId: "lienzo-caso",
+  accionComprobar: "comprobarCaso",
+  accionCancelarTipo: "cancelarDiagramaTipoCaso",
+  mostrarPregunta: false
+});
 
 document.addEventListener("keydown", e => {
   if ($("screen-quiz").classList.contains("hidden") || !session) return;
@@ -1023,6 +1086,10 @@ const ACCIONES = {
   jugarEscenario: el => jugarEscenario(el.dataset.id),
   decidirEscenario: el => decidirEscenario(parseInt(el.dataset.idx, 10)),
   continuarEscenario: () => continuarEscenario(),
+  startCasos: () => startCasos(),
+  jugarCaso: el => jugarCaso(el.dataset.id),
+  comprobarCaso: () => comprobarCaso(),
+  cancelarDiagramaTipoCaso: () => diagramasUI.cancelarSeleccion(),
   comprobarDiagrama: () => quiz.comprobarDiagrama(),
   elegirDiagramaTipo: el => quiz.elegirDiagramaTipo(el.dataset.arista),
   cancelarDiagramaTipo: () => quiz.cancelarDiagramaTipo(),
