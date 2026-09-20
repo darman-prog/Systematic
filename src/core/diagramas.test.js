@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   SUBTIPOS, CONFIG_SUBTIPO, claveArista, normalizarClave, crearTablero, colocarNodo, quitarNodo,
-  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, ratingDiagrama, resumenDiagrama
+  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, ratingDiagrama, resumenDiagrama,
+  actualizarPosicion, nombreAccesible, validarConexion, resumenDiagramaAccesible, ratingDiagramaAccesible
 } from "./diagramas.js";
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
@@ -31,6 +32,30 @@ describe("claveArista", () => {
   });
 });
 
+describe("nombreAccesible", () => {
+  it("remueve caracteres especiales", () => {
+    expect(nombreAccesible("Clase<T>")).toBe("ClaseT");
+    expect(nombreAccesible("get()")).toBe("get");
+    expect(nombreAccesible("Clase::Test")).toBe("ClaseTest");
+  });
+
+  it("mantiene guiones y espacios", () => {
+    expect(nombreAccesible("mi-clase")).toBe("mi-clase");
+    expect(nombreAccesible("Clase Test")).toBe("Clase Test");
+  });
+
+  it("retorna fallback para nombres vacios", () => {
+    expect(nombreAccesible("")).toBe("nodo sin nombre");
+    expect(nombreAccesible(null, "miembro")).toBe("miembro sin nombre");
+    expect(nombreAccesible(undefined)).toBe("nodo sin nombre");
+  });
+
+  it("acepta tipo personalizable", () => {
+    expect(nombreAccesible("", "clase")).toBe("clase sin nombre");
+    expect(nombreAccesible("", "relacion")).toBe("relacion sin nombre");
+  });
+});
+
 describe("tablero ER", () => {
   it("coloca sin duplicar y respeta el pool", () => {
     let estado = crearTablero(preguntaER);
@@ -40,6 +65,22 @@ describe("tablero ER", () => {
     expect(colocarNodo(estado, "Inexistente")).toBe(estado);
   });
 
+  it("crea una entrada de posicion al colocar", () => {
+    let estado = crearTablero(preguntaER);
+    estado = colocarNodo(estado, "Estudiante");
+    expect(estado.posiciones).toHaveProperty("Estudiante");
+    expect(typeof estado.posiciones["Estudiante"].x).toBe("number");
+    expect(typeof estado.posiciones["Estudiante"].y).toBe("number");
+  });
+
+  it("asigna posiciones diferentes a nodos apilados horizontalmente", () => {
+    let estado = crearTablero(preguntaER);
+    estado = colocarNodo(estado, "Estudiante");
+    estado = colocarNodo(estado, "Curso");
+    expect(estado.posiciones["Estudiante"].y).toBe(estado.posiciones["Curso"].y);
+    expect(estado.posiciones["Estudiante"].x).not.toBe(estado.posiciones["Curso"].x);
+  });
+
   it("quitarNodo limpia conexiones y miembros asignados", () => {
     let estado = crearTablero(preguntaER);
     ["Estudiante", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
@@ -47,6 +88,20 @@ describe("tablero ER", () => {
     estado = quitarNodo(estado, [], "Matricula");
     expect(estado.conexiones).toEqual([]);
     expect(estado.nodosDisponibles).toContain("Matricula");
+    expect(estado.posiciones).not.toHaveProperty("Matricula");
+  });
+
+  it("no permite quitar nodos fijos", () => {
+    const pregunta = {
+      id: "test-fijos",
+      subtipo: "actividades",
+      nodosFijos: ["inicio"],
+      nodosPool: ["Accion"]
+    };
+    let estado = crearTablero(pregunta);
+    const antes = estado.nodosColocados.slice();
+    const resultado = quitarNodo(estado, ["inicio"], "inicio");
+    expect(resultado.nodosColocados).toEqual(antes);
   });
 
   it("rechaza auto-conexiones y conexiones repetidas (ER)", () => {
@@ -58,7 +113,7 @@ describe("tablero ER", () => {
     expect(conectar(una, "Matricula", "Estudiante", "1:N", false)).toBe(una);
   });
 
-  it("evalúa correcto solo con el conjunto exacto", () => {
+  it("evalua correcto solo con el conjunto exacto", () => {
     let estado = crearTablero(preguntaER);
     ["Estudiante", "Curso", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
     estado = conectar(estado, "Estudiante", "Matricula", "1:N", false);
@@ -92,7 +147,7 @@ describe("miembros de clase (H6b)", () => {
     tiposArista: ["herencia", "asociación", "composición", "agregación"]
   };
 
-  it("asigna miembros solo a nodos colocados y puntúa el conjunto", () => {
+  it("asigna miembros solo a nodos colocados y puntua el conjunto", () => {
     const vacio = crearTablero(preguntaUML);
     expect(asignarMiembro(vacio, "generar()", "Reporte")).toBe(vacio);
     expect(asignarMiembro(vacio, "inexistente", null)).toBe(vacio);
@@ -106,10 +161,29 @@ describe("miembros de clase (H6b)", () => {
     expect(res.ok).toBe(false);
     expect(res.sobrantes).toBe(1);
   });
+
+  it("detecta miembros mal asignados", () => {
+    let estado = crearTablero(preguntaUML);
+    ["Reporte", "Tabular"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = asignarMiembro(estado, "generar()", "Tabular");
+    const res = evaluarDiagrama(preguntaUML, estado);
+    // "generar()" quedó en la clase equivocada y "titulo" sin asignar: el motor cuenta ambos.
+    expect(res.miembrosMal).toBe(2);
+    expect(res.miembrosOk).toBe(0);
+  });
+
+  it("desasignar miembro lo deja en null", () => {
+    let estado = crearTablero(preguntaUML);
+    ["Reporte", "Tabular"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = asignarMiembro(estado, "generar()", "Reporte");
+    expect(estado.miembros["generar()"]).toBe("Reporte");
+    estado = asignarMiembro(estado, "generar()", null);
+    expect(estado.miembros["generar()"]).toBeNull();
+  });
 });
 
-describe("configuración y rating", () => {
-  it("expone los 4 subtipos con dirección definida", () => {
+describe("configuracion y rating", () => {
+  it("expone los 4 subtipos con direccion definida", () => {
     expect(SUBTIPOS).toEqual(["er", "uml-clases", "casos-uso", "actividades"]);
     expect(CONFIG_SUBTIPO.er.dirigido).toBe(false);
     expect(esDirigido("casos-uso")).toBe(true);
@@ -156,7 +230,7 @@ describe("diagramas UML con miembros", () => {
     expect(estado.miembros["codigoBanco"]).toBe("Transferencia");
   });
 
-  it("evalúa diagrama UML con miembros correctamente", () => {
+  it("evalua diagrama UML con miembros correctamente", () => {
     let estado = crearTablero(preguntaUML);
     ["Transaccion", "Tarjeta", "Transferencia"].forEach(n => { estado = colocarNodo(estado, n); });
     estado = asignarMiembro(estado, "procesar()", "Transaccion");
@@ -187,7 +261,7 @@ describe("diagramas de actividades con guardas", () => {
     ]
   };
 
-  it("coloca nodos fijos automáticamente y permite conectar con guardas", () => {
+  it("coloca nodos fijos automaticamente y permite conectar con guardas", () => {
     let estado = crearTablero(preguntaActividad);
     expect(estado.nodosColocados).toEqual(["inicio", "fin"]);
     expect(estado.nodosDisponibles).toEqual(["Validar", "Ejecutar", "Revertir"]);
@@ -211,7 +285,6 @@ describe("diagramas de actividades con guardas", () => {
     let estado = crearTablero(preguntaActividad);
     ["Validar", "Ejecutar", "Revertir"].forEach(n => { estado = colocarNodo(estado, n); });
     
-    // Conectar con guarda incorrecta
     estado = conectar(estado, "Validar", "Ejecutar", "transicion", true, "[error]");
     estado = conectar(estado, "Validar", "Revertir", "transicion", true, "[ok]");
     
@@ -222,8 +295,8 @@ describe("diagramas de actividades con guardas", () => {
   });
 });
 
-describe("normalización de tipos y guardas", () => {
-  it("compara tipos sin depender de acentos ni mayúsculas", () => {
+describe("normalizacion de tipos y guardas", () => {
+  it("compara tipos sin depender de acentos ni mayusculas", () => {
     const pregunta = {
       id: "T-1",
       subtipo: "uml-clases",
@@ -233,7 +306,6 @@ describe("normalización de tipos y guardas", () => {
     let estado = crearTablero(pregunta);
     estado = colocarNodo(estado, "A");
     estado = colocarNodo(estado, "B");
-    // La UI ofrece el tipo canonical con acento; el dato lo escribe sin acento.
     estado = conectar(estado, "A", "B", "composición", true);
     expect(evaluarDiagrama(pregunta, estado).ok).toBe(true);
   });
@@ -254,12 +326,184 @@ describe("normalización de tipos y guardas", () => {
     let estado = crearTablero(pregunta);
     estado = colocarNodo(estado, "A");
     estado = colocarNodo(estado, "B");
-    estado = conectar(estado, "A", "B", "asociación", true); // tipo que no corresponde
+    estado = conectar(estado, "A", "B", "asociación", true);
     const res = evaluarDiagrama(pregunta, estado);
     const lineas = resumenDiagrama(res).join(" | ");
     expect(lineas).toContain("Faltan");
     expect(lineas).toContain("Sobran");
-    expect(lineas).toContain("Miembros por ubicar: m1 → A");
+    expect(lineas).toContain("Miembros por ubicar: m1");
+  });
+});
+
+describe("actualizarPosicion", () => {
+  it("actualiza la posicion de un nodo colocado", () => {
+    let estado = crearTablero(preguntaER);
+    estado = colocarNodo(estado, "Estudiante");
+    estado = actualizarPosicion(estado, "Estudiante", 250, 150);
+    expect(estado.posiciones["Estudiante"]).toEqual({ x: 250, y: 150 });
+  });
+
+  it("no modifica el estado si el nodo no esta colocado", () => {
+    const estado = crearTablero(preguntaER);
+    const resultado = actualizarPosicion(estado, "Inexistente", 100, 100);
+    expect(resultado).toBe(estado);
+  });
+
+  it("redondea las coordenadas a enteros", () => {
+    let estado = crearTablero(preguntaER);
+    estado = colocarNodo(estado, "Estudiante");
+    estado = actualizarPosicion(estado, "Estudiante", 100.7, 200.3);
+    expect(estado.posiciones["Estudiante"]).toEqual({ x: 101, y: 200 });
+  });
+
+  it("permite mover un nodo multiples veces", () => {
+    let estado = crearTablero(preguntaER);
+    estado = colocarNodo(estado, "Estudiante");
+    estado = actualizarPosicion(estado, "Estudiante", 100, 100);
+    estado = actualizarPosicion(estado, "Estudiante", 200, 200);
+    estado = actualizarPosicion(estado, "Estudiante", 300, 300);
+    expect(estado.posiciones["Estudiante"]).toEqual({ x: 300, y: 300 });
+  });
+});
+
+describe("quitarConexion", () => {
+  it("elimina una conexion existente", () => {
+    let estado = crearTablero(preguntaER);
+    ["Estudiante", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = conectar(estado, "Estudiante", "Matricula", "1:N", false);
+    expect(estado.conexiones).toHaveLength(1);
+    estado = quitarConexion(estado, "Estudiante", "Matricula", "1:N", false);
+    expect(estado.conexiones).toHaveLength(0);
+  });
+
+  it("no falla si la conexion no existe", () => {
+    let estado = crearTablero(preguntaER);
+    const resultado = quitarConexion(estado, "A", "B", "1:N", false);
+    expect(resultado.conexiones).toEqual([]);
+  });
+
+  it("solo elimina la conexion con el mismo tipo", () => {
+    let estado = crearTablero(preguntaER);
+    ["Estudiante", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = conectar(estado, "Estudiante", "Matricula", "1:N", false);
+    estado = conectar(estado, "Estudiante", "Matricula", "1:1", false);
+    estado = quitarConexion(estado, "Estudiante", "Matricula", "1:N", false);
+    expect(estado.conexiones).toHaveLength(1);
+    expect(estado.conexiones[0].tipo).toBe("1:1");
+  });
+});
+
+describe("validarConexion", () => {
+  it("rechaza datos incompletos", () => {
+    const estado = crearTablero(preguntaER);
+    const resultado = validarConexion(estado, "", "B", "1:N", false);
+    expect(resultado.valida).toBe(false);
+    expect(resultado.error).toBe("datos_incompletos");
+  });
+
+  it("rechaza auto-conexion en diagramas no dirigidos", () => {
+    const estado = crearTablero(preguntaER);
+    const resultado = validarConexion(estado, "A", "A", "1:N", false);
+    expect(resultado.valida).toBe(false);
+    expect(resultado.error).toBe("auto_conexion_no_dirigida");
+  });
+
+  it("permite auto-conexion en diagramas dirigidos", () => {
+    const estado = crearTablero(preguntaER);
+    const resultado = validarConexion(estado, "A", "A", "herencia", true);
+    expect(resultado.valida).toBe(true);
+  });
+
+  it("detecta conexion duplicada", () => {
+    let estado = crearTablero(preguntaER);
+    ["Estudiante", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = conectar(estado, "Estudiante", "Matricula", "1:N", false);
+    const resultado = validarConexion(estado, "Estudiante", "Matricula", "1:N", false);
+    expect(resultado.valida).toBe(false);
+    expect(resultado.error).toBe("conexion_duplicada");
+  });
+
+  it("retorna mensaje accesible para conexion valida", () => {
+    const estado = crearTablero(preguntaER);
+    const resultado = validarConexion(estado, "A", "B", "1:N", false);
+    expect(resultado.valida).toBe(true);
+    expect(typeof resultado.mensajeAccesible).toBe("string");
+    expect(resultado.mensajeAccesible.length).toBeGreaterThan(0);
+  });
+});
+
+describe("funciones accesibles", () => {
+  it("resumenDiagramaAccesible retorna estructura con announcements para resultado correcto", () => {
+    const res = { 
+      ok: true, 
+      correctas: 2, 
+      totalEsperado: 2, 
+      detalle: { 
+        faltantes: [], 
+        sobrantes: [], 
+        miembrosMal: [],
+        miembrosOk: []
+      } 
+    };
+    const resumen = resumenDiagramaAccesible(res);
+    expect(resumen.announcements).toHaveLength(1);
+    expect(resumen.announcements[0].priority).toBe("assertive");
+    expect(resumen.progress.correctas).toBe(2);
+    expect(resumen.progress.porcentaje).toBe(100);
+  });
+
+  it("resumenDiagramaAccesible incluye errores en announcements", () => {
+    const res = { 
+      ok: false, 
+      correctas: 1, 
+      totalEsperado: 3, 
+      detalle: { 
+        faltantes: ["A - B (1:N)"], 
+        sobrantes: ["C - D (1:1)"], 
+        miembrosMal: ["m1 - X"],
+        miembrosOk: []
+      } 
+    };
+    const resumen = resumenDiagramaAccesible(res);
+    expect(resumen.announcements.length).toBe(3);
+    resumen.announcements.forEach(a => {
+      expect(a.priority).toBe("polite");
+      expect(typeof a.text).toBe("string");
+    });
+  });
+
+  it("resumenDiagramaAccesible maneja entrada invalida", () => {
+    const resumen = resumenDiagramaAccesible(null);
+    expect(resumen.announcements).toEqual([]);
+    expect(resumen.progress.correctas).toBe(0);
+  });
+
+  it("ratingDiagramaAccesible retorna objeto completo para exito", () => {
+    const rating = ratingDiagramaAccesible(8, 10);
+    expect(rating.nivel).toBe("exito");
+    expect(rating.porcentaje).toBe(80);
+    expect(typeof rating.accesible).toBe("string");
+    expect(rating.accesible).toContain("80%");
+    expect(typeof rating.progreso).toBe("string");
+    expect(rating.progreso).toContain("8 de 10");
+  });
+
+  it("ratingDiagramaAccesible retorna parcial para 50-79%", () => {
+    const rating = ratingDiagramaAccesible(6, 10);
+    expect(rating.nivel).toBe("parcial");
+    expect(rating.porcentaje).toBe(60);
+  });
+
+  it("ratingDiagramaAccesible retorna fracaso para menos del 50%", () => {
+    const rating = ratingDiagramaAccesible(4, 10);
+    expect(rating.nivel).toBe("fracaso");
+    expect(rating.porcentaje).toBe(40);
+  });
+
+  it("ratingDiagramaAccesible maneja cero esperadas", () => {
+    const rating = ratingDiagramaAccesible(0, 0);
+    expect(rating.nivel).toBe("fracaso");
+    expect(rating.porcentaje).toBe(0);
   });
 });
 
@@ -273,7 +517,6 @@ describe("contenido real resoluble (ISW/ASW/BD2)", () => {
     const ofrecidos = Array.isArray(pregunta.tiposArista) && pregunta.tiposArista.length ? pregunta.tiposArista : cfg.tiposArista;
     const dirigido = esDirigido(pregunta.subtipo);
     (pregunta.relacionesEsperadas || []).forEach(r => {
-      // La UI ofrece el label canonical; buscamos el equivalente normalizado al del dato.
       const tipo = ofrecidos.find(t => normalizarClave(t) === normalizarClave(r.tipo)) || r.tipo;
       estado = conectar(estado, r.de, r.a, tipo, dirigido, r.guarda);
     });
@@ -283,6 +526,7 @@ describe("contenido real resoluble (ISW/ASW/BD2)", () => {
 
   it("detecta que hay diagramas que validar", () => {
     expect(diagramas.length).toBeGreaterThan(0);
+    expect(diagramas.every(d => d.subtipo)).toBe(true);
   });
 
   diagramas.forEach(p => {

@@ -6,7 +6,7 @@ import { escapar, bloqueCaso } from "./helpers.js";
 import { icono } from "./iconos.js";
 import {
   CONFIG_SUBTIPO, esDirigido, crearTablero, colocarNodo, quitarNodo,
-  asignarMiembro, conectar, quitarConexion
+  asignarMiembro, conectar, quitarConexion, actualizarPosicion
 } from "../core/diagramas.js";
 
 const $ = id => document.getElementById(id);
@@ -216,23 +216,28 @@ export function crearDiagramasUI({
   }
 
   function colocarNodoUI(nombre, x, y) {
-    const item = itemActual();
-    if (!item) return;
-    guardar(colocarNodo(estado(), nombre));
-    pintarNodos(item, zona());
-    posicionarUltimo(x, y);
-    dibujarAristas(item);
-    setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
-  }
-
-  function posicionarUltimo(x, y) {
-    if (x === undefined || y === undefined) return;
+  const item = itemActual();
+  if (!item) return;
+  
+  // Colocar el nodo (crea la entrada en el estado)
+  let nuevoEstado = colocarNodo(estado(), nombre);
+  
+  if (x !== undefined && y !== undefined) {
     const lienzo = $("lienzo-diagrama");
-    const nodos = lienzo ? lienzo.querySelectorAll(".nodo-puesto") : [];
-    const ultimo = nodos[nodos.length - 1];
-    if (!ultimo) return;
-    ultimo.style.left = Math.max(4, Math.min(x, lienzo.clientWidth - 110)) + "px";
-    ultimo.style.top = Math.max(4, Math.min(y, lienzo.clientHeight - 60)) + "px";
+    if (lienzo) {
+      // Ajustar coordenadas para que estén dentro de los límites del lienzo
+      const maxX = Math.max(0, lienzo.clientWidth - 110);
+      const maxY = Math.max(0, lienzo.clientHeight - 60);
+      const xAjustada = Math.max(4, Math.min(x, maxX));
+      const yAjustada = Math.max(4, Math.min(y, maxY));
+      nuevoEstado = actualizarPosicion(nuevoEstado, nombre, xAjustada, yAjustada);
+    }
+  }
+  
+  guardar(nuevoEstado);
+  pintarNodos(item, zona());
+  dibujarAristas(item);
+  setHint("«" + nombre + "» en el lienzo. Toca un nodo y luego otro para conectarlos.");
   }
 
   function colocarMiembro(texto) {
@@ -263,24 +268,40 @@ export function crearDiagramasUI({
     if (dragPid && dragPid.indexOf("nodo:") === 0) return;
     e.preventDefault();
     e.stopPropagation();
+    
     const lienzo = $("lienzo-diagrama");
     const x0 = e.clientX, y0 = e.clientY;
     const l0 = n.offsetLeft, t0 = n.offsetTop;
     let movido = false;
+    
     try { n.setPointerCapture(e.pointerId); } catch (_) { /* pointer no capturable */ }
+    
     const mover = ev => {
       if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 6) movido = true;
       if (!movido) return;
-      n.style.left = Math.max(0, Math.min(l0 + ev.clientX - x0, lienzo.clientWidth - n.offsetWidth)) + "px";
-      n.style.top = Math.max(0, Math.min(t0 + ev.clientY - y0, lienzo.clientHeight - n.offsetHeight)) + "px";
+      
+      const nuevoX = Math.max(0, Math.min(l0 + ev.clientX - x0, lienzo.clientWidth - n.offsetWidth));
+      const nuevoY = Math.max(0, Math.min(t0 + ev.clientY - y0, lienzo.clientHeight - n.offsetHeight));
+      n.style.left = nuevoX + "px";
+      n.style.top = nuevoY + "px";
       dibujarAristas(itemActual());
     };
+    
     const soltar = () => {
       n.removeEventListener("pointermove", mover);
       n.removeEventListener("pointerup", soltar);
       n.removeEventListener("pointercancel", soltar);
-      if (!movido) toqueNodo(n.dataset.label);
+      
+      if (!movido) {
+        toqueNodo(n.dataset.label);
+      } else {
+        // ✅ Guardar la nueva posición en el estado usando las coordenadas finales del elemento
+        const nuevaX = parseInt(n.style.left);
+        const nuevaY = parseInt(n.style.top);
+        guardar(actualizarPosicion(estado(), n.dataset.label, nuevaX, nuevaY));
+      }
     };
+    
     n.addEventListener("pointermove", mover);
     n.addEventListener("pointerup", soltar);
     n.addEventListener("pointercancel", soltar);
@@ -407,13 +428,18 @@ export function crearDiagramasUI({
     const svg = $("edges-diagrama");
     if (!lienzo || !svg) return;
     lienzo.querySelectorAll(".nodo-puesto,.etiqueta-arista").forEach(el => el.remove());
-    est.nodosColocados.forEach((nombre, i) => {
+    
+    // ✅ USAR POSICIONES DEL ESTADO en lugar de calcular automáticamente
+    est.nodosColocados.forEach((nombre) => {
       const fijo = Array.isArray(item.nodosFijos) && item.nodosFijos.indexOf(nombre) !== -1;
       const n = document.createElement("div");
       n.className = "nodo-puesto" + (fijo ? " nodo-fijo" : "");
       n.dataset.label = nombre;
-      n.style.left = 12 + (i % 3) * 96 + "px";
-      n.style.top = 14 + Math.floor(i / 3) * 62 + "px";
+      
+      // ✅ Usar posición guardada en el estado, o fallback por si no existe
+      const pos = est.posiciones[nombre] || { x: 50, y: 50 };
+      n.style.left = pos.x + "px";
+      n.style.top = pos.y + "px";
       
       // Contenido del nodo
       let contenido = '<span class="nodo-nombre">' + escapar(nombre) + '</span>';
@@ -483,14 +509,19 @@ export function crearDiagramasUI({
           quitarNodoUI(nombre);
           return;
         }
+        // Mover con flechas del teclado
         const paso = 12;
         const deltas = { ArrowLeft: [-paso, 0], ArrowRight: [paso, 0], ArrowUp: [0, -paso], ArrowDown: [0, paso] };
         if (deltas[e.key]) {
           e.preventDefault();
           const [dx, dy] = deltas[e.key];
-          n.style.left = Math.max(0, n.offsetLeft + dx) + "px";
-          n.style.top = Math.max(0, n.offsetTop + dy) + "px";
+          const nuevoX = Math.max(0, Math.min(n.offsetLeft + dx, lienzo.clientWidth - n.offsetWidth));
+          const nuevoY = Math.max(0, Math.min(n.offsetTop + dy, lienzo.clientHeight - n.offsetHeight));
+          n.style.left = nuevoX + "px";
+          n.style.top = nuevoY + "px";
           dibujarAristas(item);
+          // ✅ Guardar la nueva posición en el estado
+          guardar(actualizarPosicion(est, nombre, nuevoX, nuevoY));
         }
       });
       lienzo.appendChild(n);
