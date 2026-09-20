@@ -42,8 +42,8 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
           '<p class="text-slate-300 mb-1">✅ Sabías: <b>' + flash.aciertos + '</b></p>' +
           '<p class="text-slate-300 mb-6">❌ No sabías: <b>' + flash.fallos + '</b></p>' +
           '<div class="flex flex-wrap gap-3 justify-center">' +
-            '<button class="btn btn-primary" onclick="startFlashcards()">Otra ronda</button>' +
-            '<button class="btn btn-ghost" onclick="goHome()">Inicio</button>' +
+            '<button class="btn btn-primary" data-action="startFlashcards">Otra ronda</button>' +
+            '<button class="btn btn-ghost" data-action="goHome">Inicio</button>' +
           '</div>' +
         '</div>';
       return;
@@ -69,10 +69,10 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
       '<div class="flash-card">' + frente + reves + '</div>' +
       '<div class="mt-5 flex flex-col sm:flex-row gap-3">' +
         (flash.volteada
-          ? '<button class="btn btn-primary flex-1" onclick="responderFlash(true)">Sabía</button>' +
-            '<button class="btn btn-secondary flex-1" onclick="responderFlash(false)">No sabía</button>'
-          : '<button class="btn btn-primary flex-1" onclick="voltearFlash()">Voltear</button>') +
-        '<button class="btn btn-ghost" onclick="saltarFlash()">Saltar</button>' +
+          ? '<button class="btn btn-primary flex-1" data-action="responderFlash" data-ok="true">Sabía</button>' +
+            '<button class="btn btn-secondary flex-1" data-action="responderFlash" data-ok="false">No sabía</button>'
+          : '<button class="btn btn-primary flex-1" data-action="voltearFlash">Voltear</button>') +
+        '<button class="btn btn-ghost" data-action="saltarFlash">Saltar</button>' +
       '</div>';
   }
 

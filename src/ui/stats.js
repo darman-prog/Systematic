@@ -34,7 +34,7 @@ export function renderHistory(historial) {
   }).join("");
 }
 
-export function renderStats({ materia, banco, obtenerP, historial, actividad, meta }) {
+export function renderStats({ materia, banco, obtenerP, historial, actividad, meta, onCambiarMeta }) {
   if (!materia) return;
   if (!banco.length) {
     $("stat-total").textContent = "0";
@@ -72,7 +72,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
     '<div class="flex items-center justify-between gap-3 flex-wrap">' +
       '<span class="text-sm font-semibold text-slate-300">🎯 Meta de hoy</span>' +
       '<label class="text-xs text-slate-400 flex items-center gap-2">meta diaria:' +
-        '<input id="meta-input" type="number" min="1" value="' + meta + '" onchange="cambiarMeta(this.value)" class="stat-input">' +
+        '<input id="meta-input" type="number" min="1" value="' + meta + '" class="stat-input">' +
       '</label>' +
     '</div>' +
     '<div class="progress-track mt-3 mb-2"><div class="progress-fill" style="width:' + pctMeta + '%"></div></div>' +
@@ -127,6 +127,8 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
   }
 
   $("stats-panel").innerHTML = html;
+  const metaInput = $("meta-input");
+  if (metaInput) metaInput.addEventListener("change", e => onCambiarMeta(e.target.value));
   const nParciales = new Set(banco.map(q => q.parcial)).size;
   $("stat-total").textContent = banco.length;
   $("stat-parciales").textContent = nParciales;

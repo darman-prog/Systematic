@@ -42,11 +42,11 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
     let html = tipos.map(t => {
       const etiqueta = t === "todos" ? "Todos" : (TIPO_LABELS[t] || t);
       const cuenta = t === "todos" ? ctx.banco.length : ctx.banco.filter(q => q.tipo === t).length;
-      return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" onclick="cambiarEstudioTipo(\'' + t + '\')">' + etiqueta + ' · ' + cuenta + '</button>';
+      return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" data-action="cambiarEstudioTipo" data-tipo="' + t + '">' + etiqueta + ' · ' + cuenta + '</button>';
     }).join("");
     const nReales = ctx.banco.filter(q => q.real).length;
     if (nReales) {
-      html += '<button class="chip' + (estudioSoloReales ? " chip-on" : "") + '" onclick="toggleEstudioReales()">🔥 Garantizadas · ' + nReales + '</button>';
+      html += '<button class="chip' + (estudioSoloReales ? " chip-on" : "") + '" data-action="toggleEstudioReales">🔥 Garantizadas · ' + nReales + '</button>';
     }
     cont.innerHTML = html;
   }
@@ -76,7 +76,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
             '<span class="badge" style="background:' + (TOPIC_COLORS[item.tema] || "#3b82f6") + '; color:#0f172a">' + item.tema + '</span>' +
             '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + (item.real ? ' · <b class="text-amber-300">🔥 garantizada</b>' : "") + '</span>' +
           '</div>' +
-          '<button class="star-btn' + (marcada ? " star-on" : "") + '" onclick="toggleMarcadaEstudio(\'' + item.id + '\')">' + (marcada ? "★" : "☆") + '</button>' +
+          '<button class="star-btn' + (marcada ? " star-on" : "") + '" data-action="toggleMarcadaEstudio" data-id="' + item.id + '">' + (marcada ? "★" : "☆") + '</button>' +
         '</div>' +
         bloqueCaso(item) +
         '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
@@ -85,7 +85,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
         (codigo && item.tipo !== "dragdrop" ? '<pre class="code-block mb-3">' + resaltarSQL(codigo) + '</pre>' : "") +
         (codigo && item.tipo === "dragdrop" ? '<pre class="code-block mb-3">' + resaltarSQL(codigo) + '</pre>' : "") +
         '<div class="oculto">' + respuestaEstudio(item) + '<div class="study-exp">' + item.exp + '</div></div>' +
-        '<button class="btn btn-secondary btn-sm mt-3" onclick="toggleStudy(this)">Mostrar respuesta</button>' +
+        '<button class="btn btn-secondary btn-sm mt-3" data-action="toggleStudy">Mostrar respuesta</button>' +
       '</div>';
     }).join("") || '<p class="text-sm text-slate-400">Sin resultados para esa búsqueda.</p>';
     const contador = $("study-count");

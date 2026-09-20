@@ -100,7 +100,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       (item.diagrama ? diagramaER() : "") +
       (item.datos ? tablaDatos(item.datos) : "") +
       '<div class="flex flex-col gap-3 mt-4" id="multi-container"></div>' +
-      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-multi" onclick="comprobarMulti()">Comprobar</button></div>';
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-multi" data-action="comprobarMulti">Comprobar</button></div>';
     $("question-text").textContent = item.q;
     pintarMulti();
   }
@@ -119,7 +119,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       } else if (e.sel[idx]) {
         clase += " pieza-sel";
       }
-      return '<button class="' + clase + '" ' + (e.bloqueado ? "disabled" : "") + ' onclick="toggleMulti(' + idx + ')">' +
+      return '<button class="' + clase + '" ' + (e.bloqueado ? "disabled" : "") + ' data-action="toggleMulti" data-idx="' + idx + '">' +
         '<span class="opt-key">' + (e.sel[idx] ? "☑" : "☐") + '</span><span>' + escapar(opt) + '</span></button>';
     }).join("");
     const btn = $("btn-comprobar-multi");
@@ -252,14 +252,14 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       let clase = "match-item";
       if (e.emparejados[i]) clase += " match-ok";
       else if (e.seleccion === i) clase += " match-sel";
-      return '<button class="' + clase + '" data-i="' + i + '" ' + (e.emparejados[i] || e.bloqueado ? "disabled" : "") + ' onclick="clickMatchIzq(' + i + ')">' + escapar(p[0]) + '</button>';
+      return '<button class="' + clase + '" data-action="clickMatchIzq" data-i="' + i + '" ' + (e.emparejados[i] || e.bloqueado ? "disabled" : "") + '>' + escapar(p[0]) + '</button>';
     }).join("");
     $("match-der").innerHTML = e.derecha.map(d => {
       const usado = e.usadosDerecha[d.idx] !== undefined;
       let clase = "match-item";
       if (usado) clase += " match-ok";
       if (e.errorIdx === d.idx) clase += " match-err";
-      return '<button class="' + clase + '" data-idx="' + d.idx + '" ' + (usado || e.bloqueado ? "disabled" : "") + ' onclick="clickMatchDer(' + d.idx + ')">' + escapar(d.texto) + '</button>';
+      return '<button class="' + clase + '" data-action="clickMatchDer" data-idx="' + d.idx + '" ' + (usado || e.bloqueado ? "disabled" : "") + '>' + escapar(d.texto) + '</button>';
     }).join("");
   }
 
@@ -355,6 +355,10 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       const p = e.target.closest(".pieza");
       if (p) clickPieza(p.dataset.pid);
     });
+    pool.addEventListener("dragstart", e => {
+      const p = e.target.closest(".pieza");
+      if (p) iniciarArrastre(e, p.dataset.pid);
+    });
     $("btn-comprobar").onclick = () => comprobarDragdrop();
     pintarDragdrop();
   }
@@ -386,7 +390,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const usadas = piezasUsadas();
     const pool = $("piezas-pool");
     pool.innerHTML = estado.piezas.filter(p => usadas.indexOf(p.pid) === -1).map(p =>
-      '<div class="pieza' + (estado.seleccion === p.pid ? " pieza-sel" : "") + '" draggable="true" data-pid="' + p.pid + '" ondragstart="iniciarArrastre(event, \'' + p.pid + '\')">' + escapar(p.text) + '</div>'
+      '<div class="pieza' + (estado.seleccion === p.pid ? " pieza-sel" : "") + '" draggable="true" data-pid="' + p.pid + '">' + escapar(p.text) + '</div>'
     ).join("") || '<span class="text-sm text-slate-400">Todas las piezas están colocadas.</span>';
     const contador = $("drag-contador");
     if (contador) {
@@ -467,7 +471,19 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       (item.datos ? tablaDatos(item.datos) : "") +
       '<p class="text-xs text-slate-400 mb-3">Usa ▲▼ o arrastra los bloques hasta lograr el orden correcto.</p>' +
       '<div id="bloques" class="flex flex-col gap-2"></div>' +
-      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-orden" onclick="comprobarOrden()">Comprobar</button></div>';
+      '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-orden" data-action="comprobarOrden">Comprobar</button></div>';
+    const bloques = $("bloques");
+    bloques.addEventListener("dragstart", e => {
+      const b = e.target.closest(".bloque");
+      if (b) iniciarArrastreBloque(e, parseInt(b.dataset.i, 10));
+    });
+    bloques.addEventListener("dragover", e => {
+      if (e.target.closest(".bloque")) e.preventDefault();
+    });
+    bloques.addEventListener("drop", e => {
+      const b = e.target.closest(".bloque");
+      if (b) soltarBloque(e, parseInt(b.dataset.i, 10));
+    });
     pintarOrden();
   }
 
@@ -477,10 +493,10 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     $("bloques").innerHTML = estado.orden.map((texto, i) => {
       let clase = "bloque";
       if (estado.resultado) clase += estado.resultado[i] ? " bloque-ok" : " bloque-mal";
-      return '<div class="' + clase + '" draggable="' + (estado.bloqueado ? "false" : "true") + '" data-i="' + i + '" ondragstart="iniciarArrastreBloque(event,' + i + ')" ondragover="event.preventDefault()" ondrop="soltarBloque(event,' + i + ')">' +
+      return '<div class="' + clase + '" draggable="' + (estado.bloqueado ? "false" : "true") + '" data-i="' + i + '">' +
         '<div class="flex gap-1">' +
-          '<button class="btn-mini" onclick="moverBloque(' + i + ',-1)" ' + (i === 0 || estado.bloqueado ? "disabled" : "") + '>▲</button>' +
-          '<button class="btn-mini" onclick="moverBloque(' + i + ',1)" ' + (i === estado.orden.length - 1 || estado.bloqueado ? "disabled" : "") + '>▼</button>' +
+          '<button class="btn-mini" data-action="moverBloque" data-i="' + i + '" data-dir="-1" ' + (i === 0 || estado.bloqueado ? "disabled" : "") + '>▲</button>' +
+          '<button class="btn-mini" data-action="moverBloque" data-i="' + i + '" data-dir="1" ' + (i === estado.orden.length - 1 || estado.bloqueado ? "disabled" : "") + '>▼</button>' +
         '</div>' +
         '<span class="flex-1 min-w-0">' + escapar(texto) + '</span>' +
       '</div>';
@@ -552,7 +568,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-blue-500 mb-4"></textarea>' +
       '<div id="dev-solucion" class="hidden"></div>' +
       '<div id="dev-eval" class="flex flex-wrap gap-3 mt-3"></div>' +
-      (session.modo === "simulacro" ? "" : '<div class="mt-3" id="dev-ver"><button class="btn btn-secondary" onclick="revelarSolucion()">Ver solución modelo</button></div>');
+      (session.modo === "simulacro" ? "" : '<div class="mt-3" id="dev-ver"><button class="btn btn-secondary" data-action="revelarSolucion">Ver solución modelo</button></div>');
     const ta = $("dev-texto");
     ta.addEventListener("input", () => { if (session.desarrollo) session.desarrollo.texto = ta.value; });
   }
@@ -578,8 +594,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const btnVer = $("dev-ver");
     if (btnVer) btnVer.classList.add("hidden");
     $("dev-eval").innerHTML =
-      '<button class="btn btn-primary" onclick="autoevaluarDev(true)">Me acerqué</button>' +
-      '<button class="btn btn-secondary" onclick="autoevaluarDev(false)">No pude</button>';
+      '<button class="btn btn-primary" data-action="autoevaluarDev" data-ok="true">Me acerqué</button>' +
+      '<button class="btn btn-secondary" data-action="autoevaluarDev" data-ok="false">No pude</button>';
   }
 
   function autoevaluarDev(ok) {

@@ -212,11 +212,11 @@ function renderConfig() {
   let html = "";
   grupos.forEach(g => {
     html += '<div class="mb-5"><div class="flex items-center gap-2 mb-2.5"><span class="font-semibold text-sm text-slate-300">' + g.titulo +
-      '</span><span class="ml-auto"></span><button class="link-btn" onclick="toggleFiltroTodos(\'' + g.clave + '\', true)">Todos</button>' +
-      '<button class="link-btn" onclick="toggleFiltroTodos(\'' + g.clave + '\', false)">Ninguno</button></div><div class="flex flex-wrap gap-2">';
+      '</span><span class="ml-auto"></span><button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="true">Todos</button>' +
+      '<button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="false">Ninguno</button></div><div class="flex flex-wrap gap-2">';
     valoresDe(g.clave).forEach(v => {
       const activa = filtros[g.clave].has(v);
-      html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" onclick="toggleFiltro(\'' + g.clave + '\',\'' + v + '\')">' +
+      html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '">' +
         g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
     });
     html += '</div></div>';
@@ -353,7 +353,7 @@ function renderTiposPanel() {
   const conteos = {};
   banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
   panel.innerHTML = TIPOS.filter(t => conteos[t]).map(t =>
-    '<button class="chip" onclick="practicarTipo(\'' + t + '\')">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
+    '<button class="chip" data-action="practicarTipo" data-tipo="' + t + '">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
   ).join("");
 }
 
@@ -479,7 +479,8 @@ function renderStats() {
     obtenerP,
     historial: cargarHistorial(),
     actividad: cargarActividad(),
-    meta: cargarMeta()
+    meta: cargarMeta(),
+    onCambiarMeta: cambiarMeta
   });
 }
 
@@ -496,7 +497,7 @@ function renderMaterias() {
     const detalles = pendiente
       ? "Contenido en preparación"
       : n + " preguntas" + (m.glosario.terminos.length ? " · " + m.glosario.terminos.length + " términos" : "");
-    return '<button class="mode-card" onclick="seleccionarMateria(\'' + m.id + '\')" style="border-left:4px solid ' + m.color + '">' +
+    return '<button class="mode-card" data-action="seleccionarMateria" data-materia="' + m.id + '" style="border-left:4px solid ' + m.color + '">' +
       '<span class="text-2xl">' + m.icono + '</span>' +
       '<span class="font-bold">' + m.nombre + '</span>' +
       '<span class="text-xs text-slate-400">' + m.descripcion + '</span>' +
@@ -559,7 +560,7 @@ function renderApuntesFiltros() {
   const temas = ["todos"].concat([...new Set(todos.map(a => a.tema))]);
   cont.innerHTML = temas.map(t => {
     const cuenta = t === "todos" ? todos.length : todos.filter(a => a.tema === t).length;
-    return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" onclick="cambiarApunteTema(\'' + t + '\')">' +
+    return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" data-action="cambiarApunteTema" data-tema="' + t + '">' +
       (t === "todos" ? "Todos" : escapar(t)) + " · " + cuenta + '</button>';
   }).join("");
 }
@@ -635,69 +636,79 @@ document.addEventListener("visibilitychange", () => {
 migrarClavesLegacy(localStorage);
 renderMaterias();
 show("materias");
-// Puente de funciones para atributos inline (onclick, onchange, ...):
-// este script es un modulo ES y las funciones no son globales por defecto.
-// (El puente se elimina en el paso 2 de la spec 002.)
-Object.assign(window, {
-  actualizarResumen,
-  alternarPausa,
-  autoevaluarDev: quiz.autoevaluarDev,
-  autoevaluarResultado: resultados.autoevaluarResultado,
-  cambiarEstudioTipo: estudio.cambiarEstudioTipo,
-  cambiarGlosarioCat: glosarioUI.cambiarGlosarioCat,
-  cambiarMeta,
-  clearHistory,
-  clickMatchDer: quiz.clickMatchDer,
-  clickMatchIzq: quiz.clickMatchIzq,
-  comenzarPractica,
-  comenzarSimulacro,
-  comprobarMulti: quiz.comprobarMulti,
-  comprobarOrden: quiz.comprobarOrden,
-  estudioGarantizadas: estudio.estudioGarantizadas,
-  exportarDatos,
-  flashcardsGarantizadas: flashcards.flashcardsGarantizadas,
-  goHome,
-  importarDatos,
-  iniciarArrastre: quiz.iniciarArrastre,
-  iniciarArrastreBloque: quiz.iniciarArrastreBloque,
-  iniciarRepasoQuiz,
-  irConfig,
-  irRepaso,
-  moverBloque: quiz.moverBloque,
-  next,
-  pintarResultados: resultados.pintarResultados,
-  practicarArrastre,
-  practicarCasos,
-  practicarDebiles,
-  practicarTipo,
-  practicarVencidas,
-  renderGlosario: glosarioUI.renderGlosario,
-  renderStudy: estudio.renderStudy,
-  repetirFalladas,
-  repetirMisma,
-  resetProgreso,
-  responderFlash: flashcards.responderFlash,
-  revelarSolucion: quiz.revelarSolucion,
-  salir,
-  saltarFlash: flashcards.saltarFlash,
-  saltarPregunta: quiz.saltarPregunta,
-  shuffle,
-  soltarBloque: quiz.soltarBloque,
-  startFlashcards: flashcards.startFlashcards,
-  startGlosario: glosarioUI.startGlosario,
-  startStudy: estudio.startStudy,
-  toggleEstudioReales: estudio.toggleEstudioReales,
-  toggleFiltro,
-  toggleFiltroTodos,
-  toggleMarcadaActual: quiz.toggleMarcadaActual,
-  toggleMarcadaEstudio: estudio.toggleMarcadaEstudio,
-  toggleMulti: quiz.toggleMulti,
-  toggleStudy: estudio.toggleStudy,
-  irMaterias,
-  seleccionarMateria,
-  usarTodas,
-  voltearFlash: flashcards.voltearFlash,
-  startApuntes,
-  renderApuntes,
-  cambiarApunteTema
+
+// Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre
+// de la función que ejecutan y sus parámetros en data-*; un único listener delegado de
+// click los resuelve desde este mapa. No se publica nada en window.
+const ACCIONES = {
+  actualizarResumen: () => actualizarResumen(),
+  alternarPausa: () => alternarPausa(),
+  autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),
+  autoevaluarResultado: el => resultados.autoevaluarResultado(el.dataset.id, el.dataset.ok === "true"),
+  cambiarApunteTema: el => cambiarApunteTema(el.dataset.tema),
+  cambiarEstudioTipo: el => estudio.cambiarEstudioTipo(el.dataset.tipo),
+  cambiarGlosarioCat: el => glosarioUI.cambiarGlosarioCat(el.dataset.id),
+  clearHistory: () => clearHistory(),
+  clickMatchDer: el => quiz.clickMatchDer(parseInt(el.dataset.idx, 10)),
+  clickMatchIzq: el => quiz.clickMatchIzq(parseInt(el.dataset.i, 10)),
+  comenzarPractica: () => comenzarPractica(),
+  comenzarSimulacro: () => comenzarSimulacro(),
+  comprobarMulti: () => quiz.comprobarMulti(),
+  comprobarOrden: () => quiz.comprobarOrden(),
+  estudioGarantizadas: () => estudio.estudioGarantizadas(),
+  exportarDatos: () => exportarDatos(),
+  flashcardsGarantizadas: () => flashcards.flashcardsGarantizadas(),
+  goHome: () => goHome(),
+  importarArchivo: () => $("import-file").click(),
+  iniciarRepasoQuiz: () => iniciarRepasoQuiz(),
+  irConfig: () => irConfig(),
+  irMaterias: () => irMaterias(),
+  irRepaso: () => irRepaso(),
+  moverBloque: el => quiz.moverBloque(parseInt(el.dataset.i, 10), parseInt(el.dataset.dir, 10)),
+  next: () => next(),
+  pintarResultados: el => resultados.pintarResultados(el.dataset.verTodas === "true"),
+  practicarArrastre: () => practicarArrastre(),
+  practicarCasos: () => practicarCasos(),
+  practicarDebiles: () => practicarDebiles(),
+  practicarTipo: el => practicarTipo(el.dataset.tipo),
+  practicarVencidas: () => practicarVencidas(),
+  repetirFalladas: () => repetirFalladas(),
+  repetirMisma: () => repetirMisma(),
+  resetProgreso: () => resetProgreso(),
+  responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
+  revelarSolucion: () => quiz.revelarSolucion(),
+  saltarFlash: () => flashcards.saltarFlash(),
+  saltarPregunta: () => quiz.saltarPregunta(),
+  salir: () => salir(),
+  seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
+  startApuntes: () => startApuntes(),
+  startFlashcards: () => flashcards.startFlashcards(),
+  startGlosario: () => glosarioUI.startGlosario(),
+  startStudy: () => estudio.startStudy(),
+  toggleEstudioReales: () => estudio.toggleEstudioReales(),
+  toggleFiltro: el => toggleFiltro(el.dataset.clave, el.dataset.valor),
+  toggleFiltroTodos: el => toggleFiltroTodos(el.dataset.clave, el.dataset.activar === "true"),
+  toggleMarcadaActual: () => quiz.toggleMarcadaActual(),
+  toggleMarcadaEstudio: el => estudio.toggleMarcadaEstudio(el.dataset.id),
+  toggleMulti: el => quiz.toggleMulti(parseInt(el.dataset.idx, 10)),
+  toggleStudy: el => estudio.toggleStudy(el),
+  usarTodas: () => usarTodas(),
+  voltearFlash: () => flashcards.voltearFlash()
+};
+
+document.addEventListener("click", event => {
+  const el = event.target.closest("[data-action]");
+  if (!el) return;
+  const accion = ACCIONES[el.dataset.action];
+  if (accion) accion(el);
 });
+
+// Listeners puntuales sobre elementos estáticos (eventos change/input, fuera del alcance
+// de la delegación de click).
+["cfg-priorizar", "cfg-solo-debiles", "cfg-solo-marcadas"].forEach(id =>
+  $(id).addEventListener("change", () => actualizarResumen())
+);
+$("import-file").addEventListener("change", e => importarDatos(e.target));
+$("study-search").addEventListener("input", e => estudio.renderStudy(e.target.value));
+$("apuntes-search").addEventListener("input", e => renderApuntes(e.target.value));
+$("glosario-search").addEventListener("input", e => glosarioUI.renderGlosario(e.target.value));

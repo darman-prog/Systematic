@@ -79,7 +79,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
           '<div class="mt-3 text-sm text-slate-300 leading-relaxed">' + item.exp + '</div>' +
           '<div class="mt-3" id="eval-' + item.id + '">' +
             (pendiente
-              ? '<p class="text-xs text-slate-400 mb-2">Autoevaluación (no afecta el puntaje):</p><div class="flex gap-3 flex-wrap"><button class="btn btn-primary btn-sm" onclick="autoevaluarResultado(\'' + item.id + '\', true)">Me acerqué</button><button class="btn btn-secondary btn-sm" onclick="autoevaluarResultado(\'' + item.id + '\', false)">No pude</button></div>'
+              ? '<p class="text-xs text-slate-400 mb-2">Autoevaluación (no afecta el puntaje):</p><div class="flex gap-3 flex-wrap"><button class="btn btn-primary btn-sm" data-action="autoevaluarResultado" data-id="' + item.id + '" data-ok="true">Me acerqué</button><button class="btn btn-secondary btn-sm" data-action="autoevaluarResultado" data-id="' + item.id + '" data-ok="false">No pude</button></div>'
               : '<span class="tag ' + (a.ok ? "tag-ok" : "tag-bad") + '">Autoevaluación: ' + (a.ok ? "Me acerqué" : "No pude") + '</span>') +
           '</div>' +
         '</div>';
@@ -88,10 +88,10 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     }
 
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
-      (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" onclick="repetirFalladas()">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
-      (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" onclick="pintarResultados(' + !verTodas + ')">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
-      '<button class="btn btn-secondary w-full sm:w-auto" onclick="repetirMisma()">Repetir ronda</button>' +
-      '<button class="btn btn-ghost w-full sm:w-auto" onclick="goHome()">Inicio</button>' +
+      (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
+      (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
+      '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +
+      '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>' +
     '</div>';
 
     $("screen-results").innerHTML = html;
