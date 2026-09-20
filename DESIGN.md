@@ -52,8 +52,17 @@ se reserva para acciones y foco. Salvia, terracota y ámbar aparecen solo en est
 
 ## Typography
 
-Segoe UI se mantiene como fuente local del sistema. El cuerpo usa 16px y line-height 1.6; los
-encabezados son claros sin usar texto con gradiente.
+El cuerpo usa la fuente del sistema (Segoe UI) a 16px con line-height 1.6. Los titulares (h1/h2)
+usan **Source Serif 4** self-hosted vía `@fontsource` — solo pesos 600/700 — a través del token
+`--fuente-display`; le da carácter de "apuntes académicos" sin cargar más pesos ni CDN. Los
+encabezados son claros y sin texto con gradiente.
+
+## Identity
+
+Cada materia tiene acento propio: al seleccionarla, `app.js` fija `--materia-accent` con su color
+y lo heredan el botón primario, la barra de progreso y los valores de stats; `theme-color` del
+navegador lo acompaña. Las tres materias usan pasteles claros, así que el texto sobre el acento es
+siempre `--study-bg` (contraste ~8:1). Fuera de una materia, el acento vuelve al azul niebla.
 
 ## Layout
 
