@@ -1,0 +1,82 @@
+﻿/* Estilos del constructor de diagramas (lienzo, nodos, etiquetas, modal de guarda). */
+/* Extraido de entrada.css al descongelar la zona (spec 006); incluye overrides moviles. */
+
+/* ===== ZONA CONGELADA: constructor de diagramas =====
+   No mover ni editar mientras el área de diagramas esté en trabajo activo
+   (spec 006). Este bloque se extraerá a estilos/lienzo.css al descongelar. */
+#lienzo-diagrama { position: relative; width: 100%; min-height: 320px; border: 1px solid var(--study-border); border-radius: 12px; background: var(--study-surface); overflow: hidden; touch-action: none; }
+#edges-diagrama { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#edges-diagrama line { stroke: var(--study-accent); stroke-width: 2; }
+.nodo-puesto { position: absolute; min-width: 96px; max-width: 180px; background: var(--study-surface-2); border: 2px solid var(--study-border); border-radius: 8px; padding: 8px 22px 8px 10px; font-size: 0.85rem; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; color: var(--study-text); }
+.nodo-puesto.seleccionado { border-color: var(--study-accent); box-shadow: 0 0 0 2px rgba(155, 184, 201, 0.35); }
+.nodo-fijo { border-style: solid; background: var(--study-surface-3); }
+.nodo-nombre { font-weight: 600; display: block; }
+.nodo-miembros { margin-top: 6px; border-top: 1px solid var(--study-border); padding-top: 4px; }
+.miembro-item { font-size: 0.75rem; color: var(--study-muted); padding: 2px 0; }
+.nodo-quitar { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 9999px; background: #2b2f38; color: var(--study-text); border: 1px solid var(--study-error); font-size: 12px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.etiqueta-arista { position: absolute; transform: translate(-50%, -50%); background: var(--study-bg); border: 1px solid var(--study-accent); color: var(--study-accent); border-radius: 9999px; font-size: 11px; padding: 2px 20px 2px 8px; cursor: pointer; white-space: nowrap; }
+#ghost-diagrama { position: fixed; z-index: 50; pointer-events: none; opacity: 0.85; }
+#tipos-diagrama .btn-mini { min-width: 44px; min-height: 44px; }
+
+/* Modal de selección de guarda para diagramas de actividades */
+.modal-guarda { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.modal-guarda-contenido { background: var(--study-surface); border: 2px solid var(--study-accent); border-radius: 12px; padding: 24px; max-width: 400px; }
+.modal-guarda-contenido h3 { color: var(--study-text); margin: 0 0 12px 0; font-size: 1.2rem; }
+.modal-guarda-contenido p { color: var(--study-muted); margin: 0 0 16px 0; font-size: 0.9rem; }
+.guardas-opciones { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.btn-guarda { background: var(--study-surface-2); color: var(--study-text); border: 1px solid var(--study-border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; min-width: 44px; min-height: 44px; }
+.btn-guarda:hover { background: var(--study-surface-3); border-color: var(--study-accent); }
+.btn-cancelar { background: transparent; color: var(--study-muted); border: 1px solid var(--study-border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; width: 100%; }
+.btn-cancelar:hover { background: var(--study-surface-2); }
+
+
+/* Overrides del lienzo. Van después de la zona congelada para ganarle en cascada.
+   Al descongelar (spec 006) mover este bloque junto con la zona a estilos/lienzo.css. */
+#lienzo-diagrama { touch-action: manipulation; }
+.nodo-puesto, .etiqueta-arista { touch-action: none; }
+#pool-diagrama .pieza, #pool-miembros .pieza { touch-action: none; }
+
+@media (max-width: 640px) {
+  #lienzo-diagrama {
+    min-height: 340px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nodo-puesto {
+    min-width: 96px;
+    min-height: 48px;
+    padding: 10px 40px 10px 12px;
+    font-size: 14px;
+  }
+  .nodo-quitar {
+    width: 32px;
+    height: 32px;
+    top: 6px;
+    right: 6px;
+  }
+  .pieza {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .etiqueta-arista {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px 20px 8px 10px;
+  }
+  #tipos-diagrama {
+    position: sticky;
+    bottom: 0;
+    padding: 8px 0;
+    z-index: 20;
+    background: var(--study-bg, #0b1220);
+  }
+}
+
+.nodo-objetivo {
+  outline: 2px dashed rgba(155, 184, 201, .6);
+  outline-offset: 2px;
+}
+
+#lienzo-diagrama { overscroll-behavior: contain; }
+body.drag-activo { overflow: hidden; }

@@ -8,4 +8,5 @@ import './estilos/entrada.css';
 import './estilos/tokens.css';
 import './estilos/componentes.css';
 import './estilos/pantallas.css';
+import './estilos/lienzo.css';
 import './app.js';
