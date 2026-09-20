@@ -1,6 +1,6 @@
 ---
 id: 002
-status: aprobada
+status: implementada
 created: 2026-09-19
 updated: 2026-09-19
 ---

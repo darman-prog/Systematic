@@ -15,15 +15,19 @@ apuntes. Sitio estático desplegado en Vercel.
 
 ## Estructura
 
-- `index.html` — shell de la app (pantallas y contenedores).
-- `src/app.js` — lógica de UI y sesiones (antes todo el JS vivía inline en `app.html`).
-- `src/core/` — dominio testeable: materias, progreso (localStorage), sesiones.
-- `src/ui/` — módulos de UI por feature (p. ej. apuntes).
+- `index.html` — shell de la app (pantallas y contenedores; acciones vía `data-action`, sin `onclick` inline).
+- `src/app.js` — orquestación: estado, navegación, persistencia por materia y mapa de acciones delegadas
+  (antes todo el JS vivía inline en `app.html`).
+- `src/core/` — dominio testeable: materias (registro), progreso (localStorage inyectado), sesiones.
+  Sin DOM ni ids de materia incrustados.
+- `src/ui/` — render por pantalla (quiz, resultados, stats, estudio, glosario, flashcards, apuntes) con
+  helpers compartidos; recibe estado por parámetro, no toca `localStorage` ni `src/datos/`.
 - `src/estilos/entrada.css` — Tailwind + estilos de la app.
-- `src/datos/` — contenido por materia.
+- `src/datos/` — contenido por materia (incluye presentación: colores de tema, keywords).
 - `scripts/` — utilidades Node.js (validador de datos).
 - `e2e/` — pruebas Playwright.
 - `docs/specs/` — specs (formato de la skill `ingenieria-software`).
+- `docs/adr/` — decisiones de arquitectura (formato Contexto/Decisión/Consecuencias/Alternativas).
 - `BancoDeInformacion/` — material fuente (`*.md` convertidos; PDF/PPTX/DOCX no se versionan).
 
 ## Comandos
