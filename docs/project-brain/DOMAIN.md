@@ -29,7 +29,7 @@ Vive en `src/core/sesiones.js`. Arma la lista de práctica:
 - `prepararItem` baraja opciones, piezas, bloques o pares según el tipo de pregunta.
 
 Tipos de pregunta actuales (definidos en `scripts/validador.mjs`): `multiple`, `multi`, `vf`,
-`codigo`, `dragdrop`, `ordenar`, `desarrollo` y `relacionar`. Pendiente (spec 003): `diagrama`.
+`codigo`, `dragdrop`, `ordenar`, `desarrollo`, `relacionar` y `diagrama`.
 
 ## Gamificación
 
@@ -49,6 +49,21 @@ Vive en `src/core/escenarios.js`. Multi-paso con decisiones y consecuencias.
 - Cada opción otorga 0, 1 o 2 puntos y muestra feedback antes de continuar.
 - Rating por porcentaje sobre el máximo: 70% o más es éxito, 40% o más es parcial, el resto fracaso.
 - XP solo por decisiones perfectas (2 puntos cada una).
+
+## Diagramas y casos
+
+Motor puro en `src/core/diagramas.js`; el lienzo y el modo de casos viven en `src/ui/`.
+
+- Subtipos: `er` (no dirigido, cardinalidad `1:1`/`1:N`/`N:M`), `uml-clases` (dirigido:
+  herencia/asociación/composición/agregación y asignación de miembros a clases), `casos-uso`
+  (`asociación`/`include`/`extend`) y `actividades` (`transición` con guardas).
+- Estado serializable: nodos colocados y disponibles, miembros asignados y conexiones; los
+  `nodosFijos` no se pueden quitar. La clave canónica de una conexión es el par de extremos
+  (ordenado en ER) más el tipo (y la guarda si existe).
+- Evaluación: conexiones correctas + miembros bien asignados − sobrantes; el tablero está `ok`
+  solo si no sobran, no faltan y no hay miembros mal asignados.
+- Rating de casos: `≥80%` éxito, `≥50%` parcial, resto fracaso; XP +60 éxito / +25 parcial y
+  logro "Arquitecto". El mejor rating por caso se guarda en `sys.casos-diagrama`.
 
 ## Materias
 

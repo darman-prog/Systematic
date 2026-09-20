@@ -14,12 +14,12 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
 | Nivel | Herramienta | Qué cubre |
 |---|---|---|
 | Unitario | Vitest (`npm run test`) | Dominio puro en `src/core/` y lógica de módulos UI |
-| Validación de datos | Node (`npm run validar`) | Schema de preguntas, glosario, apuntes y escenarios |
+| Validación de datos | Node (`npm run validar`) | Schema de preguntas, glosario, apuntes, escenarios y casos de diagramación |
 | E2E | Playwright (`npm run e2e`) | Smoke de flujos críticos sobre el build |
 
 ## Suites actuales
 
-- `src/core/progreso.test.js`, `sesiones.test.js`, `gamificacion.test.js`, `escenarios.test.js`.
+- `src/core/progreso.test.js`, `sesiones.test.js`, `gamificacion.test.js`, `escenarios.test.js`, `diagramas.test.js`.
 - `src/ui/misiones.test.js`, `src/ui/apuntes.test.js`.
 - `scripts/validador.test.js`.
 - `e2e/smoke.spec.js`.

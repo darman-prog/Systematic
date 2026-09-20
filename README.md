@@ -1,8 +1,9 @@
 # Systematic
 
-App de estudio para materias de ingeniería: práctica tipo quiz, simulacro, modo estudio, apuntes,
-flashcards y glosario. Sitio estático (Vite + Tailwind, sin backend): el progreso se guarda en el
-navegador (localStorage) y puede exportarse/importarse como JSON.
+App de estudio para materias de ingeniería: práctica tipo quiz y simulacro, modo estudio,
+Contrarreloj, Supervivencia, misiones por tema, escenarios, casos de diagramación (constructor
+ER/UML), apuntes, flashcards y glosario. Sitio estático (Vite + Tailwind, sin backend): el
+progreso se guarda en el navegador (localStorage) y puede exportarse/importarse como JSON.
 
 **Materias:** Base de Datos 2 · Ingeniería de Software · Arquitectura de Software.
 
@@ -35,8 +36,8 @@ Rollback: en Vercel, *Deployments → Instant Rollback*; en el repo, `git revert
 
 ## Aportar contenido
 
-- El contenido vive en `src/datos/<materia>/` (`preguntas.js`, `glosario.js`, `apuntes.js`) y se
-  deriva del material fuente en `BancoDeInformacion/` (los PDF/PPTX/DOCX no se versionan, solo los
-  `.md` convertidos).
+- El contenido vive en `src/datos/<materia>/` (`preguntas.js`, `glosario.js`, `apuntes.js`,
+  `escenarios.js`, `casos.js`) y se deriva del material fuente en `BancoDeInformacion/` (los
+  PDF/PPTX/DOCX no se versionan, solo los `.md` convertidos).
 - Toda pregunta/apunte/glosario debe pasar `npm run validar` antes de commitear.
 - Ids: BD2 conserva `P1-*` / `PR-*`; materias nuevas usan `ISW-*` / `ASW-*` (apuntes `AP-ISW-*` / `AP-ASW-*`).

@@ -1,8 +1,8 @@
 ---
 id: 003
-status: aprobada
+status: implementada
 created: 2026-09-19
-updated: 2026-09-19
+updated: 2026-09-20
 ---
 
 # 003 — Systematic: ambiente de estudio y gamificación
@@ -70,6 +70,12 @@ ni los ids de preguntas existentes.
 - XP repetible: reducir recompensa de preguntas ya dominadas.
 
 ## Trazabilidad
-Base refactorizada en `613cf28`; H5 escenarios en `fb31527`. Gates al cierre H5: validar
-(152 preguntas), 76 unitarios, build y 9 E2E verdes. Pendiente H6a/H6b/H6c y QA/deploy para
-marcar `implementada`.
+Refactor base `613cf28`. H1 Noche calma y docs `c44f78c`/`06e32ad`; H2 `14569cf`; H3
+`2cfd826`; H4 `73d9ab1`; H5 `fb31527`; spec ampliada `b71cecf`; H6a `d8e254e`; H6b
+`049222a`; H6c `d2d0a1b`.
+
+Gates al cierre H6c: `npm run validar` (3 materias · 160 preguntas · 79 términos),
+`npm run test` (100 unitarios), `npm run build` y `npm run e2e` (12) verdes.
+
+Pendiente de verificación manual del cliente: detector visual Impeccable (no es un comando
+del repo en este entorno). Deploy por Vercel a partir de `main`.

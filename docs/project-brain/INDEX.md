@@ -15,7 +15,7 @@ No cargues el cerebro completo: leé este índice y solo los documentos que nece
 | Documento | Qué contiene | Cuándo cargarlo | Estado |
 |---|---|---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Capas, límites y patrones estructurales | Antes de mover o agregar módulos | vigente |
-| [DOMAIN.md](DOMAIN.md) | Reglas de negocio (Leitner, XP, escenarios, misiones) | Al tocar lógica de estudio o gamificación | vigente |
+| [DOMAIN.md](DOMAIN.md) | Reglas de negocio (Leitner, XP, escenarios, misiones, diagramas y casos) | Al tocar lógica de estudio o gamificación | vigente |
 | [DATA.md](DATA.md) | Persistencia, claves `sys.*`, migración y schema de datos | Al tocar progreso, export/import o contenido | vigente |
 | [TESTING.md](TESTING.md) | Estrategia y suites de tests | Al agregar tests o antes de cerrar un cambio | vigente |
 | [OPERATIONS.md](OPERATIONS.md) | Build, deploy en Vercel y rollback | Antes de publicar o revertir | vigente |

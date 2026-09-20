@@ -16,12 +16,16 @@ La Dependency Rule apunta hacia adentro: el dominio no conoce UI ni persistencia
 
 | Capa | Carpeta | Responsabilidad |
 |---|---|---|
-| Dominio | `src/core/` | Reglas puras: `materias.js` (registro), `progreso.js` (Leitner con `storage` inyectado), `sesiones.js` (armado de sesiones con `rng` inyectable), `escenarios.js` (motor multi-paso), `gamificacion.js` (XP, niveles y logros) |
-| Render | `src/ui/` | Un módulo por pantalla (`quiz.js`, `resultados.js`, `stats.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `misiones.js`, `escenarios.js`, `apuntes.js`) más `helpers.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
+| Dominio | `src/core/` | Reglas puras: `materias.js` (registro), `progreso.js` (Leitner con `storage` inyectado), `sesiones.js` (armado de sesiones con `rng` inyectable), `escenarios.js` (motor multi-paso), `gamificacion.js` (XP, niveles y logros), `diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating) |
+| Render | `src/ui/` | Un módulo por pantalla (`quiz.js`, `resultados.js`, `stats.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `misiones.js`, `escenarios.js`, `apuntes.js`, `casos.js`) más `diagramas.js` (lienzo) y `helpers.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
 | Composición | `src/app.js` | Estado de la app, navegación, persistencia por materia y mapa de acciones `ACCIONES` con un único listener delegado |
-| Contenido | `src/datos/<materia>/` | Preguntas, glosario, apuntes, escenarios y presentación (colores/keywords) por materia |
+| Contenido | `src/datos/<materia>/` | Preguntas, glosario, apuntes, escenarios, casos y presentación (colores/keywords) por materia |
 
 `src/main.js` importa estilos y arranca `app.js`. `index.html` es el shell con las pantallas.
+
+`src/ui/diagramas.js` es un componente compartido: el quiz lo usa para el tipo de pregunta
+`diagrama` y el modo de casos lo instancia aparte con `obtenerItem`/`obtenerEstado`/`guardarEstado`,
+sin acoplarse a la sesión del quiz.
 
 ## Decisiones estructurales
 

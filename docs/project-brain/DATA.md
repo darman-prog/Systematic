@@ -26,6 +26,7 @@ No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/
 | `sys.logros` | Logros desbloqueados y su fecha |
 | `sys.misiones.<materiaId>` | Estrellas y mejor porcentaje por tema |
 | `sys.escenarios` | Mejor rating y cantidad de jugadas por escenario |
+| `sys.casos-diagrama` | Mejor rating y cantidad de jugadas por caso de diagramación |
 
 Si `localStorage` está bloqueado o lleno, la app degrada sin persistir.
 
@@ -49,10 +50,15 @@ El contenido vive en `src/datos/<materia>/` y lo valida `npm run validar`
 - `ordenar`: `bloques[]`.
 - `relacionar`: `pares` como `[izquierda, derecha]`.
 - `desarrollo`: `solucion` más `claves[]` opcional.
+- `diagrama`: construcción en lienzo con `subtipo` (`er` | `uml-clases` | `casos-uso` |
+  `actividades`), `nodosPool`, `relacionesEsperadas` (`[{ de, a, tipo, guarda? }]`) y
+  `miembrosPool`; `tiposArista` y `nodosFijos` son opcionales.
 
 Otras estructuras: `glosario` (`{ categorias, terminos, tips }`), `apuntes`
-(`{ id, tema, titulo, contenido, fuente }`) y `escenarios`
-(`{ id, titulo, tema, intro, pasos, finales }`).
+(`{ id, tema, titulo, contenido, fuente }`), `escenarios`
+(`{ id, titulo, tema, intro, pasos, finales }`) y `casos`
+(`{ id, titulo, tema, caso, diagrama, finales }`, con `diagrama` del schema anterior en
+versión standalone sin `id`).
 
 ## Convenciones de ids
 
