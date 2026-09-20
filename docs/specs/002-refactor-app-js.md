@@ -2,7 +2,7 @@
 id: 002
 status: implementada
 created: 2026-09-19
-updated: 2026-09-19
+updated: 2026-09-20
 ---
 
 # 002 — Refactor de `src/app.js`: extracción de renderers y eliminación de acoplamiento por `window`
@@ -86,3 +86,10 @@ ni funcionales.
 - Default de materia en core: `core/progreso.js:25`.
 - E2E acoplado a cifras: `e2e/smoke.spec.js:10-15`, `:25`.
 - `src/core/` sin DOM ni `localStorage` directo (grep vacío) — límite que se preserva.
+
+## Desviación conocida
+
+El criterio de aceptación 1 (`src/app.js` por debajo de ~400 líneas) no se cumplió al cierre: el
+archivo quedó por encima de las 1.000 líneas y sigue concentrando persistencia, gamificación,
+filtros, sesión y navegación. El resto de los criterios sí se cumple. La deuda se resuelve con el
+refactor a la capa `student/` (spec 004, pendiente).
