@@ -22,7 +22,7 @@ export function normalizarClave(texto) {
 
 export function nombreAccesible(nombre, tipo = "nodo") {
   const limpio = String(nombre || "")
-    .replace(/[^\w\s\-]/g, "")
+    .replace(/[^\p{L}\p{N}\s\-]/gu, "")
     .trim();
   if (!limpio) return tipo + " sin nombre";
   return limpio;

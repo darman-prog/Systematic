@@ -31,7 +31,7 @@ const glosario = {
       termino: "Polimorfismo",
       categoria: "poo",
       definicion: "Capacidad de tratar objetos de clases distintas de forma uniforme a través de una misma interfaz o clase base.",
-      ejemplo: "Un método cobrar(Transaccion) funciona igual con transacciones de Tarjeta, Transferencia o Cripto."
+      ejemplo: "Un método cobrar(Transacción) funciona igual con transacciones de Tarjeta, Transferencia o Cripto."
     },
     {
       termino: "Dependencia",

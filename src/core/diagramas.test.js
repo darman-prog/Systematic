@@ -45,6 +45,11 @@ describe("nombreAccesible", () => {
     expect(nombreAccesible("Clase Test")).toBe("Clase Test");
   });
 
+  it("preserva letras Unicode como ñ y vocales acentuadas", () => {
+    expect(nombreAccesible("tamaño")).toBe("tamaño");
+    expect(nombreAccesible("Gestión de Información")).toBe("Gestión de Información");
+  });
+
   it("retorna fallback para nombres vacios", () => {
     expect(nombreAccesible("")).toBe("nodo sin nombre");
     expect(nombreAccesible(null, "miembro")).toBe("miembro sin nombre");

@@ -10,13 +10,13 @@ const casos = [
       subtipo: "casos-uso",
       nodosPool: ["Usuario", "Administrador", "Registrarse", "Iniciar Sesión", "Crear Tarea", "Editar Tarea", "Marcar Completada", "Eliminar Usuario", "Ver Reportes"],
       relacionesEsperadas: [
-        { de: "Usuario", a: "Registrarse", tipo: "asociacion" },
-        { de: "Usuario", a: "Iniciar Sesión", tipo: "asociacion" },
-        { de: "Usuario", a: "Crear Tarea", tipo: "asociacion" },
-        { de: "Usuario", a: "Editar Tarea", tipo: "asociacion" },
-        { de: "Usuario", a: "Marcar Completada", tipo: "asociacion" },
-        { de: "Administrador", a: "Eliminar Usuario", tipo: "asociacion" },
-        { de: "Administrador", a: "Ver Reportes", tipo: "asociacion" }
+        { de: "Usuario", a: "Registrarse", tipo: "asociación" },
+        { de: "Usuario", a: "Iniciar Sesión", tipo: "asociación" },
+        { de: "Usuario", a: "Crear Tarea", tipo: "asociación" },
+        { de: "Usuario", a: "Editar Tarea", tipo: "asociación" },
+        { de: "Usuario", a: "Marcar Completada", tipo: "asociación" },
+        { de: "Administrador", a: "Eliminar Usuario", tipo: "asociación" },
+        { de: "Administrador", a: "Ver Reportes", tipo: "asociación" }
       ],
       exp: "Los <b>actores</b> (Usuario y Administrador) se conectan con los <b>casos de uso</b> mediante líneas de <b>asociación</b>. El Usuario tiene acceso a las operaciones básicas de tareas, mientras que el Administrador tiene permisos adicionales para gestionar usuarios y ver reportes."
     },
@@ -36,16 +36,16 @@ const casos = [
       nodosPool: ["Enviar Solicitud", "Revisar Supervisor", "¿Monto < $1000?", "Aprobar Automático", "Revisar Director", "Procesar Pago", "Notificar Rechazo"],
       nodosFijos: ["inicio", "fin-aprobado", "fin-rechazado"],
       relacionesEsperadas: [
-        { de: "inicio", a: "Enviar Solicitud", tipo: "transicion" },
-        { de: "Enviar Solicitud", a: "Revisar Supervisor", tipo: "transicion" },
-        { de: "Revisar Supervisor", a: "¿Monto < $1000?", tipo: "transicion" },
-        { de: "¿Monto < $1000?", a: "Aprobar Automático", tipo: "transicion", guarda: "[sí]" },
-        { de: "¿Monto < $1000?", a: "Revisar Director", tipo: "transicion", guarda: "[no]" },
-        { de: "Aprobar Automático", a: "Procesar Pago", tipo: "transicion" },
-        { de: "Revisar Director", a: "Procesar Pago", tipo: "transicion", guarda: "[aprobado]" },
-        { de: "Revisar Director", a: "Notificar Rechazo", tipo: "transicion", guarda: "[rechazado]" },
-        { de: "Procesar Pago", a: "fin-aprobado", tipo: "transicion" },
-        { de: "Notificar Rechazo", a: "fin-rechazado", tipo: "transicion" }
+        { de: "inicio", a: "Enviar Solicitud", tipo: "transición" },
+        { de: "Enviar Solicitud", a: "Revisar Supervisor", tipo: "transición" },
+        { de: "Revisar Supervisor", a: "¿Monto < $1000?", tipo: "transición" },
+        { de: "¿Monto < $1000?", a: "Aprobar Automático", tipo: "transición", guarda: "[sí]" },
+        { de: "¿Monto < $1000?", a: "Revisar Director", tipo: "transición", guarda: "[no]" },
+        { de: "Aprobar Automático", a: "Procesar Pago", tipo: "transición" },
+        { de: "Revisar Director", a: "Procesar Pago", tipo: "transición", guarda: "[aprobado]" },
+        { de: "Revisar Director", a: "Notificar Rechazo", tipo: "transición", guarda: "[rechazado]" },
+        { de: "Procesar Pago", a: "fin-aprobado", tipo: "transición" },
+        { de: "Notificar Rechazo", a: "fin-rechazado", tipo: "transición" }
       ],
       exp: "El flujo muestra un proceso de aprobación con <b>decisiones</b> basadas en el monto. Los nodos de decisión (rombos) tienen salidas con <b>guardas</b> que determinan el camino. El proceso puede terminar en dos estados finales: aprobado o rechazado."
     },

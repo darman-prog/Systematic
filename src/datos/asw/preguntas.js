@@ -422,19 +422,19 @@ const preguntas = [
     tipo: "diagrama",
     subtipo: "uml-clases",
     q: "Modela el sistema de transacciones: una clase base Transacción con método procesar(), y tres subclases específicas (Tarjeta, Transferencia, Cripto) que heredan de ella. Cada subclase sobrescribe procesar() con su lógica específica.",
-    nodosPool: ["Transaccion", "Tarjeta", "Transferencia", "Cripto"],
+    nodosPool: ["Transacción", "Tarjeta", "Transferencia", "Cripto"],
     miembrosPool: [
-      { texto: "procesar()", de: "Transaccion" },
+      { texto: "procesar()", de: "Transacción" },
       { texto: "validarNumero()", de: "Tarjeta" },
       { texto: "codigoBanco", de: "Transferencia" },
       { texto: "clavePrivada", de: "Cripto" }
     ],
     relacionesEsperadas: [
-      { de: "Tarjeta", a: "Transaccion", tipo: "herencia" },
-      { de: "Transferencia", a: "Transaccion", tipo: "herencia" },
-      { de: "Cripto", a: "Transaccion", tipo: "herencia" }
+      { de: "Tarjeta", a: "Transacción", tipo: "herencia" },
+      { de: "Transferencia", a: "Transacción", tipo: "herencia" },
+      { de: "Cripto", a: "Transacción", tipo: "herencia" }
     ],
-    exp: "La <b>herencia</b> permite reutilizar código: las tres subclases heredan de <b>Transaccion</b> y sobrescriben <b>procesar()</b> con su lógica específica. Cada subclase tiene sus propios miembros (Tarjeta valida el número, Transferencia guarda el código de banco, Cripto tiene su propio procesamiento). Esto es el pilar de <b>herencia</b> de la POO aplicado al patrón Template Method."
+    exp: "La <b>herencia</b> permite reutilizar código: las tres subclases heredan de <b>Transacción</b> y sobrescriben <b>procesar()</b> con su lógica específica. Cada subclase tiene sus propios miembros (Tarjeta valida el número, Transferencia guarda el código de banco, Cripto tiene su propio procesamiento). Esto es el pilar de <b>herencia</b> de la POO aplicado al patrón Template Method."
   },
   {
     id: "ASW-032",
@@ -447,12 +447,12 @@ const preguntas = [
     nodosPool: ["Carpeta", "Archivo"],
     miembrosPool: [
       { texto: "tamaño", de: "Archivo" },
-      { texto: "extension", de: "Archivo" },
+      { texto: "extensión", de: "Archivo" },
       { texto: "nombre", de: "Carpeta" },
       { texto: "agregarArchivo()", de: "Carpeta" }
     ],
     relacionesEsperadas: [
-      { de: "Carpeta", a: "Archivo", tipo: "composicion" }
+      { de: "Carpeta", a: "Archivo", tipo: "composición" }
     ],
     exp: "La <b>composición</b> es una relación fuerte donde el contenedor (Carpeta) gestiona el ciclo de vida de los componentes (Archivos). Si eliminas la carpeta, los archivos también se eliminan. En UML se representa con un <b>diamante relleno</b> en el lado del contenedor. Es diferente a la agregación (diamante vacío), donde los componentes pueden existir independientemente."
   },
@@ -474,7 +474,7 @@ const preguntas = [
     relacionesEsperadas: [
       { de: "Archivo", a: "Componente", tipo: "herencia" },
       { de: "Carpeta", a: "Componente", tipo: "herencia" },
-      { de: "Carpeta", a: "Componente", tipo: "agregacion" }
+      { de: "Carpeta", a: "Componente", tipo: "agregación" }
     ],
     exp: "El patrón <b>Composite</b> permite tratar objetos individuales (Archivo) y composiciones (Carpeta) de manera uniforme a través de una interfaz común (Componente). La Carpeta <b>hereda</b> de Componente igual que Archivo y además <b>agrega</b> una lista de Componentes (pueden ser Archivos u otras Carpetas). Esto permite calcular el tamaño total recursivamente: si es Archivo devuelve su tamaño, si es Carpeta suma recursivamente el tamaño de sus hijos."
   }
