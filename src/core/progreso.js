@@ -20,10 +20,11 @@ export function claves(materiaId) {
   };
 }
 
-// Migra una sola vez las claves de la app de una materia (quizBD2.*) al namespace sys.*.bd2.
-// No borra las claves viejas: si algo sale mal, el progreso original sigue ahí.
-export function migrarClavesLegacy(storage, materiaId = "bd2") {
-  if (!storage) return false;
+// Migra una sola vez las claves legacy de la app anterior (quizBD2.*) al namespace sys.*
+// de la materia indicada. El id de materia es obligatorio: el core no conoce materias
+// concretas. No borra las claves viejas: si algo sale mal, el progreso original sigue ahí.
+export function migrarClavesLegacy(storage, materiaId) {
+  if (!storage || !materiaId) return false;
   try {
     if (storage.getItem(FLAG_MIGRACION)) return false;
     const destino = claves(materiaId);

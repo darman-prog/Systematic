@@ -4,13 +4,14 @@
 import { shuffle } from "../core/sesiones.js";
 import {
   TIPO_LABELS,
-  bloqueCaso, escapar, respuestaEstudio, resaltarSQL, tablaDatos
+  bloqueCaso, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
 
 const $ = id => document.getElementById(id);
 
 export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla }) {
   let flash = null;
+  const keywords = () => sqlKeywordsDe(ctx.materia);
 
   function startFlashcards() {
     const items = priorizar(ctx.banco).map(it =>
@@ -52,13 +53,13 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     let frente = bloqueCaso(item) + '<div class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-3">' + item.parcial + ' · ' + item.tema + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + '</div>' +
       '<div class="text-base sm:text-lg font-semibold leading-relaxed">' + escapar(item.q) + '</div>';
     if (item.datos) frente += tablaDatos(item.datos);
-    if (item.codigo && item.tipo === "codigo") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo) + '</pre>';
-    if (item.codigo && item.tipo === "dragdrop") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo.replace(/\{\d\}/g, "____")) + '</pre>';
+    if (item.codigo && item.tipo === "codigo") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo, keywords()) + '</pre>';
+    if (item.codigo && item.tipo === "dragdrop") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo.replace(/\{\d\}/g, "____"), keywords()) + '</pre>';
     if (item.tipo === "ordenar") frente += '<div class="mt-4 flex flex-col gap-2">' + (item.frenteOrden || shuffle(item.bloques)).map(b => '<div class="bloque">' + escapar(b) + '</div>').join("") + '</div>';
 
     let reves = "";
     if (flash.volteada) {
-      reves = '<hr class="border-slate-700 my-4">' + respuestaEstudio(item) + '<div class="study-exp">' + item.exp + '</div>';
+      reves = '<hr class="border-slate-700 my-4">' + respuestaEstudio(item, keywords()) + '<div class="study-exp">' + item.exp + '</div>';
     }
 
     cont.innerHTML =

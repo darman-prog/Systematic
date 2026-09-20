@@ -633,7 +633,9 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-migrarClavesLegacy(localStorage);
+// Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
+// namespace al arrancar, antes de que el usuario seleccione materia.
+migrarClavesLegacy(localStorage, "bd2");
 renderMaterias();
 show("materias");
 

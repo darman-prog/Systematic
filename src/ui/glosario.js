@@ -1,11 +1,12 @@
 // Render del glosario (filtros por categoría, búsqueda) y del tip del día del home.
 // Recibe el glosario de la materia activa vía `ctx`; no lee localStorage ni importa datos.
-import { escapar, resaltarSQL } from "./helpers.js";
+import { escapar, resaltarSQL, sqlKeywordsDe } from "./helpers.js";
 
 const $ = id => document.getElementById(id);
 
 export function crearGlosarioUI({ ctx, mostrarPantalla }) {
   let glosarioCat = "todas";
+  const keywords = () => sqlKeywordsDe(ctx.materia);
 
   function startGlosario() {
     glosarioCat = "todas";
@@ -49,7 +50,7 @@ export function crearGlosarioUI({ ctx, mostrarPantalla }) {
           '<span class="font-bold text-sky-300 font-mono">' + escapar(t.termino) + '</span>' +
         '</div>' +
         '<p class="text-sm text-slate-300 leading-relaxed">' + escapar(t.definicion) + '</p>' +
-        (t.ejemplo ? '<pre class="code-block mt-2.5">' + resaltarSQL(t.ejemplo) + '</pre>' : '') +
+        (t.ejemplo ? '<pre class="code-block mt-2.5">' + resaltarSQL(t.ejemplo, keywords()) + '</pre>' : '') +
       '</div>';
     }).join("") || '<p class="text-sm text-slate-400">Sin resultados para esa búsqueda.</p>';
     const cont = $("glosario-count");

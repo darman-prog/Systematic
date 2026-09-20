@@ -1,11 +1,12 @@
 // Render de la pantalla de resultados de una sesión.
 // Recibe la sesión vía `ctx` y el callback de persistencia; no lee localStorage.
 import { respuestaCorrecta } from "../core/sesiones.js";
-import { TOPIC_COLORS, animar, escapar, resaltarSQL } from "./helpers.js";
+import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "./helpers.js";
 
 const $ = id => document.getElementById(id);
 
 export function crearResultadosUI({ ctx, registrarRespuesta }) {
+  const keywords = () => sqlKeywordsDe(ctx.materia);
   function respuestaHTML(item, texto, esCorrecta) {
     if (item.tipo === "relacionar") {
       return '<ul class="flex flex-col gap-1 text-xs sm:text-sm">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
@@ -42,7 +43,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
         const p = Math.round((d.ok / d.total) * 100);
         return '<div class="topic-row">' +
           '<span class="text-slate-300">' + tema + '</span>' +
-          '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + p + '%; background:' + (TOPIC_COLORS[tema] || "#3b82f6") + '"></div></div>' +
+          '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + p + '%; background:' + colorTema(ctx.materia, tema) + '"></div></div>' +
           '<span class="topic-score">' + d.ok + '/' + d.total + '</span>' +
         '</div>';
       }).join("") +
@@ -75,7 +76,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
           '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
           '<div class="flex items-start gap-2 text-sm mb-2"><span class="tag tag-bad mt-0.5">Tu respuesta</span><div class="flex-1 min-w-0"><pre class="code-block">' + escapar(a.selected || "(sin escribir)") + '</pre></div></div>' +
           '<div class="text-sm mb-2"><span class="tag tag-ok">Solución modelo</span></div>' +
-          '<pre class="code-block">' + resaltarSQL(item.solucion) + '</pre>' +
+          '<pre class="code-block">' + resaltarSQL(item.solucion, keywords()) + '</pre>' +
           '<div class="mt-3 text-sm text-slate-300 leading-relaxed">' + item.exp + '</div>' +
           '<div class="mt-3" id="eval-' + item.id + '">' +
             (pendiente

@@ -15,46 +15,46 @@ function memoriaStorage(inicial = {}) {
 
 describe("claves", () => {
   it("genera claves namespaced por materia", () => {
-    expect(claves("bd2")).toEqual({
-      progreso: "sys.progreso.bd2",
-      historial: "sys.historial.bd2",
-      actividad: "sys.actividad.bd2",
-      meta: "sys.meta.bd2"
+    expect(claves("demo")).toEqual({
+      progreso: "sys.progreso.demo",
+      historial: "sys.historial.demo",
+      actividad: "sys.actividad.demo",
+      meta: "sys.meta.demo"
     });
   });
 });
 
 describe("migrarClavesLegacy", () => {
-  it("copia quizBD2.* a sys.*.bd2 y marca el flag", () => {
+  it("copia quizBD2.* al namespace sys.* de la materia indicada y marca el flag", () => {
     const s = memoriaStorage({
       "quizBD2.progreso": '{"P1-001":{"ok":2}}',
       "quizBD2.historial": '[{"score":8}]',
       "quizBD2.actividad": '{"2026-09-01":5}',
       "quizBD2.meta": "30"
     });
-    expect(migrarClavesLegacy(s)).toBe(true);
-    expect(s.getItem("sys.progreso.bd2")).toBe('{"P1-001":{"ok":2}}');
-    expect(s.getItem("sys.historial.bd2")).toBe('[{"score":8}]');
-    expect(s.getItem("sys.actividad.bd2")).toBe('{"2026-09-01":5}');
-    expect(s.getItem("sys.meta.bd2")).toBe("30");
+    expect(migrarClavesLegacy(s, "demo")).toBe(true);
+    expect(s.getItem("sys.progreso.demo")).toBe('{"P1-001":{"ok":2}}');
+    expect(s.getItem("sys.historial.demo")).toBe('[{"score":8}]');
+    expect(s.getItem("sys.actividad.demo")).toBe('{"2026-09-01":5}');
+    expect(s.getItem("sys.meta.demo")).toBe("30");
     expect(s.getItem("sys.migracion.v1")).toBeTruthy();
   });
 
   it("no sobreescribe claves destino existentes", () => {
     const s = memoriaStorage({
       "quizBD2.progreso": '{"viejo":true}',
-      "sys.progreso.bd2": '{"nuevo":true}'
+      "sys.progreso.demo": '{"nuevo":true}'
     });
-    migrarClavesLegacy(s);
-    expect(s.getItem("sys.progreso.bd2")).toBe('{"nuevo":true}');
+    migrarClavesLegacy(s, "demo");
+    expect(s.getItem("sys.progreso.demo")).toBe('{"nuevo":true}');
   });
 
   it("es idempotente (segunda corrida no re-migra)", () => {
     const s = memoriaStorage({ "quizBD2.progreso": '{"a":1}' });
-    migrarClavesLegacy(s);
+    migrarClavesLegacy(s, "demo");
     s.setItem("quizBD2.progreso", '{"a":2}');
-    expect(migrarClavesLegacy(s)).toBe(false);
-    expect(s.getItem("sys.progreso.bd2")).toBe('{"a":1}');
+    expect(migrarClavesLegacy(s, "demo")).toBe(false);
+    expect(s.getItem("sys.progreso.demo")).toBe('{"a":1}');
   });
 
   it("no falla si el storage lanza errores", () => {
@@ -63,7 +63,7 @@ describe("migrarClavesLegacy", () => {
       setItem: () => {},
       removeItem: () => {}
     };
-    expect(migrarClavesLegacy(roto)).toBe(false);
+    expect(migrarClavesLegacy(roto, "demo")).toBe(false);
   });
 });
 

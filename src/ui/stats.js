@@ -2,7 +2,7 @@
 // Funciones de render que reciben los datos por parámetro (materia, banco, progreso vía
 // callback `obtenerP`, historial, actividad y meta ya normalizada); no lee localStorage.
 import { calcularRacha, esDebil, hoyISO, vencida } from "../core/progreso.js";
-import { DIF_LABELS, TOPIC_COLORS, escapar } from "./helpers.js";
+import { DIF_LABELS, colorTema, escapar } from "./helpers.js";
 
 const $ = id => document.getElementById(id);
 
@@ -94,7 +94,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
     const pct = (tOk + tFail) ? Math.round((tOk / (tOk + tFail)) * 100) : 0;
     filas += '<div class="topic-row">' +
       '<span class="text-slate-300">' + t + '</span>' +
-      '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + pct + '%; background:' + (TOPIC_COLORS[t] || "#3b82f6") + '"></div></div>' +
+      '<div class="topic-bar"><div class="topic-bar-fill" style="width:' + pct + '%; background:' + colorTema(materia, t) + '"></div></div>' +
       '<span class="topic-score">' + pct + '%</span>' +
     '</div>';
   });

@@ -2,16 +2,6 @@
 // Solo produce HTML string a partir de los parámetros recibidos; sin estado global,
 // sin localStorage y sin imports de src/datos/ (los datos llegan como parámetros).
 
-export const TOPIC_COLORS = {
-  "DML": "#38bdf8",
-  "DDL": "#a78bfa",
-  "Integridad": "#f472b6",
-  "Índices": "#facc15",
-  "Modelado": "#34d399",
-  "Consultas": "#fb923c",
-  "Funciones": "#22d3ee"
-};
-
 export const TIPO_LABELS = {
   multiple: "Opción múltiple",
   multi: "Selección múltiple",
@@ -35,12 +25,23 @@ function escaparRegex(texto) {
   return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-// Nota: se mueve a los datos por materia en el paso 3 de la spec 002.
-const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "JOIN", "ON", "GROUP BY", "ORDER BY", "WITHIN GROUP", "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE", "CREATE TABLE", "ALTER TABLE", "ADD", "DROP TABLE", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "LISTAGG", "GROUP_CONCAT", "SUBSTR", "SUBSTRING", "CAST", "TO_CHAR", "TO_NUMBER", "VARCHAR2", "NUMBER", "AS", "AND", "OR", "COUNT", "DISTINCT", "INT", "FLOAT", "NULL", "NOT", "CASCADE", "ASC", "HAVING", "SUM", "INTO"];
+// Contenido por materia (colores de tema, palabras clave SQL) llega vía la entrada de la
+// materia activa (src/core/materias.js); fallback genérico solo cuando el campo falta.
+const COLOR_TEMA_FALLBACK = "#3b82f6";
 
-export function resaltarSQL(sql) {
+export function colorTema(materia, tema) {
+  return (materia && materia.topicColors && materia.topicColors[tema]) || COLOR_TEMA_FALLBACK;
+}
+
+export function sqlKeywordsDe(materia) {
+  return (materia && materia.sqlKeywords) || [];
+}
+
+export function resaltarSQL(sql, keywords) {
   let base = escapar(sql).replace(/'([^']*)'/g, "<span class=\"str\">'$1'</span>");
-  const patron = new RegExp("\\b(" + SQL_KEYWORDS.slice().sort((a, b) => b.length - a.length).map(escaparRegex).join("|") + ")\\b", "g");
+  const lista = Array.isArray(keywords) ? keywords : [];
+  if (!lista.length) return base;
+  const patron = new RegExp("\\b(" + lista.slice().sort((a, b) => b.length - a.length).map(escaparRegex).join("|") + ")\\b", "g");
   return base.replace(patron, m => '<span class="kw">' + m + '</span>');
 }
 
@@ -93,11 +94,11 @@ export function diagramaER() {
 }
 
 // Respuesta revelada de un ítem, compartida por modo estudio y flashcards.
-export function respuestaEstudio(item) {
+export function respuestaEstudio(item, keywords) {
   if (item.tipo === "dragdrop") return '<div class="study-answer">' + escapar(item.respuestas.join("  |  ")) + '</div>';
   if (item.tipo === "relacionar") return '<ul class="flex flex-col gap-1 text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
   if (item.tipo === "ordenar") return '<ol class="list-decimal list-inside flex flex-col gap-1 font-mono text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.bloques.map(b => '<li>' + escapar(b) + '</li>').join("") + '</ol>';
-  if (item.tipo === "desarrollo") return '<pre class="code-block mb-3">' + resaltarSQL(item.solucion) + '</pre>';
+  if (item.tipo === "desarrollo") return '<pre class="code-block mb-3">' + resaltarSQL(item.solucion, keywords) + '</pre>';
   if (item.tipo === "multi") {
     return '<div class="flex flex-col gap-2 mb-3">' + item.options.map((o, j) => {
       const esOk = item.correctos.indexOf(j) !== -1;

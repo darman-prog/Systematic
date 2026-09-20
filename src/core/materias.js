@@ -1,6 +1,7 @@
 // Registro de materias de la app. El contenido vive en src/datos/<materia>/.
 import bd2Preguntas from "../datos/bd2/preguntas.js";
 import bd2Glosario from "../datos/bd2/glosario.js";
+import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
 import iswGlosario from "../datos/isw/glosario.js";
 import iswApuntes from "../datos/isw/apuntes.js";
@@ -17,7 +18,9 @@ export const MATERIAS = [
     color: "#38bdf8",
     preguntas: bd2Preguntas,
     glosario: bd2Glosario,
-    apuntes: []
+    apuntes: [],
+    topicColors: bd2TopicColors,
+    sqlKeywords: bd2SqlKeywords
   },
   {
     id: "isw",

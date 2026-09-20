@@ -3,8 +3,8 @@
 // persistencia y acciones; no lee localStorage ni importa datos de materias.
 import { respuestaCorrecta } from "../core/sesiones.js";
 import {
-  TOPIC_COLORS, TIPO_LABELS, DIF_LABELS,
-  animar, bloqueCaso, diagramaER, escapar, resaltarSQL, tablaDatos
+  TIPO_LABELS, DIF_LABELS,
+  animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
 
 const $ = id => document.getElementById(id);
@@ -12,6 +12,7 @@ const $ = id => document.getElementById(id);
 export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked }) {
   let dragPid = null;
   let dragBloqueIndex = null;
+  const keywords = () => sqlKeywordsDe(ctx.materia);
 
   function renderQuestion() {
     const session = ctx.session;
@@ -20,7 +21,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     $("progress").textContent = "Pregunta " + (session.idx + 1) + " de " + n + " · " + Math.round(((session.idx + 1) / n) * 100) + "%";
     const tb = $("topic-badge");
     tb.textContent = item.tema;
-    tb.style.background = TOPIC_COLORS[item.tema] || "#3b82f6";
+    tb.style.background = colorTema(ctx.materia, item.tema);
     tb.style.color = "#0f172a";
     $("type-badge").textContent = (TIPO_LABELS[item.tipo] || item.tipo) + (item.real ? " · 🔥 real" : "");
     const db = $("dif-badge");
@@ -59,7 +60,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     html += '<div class="flex flex-col gap-3" id="options-container"></div>';
     area.innerHTML = html;
     $("question-text").textContent = item.q;
-    if (item.tipo === "codigo" && item.codigo) $("code-block").innerHTML = resaltarSQL(item.codigo);
+    if (item.tipo === "codigo" && item.codigo) $("code-block").innerHTML = resaltarSQL(item.codigo, keywords());
     const cont = $("options-container");
     item.options.forEach((opt, idx) => {
       const btn = document.createElement("button");
@@ -377,7 +378,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
   function pintarDragdrop() {
     const session = ctx.session;
     const estado = session.drag;
-    let html = resaltarSQL(estado.item.codigo);
+    let html = resaltarSQL(estado.item.codigo, keywords());
     html = html.replace(/\{(\d)\}/g, (m, n) => {
       const i = parseInt(n, 10) - 1;
       const pid = estado.slots[i];
@@ -589,7 +590,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     if (!d || d.revelada) return;
     d.revelada = true;
     const cont = $("dev-solucion");
-    cont.innerHTML = '<p class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Solución modelo</p><pre class="code-block">' + resaltarSQL(d.item.solucion) + '</pre>' + analizarClaves(d.item, d.texto);
+    cont.innerHTML = '<p class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-2">Solución modelo</p><pre class="code-block">' + resaltarSQL(d.item.solucion, keywords()) + '</pre>' + analizarClaves(d.item, d.texto);
     cont.classList.remove("hidden");
     const btnVer = $("dev-ver");
     if (btnVer) btnVer.classList.add("hidden");
