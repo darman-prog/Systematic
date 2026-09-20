@@ -1,17 +1,11 @@
 ﻿// Render de la lista y la ejecución de escenarios multi-paso (spec 003).
 // Funciones puras de render: reciben datos y estado; no leen localStorage.
 import { escapar } from "../helpers.js";
-import { icono } from "../iconos.js";
-import { tarjeta } from "../componentes/tarjetas.js";
 import { estadoVacio } from "../componentes/estados.js";
+import { tarjeta } from "../componentes/tarjetas.js";
+import { tagRating } from "../componentes/etiquetas.js";
 
 const $ = id => document.getElementById(id);
-
-const RATINGS = {
-  exito: { texto: "¡Éxito!", icono: "check", clase: "tag-ok" },
-  parcial: { texto: "Resultado parcial", icono: "idea", clase: "tag-practica" },
-  fracaso: { texto: "Fracaso", icono: "cruz", clase: "tag-bad" }
-};
 
 export function pintarListaEscenarios(escenarios, registros) {
   const cont = $("escenarios-lista");
@@ -35,11 +29,10 @@ export function pintarEscenario(escenario, estado) {
   const cont = $("escenario-escena");
   if (!cont) return;
   if (estado.terminado) {
-    const r = RATINGS[estado.rating] || RATINGS.parcial;
     const finalTexto = estado.rating === "exito" ? escenario.finales.exito : estado.rating === "parcial" ? escenario.finales.parcial : escenario.finales.fracaso;
     cont.innerHTML =
       '<div class="text-center mb-5">' +
-        '<span class="tag ' + r.clase + '">' + icono(r.icono, "icono-sm") + r.texto + '</span>' +
+        tagRating(estado.rating) +
         '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
         '<p class="text-xs text-slate-400 mt-1">Puntuación: ' + estado.puntos + ' pts · XP por buenas decisiones incluida</p>' +
       '</div>' +
