@@ -62,3 +62,13 @@ fixes residuales que quedan para después de su paso 5. No introduce features nu
 - Base actual: `main` con spec 003 H5 en `fb31527`; H6a-H6c/H7 en curso.
 - Relación: la Parte C es delta de la spec 003 (no la modifica, la complementa); la Parte A
   es trabajo nuevo diferido.
+
+### Estado Parte C tras H7 (2026-09-20)
+
+Cubierto en `fcd3d7f` (lienzo operable por teclado con Enter/Espacio/flechas/Esc/Supr, foco a
+un control real al montar el lienzo, `aria-pressed` en nodos, anuncios por `role="status"` en
+`#hint-diagrama`, guarda de atajos globales ante input/textarea, foco al heading de Casos y
+`aria-live` en la escena del caso) y en el E2E "lienzo de diagrama operable solo con teclado"
+(`npm run e2e`, 13 tests verdes). Pendientes de la Parte C: piezas/huecos de dragdrop como
+`<button>` (ítem 5), `aria-pressed` en chips de configuración y mensajes de error de guardas
+con texto (ítem 6) y targets ≥24px en controles del lienzo (ítem 7). La Parte A sigue diferida.

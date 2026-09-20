@@ -77,8 +77,12 @@ Refactor base `613cf28`. H1 Noche calma y docs `c44f78c`/`06e32ad`; H2 `14569cf`
 Gates al cierre H6c: `npm run validar` (3 materias · 160 preguntas · 79 términos),
 `npm run test` (100 unitarios), `npm run build` y `npm run e2e` (12) verdes.
 
+Cierre H7 (QA + teclado): corrección de diagramas `fcd3d7f` y docs `283bb58`; gates finales
+`npm run validar`, `npm run test` (121 unitarios), `npm run build` y `npm run e2e` (13, con
+recorrido de teclado del lienzo) verdes. Deploy por Vercel a partir de `main` (`283bb58`).
+
 Pendiente de verificación manual del cliente: detector visual Impeccable (no es un comando
-del repo en este entorno). Deploy por Vercel a partir de `main`.
+del repo en este entorno).
 
 ### Corrección post-H6c de diagramas ISW/ASW
 
