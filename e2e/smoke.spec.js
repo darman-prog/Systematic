@@ -157,6 +157,30 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#next-btn')).toBeVisible();
   });
 
+  test('constructor UML con miembros: ASW muestra preguntas de diagrama de clases', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').nth(2).click(); // ASW
+    await page.getByRole('button', { name: /Configurar práctica/ }).click();
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    await expect(page.locator('#cfg-resumen')).toContainText('3 preguntas coinciden');
+    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    await expect(page.locator('#lienzo-diagrama')).toBeVisible();
+    // Verifica que hay miembros en el pool (para UML clases)
+    const miembrosPool = page.locator('#pool-miembros .pieza');
+    const numMiembros = await miembrosPool.count();
+    if (numMiembros > 0) {
+      // Coloca al menos un nodo
+      await page.locator('#pool-diagrama .pieza').first().click();
+      await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
+      // Asigna un miembro al nodo
+      await miembrosPool.first().click();
+      await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
+      await expect(page.locator('#lienzo-diagrama .nodo-miembros')).toBeVisible();
+    }
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();

@@ -272,11 +272,55 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
     if (!item || !tipos || tipos.hidden) return;
     const est = estado();
     const dirigido = esDirigido(item.subtipo);
-    guardar(conectar(est, tipos.dataset.de, tipos.dataset.a, tipo, dirigido));
-    tipos.hidden = true;
-    pintarNodos(item, $("question-area"));
-    dibujarAristas(item);
-    setHint("Relación creada. Pulsa «Comprobar» cuando el diagrama esté listo.");
+    
+    // Para actividades, permitir seleccionar una guarda
+    if (item.subtipo === "actividades") {
+      mostrarSelectorGuarda(tipos.dataset.de, tipos.dataset.a, tipo, dirigido, item);
+    } else {
+      guardar(conectar(est, tipos.dataset.de, tipos.dataset.a, tipo, dirigido));
+      tipos.hidden = true;
+      pintarNodos(item, $("question-area"));
+      dibujarAristas(item);
+      setHint("Relación creada. Pulsa «Comprobar» cuando el diagrama esté listo.");
+    }
+  }
+
+  function mostrarSelectorGuarda(de, a, tipo, dirigido, item) {
+    const modal = document.createElement("div");
+    modal.className = "modal-guarda";
+    modal.innerHTML = `
+      <div class="modal-guarda-contenido">
+        <h3>Seleccionar guarda</h3>
+        <p>Elige la condición para esta transición:</p>
+        <div class="guardas-opciones">
+          <button class="btn-guarda" data-guarda="">Sin guarda</button>
+          <button class="btn-guarda" data-guarda="[sí]">[sí]</button>
+          <button class="btn-guarda" data-guarda="[no]">[no]</button>
+          <button class="btn-guarda" data-guarda="[verdadero]">[verdadero]</button>
+          <button class="btn-guarda" data-guarda="[falso]">[falso]</button>
+        </div>
+        <button class="btn-cancelar" id="cancelar-guarda">Cancelar</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    modal.querySelectorAll(".btn-guarda").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const guarda = btn.dataset.guarda || undefined;
+        const est = estado();
+        guardar(conectar(est, de, a, tipo, dirigido, guarda));
+        modal.remove();
+        const tipos = $("tipos-diagrama");
+        if (tipos) tipos.hidden = true;
+        pintarNodos(item, $("question-area"));
+        dibujarAristas(item);
+        setHint("Relación creada" + (guarda ? " con guarda " + guarda : "") + ". Pulsa «Comprobar» cuando el diagrama esté listo.");
+      });
+    });
+    
+    modal.querySelector("#cancelar-guarda").addEventListener("click", () => {
+      modal.remove();
+    });
   }
 
   function pintarNodos(item, area) {
@@ -293,9 +337,24 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
       n.dataset.label = nombre;
       n.style.left = 12 + (i % 3) * 96 + "px";
       n.style.top = 14 + Math.floor(i / 3) * 62 + "px";
-      const span = document.createElement("span");
-      span.textContent = nombre;
-      n.appendChild(span);
+      
+      // Contenido del nodo
+      let contenido = '<span class="nodo-nombre">' + escapar(nombre) + '</span>';
+      
+      // Mostrar miembros asignados (para UML clases)
+      if (Array.isArray(item.miembrosPool) && item.miembrosPool.length > 0) {
+        const miembrosNodo = item.miembrosPool
+          .filter(m => est.miembros[m.texto] === nombre)
+          .map(m => m.texto);
+        if (miembrosNodo.length > 0) {
+          contenido += '<div class="nodo-miembros">' + 
+            miembrosNodo.map(m => '<div class="miembro-item">' + escapar(m) + '</div>').join('') +
+            '</div>';
+        }
+      }
+      
+      n.innerHTML = contenido;
+      
       if (!fijo) {
         const quitar = document.createElement("button");
         quitar.className = "nodo-quitar";
@@ -312,6 +371,16 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
           e.preventDefault();
           e.stopPropagation();
           segundoToque(nombre);
+          return;
+        }
+        if (dragPid && dragPid.indexOf("miembro:") === 0) {
+          e.preventDefault();
+          e.stopPropagation();
+          const texto = dragPid.slice("miembro:".length);
+          dragPid = null;
+          guardar(asignarMiembro(est, texto, nombre));
+          pintarNodos(item, area);
+          setHint("Miembro asignado a «" + nombre + "».");
           return;
         }
         inicioMoverNodo(e);
@@ -364,7 +433,9 @@ export function crearDiagramasUI({ ctx, guardarEstado, alComprobar }) {
       svg.appendChild(linea);
       const etiqueta = document.createElement("span");
       etiqueta.className = "etiqueta-arista";
-      etiqueta.textContent = c.tipo + " ✕";
+      let textoEtiqueta = c.tipo;
+      if (c.guarda) textoEtiqueta += " " + c.guarda;
+      etiqueta.textContent = textoEtiqueta + " ✕";
       etiqueta.title = "Quitar relación";
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";

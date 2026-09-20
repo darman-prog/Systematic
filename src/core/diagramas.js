@@ -69,12 +69,16 @@ export function asignarMiembro(estado, texto, nodo) {
   return Object.assign({}, estado, { miembros });
 }
 
-export function conectar(estado, de, a, tipo, dirigido) {
+export function conectar(estado, de, a, tipo, dirigido, guarda) {
   if (!de || !a || !tipo) return estado;
   if (!dirigido && de === a) return estado;
   const nueva = { de, a, tipo };
-  const clave = claveArista(de, a, tipo, dirigido);
-  const repetida = estado.conexiones.some(c => claveArista(c.de, c.a, c.tipo, dirigido) === clave);
+  if (guarda) nueva.guarda = guarda;
+  const clave = claveArista(de, a, tipo, dirigido) + (guarda ? "|" + guarda : "");
+  const repetida = estado.conexiones.some(c => {
+    const cClave = claveArista(c.de, c.a, c.tipo, dirigido) + (c.guarda ? "|" + c.guarda : "");
+    return cClave === clave;
+  });
   if (repetida) return estado;
   return Object.assign({}, estado, { conexiones: estado.conexiones.concat([nueva]) });
 }
@@ -94,8 +98,16 @@ function relacionesDe(pregunta) {
 // Puntuación: conexiones correctas + miembros bien asignados - sobrantes.
 export function evaluarDiagrama(pregunta, estado) {
   const dirigido = esDirigido(pregunta.subtipo);
-  const esperadas = new Set(relacionesDe(pregunta).map(r => claveArista(r.de, r.a, r.tipo, dirigido)));
-  const actuales = new Set(estado.conexiones.map(c => claveArista(c.de, c.a, c.tipo, dirigido)));
+  const esperadas = new Set(relacionesDe(pregunta).map(r => {
+    let clave = claveArista(r.de, r.a, r.tipo, dirigido);
+    if (r.guarda) clave += "|" + r.guarda;
+    return clave;
+  }));
+  const actuales = new Set(estado.conexiones.map(c => {
+    let clave = claveArista(c.de, c.a, c.tipo, dirigido);
+    if (c.guarda) clave += "|" + c.guarda;
+    return clave;
+  }));
   const correctas = [...actuales].filter(k => esperadas.has(k));
   const sobrantes = [...actuales].filter(k => !esperadas.has(k));
   const faltantes = [...esperadas].filter(k => !actuales.has(k));

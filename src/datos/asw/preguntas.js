@@ -412,7 +412,73 @@ const preguntas = [
     q: "Explica qué problema resuelve el patrón Bridge y cómo lo soluciona. Incluye el ejemplo de las formas geométricas y los renderizadores.",
     solucion: "Bridge resuelve la explosión de clases que ocurre al usar herencia para combinar múltiples dimensiones de variabilidad: con formas (Circulo, Cuadrado) y renderizadores (Vector, Raster) aparecerían CirculoVector, CirculoRaster, CuadradoVector, CuadradoRaster, y el número de clases crecería exponencialmente con cada forma o motor nuevo. La solución es cambiar la herencia por composición, dividiendo las clases en dos jerarquías independientes: la Abstracción (capa de alto nivel que interactúa con el cliente, como Forma, y contiene una referencia hacia la implementación) y la Implementación (capa de bajo nivel que realiza el trabajo, como Renderizador). Así ambas dimensiones pueden variar de forma independiente sin afectarse mutuamente.",
     claves: ["explosión de clases", "composición", "abstracción", "implementación", "independiente"],
-    exp: "El síntoma clave es la <b>explosión de clases</b> por combinar dos dimensiones con herencia. La cura es <b>composición</b>: dos jerarquías separadas (<b>Abstracción</b> arriba, <b>Implementación</b> abajo) conectadas por una referencia, de modo que agregar un Triangulo o un motor 3D ya no multiplica clases."
+    exp: "El síntoma clave es la <b>explosión de clases</b> por combinar dos dimensiones con herencia. La cura es <b>composición</b>: dos jerarquías independientes (<b>Abstracción</b> arriba, <b>Implementación</b> abajo) conectadas por una referencia, de modo que agregar un Triangulo o un motor 3D ya no multiplica clases."
+  },
+  {
+    id: "ASW-031",
+    parcial: "Parcial 1",
+    tema: "Relaciones entre Objetos",
+    dificultad: "media",
+    tipo: "diagrama",
+    subtipo: "uml-clases",
+    q: "Modela el sistema de transacciones: una clase base Transacción con método procesar(), y tres subclases específicas (Tarjeta, Transferencia, Cripto) que heredan de ella. Cada subclase sobrescribe procesar() con su lógica específica.",
+    nodosPool: ["Transaccion", "Tarjeta", "Transferencia", "Cripto"],
+    miembrosPool: [
+      { texto: "procesar()", de: "Transaccion" },
+      { texto: "validarNumero()", de: "Tarjeta" },
+      { texto: "codigoBanco", de: "Transferencia" },
+      { texto: "procesar()", de: "Tarjeta" },
+      { texto: "procesar()", de: "Cripto" }
+    ],
+    relacionesEsperadas: [
+      { de: "Tarjeta", a: "Transaccion", tipo: "herencia" },
+      { de: "Transferencia", a: "Transaccion", tipo: "herencia" },
+      { de: "Cripto", a: "Transaccion", tipo: "herencia" }
+    ],
+    exp: "La <b>herencia</b> permite reutilizar código: las tres subclases heredan de <b>Transaccion</b> y sobrescriben <b>procesar()</b> con su lógica específica. Cada subclase tiene sus propios miembros (Tarjeta valida el número, Transferencia guarda el código de banco, Cripto tiene su propio procesamiento). Esto es el pilar de <b>herencia</b> de la POO aplicado al patrón Template Method."
+  },
+  {
+    id: "ASW-032",
+    parcial: "Parcial 1",
+    tema: "Relaciones entre Objetos",
+    dificultad: "media",
+    tipo: "diagrama",
+    subtipo: "uml-clases",
+    q: "Modela un sistema de archivos: una clase Carpeta que contiene múltiples Archivos. La Carpeta gestiona el ciclo de vida de los Archivos (si eliminas la carpeta, se eliminan los archivos). Usa composición.",
+    nodosPool: ["Carpeta", "Archivo"],
+    miembrosPool: [
+      { texto: "nombre", de: "Archivo" },
+      { texto: "tamano", de: "Archivo" },
+      { texto: "nombre", de: "Carpeta" },
+      { texto: "agregarArchivo()", de: "Carpeta" }
+    ],
+    relacionesEsperadas: [
+      { de: "Carpeta", a: "Archivo", tipo: "composicion" }
+    ],
+    exp: "La <b>composición</b> es una relación fuerte donde el contenedor (Carpeta) gestiona el ciclo de vida de los componentes (Archivos). Si eliminas la carpeta, los archivos también se eliminan. En UML se representa con un <b>diamante relleno</b> en el lado del contenedor. Es diferente a la agregación (diamante vacío), donde los componentes pueden existir independientemente."
+  },
+  {
+    id: "ASW-033",
+    parcial: "Parcial 1",
+    tema: "Patrones Estructurales",
+    dificultad: "dificil",
+    tipo: "diagrama",
+    subtipo: "uml-clases",
+    q: "Modela el patrón Composite para un sistema de archivos: una interfaz comun Componente con metodo tamano(), una clase Archivo (hoja) que implementa Componente, y una clase Carpeta (compuesto) que contiene una lista de Componentes y también implementa Componente.",
+    nodosPool: ["Componente", "Archivo", "Carpeta"],
+    miembrosPool: [
+      { texto: "tamano()", de: "Componente" },
+      { texto: "tamano()", de: "Archivo" },
+      { texto: "tamano()", de: "Carpeta" },
+      { texto: "hijos: Componente[]", de: "Carpeta" },
+      { texto: "agregar()", de: "Carpeta" }
+    ],
+    relacionesEsperadas: [
+      { de: "Archivo", a: "Componente", tipo: "implementacion" },
+      { de: "Carpeta", a: "Componente", tipo: "implementacion" },
+      { de: "Carpeta", a: "Componente", tipo: "agregacion" }
+    ],
+    exp: "El patrón <b>Composite</b> permite tratar objetos individuales (Archivo) y composiciones (Carpeta) de manera uniforme a través de una interfaz común (Componente). La Carpeta <b>implementa</b> Componente y <b>agrega</b> una lista de Componentes (pueden ser Archivos u otras Carpetas). Esto permite calcular el tamaño total recursivamente: si es Archivo devuelve su tamaño, si es Carpeta suma recursivamente el tamaño de sus hijos."
   }
 ];
 

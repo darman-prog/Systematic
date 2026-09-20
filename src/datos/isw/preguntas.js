@@ -248,6 +248,42 @@ const preguntas = [
     options: ["Blueprinting", "VOC (Voice of Customers)", "Cutover", "Daily Scrum"],
     correct: 1,
     exp: "El guión usa el <b>VOC (Voice of Customers)</b>: cada interesado describe su percepción del proyecto y esa información alimenta el análisis de interesados y entregables como el Acta de Constitución. El blueprinting y el cutover son responsabilidades del proveedor del ERP."
+  },
+  {
+    id: "ISW-036",
+    parcial: "Parcial 1",
+    tema: "Casos de Uso",
+    dificultad: "media",
+    tipo: "diagrama",
+    subtipo: "casos-uso",
+    q: "Modela el sistema ERP de Naibe: los actores (Gerente Proyecto Interno, Analista Negocios, Usuario Financiero) y sus casos de uso principales. El Gerente coordina el proyecto, el Analista hace blueprinting, y el Usuario Financiero participa en la migración de datos.",
+    nodosPool: ["Gerente Proyecto", "Analista Negocios", "Usuario Financiero", "Coordinar Proyecto", "Blueprinting", "Migrar Datos"],
+    relacionesEsperadas: [
+      { de: "Gerente Proyecto", a: "Coordinar Proyecto", tipo: "asociacion" },
+      { de: "Analista Negocios", a: "Blueprinting", tipo: "asociacion" },
+      { de: "Usuario Financiero", a: "Migrar Datos", tipo: "asociacion" }
+    ],
+    exp: "En un diagrama de <b>casos de uso</b>, los <b>actores</b> (personas o sistemas externos) se conectan con los <b>casos de uso</b> (funcionalidades del sistema) mediante líneas de <b>asociación</b>. Cada actor participa en los casos de uso que le corresponden según sus responsabilidades en el proyecto ERP."
+  },
+  {
+    id: "ISW-037",
+    parcial: "Parcial 1",
+    tema: "Diagramas de Actividad",
+    dificultad: "dificil",
+    tipo: "diagrama",
+    subtipo: "actividades",
+    q: "Modela el flujo del cutover del proyecto ERP: inicio → preparar migración → ¿datos validados? → si sí: ejecutar cutover → fin exitoso; si no: revertir cambios → fin fallido.",
+    nodosPool: ["inicio", "preparar migración", "¿datos validados?", "ejecutar cutover", "revertir cambios", "fin exitoso", "fin fallido"],
+    nodosFijos: ["inicio", "fin exitoso", "fin fallido"],
+    relacionesEsperadas: [
+      { de: "inicio", a: "preparar migración", tipo: "transicion" },
+      { de: "preparar migración", a: "¿datos validados?", tipo: "transicion" },
+      { de: "¿datos validados?", a: "ejecutar cutover", tipo: "transicion", guarda: "[sí]" },
+      { de: "¿datos validados?", a: "revertir cambios", tipo: "transicion", guarda: "[no]" },
+      { de: "ejecutar cutover", a: "fin exitoso", tipo: "transicion" },
+      { de: "revertir cambios", a: "fin fallido", tipo: "transicion" }
+    ],
+    exp: "Los <b>diagramas de actividad</b> modelan flujos de trabajo con nodos de acción y decisiones. Los nodos de <b>decisión</b> (rombos) tienen salidas con <b>guardas</b> [condición] que determinan qué camino tomar. En este caso, el cutover solo procede si los datos están validados; si no, se revierten los cambios. Los nodos de inicio/fin son puntos fijos del flujo."
   }
 ];
 

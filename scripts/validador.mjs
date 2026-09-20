@@ -102,10 +102,10 @@ export function validarPregunta(p, idsVistos) {
           if (fuera.length) err(`nodosFijos fuera del pool: ${fuera.join(", ")}`);
         }
       }
+      const nodoValido = n => p.nodosPool.includes(n) || (esArreglo(p.nodosFijos) && p.nodosFijos.includes(n));
       if (!esArreglo(p.relacionesEsperadas) || p.relacionesEsperadas.length === 0) {
         err("relacionesEsperadas debe tener al menos 1 relación");
       } else {
-        const nodoValido = n => p.nodosPool.includes(n) || (esArreglo(p.nodosFijos) && p.nodosFijos.includes(n));
         p.relacionesEsperadas.forEach((r, i) => {
           if (!r || !textoNoVacio(r.de) || !textoNoVacio(r.a) || !textoNoVacio(r.tipo)) {
             err(`relación ${i + 1} necesita {de, a, tipo}`);
@@ -113,6 +113,7 @@ export function validarPregunta(p, idsVistos) {
             err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
           }
           if (r && p.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
+          if (r && r.guarda !== undefined && !textoNoVacio(r.guarda)) err(`relación ${i + 1} con guarda vacía`);
         });
       }
       if (p.tiposArista !== undefined) {
