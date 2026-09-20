@@ -203,3 +203,10 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
 .toast { @apply px-4 py-3 rounded-xl text-sm font-semibold shadow-xl; background: var(--study-surface-2); color: var(--study-text); border: 1px solid var(--study-border); animation: fadeInUp 0.28s ease-out; max-width: 20rem; }
 .toast-out { opacity: 0; transition: opacity 0.5s ease; }
 #confeti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
+
+/* Mapa de misiones (spec 003) */
+.mision-nodo { @apply flex items-center gap-3 w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mb-3 text-left transition; }
+.mision-disponible { @apply hover:border-blue-500 cursor-pointer; }
+.mision-bloqueada { @apply opacity-50; }
+.mision-num { @apply flex-none w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm; background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-accent); }
+.mision-estrellas { @apply text-lg font-bold whitespace-nowrap; color: var(--study-warning); }

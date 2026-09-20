@@ -60,6 +60,11 @@
         <span class="font-bold">Apuntes</span>
         <span class="text-xs text-slate-400">Resúmenes curados por tema</span>
       </button>
+      <button class="mode-card" data-action="irMisiones">
+        <span class="text-2xl">🗺️</span>
+        <span class="font-bold">Misiones</span>
+        <span class="text-xs text-slate-400">Gana estrellas por tema, nodo a nodo</span>
+      </button>
       <button class="mode-card" data-action="startFlashcards">
         <span class="text-2xl">🃏</span>
         <span class="font-bold">Flashcards</span>
@@ -186,6 +191,15 @@
     <div id="apuntes-filtros" class="flex flex-wrap gap-2 mb-3"></div>
     <p class="text-xs text-slate-500 mb-3" id="apuntes-count"></p>
     <div id="apuntes-list"></div>
+  </section>
+
+  <section id="screen-misiones" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">🗺️ Misiones</h1>
+      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+    </div>
+    <p class="subtitle">Completa misiones por tema y gana hasta 3 estrellas según tu precisión. Cada nodo se desbloquea con al menos 1 estrella del anterior.</p>
+    <div id="misiones-lista"></div>
   </section>
 
   <section id="screen-flashcards" class="card hidden">

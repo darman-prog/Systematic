@@ -83,6 +83,21 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#vidas-badge')).toContainText('❤️');
   });
 
+  test('misiones: mapa con nodos secuenciales y misión jugable', async ({ page }) => {
+    await page.on('dialog', d => d.accept());
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click();
+    await page.getByRole('button', { name: /Misiones/ }).click();
+    await expect(page.locator('#screen-misiones')).toBeVisible();
+    const nodos = page.locator('#misiones-lista .mision-nodo');
+    await expect(nodos.first()).toBeVisible();
+    await expect(page.locator('#misiones-lista .mision-disponible')).toHaveCount(1);
+    await page.locator('#misiones-lista .mision-disponible').first().click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
+    await expect(page.locator('#screen-start')).toBeVisible();
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();

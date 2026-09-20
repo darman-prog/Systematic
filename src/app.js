@@ -4,7 +4,7 @@ import {
   aplicarRespuesta, esDebil, vencida, metaDiaria, hoyISO, calcularRacha
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
-import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros, multiplicadorSupervivencia, xpContrarreloj } from "./core/gamificacion.js";
+import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/quiz.js";
@@ -13,6 +13,7 @@ import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "
 import { crearEstudioUI } from "./ui/estudio.js";
 import { crearGlosarioUI } from "./ui/glosario.js";
 import { crearFlashcardsUI } from "./ui/flashcards.js";
+import { estadoMisiones, pintarMisiones } from "./ui/misiones.js";
 
 // Materia activa y datos asociados (se definen al seleccionar materia en el home).
 let materia = null;
@@ -37,7 +38,7 @@ const ctx = {
 };
 
 function show(screen) {
-  ["materias", "start", "config", "quiz", "results", "study", "apuntes", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "flashcards", "glosario", "repaso"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -246,7 +247,9 @@ function revisarLogros(extra) {
       respuestas: s.respuestas,
       precision: s.precision,
       simulacroPerfecto: false,
-      metaCumplida: false
+      metaCumplida: false,
+      misionPerfecta: false,
+      estrellasTotales: 0
     },
     extra || {}
   );
@@ -518,6 +521,39 @@ function startSupervivencia() {
   startSession(shuffle(banco), "supervivencia", false);
 }
 
+// ===== Misiones por tema (spec 003): mapa secuencial con estrellas =====
+
+function misionesDeMateria() {
+  return materia ? leerJSON(localStorage, "sys.misiones." + materia.id, {}) : {};
+}
+
+function estrellasTotales() {
+  return MATERIAS.reduce((acc, m) => {
+    const mapa = leerJSON(localStorage, "sys.misiones." + m.id, {});
+    return acc + Object.keys(mapa).reduce((s, t) => s + (mapa[t].estrellas || 0), 0);
+  }, 0);
+}
+
+function irMisiones() {
+  clearTimer();
+  clearTimerPregunta();
+  session = null;
+  show("misiones");
+  renderMisiones();
+}
+
+function renderMisiones() {
+  const temas = [...new Set(banco.map(q => q.tema))];
+  pintarMisiones(estadoMisiones(temas, misionesDeMateria()));
+}
+
+function iniciarMision(tema) {
+  const lista = banco.filter(q => q.tema === tema);
+  if (!lista.length) return;
+  startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
+  session.misionTema = tema;
+}
+
 function practicarDebiles() {
   const debiles = banco.filter(q => esDebil(obtenerP(q.id)));
   if (!debiles.length) return;
@@ -679,6 +715,17 @@ function finalizar() {
   session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
   if (session.modo === "supervivencia") {
     session.resultado.supervivencia = { jugadas: Object.keys(session.answers).length, mejorCombo: session.mejorCombo || 0 };
+  }
+  if (session.modo === "mision" && session.misionTema) {
+    const mapa = misionesDeMateria();
+    const previa = mapa[session.misionTema] || { estrellas: 0, mejorPct: 0 };
+    const nuevas = estrellasDeMision(pct);
+    if (nuevas > previa.estrellas || pct > previa.mejorPct) {
+      mapa[session.misionTema] = { estrellas: Math.max(previa.estrellas, nuevas), mejorPct: Math.max(previa.mejorPct, pct) };
+      escribirJSON(localStorage, "sys.misiones." + materia.id, mapa);
+      if (nuevas > previa.estrellas) sumarXp((nuevas - previa.estrellas) * XP_EVENTOS.estrella);
+    }
+    revisarLogros({ misionPerfecta: nuevas === 3, estrellasTotales: estrellasTotales() });
   }
   guardarIntento(aciertos, totalCal, session.modo);
   revisarLogros({
@@ -901,6 +948,8 @@ const ACCIONES = {
   iniciarRepasoQuiz: () => iniciarRepasoQuiz(),
   irConfig: () => irConfig(),
   irMaterias: () => irMaterias(),
+  iniciarMision: el => iniciarMision(el.dataset.tema),
+  irMisiones: () => irMisiones(),
   irRepaso: () => irRepaso(),
   moverBloque: el => quiz.moverBloque(parseInt(el.dataset.i, 10), parseInt(el.dataset.dir, 10)),
   next: () => next(),

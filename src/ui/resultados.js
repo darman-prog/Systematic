@@ -90,6 +90,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     }
 
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
+      (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">🗺️ Volver al mapa</button>' : "") +
       (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
       (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
       '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +
