@@ -87,6 +87,9 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
     return obtenerEntrada(progreso, id);
   }
 
+  // Prioriza según el progreso de la materia activa (débiles → vencidas → nuevas).
+  const priorizar = lista => ordenarPrioridad(lista, obtenerP);
+
   function cargarActividad() {
     return leerJSON(localStorage, clavesMateria.actividad, {});
   }
@@ -335,7 +338,7 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
     const qs = preguntasFiltradas();
     if (!qs.length) return;
     const cant = Math.min(parseInt($("cfg-cantidad").value, 10) || qs.length, qs.length);
-    const lista = filtros.priorizar ? ordenarPrioridad(qs) : shuffle(qs);
+    const lista = filtros.priorizar ? priorizar(qs) : shuffle(qs);
     startSession(lista.slice(0, cant), "practica", false);
   }
 
@@ -355,25 +358,25 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
   function practicarTipo(tipo) {
     const lista = banco.filter(q => q.tipo === tipo);
     if (!lista.length) return;
-    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
   }
 
   function practicarArrastre() {
     const lista = banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar");
     if (!lista.length) return;
-    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
   }
 
   function practicarCasos() {
     const lista = banco.filter(q => q.caso);
     if (!lista.length) return;
-    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
   }
 
   function practicarVencidas() {
     const lista = banco.filter(q => vencida(obtenerP(q.id)));
     if (!lista.length) return;
-    startSession(ordenarPrioridad(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
   }
 
   function preguntasReales() {
@@ -1233,7 +1236,18 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
   }
 
   function renderStats() {
-    if (!banco.length) return;
+    if (!materia) return;
+    if (!banco.length) {
+      $("stat-total").textContent = "0";
+      $("stat-parciales").textContent = "0";
+      $("stat-temas").textContent = "0";
+      $("stats-panel").innerHTML = '<div class="bg-slate-900 border border-slate-700 rounded-xl p-4 my-5 text-sm text-amber-200">🚧 Contenido en preparación: esta materia todavía no tiene preguntas. Vuelve pronto.</div>';
+      const bd = $("btn-debiles");
+      const bv = $("btn-vencidas");
+      if (bd) bd.classList.add("hidden");
+      if (bv) bv.classList.add("hidden");
+      return;
+    }
     let ok = 0, fail = 0, respondidas = 0, debiles = 0;
     banco.forEach(q => {
       const p = obtenerP(q.id);
@@ -1601,7 +1615,7 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
   }
 
   function startFlashcards() {
-    const items = ordenarPrioridad(banco).map(it =>
+    const items = priorizar(banco).map(it =>
       it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: shuffle(it.bloques) }) : it
     );
     flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };
