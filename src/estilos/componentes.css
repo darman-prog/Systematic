@@ -42,6 +42,10 @@
 .icono-sm { width: 16px; height: 16px; }
 .icono-lg { width: 22px; height: 22px; }
 
+/* Identidad tipográfica (spec 007): la fuente display solo en titulares; el cuerpo queda en
+   la fuente del sistema. */
+h1, h2 { font-family: var(--fuente-display); letter-spacing: -0.01em; }
+
 /* Tarjeta de listado (shell compartido por apuntes y escenarios/casos). */
 .apunte-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
 .apunte-tema { @apply text-xs font-bold uppercase tracking-wide text-slate-400 mb-1; }
@@ -49,8 +53,7 @@
 .apunte-fuente { @apply text-xs text-slate-500 mt-3 pt-3 border-t border-slate-700; }
 
 /* Single study atmosphere: calm contrast, no pure white/black, and quiet browser surfaces. */
-.brand-title { color: var(--study-accent); font-size: 1.75rem; line-height: 1.15; }
-@media (min-width: 640px) { .brand-title { font-size: 2.25rem; } }
+.brand-title { color: var(--study-accent); font-size: 1.75rem; line-height: 1.15; }@media (min-width: 640px) { .brand-title { font-size: 2.25rem; } }
 .card { background: var(--study-surface); border-color: var(--study-border); }
 .mode-card, .materia-card { background: var(--study-surface); border-color: var(--study-border); }
 .btn-secondary, .btn-ghost { border-color: var(--study-border); }
