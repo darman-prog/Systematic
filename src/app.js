@@ -220,19 +220,46 @@ function importarDatos(input) {
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
 // Aquí solo queda la presentación: perfil, toasts y confeti.
 
+let xpMostrado = 0;
+
+function prefiereMenosMovimiento() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+// Contador de XP (spec 006): sube con easing; sin animación si el usuario pide menos movimiento.
+function contarHasta(el, desde, hasta) {
+  if (!el) return;
+  if (desde === hasta || prefiereMenosMovimiento()) {
+    el.textContent = hasta;
+    return;
+  }
+  const inicio = performance.now();
+  const dur = 460;
+  function paso(t) {
+    const k = Math.min(1, (t - inicio) / dur);
+    const suave = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(desde + (hasta - desde) * suave);
+    if (k < 1) requestAnimationFrame(paso);
+  }
+  requestAnimationFrame(paso);
+}
+
 function renderPerfil() {
   const cont = $("perfil-panel");
   if (!cont) return;
   const p = gamificacion.perfil();
+  const desde = xpMostrado;
+  xpMostrado = p.xp;
   cont.innerHTML =
     '<div class="perfil-card">' +
       '<div class="perfil-nivel"><span class="perfil-num">' + p.nivel + '</span><span class="perfil-etq">nivel</span></div>' +
       '<div class="perfil-datos">' +
-        '<div class="text-sm"><b>' + p.xp + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
+        '<div class="text-sm"><b id="perfil-xp">' + desde + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
         '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
         '<div class="perfil-mini">Racha: ' + p.racha + ' día(s) · ' + p.insignias + ' logro(s) desbloqueado(s)</div>' +
       '</div>' +
     '</div>';
+  contarHasta($("perfil-xp"), desde, p.xp);
 }
 
 function inicializarFiltros() {

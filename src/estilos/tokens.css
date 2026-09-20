@@ -14,6 +14,13 @@
   --study-warning: #d9bc8a;
   --study-border: rgba(169, 173, 182, 0.18);
   --study-shadow: 0 18px 40px rgba(8, 10, 15, 0.22);
+
+  /* Movimiento (spec 006): un solo easing y tres duraciones. Ningún elemento anima si el
+     usuario pide menos movimiento (la regla global de abajo neutraliza todo). */
+  --mov-rapida: 150ms;
+  --mov-base: 280ms;
+  --mov-enfasis: 460ms;
+  --mov-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html { background: var(--study-bg); }
