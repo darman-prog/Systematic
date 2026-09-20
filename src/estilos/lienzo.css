@@ -30,7 +30,7 @@
 
 /* Modal de selección de guarda para diagramas de actividades */
 .modal-guarda { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 100; display: flex; align-items: center; justify-content: center; }
-.modal-guarda-contenido { background: var(--study-surface); border: 2px solid var(--study-accent); border-radius: 12px; padding: 24px; max-width: 400px; }
+.modal-guarda-contenido { background: var(--study-surface); border: 2px solid var(--study-accent); border-radius: 12px; padding: 24px; max-width: min(400px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; }
 .modal-guarda-contenido h3 { color: var(--study-text); margin: 0 0 12px 0; font-size: 1.2rem; }
 .modal-guarda-contenido p { color: var(--study-muted); margin: 0 0 16px 0; font-size: 0.9rem; }
 .guardas-opciones { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
@@ -66,10 +66,10 @@
     font-size: 14px;
   }
   .nodo-quitar {
-    width: 32px;
-    height: 32px;
-    top: 6px;
-    right: 6px;
+    width: 40px;
+    height: 40px;
+    top: -10px;
+    right: -10px;
   }
   .pieza {
     min-height: 44px;
@@ -96,4 +96,3 @@
 }
 
 #lienzo-diagrama { overscroll-behavior: contain; }
-body.drag-activo { overflow: hidden; }

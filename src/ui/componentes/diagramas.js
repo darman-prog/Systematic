@@ -166,6 +166,8 @@ export function crearDiagramasUI({
     const origen = e.currentTarget;
     const etiqueta = origen.dataset.nodo || origen.dataset.miembro;
     const esMiembro = !!origen.dataset.miembro;
+    // En táctil el ghost va por encima del dedo para que se vea qué se arrastra.
+    const sobreDedo = e.pointerType === "touch";
     const x0 = e.clientX, y0 = e.clientY;
     let movido = false;
     const ghost = origen.cloneNode(true);
@@ -177,7 +179,7 @@ export function crearDiagramasUI({
       if (!movido) return;
       ghost.style.display = "block";
       ghost.style.left = ev.clientX - 40 + "px";
-      ghost.style.top = ev.clientY - 14 + "px";
+      ghost.style.top = (sobreDedo ? ev.clientY - 64 : ev.clientY - 14) + "px";
     };
     const soltar = ev => {
       window.removeEventListener("pointermove", mover);
@@ -296,6 +298,18 @@ export function crearDiagramasUI({
       n.style.left = nuevoX + "px";
       n.style.top = nuevoY + "px";
       dibujarAristas(itemActual());
+      // Auto-scroll del marco cuando el nodo se acerca a un borde visible (táctil).
+      const rMarco = lienzo.getBoundingClientRect();
+      const margen = 48;
+      let dx = 0, dy = 0;
+      if (ev.clientY < rMarco.top + margen) dy = -10;
+      else if (ev.clientY > rMarco.bottom - margen) dy = 10;
+      if (ev.clientX < rMarco.left + margen) dx = -10;
+      else if (ev.clientX > rMarco.right - margen) dx = 10;
+      if (dx || dy) {
+        lienzo.scrollLeft += dx;
+        lienzo.scrollTop += dy;
+      }
     };
     
     const soltar = () => {
