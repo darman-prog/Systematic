@@ -1,9 +1,10 @@
 import { MATERIAS, getMateria } from "./core/materias.js";
 import {
   claves, migrarClavesLegacy, leerJSON, escribirJSON, obtenerEntrada,
-  aplicarRespuesta, esDebil, vencida, metaDiaria, hoyISO
+  aplicarRespuesta, esDebil, vencida, metaDiaria, hoyISO, calcularRacha
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
+import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/quiz.js";
@@ -82,6 +83,11 @@ function registrarRespuesta(id, ok) {
   progreso[id] = aplicarRespuesta(obtenerP(id), ok);
   guardarProgreso();
   registrarActividad();
+  const ganado = xpDeRespuesta(ok, progreso[id]);
+  if (ganado) sumarXp(ganado);
+  const metaCumplida = (cargarActividad()[hoyISO()] || 0) >= cargarMeta();
+  if (metaCumplida) xpEventoUnico("meta-" + hoyISO(), XP_EVENTOS.metaDiaria);
+  revisarLogros({ metaCumplida });
 }
 
 function toggleMarked(id) {
@@ -161,6 +167,158 @@ function importarDatos(input) {
     }
   };
   lector.readAsText(archivo);
+}
+
+// ===== Gamificación (spec 003): XP, niveles, logros, perfil y avisos =====
+// La lógica pura vive en core/gamificacion.js; aquí solo orquestación y persistencia.
+
+function xpActual() {
+  return leerJSON(localStorage, "sys.xp", 0);
+}
+
+function sumarXp(cantidad) {
+  if (!cantidad) return;
+  const antes = progresoDeNivel(xpActual());
+  const nuevo = xpActual() + cantidad;
+  escribirJSON(localStorage, "sys.xp", nuevo);
+  const despues = progresoDeNivel(nuevo);
+  if (despues.nivel > antes.nivel) {
+    toast("🌟 ¡Nivel " + despues.nivel + " alcanzado!");
+    confeti();
+  }
+  renderPerfil();
+}
+
+// Recompensas de una sola ocurrencia (p. ej. meta diaria por fecha).
+function xpEventoUnico(clave, cantidad) {
+  const eventos = leerJSON(localStorage, "sys.xp-eventos", {});
+  if (eventos[clave]) return;
+  eventos[clave] = true;
+  escribirJSON(localStorage, "sys.xp-eventos", eventos);
+  sumarXp(cantidad);
+}
+
+function statsGlobales() {
+  let ok = 0;
+  let total = 0;
+  MATERIAS.forEach(m => {
+    const p = leerJSON(localStorage, claves(m.id).progreso, {});
+    Object.keys(p).forEach(idP => {
+      ok += p[idP].ok;
+      total += p[idP].ok + p[idP].fail;
+    });
+  });
+  return { respuestas: total, precision: total ? Math.round((ok / total) * 100) : 0 };
+}
+
+// Racha global: mezcla la actividad de todas las materias tomando el máximo por día.
+function actividadGlobal() {
+  const merged = {};
+  MATERIAS.forEach(m => {
+    const a = leerJSON(localStorage, claves(m.id).actividad, {});
+    Object.keys(a).forEach(d => { merged[d] = Math.max(merged[d] || 0, a[d]); });
+  });
+  return merged;
+}
+
+function revisarLogros(extra) {
+  const actuales = leerJSON(localStorage, "sys.logros", {});
+  const s = statsGlobales();
+  const ctx = Object.assign(
+    {
+      racha: calcularRacha(actividadGlobal()),
+      respuestas: s.respuestas,
+      precision: s.precision,
+      simulacroPerfecto: false,
+      metaCumplida: false
+    },
+    extra || {}
+  );
+  const nuevos = evaluarLogros(actuales, ctx);
+  if (!nuevos.length) return;
+  nuevos.forEach(l => {
+    actuales[l.id] = l.fecha;
+    toast(l.icono + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)");
+  });
+  escribirJSON(localStorage, "sys.logros", actuales);
+  sumarXp(nuevos.length * XP_EVENTOS.logro);
+}
+
+function renderPerfil() {
+  const cont = $("perfil-panel");
+  if (!cont) return;
+  const xp = xpActual();
+  const p = progresoDeNivel(xp);
+  const racha = calcularRacha(actividadGlobal());
+  const insignias = Object.keys(leerJSON(localStorage, "sys.logros", {})).length;
+  cont.innerHTML =
+    '<div class="perfil-card">' +
+      '<div class="perfil-nivel"><span class="perfil-num">' + p.nivel + '</span><span class="perfil-etq">nivel</span></div>' +
+      '<div class="perfil-datos">' +
+        '<div class="text-sm"><b>' + xp + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
+        '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
+        '<div class="perfil-mini">🔥 Racha: ' + racha + ' día(s) · 🏅 ' + insignias + ' logro(s) desbloqueado(s)</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function toast(mensaje) {
+  let zona = $("toast-zone");
+  if (!zona) {
+    zona = document.createElement("div");
+    zona.id = "toast-zone";
+    document.body.appendChild(zona);
+  }
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.setAttribute("role", "status");
+  el.textContent = mensaje;
+  zona.appendChild(el);
+  setTimeout(() => el.classList.add("toast-out"), 2800);
+  setTimeout(() => el.remove(), 3300);
+}
+
+// Confeti breve y discreto (respeta prefers-reduced-motion).
+function confeti() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let c = $("confeti-canvas");
+  if (!c) {
+    c = document.createElement("canvas");
+    c.id = "confeti-canvas";
+    document.body.appendChild(c);
+  }
+  const dpr = window.devicePixelRatio || 1;
+  c.width = window.innerWidth * dpr;
+  c.height = window.innerHeight * dpr;
+  const lienzo = c.getContext("2d");
+  if (!lienzo) return;
+  lienzo.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const colores = ["#9BB8C9", "#8FBF9F", "#D9BC8A", "#B5A9CF", "#E7E5DE"];
+  const partes = Array.from({ length: 60 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: -20 - Math.random() * window.innerHeight * 0.3,
+    vy: 120 + Math.random() * 160,
+    vx: -40 + Math.random() * 80,
+    tam: 4 + Math.random() * 5,
+    rot: Math.random() * Math.PI,
+    color: colores[Math.floor(Math.random() * colores.length)]
+  }));
+  const inicio = performance.now();
+  function cuadro(t) {
+    const dt = (t - inicio) / 1000;
+    lienzo.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    partes.forEach(p => {
+      lienzo.save();
+      lienzo.translate(p.x + p.vx * dt, p.y + p.vy * dt);
+      lienzo.rotate(p.rot + dt * 3);
+      lienzo.fillStyle = p.color;
+      lienzo.fillRect(-p.tam / 2, -p.tam / 2, p.tam, p.tam * 0.6);
+      lienzo.restore();
+    });
+    if (dt < 1.6) requestAnimationFrame(cuadro);
+    else lienzo.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+  requestAnimationFrame(cuadro);
 }
 
 function inicializarFiltros() {
@@ -450,6 +608,9 @@ function finalizar() {
   const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
   session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
   guardarIntento(aciertos, totalCal, session.modo);
+  revisarLogros({
+    simulacroPerfecto: totalCal > 0 && pct === 100 && (session.modo === "simulacro" || session.modo === "repaso")
+  });
   resultados.pintarResultados(false);
   show("results");
 }
@@ -511,6 +672,7 @@ function irMaterias() {
   session = null;
   show("materias");
   renderMaterias();
+  renderPerfil();
 }
 
 function seleccionarMateria(id) {
@@ -637,6 +799,7 @@ document.addEventListener("visibilitychange", () => {
 // namespace al arrancar, antes de que el usuario seleccione materia.
 migrarClavesLegacy(localStorage, "bd2");
 renderMaterias();
+renderPerfil();
 show("materias");
 
 // Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre
