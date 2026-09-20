@@ -1,0 +1,71 @@
+﻿/* Componentes visuales, foco, iconos y avisos (spec 006). Importado después de tokens.css. */
+.hidden { display: none !important; }
+.study-item:not(.revealed) .oculto { filter: blur(6px); pointer-events: none; user-select: none; }
+.btn { cursor: pointer; }
+.star-btn { cursor: pointer; }
+.btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
+.star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible {
+  outline: 2px solid var(--study-accent); outline-offset: 3px;
+}
+.feedback { animation: fadeInUp 0.28s ease-out; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.anim-in { animation: fadeInUp 0.28s ease-out; }
+@keyframes shakeX { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+.shake { animation: shakeX 0.4s ease; }
+@keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+.timer-low { animation: pulseSoft 1s infinite; }
+.score-ring {
+  width: 9.5rem; height: 9.5rem; border-radius: 9999px; margin: 0 auto 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  background: conic-gradient(var(--ring-color, var(--study-accent)) calc(var(--pct, 0) * 1%), var(--study-surface-3) 0);
+  transition: background 0.6s ease;
+}
+.score-ring-inner {
+  width: 7.5rem; height: 7.5rem; border-radius: 9999px; background: var(--study-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.75rem; font-weight: bold; color: var(--study-text);
+}
+
+/* Iconos SVG (spec 005): set propio de trazo, heredan currentColor. */
+.icono { width: 20px; height: 20px; flex: none; }
+.icono-sm { width: 16px; height: 16px; }
+.icono-lg { width: 22px; height: 22px; }
+
+/* Tarjeta de listado (shell compartido por apuntes y escenarios/casos). */
+.apunte-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
+.apunte-tema { @apply text-xs font-bold uppercase tracking-wide text-slate-400 mb-1; }
+.apunte-titulo { @apply text-lg font-bold text-sky-300 mb-2; }
+.apunte-fuente { @apply text-xs text-slate-500 mt-3 pt-3 border-t border-slate-700; }
+
+/* Single study atmosphere: calm contrast, no pure white/black, and quiet browser surfaces. */
+.brand-title { color: var(--study-accent); font-size: 1.75rem; line-height: 1.15; }
+@media (min-width: 640px) { .brand-title { font-size: 2.25rem; } }
+.card { background: var(--study-surface); border-color: var(--study-border); }
+.mode-card, .materia-card { background: var(--study-surface); border-color: var(--study-border); }
+.btn-secondary, .btn-ghost { border-color: var(--study-border); }
+.search-input, .stat-input { background: var(--study-surface-2); border-color: var(--study-border); color: var(--study-text); }
+.option, .match-item, .study-item, .flash-card, .glosario-item, .apunte-card { background: var(--study-surface); border-color: var(--study-border); }
+
+/* Texto oscuro sobre acentos medios (contraste real en la paleta calma). */
+.chip-on, .pieza-sel, .match-sel, .hueco-lleno, .er-head, .tag-simulacro, .tag-practica { color: var(--study-bg); }
+.tag-simulacro { background: var(--study-accent-strong); }
+.tag-practica { background: var(--study-accent-strong); }
+
+/* Perfil de gamificación y avisos (spec 003) */
+.perfil-card { @apply flex items-center gap-4 bg-slate-900 border border-slate-700 rounded-xl p-4; }
+.perfil-nivel { @apply flex flex-col items-center justify-center w-16 h-16 rounded-full shrink-0; background: var(--study-surface-2); border: 1px solid var(--study-border); }
+.perfil-num { @apply text-xl font-bold; color: var(--study-accent); line-height: 1; }
+.perfil-etq { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--study-muted); }
+.perfil-datos { @apply flex-1 min-w-0; }
+.perfil-mini { @apply text-xs text-slate-400 mt-2; }
+#toast-zone { position: fixed; top: 1rem; right: 1rem; z-index: 60; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+.toast { @apply px-4 py-3 rounded-xl text-sm font-semibold shadow-xl; background: var(--study-surface-2); color: var(--study-text); border: 1px solid var(--study-border); animation: fadeInUp 0.28s ease-out; max-width: 20rem; }
+.toast-out { opacity: 0; transition: opacity 0.5s ease; }
+#confeti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
+
+/* Mapa de misiones (spec 003) */
+.mision-nodo { @apply flex items-center gap-3 w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mb-3 text-left transition; }
+.mision-disponible { @apply hover:border-blue-500 cursor-pointer; }
+.mision-bloqueada { @apply opacity-50; }
+.mision-num { @apply flex-none w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm; background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-accent); }
+.mision-estrellas { @apply text-lg font-bold whitespace-nowrap; color: var(--study-warning); }
