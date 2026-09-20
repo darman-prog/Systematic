@@ -341,6 +341,49 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#lienzo-diagrama .etiqueta-arista').first()).toContainText('[sí]');
   });
 
+  test('relacionar columnas: pares comparten color y numero, error legible', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .materia-card').nth(1).click(); // ISW
+    await page.locator('#tipos-panel .chip', { hasText: 'Relacionar' }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+
+    // Par correcto: izquierda 0 con derecha data-idx 0 (mismo índice = pareja correcta).
+    await page.locator('#match-izq button').first().click();
+    await page.locator('#match-der button[data-idx="0"]').click();
+    await expect(page.locator('#match-izq button.match-ok')).toHaveCount(1);
+    await expect(page.locator('#match-der button.match-ok')).toHaveCount(1);
+    await expect(page.locator('#match-izq .match-par')).toHaveText('1');
+    await expect(page.locator('#match-der .match-par')).toHaveText('1');
+
+    // Par incorrecto: izquierda 1 con derecha 2 → error en ambos lados y se desvanece solo.
+    await page.locator('#match-izq button[data-i="1"]').click();
+    await page.locator('#match-der button[data-idx="2"]').click();
+    await expect(page.locator('#match-izq button.match-err')).toHaveCount(1);
+    await expect(page.locator('#match-der button.match-err')).toHaveCount(1);
+    await expect(page.locator('#match-der button.match-err')).toHaveCount(0, { timeout: 2000 });
+
+    // Segundo par por teclado: foco + Enter en cada columna.
+    await page.locator('#match-izq button[data-i="1"]').focus();
+    await page.keyboard.press('Enter');
+    await page.locator('#match-der button[data-idx="1"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#match-izq button[data-i="1"] .match-par')).toHaveText('2');
+    await expect(page.locator('#match-der button[data-idx="1"] .match-par')).toHaveText('2');
+
+    // Completa los pares restantes y verifica números únicos al terminar.
+    const pendientes = await page.locator('#match-izq button:not(.match-ok)').count();
+    for (let k = 0; k < pendientes; k++) {
+      const btn = page.locator('#match-izq button:not(.match-ok)').first();
+      const i = await btn.getAttribute('data-i');
+      await btn.click();
+      await page.locator('#match-der button[data-idx="' + i + '"]').click();
+    }
+    await expect(page.locator('#feedback-box')).toBeVisible();
+    // Números únicos por columna (cada par comparte número entre columnas).
+    const numeros = await page.locator('#match-izq .match-par').allTextContents();
+    expect(new Set(numeros).size).toBe(numeros.length);
+  });
+
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();

@@ -261,6 +261,10 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       usadosDerecha: {},
       seleccion: null,
       errorIdx: null,
+      errorIzq: null,
+      errorTimer: null,
+      parDeIzq: new Array(item.pares.length).fill(null),
+      parContador: 0,
       fallos: 0,
       bloqueado: false
     };
@@ -273,8 +277,23 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
         '<div id="match-izq" class="flex flex-col gap-2"></div>' +
         '<div id="match-der" class="flex flex-col gap-2"></div>' +
-      '</div>';
+      '</div>' +
+      '<p id="match-aviso" role="status" class="sr-only"></p>';
     pintarRelacionar();
+  }
+
+  // Paleta de pares (spec 009): pasteles legibles sobre oscuro; el badge lleva texto oscuro.
+  const COLORES_PAR = ["#9BB8C9", "#E3C08D", "#B7A6E0", "#8FD0B3", "#E0A6A6", "#A6C8E0"];
+
+  function anunciarMatch(texto) {
+    const aviso = $("match-aviso");
+    if (aviso) aviso.textContent = texto;
+  }
+
+  function limpiarErrorRel(e) {
+    if (e.errorTimer) { clearTimeout(e.errorTimer); e.errorTimer = null; }
+    e.errorIzq = null;
+    e.errorIdx = null;
   }
 
   function pintarRelacionar() {
@@ -282,16 +301,33 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const e = session.rel;
     $("match-izq").innerHTML = e.pares.map((p, i) => {
       let clase = "match-item";
-      if (e.emparejados[i]) clase += " match-ok";
-      else if (e.seleccion === i) clase += " match-sel";
-      return '<button class="' + clase + '" data-action="clickMatchIzq" data-i="' + i + '" ' + (e.emparejados[i] || e.bloqueado ? "disabled" : "") + '>' + escapar(p[0]) + '</button>';
+      let extra = "";
+      let contenido = escapar(p[0]);
+      if (e.emparejados[i]) {
+        const color = COLORES_PAR[e.parDeIzq[i] % COLORES_PAR.length];
+        clase += " match-ok";
+        extra = ' style="--par-color:' + color + '"';
+        contenido = '<span class="match-par">' + (e.parDeIzq[i] + 1) + '</span>' + icono("check", "icono-sm") + contenido;
+      } else if (e.errorIzq === i) {
+        clase += " match-err";
+      } else if (e.seleccion === i) {
+        clase += " match-sel";
+      }
+      return '<button class="' + clase + '"' + extra + ' data-action="clickMatchIzq" data-i="' + i + '" ' + (e.emparejados[i] || e.bloqueado ? "disabled" : "") + '>' + contenido + '</button>';
     }).join("");
     $("match-der").innerHTML = e.derecha.map(d => {
       const usado = e.usadosDerecha[d.idx] !== undefined;
       let clase = "match-item";
-      if (usado) clase += " match-ok";
+      let extra = "";
+      let contenido = escapar(d.texto);
+      if (usado) {
+        const color = COLORES_PAR[e.parDeIzq[e.usadosDerecha[d.idx]] % COLORES_PAR.length];
+        clase += " match-ok";
+        extra = ' style="--par-color:' + color + '"';
+        contenido = '<span class="match-par">' + (e.parDeIzq[e.usadosDerecha[d.idx]] + 1) + '</span>' + icono("check", "icono-sm") + contenido;
+      }
       if (e.errorIdx === d.idx) clase += " match-err";
-      return '<button class="' + clase + '" data-action="clickMatchDer" data-idx="' + d.idx + '" ' + (usado || e.bloqueado ? "disabled" : "") + '>' + escapar(d.texto) + '</button>';
+      return '<button class="' + clase + '"' + extra + ' data-action="clickMatchDer" data-idx="' + d.idx + '" ' + (usado || e.bloqueado ? "disabled" : "") + '>' + contenido + '</button>';
     }).join("");
   }
 
@@ -299,8 +335,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const session = ctx.session;
     const e = session.rel;
     if (!e || e.bloqueado || e.emparejados[i] || session.answers[session.idx]) return;
+    limpiarErrorRel(e);
     e.seleccion = e.seleccion === i ? null : i;
-    e.errorIdx = null;
     pintarRelacionar();
   }
 
@@ -309,17 +345,31 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const e = session.rel;
     if (!e || e.bloqueado || e.usadosDerecha[idx] !== undefined || e.seleccion === null || session.answers[session.idx]) return;
     if (e.seleccion === idx) {
+      // Par correcto (spec 009): número correlativo y color compartido en ambas columnas.
+      e.parDeIzq[idx] = e.parContador;
+      e.parContador++;
       e.emparejados[e.seleccion] = true;
       e.usadosDerecha[idx] = e.seleccion;
       e.seleccion = null;
-      e.errorIdx = null;
+      limpiarErrorRel(e);
       pintarRelacionar();
       if (e.emparejados.every(Boolean)) terminarRelacionar();
     } else {
+      // Par incorrecto (spec 009): marcado en ambos lados, >=900 ms o hasta el siguiente
+      // tap, y anuncio por la región aria-live. Sin animación (respeta reduced-motion).
       e.fallos++;
+      e.errorIzq = e.seleccion;
       e.errorIdx = idx;
       e.seleccion = null;
       pintarRelacionar();
+      anunciarMatch("Pareja incorrecta: " + e.pares[e.errorIzq][0] + " no corresponde con " + e.derecha.find(d => d.idx === idx).texto);
+      if (e.errorTimer) clearTimeout(e.errorTimer);
+      e.errorTimer = setTimeout(() => {
+        e.errorTimer = null;
+        e.errorIzq = null;
+        e.errorIdx = null;
+        if (ctx.session && ctx.session.rel === e && !e.bloqueado) pintarRelacionar();
+      }, 900);
     }
   }
 
@@ -328,6 +378,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const e = session.rel;
     if (!e || session.answers[session.idx] || e.bloqueado) return;
     e.bloqueado = true;
+    limpiarErrorRel(e);
     const item = e.item;
     const ok = e.fallos === 0;
     pintarRelacionar();
