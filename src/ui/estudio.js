@@ -65,7 +65,7 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
       if (estudioTipo !== "todos" && item.tipo !== estudioTipo) return false;
       if (estudioSoloReales && !item.real) return false;
       if (!f) return true;
-      const campos = [item.q, item.exp || "", item.codigo || "", item.tema, item.parcial, item.caso || "", (item.options || []).join(" "), (item.respuestas || []).join(" "), (item.bloques || []).join(" "), item.solucion || "", (item.pares || []).map(p => p[0] + " " + p[1]).join(" "), (item.claves || []).join(" ")];
+      const campos = [item.q, item.exp || "", item.codigo || "", item.tema, item.parcial, item.caso || "", (item.options || []).join(" "), (item.respuestas || []).join(" "), (item.bloques || []).join(" "), item.solucion || "", (item.pares || []).map(p => p[0] + " " + p[1]).join(" "), (item.claves || []).join(" "), (item.nodosPool || []).join(" "), (item.relacionesEsperadas || []).map(r => r.de + " " + r.a + " " + r.tipo).join(" ")];
       return campos.join(" ").toLowerCase().includes(f);
     });
     $("study-list").innerHTML = lista.map(item => {

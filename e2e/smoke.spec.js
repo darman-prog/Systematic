@@ -71,13 +71,17 @@ test.describe('Systematic — smoke', () => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();
-    await page.getByRole('button', { name: /Contrarreloj/ }).click();
+    await page.locator('#screen-start').getByRole('button', { name: /Contrarreloj/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#modo-badge')).toContainText('Contrarreloj');
     await expect(page.locator('#timer-pregunta')).toBeVisible();
+    // El lienzo ER puede aparecer en cualquier posición del banco barajado.
+    if (await page.locator('#lienzo-diagrama').count()) {
+      await expect(page.locator('#pool-diagrama .pieza').first()).toBeVisible();
+    }
     await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
     await expect(page.locator('#screen-start')).toBeVisible();
-    await page.getByRole('button', { name: /Supervivencia/ }).click();
+    await page.locator('#screen-start').getByRole('button', { name: /Supervivencia/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#modo-badge')).toContainText('Supervivencia');
     await expect(page.locator('#vidas-badge')).toContainText('❤️');
@@ -110,6 +114,47 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#escenario-escena')).toContainText('Continuar');
     await page.getByRole('button', { name: 'Continuar' }).click();
     await expect(page.locator('#escenario-escena')).toBeVisible();
+  });
+
+  test('constructor ER: filtra chip, coloca, conecta, comprueba y valida en el validador del banco', async ({ page }) => {
+    const errores = [];
+    page.on('pageerror', e => errores.push(String(e)));
+    await page.on('dialog', d => d.accept());
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click();
+    await page.getByRole('button', { name: /Configurar práctica/ }).click();
+    // Clic en la pestaña "Ninguno" de tipos para aislar solo el tipo diagrama.
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    await expect(page.locator('#cfg-resumen')).toContainText('3 preguntas coinciden');
+    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    await expect(page.locator('#progress')).toContainText('Pregunta 1 de 1');
+    if (errores.length > 0) {
+      throw new Error('Errores de JavaScript: ' + errores.join('; '));
+    }
+    if (await page.locator('#lienzo-diagrama').count() === 0) {
+      throw new Error('El lienzo del constructor ER no se montó en la pregunta de diagrama');
+    }
+    await expect(page.locator('#lienzo-diagrama')).toBeVisible();
+    // Coloca las entidades del pool por tap y verifica que se coloquen en el lienzo.
+    const piezasPool = page.locator('#pool-diagrama .pieza');
+    const numPiezas = await piezasPool.count();
+    expect(numPiezas).toBeGreaterThanOrEqual(2);
+    for (let i = 0; i < numPiezas; i++) {
+      await piezasPool.first().click();
+    }
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(numPiezas);
+    // Conecta la primera con la segunda y elige cardinalidad 1:N.
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
+    await page.locator('#lienzo-diagrama .nodo-puesto').nth(1).click();
+    await expect(page.locator('#tipos-diagrama')).toBeVisible();
+    await page.locator('#tipos-diagrama [data-arista="1:N"]').click();
+    await expect(page.locator('#lienzo-diagrama .etiqueta-arista').first()).toContainText('1:N');
+    // Comprueba y verifica feedback (éxito o detalle de faltantes, según las entidades).
+    await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(page.locator('#feedback-box')).toBeVisible();
+    await expect(page.locator('#next-btn')).toBeVisible();
   });
 
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {

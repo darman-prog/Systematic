@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarTodo } from "./validador.mjs";
+import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarCasos, validarTodo } from "./validador.mjs";
 
 const base = {
   id: "X-001",
@@ -114,6 +114,78 @@ describe("validarEscenarios", () => {
     malo.finales = { exito: "E" };
     const errores = validarEscenarios([malo]).join(" ");
     expect(errores).toContain("puntos inválidos");
+    expect(errores).toContain("finales incompletos");
+  });
+});
+
+describe("validarPregunta tipo diagrama", () => {
+  const base = {
+    id: "P1-078",
+    parcial: "Parcial 1",
+    tema: "Modelado",
+    dificultad: "media",
+    tipo: "diagrama",
+    q: "Arma el modelo ER del colegio.",
+    exp: "Estudiante 1:N Matrícula y Curso 1:N Matrícula.",
+    subtipo: "er",
+    nodosPool: ["Estudiante", "Curso", "Matricula"],
+    relacionesEsperadas: [
+      { de: "Estudiante", a: "Matricula", tipo: "1:N" },
+      { de: "Curso", a: "Matricula", tipo: "1:N" }
+    ]
+  };
+
+  it("acepta un diagrama ER correcto", () => {
+    expect(validarPregunta(base, new Set())).toEqual([]);
+  });
+
+  it("rechaza subtipo, nodos y enlaces inválidos", () => {
+    const mala = Object.assign({}, base, {
+      subtipo: "er-cualquiera",
+      nodosPool: ["Estudiante", 5],
+      relacionesEsperadas: [
+        { de: "Estudiante", a: "Fantasma", tipo: "1:N" }
+      ],
+      tiposArista: ["1:1", "1:N"],
+      miembrosPool: [{ texto: "nombre" }]
+    });
+    const errores = validarPregunta(mala, new Set()).join(" ");
+    expect(errores).toContain("subtipo de diagrama inválido");
+    expect(errores).toContain("nodosPool con nodos vacíos");
+    expect(errores).toContain("fuera del pool");
+    expect(errores).toContain("miembro 1 necesita");
+
+    const autoConexion = Object.assign({}, base, {
+      relacionesEsperadas: [{ de: "Estudiante", a: "Estudiante", tipo: "1:1" }]
+    });
+    expect(validarPregunta(autoConexion, new Set()).join(" ")).toContain("auto-conexión en ER");
+  });
+});
+
+describe("validarCasos", () => {
+  const caso = {
+    id: "CASO-1",
+    titulo: "Caso de prueba",
+    tema: "Modelado",
+    caso: "Narrativa del caso.",
+    finales: { exito: "E", parcial: "P", fracaso: "F" },
+    diagrama: {
+      subtipo: "er",
+      nodosPool: ["A", "B"],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "1:N" }]
+    }
+  };
+
+  it("acepta un caso correcto y detecta duplicados", () => {
+    expect(validarCasos([caso])).toEqual([]);
+    expect(validarCasos([caso, caso]).join(" ")).toContain("duplicado");
+  });
+
+  it("exige narrativa, diagrama válido y finales completos", () => {
+    const malo = Object.assign({}, caso, { caso: "", diagrama: null, finales: { exito: "E" } });
+    const errores = validarCasos([malo]).join(" ");
+    expect(errores).toContain("sin narrativa del caso");
+    expect(errores).toContain("sin diagrama");
     expect(errores).toContain("finales incompletos");
   });
 });

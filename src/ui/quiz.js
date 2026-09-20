@@ -6,6 +6,8 @@ import {
   TIPO_LABELS, DIF_LABELS,
   animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
+import { evaluarDiagrama } from "../core/diagramas.js";
+import { crearDiagramasUI } from "./diagramas.js";
 
 const $ = id => document.getElementById(id);
 
@@ -13,6 +15,11 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
   let dragPid = null;
   let dragBloqueIndex = null;
   const keywords = () => sqlKeywordsDe(ctx.materia);
+  const diagramas = crearDiagramasUI({
+    ctx,
+    guardarEstado: () => {},
+    alComprobar: () => comprobarDiagrama()
+  });
 
   function renderQuestion() {
     const session = ctx.session;
@@ -40,7 +47,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     $("skip-btn").style.display = "inline-flex";
 
     const area = $("question-area");
-    if (item.tipo === "dragdrop") renderDragdrop(item, area);
+    if (item.tipo === "diagrama") renderDiagramaPregunta(item, area);
+    else if (item.tipo === "dragdrop") renderDragdrop(item, area);
     else if (item.tipo === "ordenar") renderOrdenar(item, area);
     else if (item.tipo === "desarrollo") renderDesarrollo(item, area);
     else if (item.tipo === "relacionar") renderRelacionar(item, area);
@@ -337,6 +345,45 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     mostrarBotonSiguiente();
   }
 
+  function renderDiagramaPregunta(item, area) {
+    // El estado del lienzo vive en session.diagrama y es idempotente por pregunta:
+    // si ya existe para este ítem se conserva el trabajo en re-renders, y si la
+    // pregunta cambió se monta un tablero nuevo.
+    if (!ctx.session.diagrama || ctx.session.diagrama.preguntaId !== item.id) {
+      ctx.session.diagrama = null;
+    }
+    diagramas.renderDiagrama(item, area);
+  }
+
+  function comprobarDiagrama() {
+    const session = ctx.session;
+    const item = session.items[session.idx];
+    const estado = session.diagrama;
+    if (!item || item.tipo !== "diagrama" || !estado || session.answers[session.idx]) return;
+    const res = evaluarDiagrama(item, estado);
+    const respuesta = { ok: res.ok, detalle: res };
+    session.answers[session.idx] = {
+      ok: res.ok,
+      selected: res.ok
+        ? "Diagrama correcto"
+        : "Faltan " + res.faltantes + " · sobran " + res.sobrantes,
+      expected: "El diagrama esperado del tema"
+    };
+    registrarRespuesta(item.id, res.ok);
+    diagramas.renderDiagrama(item, $("question-area"), respuesta);
+    if (session.modo !== "simulacro") {
+      const fb = $("feedback-box");
+      fb.className = "feedback " + (res.ok ? "feedback-ok" : "feedback-bad");
+      fb.innerHTML = '<div class="font-bold mb-2">' +
+        (res.ok
+          ? "✅ ¡Diagrama correcto!"
+          : "❌ Aún no: revisa el lienzo") +
+        '</div><div>' + item.exp + '</div>';
+      fb.style.display = "block";
+    }
+    mostrarBotonSiguiente();
+  }
+
   function renderDragdrop(item, area) {
     const session = ctx.session;
     session.drag = {
@@ -580,6 +627,12 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     mostrarBotonSiguiente();
   }
 
+  function renderDiagramaPregunta(item, area) {
+    if (!area.querySelector("#lienzo-diagrama")) {
+      diagramas.renderDiagrama(item, area);
+    }
+  }
+
   function renderDesarrollo(item, area) {
     const session = ctx.session;
     session.desarrollo = { item, texto: "", revelada: false, evaluada: false };
@@ -656,6 +709,9 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     revelarSolucion,
     autoevaluarDev,
     pintarVidas,
-    expirarPregunta
+    expirarPregunta,
+    comprobarDiagrama,
+    elegirDiagramaTipo: tipo => diagramas.elegirTipo(tipo),
+    cancelarDiagramaTipo: () => diagramas.cancelarSeleccion()
   };
 }

@@ -398,7 +398,7 @@ function renderConfig() {
       '<button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="false">Ninguno</button></div><div class="flex flex-wrap gap-2">';
     valoresDe(g.clave).forEach(v => {
       const activa = filtros[g.clave].has(v);
-      html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '">' +
+      html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '"' + (g.clave === "tipos" ? ' data-tipo="' + v + '"' : "") + '>' +
         g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
     });
     html += '</div></div>';
@@ -1023,6 +1023,9 @@ const ACCIONES = {
   jugarEscenario: el => jugarEscenario(el.dataset.id),
   decidirEscenario: el => decidirEscenario(parseInt(el.dataset.idx, 10)),
   continuarEscenario: () => continuarEscenario(),
+  comprobarDiagrama: () => quiz.comprobarDiagrama(),
+  elegirDiagramaTipo: el => quiz.elegirDiagramaTipo(el.dataset.arista),
+  cancelarDiagramaTipo: () => quiz.cancelarDiagramaTipo(),
   startFlashcards: () => flashcards.startFlashcards(),
   startGlosario: () => glosarioUI.startGlosario(),
   startStudy: () => estudio.startStudy(),

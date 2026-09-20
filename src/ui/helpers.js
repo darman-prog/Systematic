@@ -10,12 +10,13 @@ export const TIPO_LABELS = {
   dragdrop: "Arrastrar piezas",
   ordenar: "Ordenar bloques",
   desarrollo: "Desarrollo",
-  relacionar: "Relacionar columnas"
+  relacionar: "Relacionar columnas",
+  diagrama: "Construir diagrama"
 };
 
 export const DIF_LABELS = { facil: "Fácil", media: "Media", dificil: "Difícil" };
 
-export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar"];
+export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 
 export function escapar(texto) {
   return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -95,6 +96,7 @@ export function diagramaER() {
 
 // Respuesta revelada de un ítem, compartida por modo estudio y flashcards.
 export function respuestaEstudio(item, keywords) {
+  if (item.tipo === "diagrama") return '<div class="study-exp">Arma el diagrama en el lienzo y pulsa Comprobar; en la práctica recibirás el detalle por elemento.</div>';
   if (item.tipo === "dragdrop") return '<div class="study-answer">' + escapar(item.respuestas.join("  |  ")) + '</div>';
   if (item.tipo === "relacionar") return '<ul class="flex flex-col gap-1 text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
   if (item.tipo === "ordenar") return '<ol class="list-decimal list-inside flex flex-col gap-1 font-mono text-xs sm:text-sm bg-emerald-900/40 border border-emerald-700 rounded-xl p-3 mb-3">' + item.bloques.map(b => '<li>' + escapar(b) + '</li>').join("") + '</ol>';

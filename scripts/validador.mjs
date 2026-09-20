@@ -1,7 +1,8 @@
 // Validador de schema del contenido de las materias (preguntas, glosario y apuntes).
 // Sin dependencias del DOM: puede importarse desde los tests.
 
-export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar"];
+export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
+export const SUBTIPOS_DIAGRAMA = ["er", "uml-clases", "casos-uso", "actividades"];
 export const DIFICULTADES = ["facil", "media", "dificil"];
 
 const esArreglo = v => Array.isArray(v);
@@ -90,6 +91,101 @@ export function validarPregunta(p, idsVistos) {
       if (p.claves !== undefined && !esArreglo(p.claves)) err("claves debe ser arreglo");
       break;
     }
+    case "diagrama": {
+      if (!SUBTIPOS_DIAGRAMA.includes(p.subtipo)) err(`subtipo de diagrama inválido: ${p.subtipo}`);
+      if (!esArreglo(p.nodosPool) || p.nodosPool.length < 2) err("nodosPool debe tener al menos 2 nodos");
+      else if (p.nodosPool.some(n => !textoNoVacio(n))) err("nodosPool con nodos vacíos");
+      if (p.nodosFijos !== undefined) {
+        if (!esArreglo(p.nodosFijos)) err("nodosFijos debe ser arreglo");
+        else {
+          const fuera = p.nodosFijos.filter(n => !p.nodosPool.includes(n));
+          if (fuera.length) err(`nodosFijos fuera del pool: ${fuera.join(", ")}`);
+        }
+      }
+      if (!esArreglo(p.relacionesEsperadas) || p.relacionesEsperadas.length === 0) {
+        err("relacionesEsperadas debe tener al menos 1 relación");
+      } else {
+        const nodoValido = n => p.nodosPool.includes(n) || (esArreglo(p.nodosFijos) && p.nodosFijos.includes(n));
+        p.relacionesEsperadas.forEach((r, i) => {
+          if (!r || !textoNoVacio(r.de) || !textoNoVacio(r.a) || !textoNoVacio(r.tipo)) {
+            err(`relación ${i + 1} necesita {de, a, tipo}`);
+          } else if (!nodoValido(r.de) || !nodoValido(r.a)) {
+            err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
+          }
+          if (r && p.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
+        });
+      }
+      if (p.tiposArista !== undefined) {
+        if (!esArreglo(p.tiposArista) || p.tiposArista.length === 0) err("tiposArista debe tener al menos 1 tipo");
+        else {
+          const desconocidos = p.relacionesEsperadas && esArreglo(p.relacionesEsperadas)
+            ? p.relacionesEsperadas.map(r => r && r.tipo).filter(t => textoNoVacio(t) && !p.tiposArista.includes(t))
+            : [];
+          if (desconocidos.length) err(`tipos de arista no declarados: ${[...new Set(desconocidos)].join(", ")}`);
+        }
+      }
+      if (p.miembrosPool !== undefined) {
+        if (!esArreglo(p.miembrosPool)) err("miembrosPool debe ser arreglo");
+        else p.miembrosPool.forEach((m, i) => {
+          if (!m || !textoNoVacio(m.texto) || !textoNoVacio(m.de)) {
+            err(`miembro ${i + 1} necesita {texto, de}`);
+          } else if (!nodoValido(m.de)) {
+            err(`miembro "${m.texto}" asignado a un nodo fuera del pool/fijos`);
+          }
+        });
+      }
+      break;
+    }
+  }
+  return errores;
+}
+
+export function validarCasos(casos, { validarDiagramaRef } = {}) {
+  if (casos === undefined) return [];
+  if (!esArreglo(casos)) return ["[casos] debe ser arreglo"];
+  const errores = [];
+  const ids = new Set();
+  casos.forEach(c => {
+    const ref = "[casos] caso \"" + (c && c.id || "?") + "\"";
+    if (!c || !textoNoVacio(c.id)) errores.push("[casos] caso sin id");
+    else if (ids.has(c.id)) errores.push(ref + " duplicado");
+    else ids.add(c.id);
+    if (!c || !textoNoVacio(c.titulo)) errores.push(ref + " sin título");
+    if (!c || !textoNoVacio(c.tema)) errores.push(ref + " sin tema");
+    if (!c || !textoNoVacio(c.caso)) errores.push(ref + " sin narrativa del caso");
+    if (!c || !c.finales || !textoNoVacio(c.finales.exito) || !textoNoVacio(c.finales.parcial) || !textoNoVacio(c.finales.fracaso)) {
+      errores.push(ref + " con finales incompletos (exito/parcial/fracaso)");
+    }
+    if (!c || typeof c.diagrama !== "object" || c.diagrama === null) {
+      errores.push(ref + " sin diagrama");
+    } else if (typeof validarDiagramaRef === "function") {
+      validarDiagramaRef(ref, c.diagrama).forEach(e => errores.push(e));
+    } else {
+      const d = Object.assign({ tipo: "diagrama" }, c.diagrama);
+      validarDiagramaCampos(ref, d).forEach(e => errores.push(e));
+    }
+  });
+  return errores;
+}
+
+function validarDiagramaCampos(ref, d) {
+  const errores = [];
+  const err = msg => errores.push(ref + " " + msg);
+  if (!SUBTIPOS_DIAGRAMA.includes(d.subtipo)) err(`subtipo de diagrama inválido: ${d.subtipo}`);
+  if (!esArreglo(d.nodosPool) || d.nodosPool.length < 2) err("nodosPool debe tener al menos 2 nodos");
+  else if (d.nodosPool.some(n => !textoNoVacio(n))) err("nodosPool con nodos vacíos");
+  if (!esArreglo(d.relacionesEsperadas) || d.relacionesEsperadas.length === 0) {
+    err("relacionesEsperadas debe tener al menos 1 relación");
+  } else {
+    const nodoValido = n => (esArreglo(d.nodosPool) && d.nodosPool.includes(n)) || (esArreglo(d.nodosFijos) && d.nodosFijos.includes(n));
+    d.relacionesEsperadas.forEach((r, i) => {
+      if (!r || !textoNoVacio(r.de) || !textoNoVacio(r.a) || !textoNoVacio(r.tipo)) {
+        err(`relación ${i + 1} necesita {de, a, tipo}`);
+      } else if (!nodoValido(r.de) || !nodoValido(r.a)) {
+        err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
+      }
+      if (r && d.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
+    });
   }
   return errores;
 }
@@ -187,6 +283,7 @@ export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   errores.push(...validarGlosario(m.glosario).map(e => `[${m.id}] ${e}`));
   errores.push(...validarApuntes(m.apuntes, { existeFuente }).map(e => `[${m.id}] ${e}`));
   errores.push(...validarEscenarios(m.escenarios).map(e => `[${m.id}] ${e}`));
+  errores.push(...validarCasos(m.casos).map(e => `[${m.id}] ${e}`));
   return errores;
 }
 

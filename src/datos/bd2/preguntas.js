@@ -1323,6 +1323,53 @@ const preguntas = [
     correctos: [0, 1, 2, 3],
     exp: "En la captura real, marcar solo a+b+c rindió 0.4/0.5: la gradación indica que <b>d</b> también es correcta (eliminar los índices no usados, salvo los de tablas maestras). La e es falsa: acumular muchos índices complejos castiga las escrituras.",
     ref: "CapturasInfo (quiz real P10)"
+  },
+  {
+    id: "P1-078",
+    parcial: "Parcial 1",
+    tema: "Modelado",
+    dificultad: "media",
+    tipo: "diagrama",
+    subtipo: "er",
+    q: "El colegio necesita su modelo ER: el sistema maneja Estudiante, Curso y la matrícula que los une. Coloca las 3 entidades y conecta las relaciones correctas.",
+    caso: "Profesor/Horas/Asignatura mostraron el patrón: cuando una relación muchos-a-muchos aparece, se resuelve con una tabla puente. Aquí la matrícula cumple ese papel entre Estudiante y Curso.",
+    nodosPool: ["Estudiante", "Curso", "Matricula"],
+    relacionesEsperadas: [
+      { de: "Estudiante", a: "Matricula", tipo: "1:N" },
+      { de: "Curso", a: "Matricula", tipo: "1:N" }
+    ],
+    exp: "La matrícula es la <b>entidad puente</b>: cada Estudiante tiene muchas Matrículas (1:N) y cada Curso tiene muchas Matrículas (1:N), resolviendo el N:M original. Una relación directa Estudiante—Curso dejaría el modelo sin la tabla que guarda cada inscripción."
+  },
+  {
+    id: "P1-079",
+    parcial: "Parcial 1",
+    tema: "Modelado",
+    dificultad: "facil",
+    tipo: "diagrama",
+    subtipo: "er",
+    q: "Cada profesor dicta varios horarios y cada horario pertenece a un solo profesor. Coloca ambas entidades y su relación.",
+    caso: "Este es el núcleo uno-a-muchos del sistema del colegio, el mismo que luego se extiende con la tabla Horas como puente.",
+    nodosPool: ["Profesor", "Horario"],
+    relacionesEsperadas: [
+      { de: "Profesor", a: "Horario", tipo: "1:N" }
+    ],
+    exp: "Un profesor dicta <b>varias</b> filas de horario y cada fila pertenece a <b>un</b> profesor: <b>1:N</b>. Si la relación fuera 1:1, cada profesor solo podría tener un horario."
+  },
+  {
+    id: "P1-080",
+    parcial: "Parcial 1",
+    tema: "Modelado",
+    dificultad: "dificil",
+    tipo: "diagrama",
+    subtipo: "er",
+    q: "Completa el modelo del colegio: agrega la tabla puente Horas y conéctala como corresponda con Profesor y Asignatura.",
+    caso: "Profesor y Asignatura tienen una relación muchos-a-muchos real: un profesor dicta varias asignaturas y cada asignatura la dictan varios profesores.",
+    nodosPool: ["Profesor", "Horas", "Asignatura"],
+    relacionesEsperadas: [
+      { de: "Profesor", a: "Horas", tipo: "1:N" },
+      { de: "Asignatura", a: "Horas", tipo: "1:N" }
+    ],
+    exp: "La relación Profesor—Asignatura es <b>N:M</b>, así que se resuelve con la puente <b>Horas</b>: cada puente apunta 1:N a sus dos padres. Conectar Profesor—Asignatura directo como 1:N perdería las combinaciones reales."
   }
 ];
 export default preguntas;

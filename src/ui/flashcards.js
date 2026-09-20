@@ -51,7 +51,8 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     }
     const item = flash.items[flash.idx];
     let frente = bloqueCaso(item) + '<div class="text-xs uppercase tracking-wide text-slate-400 font-bold mb-3">' + item.parcial + ' · ' + item.tema + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + '</div>' +
-      '<div class="text-base sm:text-lg font-semibold leading-relaxed">' + escapar(item.q) + '</div>';
+      '<div class="text-base sm:text-lg font-semibold leading-relaxed">' + escapar(item.q) + '</div>' +
+      (item.tipo === "diagrama" ? '<p class="text-xs text-slate-400 mt-3">En flashcards, los diagramas se resuelven mejor en Modo Estudio o en la práctica.</p>' : "");
     if (item.datos) frente += tablaDatos(item.datos);
     if (item.codigo && item.tipo === "codigo") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo, keywords()) + '</pre>';
     if (item.codigo && item.tipo === "dragdrop") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo.replace(/\{\d\}/g, "____"), keywords()) + '</pre>';

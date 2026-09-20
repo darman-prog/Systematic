@@ -48,6 +48,8 @@ export function prepararItem(item, barajar = true, rng = Math.random) {
       copia.options = shuffle(item.options, rng);
       copia.correctos = textosCorrectos.map(t => copia.options.indexOf(t)).sort((a, b) => a - b);
     }
+  } else if (item.tipo === "diagrama") {
+    // El lienzo se monta desde los datos originales: sin copia transformada.
   } else if (item.tipo !== "desarrollo") {
     if (barajar) {
       const textoCorrecto = item.options[item.correct];
@@ -64,5 +66,17 @@ export function respuestaCorrecta(item) {
   if (item.tipo === "relacionar") return item.pares.map(p => p[0] + " → " + p[1]).join(" | ");
   if (item.tipo === "desarrollo") return item.solucion;
   if (item.tipo === "multi") return item.correctos.map(i => item.options[i]).join(" · ");
+  if (item.tipo === "diagrama") return resumenDiagrama(item);
   return item.options[item.correct];
+}
+
+function resumenDiagrama(item) {
+  const partes = ["Diagrama " + (item.subtipo || "ER")];
+  if (Array.isArray(item.relacionesEsperadas) && item.relacionesEsperadas.length) {
+    partes.push("Relaciones: " + item.relacionesEsperadas.map(r => r.de + " " + r.tipo + " " + r.a).join(" · "));
+  }
+  if (Array.isArray(item.miembrosPool) && item.miembrosPool.length) {
+    partes.push("Miembros: " + item.miembrosPool.map(m => m.de + ": " + m.texto).join(" · "));
+  }
+  return partes.join(" | ");
 }

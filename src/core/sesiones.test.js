@@ -61,6 +61,17 @@ describe("prepararItem", () => {
     const item = { id: "X-6", tipo: "desarrollo", solucion: "SELECT 1" };
     expect(prepararItem(item, true)).toEqual(item);
   });
+
+  it("diagrama: se copia sin barajar campos inexistentes", () => {
+    const item = {
+      id: "X-7", tipo: "diagrama", subtipo: "er",
+      nodosPool: ["A", "B"],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "1:N" }]
+    };
+    const p = prepararItem(item, true, cero);
+    expect(p).toEqual(item);
+    expect(p).not.toBe(item);
+  });
 });
 
 describe("ordenarPrioridad", () => {
@@ -91,5 +102,13 @@ describe("respuestaCorrecta", () => {
 
   it("desarrollo devuelve la solución", () => {
     expect(respuestaCorrecta({ tipo: "desarrollo", solucion: "SELECT 1" })).toBe("SELECT 1");
+  });
+
+  it("diagrama resume el conjunto esperado", () => {
+    expect(respuestaCorrecta({
+      tipo: "diagrama", subtipo: "er",
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "1:N" }],
+      miembrosPool: [{ texto: "id", de: "A" }]
+    })).toBe("Diagrama er | Relaciones: A 1:N B | Miembros: A: id");
   });
 });
