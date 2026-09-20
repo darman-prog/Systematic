@@ -200,6 +200,13 @@ test.describe('Systematic — smoke', () => {
     await page.keyboard.press('Enter');
     await page.keyboard.press('Escape');
     await expect(page.locator('#lienzo-diagrama .nodo-puesto.seleccionado')).toHaveCount(0);
+
+    // Supr retira el nodo y el foco cae en la pieza devuelta al pool.
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().focus();
+    await page.keyboard.press('Delete');
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
+    const focoEnPool = await page.evaluate(() => !!document.activeElement && document.activeElement.classList.contains('pieza'));
+    expect(focoEnPool).toBe(true);
   });
 
   test('constructor UML con miembros: ASW muestra preguntas de diagrama de clases', async ({ page }) => {
@@ -263,6 +270,70 @@ test.describe('Systematic — smoke', () => {
     await page.locator('[data-action="comprobarCaso"]').click();
     await expect(page.locator('#caso-escena').getByText(/¡Éxito!|Resultado parcial|Fracaso/)).toBeVisible();
     await expect(page.locator('#caso-escena [data-action="startCasos"]')).toBeVisible();
+  });
+
+  test('las posiciones de nodos persisten al recomprobar la pregunta', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .materia-card').first().click(); // BD2 (ER)
+    await page.getByRole('button', { name: /Configurar práctica/ }).click();
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+
+    await page.locator('#pool-diagrama .pieza').first().click();
+    const nodo = page.locator('#lienzo-diagrama .nodo-puesto').first();
+    await expect(nodo).toHaveCount(1);
+    await nodo.focus();
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('ArrowRight');
+    const antes = await nodo.evaluate(el => el.style.left);
+    expect(antes).not.toBe('');
+
+    // Comprobar re-renderiza el lienzo con el resultado; la posición se conserva.
+    await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(page.locator('#feedback-box')).toBeVisible();
+    const despues = await page.locator('#lienzo-diagrama .nodo-puesto').first().evaluate(el => el.style.left);
+    expect(despues).toBe(antes);
+  });
+
+  test('modal de guardas operable en actividades (ISW)', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .materia-card').nth(1).click(); // ISW
+    await page.getByRole('button', { name: /Configurar práctica/ }).click();
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+
+    // El banco va barajado: la primera puede ser casos-uso o actividades; llegar a actividades.
+    const fijos = await page.locator('#lienzo-diagrama .nodo-fijo').count();
+    if (fijos === 0) {
+      await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+      await page.locator('#next-btn').click();
+    }
+    await expect(page.locator('#lienzo-diagrama .nodo-fijo').first()).toBeVisible();
+
+    // Conecta un nodo fijo con una pieza recién colocada y elige la transición.
+    await page.locator('#pool-diagrama .pieza').first().click();
+    await page.locator('#lienzo-diagrama .nodo-fijo').first().click();
+    await page.locator('#lienzo-diagrama .nodo-puesto').nth(3).click();
+    await expect(page.locator('#tipos-diagrama')).toBeVisible();
+    await page.locator('#tipos-diagrama [data-arista="transición"]').click();
+
+    // El diálogo toma el foco y se cierra con Escape devolviéndolo.
+    const modal = page.locator('.modal-guarda');
+    await expect(modal).toBeVisible();
+    await expect(modal).toHaveAttribute('role', 'dialog');
+    await expect(modal.locator('.btn-guarda').first()).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(modal).toHaveCount(0);
+
+    // Reabre y confirma con la guarda [sí]: la etiqueta la muestra.
+    await page.locator('#tipos-diagrama [data-arista="transición"]').click();
+    await expect(modal).toBeVisible();
+    await modal.locator('[data-guarda="[sí]"]').click();
+    await expect(page.locator('#lienzo-diagrama .etiqueta-arista').first()).toContainText('[sí]');
   });
 
   test('regresar a materias y entrar a una materia con contenido', async ({ page }) => {
