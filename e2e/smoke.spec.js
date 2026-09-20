@@ -23,7 +23,9 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#stat-total')).toHaveText('87');
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await expect(page.locator('#screen-config')).toBeVisible();
-    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await page.locator('#screen-config').getByRole('button', { name: '← Inicio' }).click();
+    // Práctica determinista: solo preguntas de opción múltiple (siempre usan #options-container).
+    await page.locator('#tipos-panel .chip', { hasText: 'Opción múltiple' }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#progress')).toContainText('Pregunta 1');
     await page.locator('#options-container .option').first().click();
@@ -49,6 +51,15 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#glosario-search').fill('INSERT');
     await expect(page.locator('#glosario-list .glosario-item').first()).toBeVisible();
     await expect(page.locator('#glosario-count')).toContainText('término');
+  });
+
+  test('apuntes: botón presente y estado vacío sin contenido', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click();
+    await page.getByRole('button', { name: /Apuntes/ }).click();
+    await expect(page.locator('#screen-apuntes')).toBeVisible();
+    await expect(page.locator('#apuntes-list')).toContainText('Aún no hay apuntes');
+    await expect(page.locator('#apuntes-count')).toContainText('0 apunte(s)');
   });
 
   test('regresar a materias y entrar a una materia vacía', async ({ page }) => {

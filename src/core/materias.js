@@ -3,8 +3,10 @@ import bd2Preguntas from "../datos/bd2/preguntas.js";
 import bd2Glosario from "../datos/bd2/glosario.js";
 import iswPreguntas from "../datos/isw/preguntas.js";
 import iswGlosario from "../datos/isw/glosario.js";
+import iswApuntes from "../datos/isw/apuntes.js";
 import aswPreguntas from "../datos/asw/preguntas.js";
 import aswGlosario from "../datos/asw/glosario.js";
+import aswApuntes from "../datos/asw/apuntes.js";
 
 export const MATERIAS = [
   {
@@ -14,7 +16,8 @@ export const MATERIAS = [
     descripcion: "SQL, modelado, índices, integridad y consultas.",
     color: "#38bdf8",
     preguntas: bd2Preguntas,
-    glosario: bd2Glosario
+    glosario: bd2Glosario,
+    apuntes: []
   },
   {
     id: "isw",
@@ -23,7 +26,8 @@ export const MATERIAS = [
     descripcion: "Procesos, Scrum, requerimientos y diseño de software.",
     color: "#a78bfa",
     preguntas: iswPreguntas,
-    glosario: iswGlosario
+    glosario: iswGlosario,
+    apuntes: iswApuntes
   },
   {
     id: "asw",
@@ -32,7 +36,8 @@ export const MATERIAS = [
     descripcion: "POO, principios de diseño, SOLID y patrones.",
     color: "#34d399",
     preguntas: aswPreguntas,
-    glosario: aswGlosario
+    glosario: aswGlosario,
+    apuntes: aswApuntes
   }
 ];
 

@@ -4,6 +4,7 @@ import {
   aplicarRespuesta, esDebil, vencida, calcularRacha, metaDiaria, hoyISO, fechaISO
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./core/sesiones.js";
+import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
 
   // Materia activa y datos asociados (se definen al seleccionar materia en el home).
   let materia = null;
@@ -68,7 +69,7 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
   }
 
   function show(screen) {
-    ["materias", "start", "config", "quiz", "results", "study", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "flashcards", "glosario", "repaso"].forEach(s =>
       $("screen-" + s).classList.toggle("hidden", s !== screen)
     );
     animar($("screen-" + screen));
@@ -1445,6 +1446,54 @@ import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./co
     if (gloTitulo) gloTitulo.textContent = "📚 Glosario";
   }
 
+  let apunteTema = "todos";
+
+  function apuntesDeMateria() {
+    return materia && materia.apuntes ? materia.apuntes : [];
+  }
+
+  function startApuntes() {
+    apunteTema = "todos";
+    const s = $("apuntes-search");
+    if (s) s.value = "";
+    renderApuntes("");
+    renderApuntesFiltros();
+    show("apuntes");
+  }
+
+  function renderApuntesFiltros() {
+    const cont = $("apuntes-filtros");
+    if (!cont) return;
+    const todos = apuntesDeMateria();
+    const temas = ["todos"].concat([...new Set(todos.map(a => a.tema))]);
+    cont.innerHTML = temas.map(t => {
+      const cuenta = t === "todos" ? todos.length : todos.filter(a => a.tema === t).length;
+      return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" onclick="cambiarApunteTema(\'' + t + '\')">' +
+        (t === "todos" ? "Todos" : escapar(t)) + " · " + cuenta + '</button>';
+    }).join("");
+  }
+
+  function cambiarApunteTema(t) {
+    apunteTema = t;
+    const s = $("apuntes-search");
+    renderApuntes(s ? s.value : "");
+    renderApuntesFiltros();
+  }
+
+  function renderApuntes(filtro) {
+    const lista = filtrarApuntes(apuntesDeMateria(), filtro, apunteTema);
+    $("apuntes-list").innerHTML = lista.map(a =>
+      '<div class="apunte-card">' +
+        '<div class="apunte-tema">' + escapar(a.tema) + '</div>' +
+        '<div class="apunte-titulo">' + escapar(a.titulo) + '</div>' +
+        '<div class="apunte-contenido">' + apunteAHTML(a.contenido) + '</div>' +
+        '<div class="apunte-fuente">Fuente: ' + escapar(a.fuente) + '</div>' +
+      '</div>'
+    ).join("") || '<p class="text-sm text-slate-400">Aún no hay apuntes para esta materia.</p>';
+    const cont = $("apuntes-count");
+    if (cont) cont.textContent = lista.length + " apunte(s)";
+  }
+
   function goHome() {
     show("start");
     renderStats();
@@ -1784,5 +1833,8 @@ Object.assign(window, {
   irMaterias,
   seleccionarMateria,
   usarTodas,
-  voltearFlash
+  voltearFlash,
+  startApuntes,
+  renderApuntes,
+  cambiarApunteTema
 });

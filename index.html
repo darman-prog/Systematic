@@ -43,6 +43,11 @@
         <span class="font-bold">Modo Estudio</span>
         <span class="text-xs text-slate-400">Todas las preguntas con su solución</span>
       </button>
+      <button class="mode-card" onclick="startApuntes()">
+        <span class="text-2xl">📝</span>
+        <span class="font-bold">Apuntes</span>
+        <span class="text-xs text-slate-400">Resúmenes curados por tema</span>
+      </button>
       <button class="mode-card" onclick="startFlashcards()">
         <span class="text-2xl">🃏</span>
         <span class="font-bold">Flashcards</span>
@@ -154,6 +159,18 @@
     <div id="study-filtros" class="flex flex-wrap gap-2 mb-3"></div>
     <p class="text-xs text-slate-500 mb-3" id="study-count"></p>
     <div id="study-list"></div>
+  </section>
+
+  <section id="screen-apuntes" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">📝 Apuntes</h1>
+      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
+    </div>
+    <p class="text-sm text-slate-400 mb-4">Resúmenes curados a partir del material de la materia. Busca o filtra por tema.</p>
+    <input class="search-input" id="apuntes-search" type="search" placeholder="Buscar en los apuntes..." oninput="renderApuntes(this.value)">
+    <div id="apuntes-filtros" class="flex flex-wrap gap-2 mb-3"></div>
+    <p class="text-xs text-slate-500 mb-3" id="apuntes-count"></p>
+    <div id="apuntes-list"></div>
   </section>
 
   <section id="screen-flashcards" class="card hidden">
