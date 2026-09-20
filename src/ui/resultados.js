@@ -37,7 +37,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
       '<p class="text-slate-400 mt-2 text-sm">' + mensaje + '</p>' +
     '</div>';
 
-    html += '<h3 class="section-title">Desglose por tema</h3><div class="flex flex-col gap-2.5">' +
+    html += '<h2 class="section-title">Desglose por tema</h2><div class="flex flex-col gap-2.5">' +
       Object.keys(r.porTema).map(tema => {
         const d = r.porTema[tema];
         const p = Math.round((d.ok / d.total) * 100);
@@ -51,7 +51,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
 
     const lista = verTodas ? r.calificables : r.falladas;
     if (lista.length) {
-      html += '<h3 class="section-title">' + (verTodas ? "Todas las preguntas (" + r.calificables.length + ")" : "Preguntas falladas (" + r.falladas.length + ")") + '</h3><div class="flex flex-col gap-3">';
+      html += '<h2 class="section-title">' + (verTodas ? "Todas las preguntas (" + r.calificables.length + ")" : "Preguntas falladas (" + r.falladas.length + ")") + '</h2><div class="flex flex-col gap-3">';
       lista.forEach(item => {
         const i = r.items.indexOf(item);
         const a = session.answers[i];
@@ -67,7 +67,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     }
 
     if (r.desarrollos.length) {
-      html += '<h3 class="section-title">Preguntas de desarrollo</h3><div class="flex flex-col gap-3">';
+      html += '<h2 class="section-title">Preguntas de desarrollo</h2><div class="flex flex-col gap-3">';
       r.desarrollos.forEach(item => {
         const i = r.items.indexOf(item);
         const a = session.answers[i] || {};

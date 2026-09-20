@@ -7,7 +7,7 @@ import { DIF_LABELS, colorTema, escapar } from "./helpers.js";
 const $ = id => document.getElementById(id);
 
 function tarjetaStat(valor, etiqueta, color) {
-  return '<div class="stat-card"><div class="stat-value" style="color:' + (color || "#38bdf8") + '">' + valor + '</div><div class="stat-label">' + etiqueta + '</div></div>';
+  return '<div class="stat-card"><div class="stat-value" style="color:' + (color || "#9BB8C9") + '">' + valor + '</div><div class="stat-label">' + etiqueta + '</div></div>';
 }
 
 export function renderHistory(historial) {
@@ -79,7 +79,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
     '<p class="text-xs text-slate-400">' + hoy + ' de ' + meta + ' preguntas hoy · racha de ' + racha + ' día(s) · ' + debiles + ' débil(es) por repasar</p>' +
   '</div>';
 
-  html += '<h3 class="section-title">Evolución</h3>' +
+  html += '<h2 class="section-title">Evolución</h2>' +
     '<div id="grafica-wrap" class="hidden"><canvas id="grafica" class="w-full h-48 bg-slate-900 border border-slate-700 rounded-xl"></canvas></div>' +
     '<p id="grafica-vacia" class="text-sm text-slate-400">Completa al menos 2 rondas para ver tu evolución.</p>';
 
@@ -98,7 +98,7 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
       '<span class="topic-score">' + pct + '%</span>' +
     '</div>';
   });
-  html += '<h3 class="section-title">Avance por tema</h3>' +
+  html += '<h2 class="section-title">Avance por tema</h2>' +
     (hayAvance ? '<div class="flex flex-col gap-2.5">' + filas + '</div>' : '<p class="text-sm text-slate-400">Responde preguntas para ver tu avance.</p>');
 
   let filasDif = "";
@@ -114,12 +114,12 @@ export function renderStats({ materia, banco, obtenerP, historial, actividad, me
       '<span class="topic-score">' + pctD + '%</span>' +
     '</div>';
   });
-  html += '<h3 class="section-title">Avance por dificultad</h3>' +
+  html += '<h2 class="section-title">Avance por dificultad</h2>' +
     (hayAvance ? '<div class="flex flex-col gap-2.5">' + filasDif + '</div>' : '<p class="text-sm text-slate-400">Responde preguntas para ver tu avance.</p>');
 
   const peores = banco.map(q => ({ q, fail: obtenerP(q.id).fail })).filter(x => x.fail > 0).sort((a, b) => b.fail - a.fail).slice(0, 5);
   if (peores.length) {
-    html += '<h3 class="section-title">Más falladas</h3><div class="flex flex-col gap-2">';
+    html += '<h2 class="section-title">Más falladas</h2><div class="flex flex-col gap-2">';
     peores.forEach(x => {
       html += '<div class="peor-row"><span class="flex-1 text-slate-300 leading-snug">' + escapar(x.q.length > 95 ? x.q.slice(0, 95) + "…" : x.q) + '</span><span class="text-rose-300 font-bold whitespace-nowrap">' + x.fail + ' fallo' + (x.fail > 1 ? "s" : "") + '</span></div>';
     });

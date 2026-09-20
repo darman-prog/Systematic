@@ -15,7 +15,7 @@ export const MATERIAS = [
     nombre: "Base de Datos 2",
     icono: "🗄️",
     descripcion: "SQL, modelado, índices, integridad y consultas.",
-    color: "#38bdf8",
+    color: "#9BB8C9",
     preguntas: bd2Preguntas,
     glosario: bd2Glosario,
     apuntes: [],
@@ -27,7 +27,7 @@ export const MATERIAS = [
     nombre: "Ingeniería de Software",
     icono: "📋",
     descripcion: "Procesos, Scrum, requerimientos y diseño de software.",
-    color: "#a78bfa",
+    color: "#B5A9CF",
     preguntas: iswPreguntas,
     glosario: iswGlosario,
     apuntes: iswApuntes
@@ -37,7 +37,7 @@ export const MATERIAS = [
     nombre: "Arquitectura de Software",
     icono: "🏛️",
     descripcion: "POO, principios de diseño, SOLID y patrones.",
-    color: "#34d399",
+    color: "#9FBEA9",
     preguntas: aswPreguntas,
     glosario: aswGlosario,
     apuntes: aswApuntes
