@@ -1,7 +1,7 @@
-// Render del glosario (filtros por categoría, búsqueda) y del tip del día del home.
+﻿// Render del glosario (filtros por categoría, búsqueda) y del tip del día del home.
 // Recibe el glosario de la materia activa vía `ctx`; no lee localStorage ni importa datos.
-import { escapar, resaltarSQL, sqlKeywordsDe } from "./helpers.js";
-import { icono } from "./iconos.js";
+import { escapar, resaltarSQL, sqlKeywordsDe } from "../helpers.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 

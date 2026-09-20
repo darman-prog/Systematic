@@ -1,9 +1,9 @@
-// Render de historial y estadísticas por materia (incluida la gráfica canvas).
+﻿// Render de historial y estadísticas por materia (incluida la gráfica canvas).
 // Funciones de render que reciben los datos por parámetro (materia, banco, progreso vía
 // callback `obtenerP`, historial, actividad y meta ya normalizada); no lee localStorage.
-import { calcularRacha, esDebil, hoyISO, vencida } from "../core/progreso.js";
-import { DIF_LABELS, colorTema, escapar } from "./helpers.js";
-import { icono } from "./iconos.js";
+import { calcularRacha, esDebil, hoyISO, vencida } from "../../core/progreso.js";
+import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 

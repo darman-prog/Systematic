@@ -1,20 +1,20 @@
-import { MATERIAS, getMateria } from "./core/materias.js";
+﻿import { MATERIAS, getMateria } from "./core/materias.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
 import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
-import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
+import { apunteAHTML, filtrarApuntes } from "./ui/pantallas/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
-import { crearQuizUI } from "./ui/quiz.js";
-import { crearResultadosUI } from "./ui/resultados.js";
-import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/stats.js";
-import { crearEstudioUI } from "./ui/estudio.js";
-import { crearGlosarioUI } from "./ui/glosario.js";
-import { crearFlashcardsUI } from "./ui/flashcards.js";
-import { estadoMisiones, pintarMisiones } from "./ui/misiones.js";
+import { crearQuizUI } from "./ui/pantallas/quiz.js";
+import { crearResultadosUI } from "./ui/pantallas/resultados.js";
+import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/pantallas/stats.js";
+import { crearEstudioUI } from "./ui/pantallas/estudio.js";
+import { crearGlosarioUI } from "./ui/pantallas/glosario.js";
+import { crearFlashcardsUI } from "./ui/pantallas/flashcards.js";
+import { estadoMisiones, pintarMisiones } from "./ui/pantallas/misiones.js";
 import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/escenarios.js";
-import { pintarListaEscenarios, pintarEscenario } from "./ui/escenarios.js";
+import { pintarListaEscenarios, pintarEscenario } from "./ui/pantallas/escenarios.js";
 import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/diagramas.js";
 import { crearDiagramasUI } from "./ui/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/casos.js";

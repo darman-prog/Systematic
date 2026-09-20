@@ -1,11 +1,11 @@
-// Render e interacción del modo estudio (listado con respuestas revelables).
+﻿// Render e interacción del modo estudio (listado con respuestas revelables).
 // Recibe el estado de la app vía `ctx` y callbacks de persistencia/navegación;
 // el estado propio de la pantalla (filtros activos) vive en este módulo.
 import {
   TIPOS, TIPO_LABELS, DIF_LABELS,
   bloqueCaso, colorTema, diagramaER, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
-} from "./helpers.js";
-import { icono } from "./iconos.js";
+} from "../helpers.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 

@@ -1,12 +1,12 @@
-// Render e interacción del modo flashcards (incluye la ronda de garantizadas).
+﻿// Render e interacción del modo flashcards (incluye la ronda de garantizadas).
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
-import { shuffle } from "../core/sesiones.js";
-import { icono } from "./iconos.js";
+import { shuffle } from "../../core/sesiones.js";
+import { icono } from "../iconos.js";
 import {
   TIPO_LABELS,
   bloqueCaso, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
-} from "./helpers.js";
+} from "../helpers.js";
 
 const $ = id => document.getElementById(id);
 

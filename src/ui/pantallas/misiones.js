@@ -1,6 +1,6 @@
-// Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
+﻿// Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
-import { icono } from "./iconos.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 

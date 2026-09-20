@@ -1,8 +1,8 @@
-// Render de la pantalla de resultados de una sesión.
+﻿// Render de la pantalla de resultados de una sesión.
 // Recibe la sesión vía `ctx` y el callback de persistencia; no lee localStorage.
-import { respuestaCorrecta } from "../core/sesiones.js";
-import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "./helpers.js";
-import { icono } from "./iconos.js";
+import { respuestaCorrecta } from "../../core/sesiones.js";
+import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "../helpers.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 

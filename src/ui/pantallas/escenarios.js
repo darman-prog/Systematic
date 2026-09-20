@@ -1,7 +1,7 @@
-// Render de la lista y la ejecución de escenarios multi-paso (spec 003).
+﻿// Render de la lista y la ejecución de escenarios multi-paso (spec 003).
 // Funciones puras de render: reciben datos y estado; no leen localStorage.
-import { escapar } from "./helpers.js";
-import { icono } from "./iconos.js";
+import { escapar } from "../helpers.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 
