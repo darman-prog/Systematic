@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz BD2 — Repaso interactivo</title>
+  <title>Systematic — App de estudio</title>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex justify-center items-start p-4 sm:p-6 font-sans">
 
@@ -12,8 +12,17 @@
 
 <div class="app w-full max-w-3xl">
 
-  <section id="screen-start" class="card">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">Quiz de Base de Datos</h1>
+  <section id="screen-materias" class="card hidden">
+    <h1 class="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">Systematic</h1>
+    <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
+    <div id="materias-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+  </section>
+
+  <section id="screen-start" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-2">
+      <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent"><span id="materia-icono">🗄️</span> <span id="materia-nombre">Base de Datos 2</span></h1>
+      <button class="btn btn-ghost btn-sm" onclick="irMaterias()">← Materias</button>
+    </div>
     <p class="subtitle">
       Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
       Preguntas y opciones aleatorias, con explicación en cada respuesta.
@@ -22,7 +31,7 @@
       <button class="mode-card col-span-2 sm:col-span-4 bg-amber-950/40 border-amber-600 hover:border-amber-400" onclick="irRepaso()">
         <span class="text-2xl">🔥</span>
         <span class="font-bold">RepasoQuiz — Preguntas garantizadas</span>
-        <span class="text-xs text-amber-200/90">Las preguntas reales de las capturas (salen sí o sí en el quiz). Mismo orden y redacción del examen.</span>
+        <span class="text-xs text-amber-200/90">Las preguntas reales de parciales anteriores. Mismo orden y redacción del examen.</span>
       </button>
       <button class="mode-card" onclick="irConfig()">
         <span class="text-2xl">🎯</span>
@@ -41,7 +50,7 @@
       </button>
       <button class="mode-card" onclick="startGlosario()">
         <span class="text-2xl">📚</span>
-        <span class="font-bold">Glosario SQL</span>
+        <span class="font-bold">Glosario</span>
         <span class="text-xs text-slate-400">Términos y ejemplos por categoría</span>
       </button>
     </div>
@@ -73,7 +82,7 @@
       <h1 class="text-xl sm:text-2xl font-bold">🔥 RepasoQuiz</h1>
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
     </div>
-    <p class="subtitle">Preguntas reales tomadas de las capturas del quiz (<b>CapturasInfo</b> — 10/09/2026). Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
+    <p class="subtitle">Preguntas reales de parciales anteriores de esta materia. Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
     <div id="repaso-list"></div>
     <div class="flex flex-wrap gap-3 justify-center mt-6">
       <button class="btn btn-primary" onclick="iniciarRepasoQuiz()">Comenzar RepasoQuiz (<span id="repaso-n">10</span> preguntas)</button>
@@ -157,7 +166,7 @@
 
   <section id="screen-glosario" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">📚 Glosario SQL</h1>
+      <h1 class="text-xl sm:text-2xl font-bold" id="glosario-titulo">📚 Glosario</h1>
       <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>

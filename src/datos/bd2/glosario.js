@@ -1,4 +1,4 @@
-window.GLOSARIO = {
+const glosario = {
   categorias: [
     { id: "dml", nombre: "DML — Manipulación de datos", corto: "DML", color: "#38bdf8" },
     { id: "ddl", nombre: "DDL — Definición de datos", corto: "DDL", color: "#a78bfa" },
@@ -275,3 +275,4 @@ window.GLOSARIO = {
     "Si un reporte une tres tablas, revisa que cada JOIN tenga su ON apuntando a las llaves correctas."
   ]
 };
+export default glosario;

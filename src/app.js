@@ -1,10 +1,15 @@
-  const banco = window.BANCO || [];
-  const glosario = window.GLOSARIO || { categorias: [], terminos: [], tips: [] };
-  const KEY_PROGRESO = "quizBD2.progreso";
-  const KEY_HISTORIAL = "quizBD2.historial";
-  const KEY_ACTIVIDAD = "quizBD2.actividad";
-  const KEY_META = "quizBD2.meta";
-  const INTERVALOS_DIAS = [0, 1, 3, 7, 16];
+import { MATERIAS, getMateria } from "./core/materias.js";
+import {
+  claves, migrarClavesLegacy, leerJSON, escribirJSON, obtenerEntrada,
+  aplicarRespuesta, esDebil, vencida, calcularRacha, metaDiaria, hoyISO, fechaISO
+} from "./core/progreso.js";
+import { shuffle, ordenarPrioridad, prepararItem, respuestaCorrecta } from "./core/sesiones.js";
+
+  // Materia activa y datos asociados (se definen al seleccionar materia en el home).
+  let materia = null;
+  let banco = [];
+  let glosario = { categorias: [], terminos: [], tips: [] };
+  let clavesMateria = null;
 
   const TOPIC_COLORS = {
     "DML": "#38bdf8",
@@ -28,7 +33,7 @@
   const DIF_LABELS = { facil: "Fácil", media: "Media", dificil: "Difícil" };
   const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar"];
 
-  let progreso = cargarProgreso();
+  let progreso = {};
   let session = null;
   let flash = null;
   let estudioTipo = "todos";
@@ -47,15 +52,6 @@
     return texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
-  function shuffle(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
   const SQL_KEYWORDS = ["SELECT", "FROM", "WHERE", "JOIN", "ON", "GROUP BY", "ORDER BY", "WITHIN GROUP", "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE", "CREATE TABLE", "ALTER TABLE", "ADD", "DROP TABLE", "PRIMARY KEY", "FOREIGN KEY", "REFERENCES", "LISTAGG", "GROUP_CONCAT", "SUBSTR", "SUBSTRING", "CAST", "TO_CHAR", "TO_NUMBER", "VARCHAR2", "NUMBER", "AS", "AND", "OR", "COUNT", "DISTINCT", "INT", "FLOAT", "NULL", "NOT", "CASCADE", "ASC", "HAVING", "SUM", "INTO"];
 
   function resaltarSQL(sql) {
@@ -72,7 +68,7 @@
   }
 
   function show(screen) {
-    ["start", "config", "quiz", "results", "study", "flashcards", "glosario", "repaso"].forEach(s =>
+    ["materias", "start", "config", "quiz", "results", "study", "flashcards", "glosario", "repaso"].forEach(s =>
       $("screen-" + s).classList.toggle("hidden", s !== screen)
     );
     animar($("screen-" + screen));
@@ -80,92 +76,56 @@
   }
 
   function cargarProgreso() {
-    try { return JSON.parse(localStorage.getItem(KEY_PROGRESO)) || {}; } catch (e) { return {}; }
+    return leerJSON(localStorage, clavesMateria.progreso, {});
   }
 
   function guardarProgreso() {
-    localStorage.setItem(KEY_PROGRESO, JSON.stringify(progreso));
+    escribirJSON(localStorage, clavesMateria.progreso, progreso);
   }
 
   function obtenerP(id) {
-    return progreso[id] || { ok: 0, fail: 0, box: 1, last: null, lastOk: null, marked: false };
-  }
-
-  function fechaISO(d) {
-    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-  }
-
-  function hoyISO() {
-    return fechaISO(new Date());
+    return obtenerEntrada(progreso, id);
   }
 
   function cargarActividad() {
-    try { return JSON.parse(localStorage.getItem(KEY_ACTIVIDAD)) || {}; } catch (e) { return {}; }
+    return leerJSON(localStorage, clavesMateria.actividad, {});
   }
 
   function registrarActividad() {
     const a = cargarActividad();
     const h = hoyISO();
     a[h] = (a[h] || 0) + 1;
-    localStorage.setItem(KEY_ACTIVIDAD, JSON.stringify(a));
+    escribirJSON(localStorage, clavesMateria.actividad, a);
   }
 
-  function metaDiaria() {
-    return Math.max(1, parseInt(localStorage.getItem(KEY_META), 10) || 20);
+  function cargarMeta() {
+    return metaDiaria(leerJSON(localStorage, clavesMateria.meta, 20));
   }
 
   function cambiarMeta(valor) {
-    const n = Math.max(1, parseInt(valor, 10) || 20);
-    localStorage.setItem(KEY_META, String(n));
+    escribirJSON(localStorage, clavesMateria.meta, metaDiaria(valor));
     renderStats();
   }
 
-  function calcularRacha() {
-    const a = cargarActividad();
-    const d = new Date();
-    let racha = 0;
-    if (!a[fechaISO(d)]) d.setDate(d.getDate() - 1);
-    while (a[fechaISO(d)]) {
-      racha++;
-      d.setDate(d.getDate() - 1);
-    }
-    return racha;
-  }
-
   function registrarRespuesta(id, ok) {
-    const p = obtenerP(id);
-    if (ok) { p.ok++; p.box = Math.min(p.box + 1, 5); } else { p.fail++; p.box = 1; }
-    p.last = Date.now();
-    p.lastOk = ok;
-    progreso[id] = p;
+    progreso[id] = aplicarRespuesta(obtenerP(id), ok);
     guardarProgreso();
     registrarActividad();
   }
 
   function toggleMarked(id) {
-    const p = obtenerP(id);
-    p.marked = !p.marked;
-    progreso[id] = p;
+    const marcada = !obtenerP(id).marked;
+    progreso[id] = Object.assign({}, obtenerP(id), { marked: marcada });
     guardarProgreso();
-    return p.marked;
-  }
-
-  function esDebil(p) {
-    return p.fail > 0 && (!p.lastOk || p.box <= 2);
-  }
-
-  function vencida(p) {
-    if (!p.last) return true;
-    const dias = INTERVALOS_DIAS[Math.max(1, Math.min(p.box, 5)) - 1];
-    return Date.now() - p.last >= dias * 86400000;
+    return marcada;
   }
 
   function cargarHistorial() {
-    try { return JSON.parse(localStorage.getItem(KEY_HISTORIAL)) || []; } catch (e) { return []; }
+    return leerJSON(localStorage, clavesMateria.historial, []);
   }
 
   function clearHistory() {
-    localStorage.removeItem(KEY_HISTORIAL);
+    try { localStorage.removeItem(clavesMateria.historial); } catch (e) { /* sin persistencia */ }
     renderHistory();
     renderStats();
   }
@@ -173,27 +133,30 @@
   function resetProgreso() {
     if (!confirm("¿Borrar todo el progreso (aciertos, fallos, marcas y racha)?")) return;
     progreso = {};
-    localStorage.removeItem(KEY_PROGRESO);
-    localStorage.removeItem(KEY_ACTIVIDAD);
+    try {
+      localStorage.removeItem(clavesMateria.progreso);
+      localStorage.removeItem(clavesMateria.actividad);
+    } catch (e) { /* sin persistencia */ }
     renderStats();
     renderHistory();
   }
 
   function exportarDatos() {
     const datos = {
-      app: "quiz-bd2",
-      version: 1,
+      app: "systematic",
+      version: 2,
+      materia: materia.id,
       exportado: new Date().toISOString(),
       progreso: cargarProgreso(),
       historial: cargarHistorial(),
       actividad: cargarActividad(),
-      meta: metaDiaria()
+      meta: cargarMeta()
     };
     const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "progreso-quiz-bd2-" + hoyISO() + ".json";
+    a.download = "systematic-" + materia.id + "-" + hoyISO() + ".json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -207,13 +170,17 @@
     lector.onload = () => {
       try {
         const datos = JSON.parse(lector.result);
-        if (!datos || datos.app !== "quiz-bd2" || typeof datos.progreso !== "object") throw new Error("formato");
+        const esLegacy = !!datos && datos.app === "quiz-bd2" && typeof datos.progreso === "object";
+        const esActual = !!datos && datos.app === "systematic" && typeof datos.progreso === "object";
+        if (!esLegacy && !esActual) throw new Error("formato");
+        if (esActual && datos.materia && datos.materia !== materia.id &&
+            !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + materia.nombre + "»?")) return;
         if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
         progreso = datos.progreso || {};
-        localStorage.setItem(KEY_PROGRESO, JSON.stringify(progreso));
-        if (datos.historial) localStorage.setItem(KEY_HISTORIAL, JSON.stringify(datos.historial));
-        if (datos.actividad) localStorage.setItem(KEY_ACTIVIDAD, JSON.stringify(datos.actividad));
-        if (datos.meta) localStorage.setItem(KEY_META, String(datos.meta));
+        escribirJSON(localStorage, clavesMateria.progreso, progreso);
+        if (datos.historial) escribirJSON(localStorage, clavesMateria.historial, datos.historial);
+        if (datos.actividad) escribirJSON(localStorage, clavesMateria.actividad, datos.actividad);
+        if (datos.meta) escribirJSON(localStorage, clavesMateria.meta, metaDiaria(datos.meta));
         goHome();
         alert("Progreso importado correctamente.");
       } catch (e) {
@@ -321,60 +288,7 @@
     show("config");
   }
 
-  function ordenarPrioridad(lista) {
-    const grupos = [[], [], []];
-    lista.forEach(q => {
-      const p = obtenerP(q.id);
-      const g = esDebil(p) ? 0 : vencida(p) ? 1 : 2;
-      grupos[g].push(q);
-    });
-    return grupos.reduce((acc, g) => acc.concat(shuffle(g)), []);
-  }
-
-  function prepararItem(item, barajar) {
-    if (barajar === undefined) barajar = true;
-    const copia = Object.assign({}, item);
-    if (item.tipo === "dragdrop") {
-      copia.piezasRuntime = barajar ? shuffle(item.piezas.map((text, i) => ({ pid: item.id + "-p" + i, text }))) : item.piezas.map((text, i) => ({ pid: item.id + "-p" + i, text }));
-    } else if (item.tipo === "ordenar") {
-      let barajados = item.bloques.slice();
-      if (barajar) {
-        barajados = shuffle(item.bloques);
-        let intentos = 0;
-        while (barajados.join("|") === item.bloques.join("|") && intentos < 5) {
-          barajados = shuffle(item.bloques);
-          intentos++;
-        }
-      }
-      copia.bloquesRuntime = barajados;
-    } else if (item.tipo === "relacionar") {
-      const paresIdx = item.pares.map((p, i) => ({ idx: i, texto: p[1] }));
-      copia.derecha = barajar ? shuffle(paresIdx) : paresIdx;
-    } else if (item.tipo === "multi") {
-      copia.correctos = item.correctos.slice();
-      if (barajar) {
-        const textosCorrectos = item.correctos.map(i => item.options[i]);
-        copia.options = shuffle(item.options);
-        copia.correctos = textosCorrectos.map(t => copia.options.indexOf(t)).sort((a, b) => a - b);
-      }
-    } else if (item.tipo !== "desarrollo") {
-      if (barajar) {
-        const textoCorrecto = item.options[item.correct];
-        copia.options = shuffle(item.options);
-        copia.correct = copia.options.indexOf(textoCorrecto);
-      }
-    }
-    return copia;
-  }
-
-  function respuestaCorrecta(item) {
-    if (item.tipo === "dragdrop") return item.respuestas.join(" / ");
-    if (item.tipo === "ordenar") return item.bloques.join(" → ");
-    if (item.tipo === "relacionar") return item.pares.map(p => p[0] + " → " + p[1]).join(" | ");
-    if (item.tipo === "desarrollo") return item.solucion;
-    if (item.tipo === "multi") return item.correctos.map(i => item.options[i]).join(" · ");
-    return item.options[item.correct];
-  }
+  // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/sesiones.js (testeables).
 
   function diagramaER() {
     const flecha = '<div class="text-slate-500 text-xl font-bold text-center px-2"><span class="md:hidden">↓</span><span class="hidden md:inline">→</span></div>';
@@ -1286,7 +1200,7 @@
   function guardarIntento(score, total, modo) {
     const historial = cargarHistorial();
     historial.unshift({ date: Date.now(), score, total, modo: modo || "practica" });
-    localStorage.setItem(KEY_HISTORIAL, JSON.stringify(historial.slice(0, 15)));
+    escribirJSON(localStorage, clavesMateria.historial, historial.slice(0, 15));
   }
 
   function renderHistory() {
@@ -1331,9 +1245,10 @@
     const precision = (ok + fail) ? Math.round((ok / (ok + fail)) * 100) : 0;
     const historial = cargarHistorial();
     const mejor = historial.length ? Math.max.apply(null, historial.map(h => Math.round((h.score / h.total) * 100))) : null;
-    const racha = calcularRacha();
-    const hoy = cargarActividad()[hoyISO()] || 0;
-    const meta = metaDiaria();
+    const actividad = cargarActividad();
+    const racha = calcularRacha(actividad);
+    const hoy = actividad[hoyISO()] || 0;
+    const meta = cargarMeta();
     const pctMeta = Math.min(100, Math.round((hoy / meta) * 100));
 
     let html = '<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">' +
@@ -1464,6 +1379,56 @@
       ctx.arc(x(i), y(v), 3, 0, Math.PI * 2);
       ctx.fill();
     });
+  }
+
+  function renderMaterias() {
+    const cont = $("materias-list");
+    if (!cont) return;
+    cont.innerHTML = MATERIAS.map(m => {
+      const n = m.preguntas.length;
+      const pendiente = n === 0;
+      const detalles = pendiente
+        ? "Contenido en preparación"
+        : n + " preguntas" + (m.glosario.terminos.length ? " · " + m.glosario.terminos.length + " términos" : "");
+      return '<button class="mode-card" onclick="seleccionarMateria(\'' + m.id + '\')" style="border-left:4px solid ' + m.color + '">' +
+        '<span class="text-2xl">' + m.icono + '</span>' +
+        '<span class="font-bold">' + m.nombre + '</span>' +
+        '<span class="text-xs text-slate-400">' + m.descripcion + '</span>' +
+        '<span class="text-xs ' + (pendiente ? "text-amber-300" : "text-emerald-300") + '">' + detalles + '</span>' +
+      '</button>';
+    }).join("");
+  }
+
+  function irMaterias() {
+    clearTimer();
+    session = null;
+    show("materias");
+    renderMaterias();
+  }
+
+  function seleccionarMateria(id) {
+    const m = getMateria(id);
+    if (!m) return;
+    materia = m;
+    banco = m.preguntas;
+    glosario = m.glosario;
+    clavesMateria = claves(m.id);
+    migrarClavesLegacy(localStorage, m.id);
+    progreso = cargarProgreso();
+    inicializarFiltros();
+    renderConfig();
+    renderMateriaUI();
+    goHome();
+  }
+
+  function renderMateriaUI() {
+    document.title = materia.nombre + " — Systematic";
+    const nombre = $("materia-nombre");
+    const icono = $("materia-icono");
+    if (nombre) nombre.textContent = materia.nombre;
+    if (icono) icono.textContent = materia.icono;
+    const gloTitulo = $("glosario-titulo");
+    if (gloTitulo) gloTitulo.textContent = "📚 Glosario";
   }
 
   function goHome() {
@@ -1742,14 +1707,9 @@
     }
   });
 
-  if (banco.length) {
-    inicializarFiltros();
-    renderConfig();
-    renderStats();
-    renderHistory();
-    renderTiposPanel();
-    renderTip();
-  }
+  migrarClavesLegacy(localStorage);
+  renderMaterias();
+  show("materias");
 // Puente de funciones para atributos inline (onclick, onchange, ...):
 // este script es un modulo ES y las funciones no son globales por defecto.
 Object.assign(window, {
@@ -1807,6 +1767,8 @@ Object.assign(window, {
   toggleMarcadaEstudio,
   toggleMulti,
   toggleStudy,
+  irMaterias,
+  seleccionarMateria,
   usarTodas,
   voltearFlash
 });

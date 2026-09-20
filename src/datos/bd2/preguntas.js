@@ -1,4 +1,4 @@
-window.BANCO = [
+const preguntas = [
   {
     id: "P1-001",
     parcial: "Parcial 1",
@@ -1325,3 +1325,4 @@ window.BANCO = [
     ref: "CapturasInfo (quiz real P10)"
   }
 ];
+export default preguntas;
