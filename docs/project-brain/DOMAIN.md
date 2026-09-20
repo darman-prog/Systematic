@@ -57,13 +57,21 @@ Motor puro en `src/core/diagramas.js`; el lienzo y el modo de casos viven en `sr
 - Subtipos: `er` (no dirigido, cardinalidad `1:1`/`1:N`/`N:M`), `uml-clases` (dirigido:
   herencia/asociación/composición/agregación y asignación de miembros a clases), `casos-uso`
   (`asociación`/`include`/`extend`) y `actividades` (`transición` con guardas).
+- Los tipos y guardas se comparan **normalizados** (sin acentos ni mayúsculas): el contenido
+  puede escribir `composicion` y la UI ofrecer `composición`.
 - Estado serializable: nodos colocados y disponibles, miembros asignados y conexiones; los
-  `nodosFijos` no se pueden quitar. La clave canónica de una conexión es el par de extremos
-  (ordenado en ER) más el tipo (y la guarda si existe).
+  `nodosFijos` se colocan solos y **no** van en `nodosPool`. La clave canónica de una conexión
+  es el par de extremos (ordenado en ER) más el tipo normalizado (y la guarda si existe).
+- Cada miembro debe tener texto único en su pregunta: el estado se indexa por texto, así que
+  textos repetidos no se pueden asignar por separado (el validador lo rechaza).
+- Las opciones de guarda del lienzo salen de las guardas declaradas en la pregunta; si no hay,
+  se ofrecen `[sí]`/`[no]`/`[verdadero]`/`[falso]`.
 - Evaluación: conexiones correctas + miembros bien asignados − sobrantes; el tablero está `ok`
-  solo si no sobran, no faltan y no hay miembros mal asignados.
-- Rating de casos: `≥80%` éxito, `≥50%` parcial, resto fracaso; XP +60 éxito / +25 parcial y
-  logro "Arquitecto". El mejor rating por caso se guarda en `sys.casos-diagrama`.
+  solo si no sobran, no faltan y no hay miembros mal asignados. El detalle es legible por
+  nombre (faltan/sobran/con qué miembro) y es lo que ve el estudiante al comprobar.
+- Rating de casos: `≥80%` éxito, `≥50%` parcial, resto fracaso; un diagrama con elementos de
+  más no puede ser "éxito" (misma vara que el quiz). XP +60 éxito / +25 parcial y logro
+  "Arquitecto". El mejor rating por caso se guarda en `sys.casos-diagrama`.
 
 ## Materias
 

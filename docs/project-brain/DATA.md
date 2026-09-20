@@ -52,7 +52,10 @@ El contenido vive en `src/datos/<materia>/` y lo valida `npm run validar`
 - `desarrollo`: `solucion` más `claves[]` opcional.
 - `diagrama`: construcción en lienzo con `subtipo` (`er` | `uml-clases` | `casos-uso` |
   `actividades`), `nodosPool`, `relacionesEsperadas` (`[{ de, a, tipo, guarda? }]`) y
-  `miembrosPool`; `tiposArista` y `nodosFijos` son opcionales.
+  `miembrosPool`; `tiposArista` y `nodosFijos` son opcionales. Los `nodosFijos` no deben
+  repetirse en `nodosPool` (se verían duplicados en el pool) y los `miembrosPool` deben tener
+  `texto` único dentro de la pregunta. El `tipo` debe existir entre los tipos que ofrece el
+  lienzo para ese subtipo (el validador lo verifica, comparando sin acentos).
 
 Otras estructuras: `glosario` (`{ categorias, terminos, tips }`), `apuntes`
 (`{ id, tema, titulo, contenido, fuente }`), `escenarios`
