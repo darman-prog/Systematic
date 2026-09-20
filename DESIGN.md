@@ -65,6 +65,22 @@ de estudio conservan controles accesibles y los modos de juego no dependen de ho
 La profundidad viene de superficies tonales, bordes suaves y sombras difusas; no se usan halos
 neón ni sombras duras.
 
+## Motion
+
+El movimiento es un sistema, no efectos sueltos: tokens `--mov-rapida` (150ms), `--mov-base`
+(280ms), `--mov-enfasis` (460ms) y un único easing (`cubic-bezier(0.22, 1, 0.36, 1)`) definidos
+en `tokens.css`. Se admiten pocos momentos y siempre informativos:
+
+- Entrada de pantalla única (fade + 10px) al cambiar de pantalla o de pregunta.
+- Acierto: el bloque de feedback y la marca correcta hacen un `pop` breve; el fallo usa `shake`.
+- Marcar una pregunta: la estrella hace un `pop`.
+- Resultados: el anillo se dibuja de 0 al porcentaje final.
+- Perfil: el contador de XP sube con easing; no anima si el usuario pidió menos movimiento.
+- Avisos: el toast entra desde la derecha y se desvanece.
+
+Con `prefers-reduced-motion: reduce` todas las animaciones y transiciones quedan neutralizadas por
+la regla global de `tokens.css`. Ninguna animación es obligatoria para entender un estado.
+
 ## Shapes
 
 Cards y controles usan radios de 8-16px, foco visible y objetivos táctiles de al menos 44px.

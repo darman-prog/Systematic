@@ -20,7 +20,7 @@ No cargues el cerebro completo: leé este índice y solo los documentos que nece
 | [TESTING.md](TESTING.md) | Estrategia y suites de tests | Al agregar tests o antes de cerrar un cambio | vigente |
 | [OPERATIONS.md](OPERATIONS.md) | Build, deploy en Vercel y rollback | Antes de publicar o revertir | vigente |
 | [PRODUCT.md](../../PRODUCT.md) | Problema, usuarios y principios de producto | Al decidir alcance o prioridades | vigente |
-| [DESIGN.md](../../DESIGN.md) | Dirección visual "Noche calma", tokens y accesibilidad | Al tocar UI visible | vigente |
+| [DESIGN.md](../../DESIGN.md) | Dirección visual "Noche calma", tokens, movimiento y accesibilidad | Al tocar UI visible | vigente |
 
 ## Decisiones y planes
 

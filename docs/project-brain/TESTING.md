@@ -21,7 +21,8 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
 
 - `src/core/progreso.test.js`, `sesiones.test.js`, `gamificacion.test.js`, `escenarios.test.js`, `diagramas.test.js`.
 - `src/student/persistencia.test.js`, `gamificacion.test.js`, `registros.test.js`.
-- `src/ui/misiones.test.js`, `apuntes.test.js`, `iconos.test.js`.
+- `src/ui/pantallas/misiones.test.js`, `apuntes.test.js`; `src/ui/iconos.test.js` y
+  `src/ui/componentes/estados.test.js`, `componentes.test.js`.
 - `scripts/validador.test.js`.
 - `e2e/smoke.spec.js` (incluye recorrido de teclado del lienzo de diagramas).
 
