@@ -18,8 +18,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
   const keywords = () => sqlKeywordsDe(ctx.materia);
   const diagramas = crearDiagramasUI({
     ctx,
-    guardarEstado: () => {},
-    alComprobar: () => comprobarDiagrama()
+    guardarEstado: () => {}
   });
 
   function renderQuestion() {
@@ -718,7 +717,6 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     pintarVidas,
     expirarPregunta,
     comprobarDiagrama,
-    elegirDiagramaTipo: tipo => diagramas.elegirTipo(tipo),
     cancelarDiagramaTipo: () => diagramas.cancelarSeleccion()
   };
 }

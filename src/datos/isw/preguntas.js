@@ -256,7 +256,7 @@ const preguntas = [
     dificultad: "media",
     tipo: "diagrama",
     subtipo: "casos-uso",
-    q: "Modela el sistema ERP de Naibe: los actores (Gerente Proyecto Interno, Analista Negocios, Usuario Financiero) y sus casos de uso principales. El Gerente coordina el proyecto, el Analista hace blueprinting, y el Usuario Financiero participa en la migración de datos.",
+    q: "Modela el sistema ERP de Naibe: los actores (Gerente Proyecto, Analista Negocios, Usuario Financiero) y sus casos de uso principales. El Gerente coordina el proyecto, el Analista hace blueprinting, y el Usuario Financiero participa en la migración de datos.",
     nodosPool: ["Gerente Proyecto", "Analista Negocios", "Usuario Financiero", "Coordinar Proyecto", "Blueprinting", "Migrar Datos"],
     relacionesEsperadas: [
       { de: "Gerente Proyecto", a: "Coordinar Proyecto", tipo: "asociacion" },

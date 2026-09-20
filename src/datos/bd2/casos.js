@@ -5,7 +5,7 @@ const casos = [
     id: "CASO-BD2-01",
     titulo: "Sistema de reservas de hotel",
     tema: "Modelado",
-    caso: "Un hotel necesita un sistema para gestionar reservas. Los huéspedes se registran con sus datos personales. Cada habitación tiene un número, tipo (sindividual/doble/suite) y precio por noche. Una reserva vincula un huésped con una o más habitaciones para un período específico (fecha entrada, fecha salida).",
+    caso: "Un hotel necesita un sistema para gestionar reservas. Los huéspedes se registran con sus datos personales. Cada habitación tiene un número, tipo (individual/doble/suite) y precio por noche. Una reserva vincula un huésped con una o más habitaciones para un período específico (fecha entrada, fecha salida).",
     diagrama: {
       subtipo: "er",
       nodosPool: ["Huesped", "Habitacion", "Reserva"],

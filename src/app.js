@@ -966,7 +966,6 @@ const ACCIONES = {
   comprobarCaso: () => comprobarCaso(),
   cancelarDiagramaTipoCaso: () => diagramasUI.cancelarSeleccion(),
   comprobarDiagrama: () => quiz.comprobarDiagrama(),
-  elegirDiagramaTipo: el => quiz.elegirDiagramaTipo(el.dataset.arista),
   cancelarDiagramaTipo: () => quiz.cancelarDiagramaTipo(),
   startFlashcards: () => flashcards.startFlashcards(),
   startGlosario: () => glosarioUI.startGlosario(),

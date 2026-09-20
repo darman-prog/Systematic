@@ -1,7 +1,7 @@
 // Lógica pura del constructor de diagramas (spec 003, H6a ER + H6b subtipos).
-// El lienzo vive en src/ui/diagramas.js; aquí solo hay estado, validación y puntuación
-// serializables, sin DOM. Las conexiones son dirigidas {de → a, tipo} salvo ER y los
-// tipos declarados en tiposNoDirigidos, que comparan el par sin orden.
+// El lienzo vive en src/ui/componentes/diagramas.js; aquí solo hay estado, validación y
+// puntuación serializables, sin DOM. Las conexiones son dirigidas {de → a, tipo} salvo ER
+// y los tipos declarados en tiposNoDirigidos, que comparan el par sin orden.
 
 export const SUBTIPOS = ["er", "uml-clases", "casos-uso", "actividades"];
 
@@ -81,12 +81,7 @@ export function crearTablero(pregunta) {
     miembros: {},
     conexiones: [],
     posiciones: {},
-    ultimoCambio: null,
-    accesibilidad: {
-      totalNodos: nodos.length + (Array.isArray(pregunta.nodosPool) ? pregunta.nodosPool.length : 0),
-      totalMiembros: Array.isArray(pregunta.miembrosPool) ? pregunta.miembrosPool.length : 0,
-      subtipo: pregunta.subtipo || "er"
-    }
+    ultimoCambio: null
   };
   nodos.forEach((nombre, index) => {
     estado.posiciones[nombre] = calcularPosicionInicial(index, nodos.length);
