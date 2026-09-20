@@ -1,10 +1,9 @@
 import { MATERIAS, getMateria } from "./core/materias.js";
 import {
-  claves, migrarClavesLegacy, leerJSON, escribirJSON, obtenerEntrada,
-  aplicarRespuesta, esDebil, vencida, metaDiaria, hoyISO, calcularRacha
+  obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/progreso.js";
 import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
-import { XP_EVENTOS, xpDeRespuesta, progresoDeNivel, evaluarLogros, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
+import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/quiz.js";
@@ -20,6 +19,9 @@ import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/diagramas.
 import { crearDiagramasUI } from "./ui/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/casos.js";
 import { icono } from "./ui/iconos.js";
+import { crearPersistencia } from "./student/persistencia.js";
+import { crearGamificacion } from "./student/gamificacion.js";
+import { fusionarMejor, fusionarMision } from "./student/registros.js";
 
 // Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
 function pintarIconos(raiz) {
@@ -33,7 +35,6 @@ pintarIconos();
 let materia = null;
 let banco = [];
 let glosario = { categorias: [], terminos: [], tips: [] };
-let clavesMateria = null;
 
 let progreso = {};
 let session = null;
@@ -43,6 +44,20 @@ let escenarioActual = null;
 let escenarioEstado = null;
 
 const $ = id => document.getElementById(id);
+
+// Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
+// dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
+const persistencia = crearPersistencia(localStorage);
+const gamificacion = crearGamificacion({
+  persistencia,
+  materias: MATERIAS,
+  alSubirNivel: nivel => {
+    toast(icono("nivel", "icono-sm") + " ¡Nivel " + nivel + " alcanzado!");
+    confeti();
+  },
+  alLogro: l => toast(icono(l.icono, "icono-sm") + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)"),
+  alCambiarPerfil: () => renderPerfil()
+});
 
 // Estado explícito que se inyecta a los módulos de src/ui/ (lectura vía getters,
 // porque estas variables se reasignan al cambiar de materia o de sesión).
@@ -62,11 +77,11 @@ function show(screen) {
 }
 
 function cargarProgreso() {
-  return leerJSON(localStorage, clavesMateria.progreso, {});
+  return persistencia.progreso(materia.id);
 }
 
 function guardarProgreso() {
-  escribirJSON(localStorage, clavesMateria.progreso, progreso);
+  persistencia.guardarProgreso(materia.id, progreso);
 }
 
 function obtenerP(id) {
@@ -77,22 +92,22 @@ function obtenerP(id) {
 const priorizar = lista => ordenarPrioridad(lista, obtenerP);
 
 function cargarActividad() {
-  return leerJSON(localStorage, clavesMateria.actividad, {});
+  return persistencia.actividad(materia.id);
 }
 
 function registrarActividad() {
   const a = cargarActividad();
   const h = hoyISO();
   a[h] = (a[h] || 0) + 1;
-  escribirJSON(localStorage, clavesMateria.actividad, a);
+  persistencia.guardarActividad(materia.id, a);
 }
 
 function cargarMeta() {
-  return metaDiaria(leerJSON(localStorage, clavesMateria.meta, 20));
+  return persistencia.meta(materia.id);
 }
 
 function cambiarMeta(valor) {
-  escribirJSON(localStorage, clavesMateria.meta, metaDiaria(valor));
+  persistencia.guardarMeta(materia.id, valor);
   renderStats();
 }
 
@@ -117,10 +132,10 @@ function registrarRespuesta(id, ok) {
       quiz.pintarVidas();
     }
   }
-  if (ganado) sumarXp(ganado);
+  if (ganado) gamificacion.sumarXp(ganado);
   const metaCumplida = (cargarActividad()[hoyISO()] || 0) >= cargarMeta();
-  if (metaCumplida) xpEventoUnico("meta-" + hoyISO(), XP_EVENTOS.metaDiaria);
-  revisarLogros({ metaCumplida });
+  if (metaCumplida) gamificacion.xpEventoUnico("meta-" + hoyISO(), XP_EVENTOS.metaDiaria);
+  gamificacion.revisarLogros({ metaCumplida });
 }
 
 function toggleMarked(id) {
@@ -131,11 +146,11 @@ function toggleMarked(id) {
 }
 
 function cargarHistorial() {
-  return leerJSON(localStorage, clavesMateria.historial, []);
+  return persistencia.historial(materia.id);
 }
 
 function clearHistory() {
-  try { localStorage.removeItem(clavesMateria.historial); } catch (e) { /* sin persistencia */ }
+  persistencia.borrarHistorial(materia.id);
   renderHistory();
   renderStats();
 }
@@ -143,10 +158,7 @@ function clearHistory() {
 function resetProgreso() {
   if (!confirm("¿Borrar todo el progreso (aciertos, fallos, marcas y racha)?")) return;
   progreso = {};
-  try {
-    localStorage.removeItem(clavesMateria.progreso);
-    localStorage.removeItem(clavesMateria.actividad);
-  } catch (e) { /* sin persistencia */ }
+  persistencia.borrarProgresoYActividad(materia.id);
   renderStats();
   renderHistory();
 }
@@ -187,10 +199,10 @@ function importarDatos(input) {
           !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + materia.nombre + "»?")) return;
       if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
       progreso = datos.progreso || {};
-      escribirJSON(localStorage, clavesMateria.progreso, progreso);
-      if (datos.historial) escribirJSON(localStorage, clavesMateria.historial, datos.historial);
-      if (datos.actividad) escribirJSON(localStorage, clavesMateria.actividad, datos.actividad);
-      if (datos.meta) escribirJSON(localStorage, clavesMateria.meta, metaDiaria(datos.meta));
+      persistencia.guardarProgreso(materia.id, progreso);
+      if (datos.historial) persistencia.guardarHistorial(materia.id, datos.historial);
+      if (datos.actividad) persistencia.guardarActividad(materia.id, datos.actividad);
+      if (datos.meta) persistencia.guardarMeta(materia.id, datos.meta);
       goHome();
       alert("Progreso importado correctamente.");
     } catch (e) {
@@ -202,99 +214,20 @@ function importarDatos(input) {
   lector.readAsText(archivo);
 }
 
-// ===== Gamificación (spec 003): XP, niveles, logros, perfil y avisos =====
-// La lógica pura vive en core/gamificacion.js; aquí solo orquestación y persistencia.
-
-function xpActual() {
-  return leerJSON(localStorage, "sys.xp", 0);
-}
-
-function sumarXp(cantidad) {
-  if (!cantidad) return;
-  const antes = progresoDeNivel(xpActual());
-  const nuevo = xpActual() + cantidad;
-  escribirJSON(localStorage, "sys.xp", nuevo);
-  const despues = progresoDeNivel(nuevo);
-  if (despues.nivel > antes.nivel) {
-    toast(icono("nivel", "icono-sm") + " ¡Nivel " + despues.nivel + " alcanzado!");
-    confeti();
-  }
-  renderPerfil();
-}
-
-// Recompensas de una sola ocurrencia (p. ej. meta diaria por fecha).
-function xpEventoUnico(clave, cantidad) {
-  const eventos = leerJSON(localStorage, "sys.xp-eventos", {});
-  if (eventos[clave]) return;
-  eventos[clave] = true;
-  escribirJSON(localStorage, "sys.xp-eventos", eventos);
-  sumarXp(cantidad);
-}
-
-function statsGlobales() {
-  let ok = 0;
-  let total = 0;
-  MATERIAS.forEach(m => {
-    const p = leerJSON(localStorage, claves(m.id).progreso, {});
-    Object.keys(p).forEach(idP => {
-      ok += p[idP].ok;
-      total += p[idP].ok + p[idP].fail;
-    });
-  });
-  return { respuestas: total, precision: total ? Math.round((ok / total) * 100) : 0 };
-}
-
-// Racha global: mezcla la actividad de todas las materias tomando el máximo por día.
-function actividadGlobal() {
-  const merged = {};
-  MATERIAS.forEach(m => {
-    const a = leerJSON(localStorage, claves(m.id).actividad, {});
-    Object.keys(a).forEach(d => { merged[d] = Math.max(merged[d] || 0, a[d]); });
-  });
-  return merged;
-}
-
-function revisarLogros(extra) {
-  const actuales = leerJSON(localStorage, "sys.logros", {});
-  const s = statsGlobales();
-  const ctx = Object.assign(
-    {
-      racha: calcularRacha(actividadGlobal()),
-      respuestas: s.respuestas,
-      precision: s.precision,
-      simulacroPerfecto: false,
-      metaCumplida: false,
-      misionPerfecta: false,
-      estrellasTotales: 0,
-      escenarioExito: false,
-      casoExito: false
-    },
-    extra || {}
-  );
-  const nuevos = evaluarLogros(actuales, ctx);
-  if (!nuevos.length) return;
-  nuevos.forEach(l => {
-    actuales[l.id] = l.fecha;
-    toast(icono(l.icono, "icono-sm") + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)");
-  });
-  escribirJSON(localStorage, "sys.logros", actuales);
-  sumarXp(nuevos.length * XP_EVENTOS.logro);
-}
+// ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
+// Aquí solo queda la presentación: perfil, toasts y confeti.
 
 function renderPerfil() {
   const cont = $("perfil-panel");
   if (!cont) return;
-  const xp = xpActual();
-  const p = progresoDeNivel(xp);
-  const racha = calcularRacha(actividadGlobal());
-  const insignias = Object.keys(leerJSON(localStorage, "sys.logros", {})).length;
+  const p = gamificacion.perfil();
   cont.innerHTML =
     '<div class="perfil-card">' +
       '<div class="perfil-nivel"><span class="perfil-num">' + p.nivel + '</span><span class="perfil-etq">nivel</span></div>' +
       '<div class="perfil-datos">' +
-        '<div class="text-sm"><b>' + xp + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
+        '<div class="text-sm"><b>' + p.xp + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
         '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
-        '<div class="perfil-mini">Racha: ' + racha + ' día(s) · ' + insignias + ' logro(s) desbloqueado(s)</div>' +
+        '<div class="perfil-mini">Racha: ' + p.racha + ' día(s) · ' + p.insignias + ' logro(s) desbloqueado(s)</div>' +
       '</div>' +
     '</div>';
 }
@@ -546,14 +479,7 @@ function startSupervivencia() {
 // ===== Misiones por tema (spec 003): mapa secuencial con estrellas =====
 
 function misionesDeMateria() {
-  return materia ? leerJSON(localStorage, "sys.misiones." + materia.id, {}) : {};
-}
-
-function estrellasTotales() {
-  return MATERIAS.reduce((acc, m) => {
-    const mapa = leerJSON(localStorage, "sys.misiones." + m.id, {});
-    return acc + Object.keys(mapa).reduce((s, t) => s + (mapa[t].estrellas || 0), 0);
-  }, 0);
+  return materia ? persistencia.misiones(materia.id) : {};
 }
 
 function irMisiones() {
@@ -580,7 +506,7 @@ function iniciarMision(tema) {
 
 function startEscenarios() {
   show("escenarios");
-  pintarListaEscenarios((materia && materia.escenarios) || [], leerJSON(localStorage, "sys.escenarios", {}));
+  pintarListaEscenarios((materia && materia.escenarios) || [], persistencia.escenarios());
 }
 
 function jugarEscenario(id) {
@@ -605,18 +531,11 @@ function continuarEscenario() {
   pintarEscenario(escenarioActual, escenarioEstado);
   if (!escenarioEstado.terminado) return;
   const xp = xpDeEscenario(escenarioEstado);
-  if (xp) sumarXp(xp);
-  const registros = leerJSON(localStorage, "sys.escenarios", {});
-  const previo = registros[escenarioActual.id];
-  const orden = { fracaso: 0, parcial: 1, exito: 2 };
-  const jugadas = ((previo && previo.jugadas) || 0) + 1;
-  if (!previo || orden[escenarioEstado.rating] > orden[previo.mejorRating]) {
-    registros[escenarioActual.id] = { mejorRating: escenarioEstado.rating, jugadas };
-  } else {
-    registros[escenarioActual.id] = { mejorRating: previo.mejorRating, jugadas };
-  }
-  escribirJSON(localStorage, "sys.escenarios", registros);
-  revisarLogros({ escenarioExito: escenarioEstado.rating === "exito" });
+  if (xp) gamificacion.sumarXp(xp);
+  const registros = persistencia.escenarios();
+  registros[escenarioActual.id] = fusionarMejor(registros[escenarioActual.id], escenarioEstado.rating);
+  persistencia.guardarEscenarios(registros);
+  gamificacion.revisarLogros({ escenarioExito: escenarioEstado.rating === "exito" });
 }
 
 // ===== Casos de diagramación (spec 003, H6c) =====
@@ -627,8 +546,7 @@ let casoEstado = null;
 function startCasos() {
   show("casos");
   const casos = (materia && materia.casos) || [];
-  const registros = leerJSON(localStorage, "sys.casos-diagrama", {});
-  pintarListaCasos(casos, registros);
+  pintarListaCasos(casos, persistencia.casos());
 }
 
 function jugarCaso(id) {
@@ -653,21 +571,14 @@ function comprobarCaso() {
   const resultado = { rating, detalle: res };
   
   // Guardar resultado
-  const registros = leerJSON(localStorage, "sys.casos-diagrama", {});
-  const previo = registros[casoActual.id];
-  const orden = { fracaso: 0, parcial: 1, exito: 2 };
-  const jugadas = ((previo && previo.jugadas) || 0) + 1;
-  if (!previo || orden[rating] > orden[previo.mejorRating]) {
-    registros[casoActual.id] = { mejorRating: rating, jugadas };
-  } else {
-    registros[casoActual.id] = { mejorRating: previo.mejorRating, jugadas };
-  }
-  escribirJSON(localStorage, "sys.casos-diagrama", registros);
+  const registros = persistencia.casos();
+  registros[casoActual.id] = fusionarMejor(registros[casoActual.id], rating);
+  persistencia.guardarCasos(registros);
   
   // XP y logros
   const xp = rating === "exito" ? 60 : rating === "parcial" ? 25 : 0;
-  if (xp) sumarXp(xp);
-  if (rating === "exito") revisarLogros({ casoExito: true });
+  if (xp) gamificacion.sumarXp(xp);
+  if (rating === "exito") gamificacion.revisarLogros({ casoExito: true });
   
   pintarCaso(casoActual, casoEstado, resultado);
 }
@@ -836,17 +747,17 @@ function finalizar() {
   }
   if (session.modo === "mision" && session.misionTema) {
     const mapa = misionesDeMateria();
-    const previa = mapa[session.misionTema] || { estrellas: 0, mejorPct: 0 };
     const nuevas = estrellasDeMision(pct);
-    if (nuevas > previa.estrellas || pct > previa.mejorPct) {
-      mapa[session.misionTema] = { estrellas: Math.max(previa.estrellas, nuevas), mejorPct: Math.max(previa.mejorPct, pct) };
-      escribirJSON(localStorage, "sys.misiones." + materia.id, mapa);
-      if (nuevas > previa.estrellas) sumarXp((nuevas - previa.estrellas) * XP_EVENTOS.estrella);
+    const merge = fusionarMision(mapa[session.misionTema], pct, nuevas);
+    if (merge.cambio) {
+      mapa[session.misionTema] = merge.registro;
+      persistencia.guardarMisiones(materia.id, mapa);
+      if (merge.mejoraEstrellas) gamificacion.sumarXp(merge.estrellasGanadas * XP_EVENTOS.estrella);
     }
-    revisarLogros({ misionPerfecta: nuevas === 3, estrellasTotales: estrellasTotales() });
+    gamificacion.revisarLogros({ misionPerfecta: nuevas === 3, estrellasTotales: gamificacion.estrellasTotales() });
   }
   guardarIntento(aciertos, totalCal, session.modo);
-  revisarLogros({
+  gamificacion.revisarLogros({
     simulacroPerfecto: totalCal > 0 && pct === 100 && (session.modo === "simulacro" || session.modo === "repaso")
   });
   resultados.pintarResultados(false);
@@ -866,7 +777,7 @@ function repetirMisma() {
 function guardarIntento(score, total, modo) {
   const historial = cargarHistorial();
   historial.unshift({ date: Date.now(), score, total, modo: modo || "practica" });
-  escribirJSON(localStorage, clavesMateria.historial, historial.slice(0, 15));
+  persistencia.guardarHistorial(materia.id, historial);
 }
 
 // Wrappers que inyectan los datos persistidos al módulo de estadísticas.
@@ -919,8 +830,7 @@ function seleccionarMateria(id) {
   materia = m;
   banco = m.preguntas;
   glosario = m.glosario;
-  clavesMateria = claves(m.id);
-  migrarClavesLegacy(localStorage, m.id);
+  persistencia.migrarLegacy(m.id);
   progreso = cargarProgreso();
   inicializarFiltros();
   renderConfig();
@@ -1049,7 +959,7 @@ document.addEventListener("visibilitychange", () => {
 
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
 // namespace al arrancar, antes de que el usuario seleccione materia.
-migrarClavesLegacy(localStorage, "bd2");
+persistencia.migrarLegacy("bd2");
 renderMaterias();
 renderPerfil();
 show("materias");
