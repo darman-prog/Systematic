@@ -120,3 +120,55 @@
 .btn-guarda:hover { background: var(--study-surface-3); border-color: var(--study-accent); }
 .btn-cancelar { background: transparent; color: var(--study-muted); border: 1px solid var(--study-border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; width: 100%; }
 .btn-cancelar:hover { background: var(--study-surface-2); }
+
+
+/* Overrides del lienzo. Van después de la zona congelada para ganarle en cascada.
+   Al descongelar (spec 006) mover este bloque junto con la zona a estilos/lienzo.css. */
+#lienzo-diagrama { touch-action: manipulation; }
+.nodo-puesto, .etiqueta-arista { touch-action: none; }
+#pool-diagrama .pieza, #pool-miembros .pieza { touch-action: none; }
+
+@media (max-width: 640px) {
+  #lienzo-diagrama {
+    min-height: 340px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nodo-puesto {
+    min-width: 96px;
+    min-height: 48px;
+    padding: 10px 40px 10px 12px;
+    font-size: 14px;
+  }
+  .nodo-quitar {
+    width: 32px;
+    height: 32px;
+    top: 6px;
+    right: 6px;
+  }
+  .pieza {
+    min-height: 44px;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .etiqueta-arista {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 8px 20px 8px 10px;
+  }
+  #tipos-diagrama {
+    position: sticky;
+    bottom: 0;
+    padding: 8px 0;
+    z-index: 20;
+    background: var(--study-bg, #0b1220);
+  }
+}
+
+.nodo-objetivo {
+  outline: 2px dashed rgba(155, 184, 201, .6);
+  outline-offset: 2px;
+}
+
+#lienzo-diagrama { overscroll-behavior: contain; }
+body.drag-activo { overflow: hidden; }

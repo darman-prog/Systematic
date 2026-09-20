@@ -95,3 +95,5 @@ input, textarea { caret-color: var(--study-accent); }
 .mision-bloqueada { @apply opacity-50; }
 .mision-num { @apply flex-none w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm; background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-accent); }
 .mision-estrellas { @apply text-lg font-bold whitespace-nowrap; color: var(--study-warning); }
+
+
