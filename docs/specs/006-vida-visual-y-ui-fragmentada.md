@@ -58,11 +58,19 @@ mueven ni se editan. Tampoco se anima el lienzo.
   computados (tokens sobre utilidades).
 - Motion → slop: tokens + momentos acotados + detector Impeccable; nada obligatorio.
 
-## Pendientes (al descongelar diagramas)
-- Mover `ui/casos.js` y `ui/diagramas.js` a su ubicación definitiva.
-- Adoptar `componentes/estados.js` y `tarjetas.js` en `casos.js`.
-- Extraer `componentes/etiquetas.js` (mapa `RATINGS` duplicado en escenarios y casos).
-- Extraer `estilos/lienzo.css` del bloque congelado de `entrada.css`.
+## Pendientes (al descongelar diagramas) — EJECUTADOS
+
+Al descongelarse la zona (el usuario cerró su trabajo del motor y el lienzo), se ejecutaron:
+
+- `ui/diagramas.js` movido a `ui/componentes/diagramas.js` (lienzo compartido por quiz y casos).
+- `ui/casos.js` movido a `ui/pantallas/casos.js`.
+- `casos.js` adopta `componentes/estados.js`, `tarjetas.js` y `etiquetas.js` (nuevo módulo que
+  centraliza el mapa `RATINGS` y el render de la etiqueta, antes duplicado con escenarios).
+- `estilos/lienzo.css` extraído de `entrada.css` (incluye los overrides móviles del usuario).
+
+Además, al cerrar su trabajo el usuario dejó la suite del motor pegada en `apuntes.test.js`; se
+reubicó en `core/diagramas.test.js` (donde resuelve `./diagramas.js`), se restauraron los tests de
+apuntes y se corrigió una expectativa (`miembrosMal` cuenta también los miembros sin asignar).
 
 ## Trazabilidad
 - `refactor: agrupar las pantallas de ui en src/ui/pantallas` (`206edca`).
