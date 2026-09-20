@@ -1,6 +1,7 @@
 // Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
 import { escapar } from "./helpers.js";
+import { resumenDiagrama } from "../core/diagramas.js";
 
 const $ = id => document.getElementById(id);
 
@@ -37,18 +38,15 @@ export function pintarCaso(caso, estado, resultado) {
   if (resultado) {
     const r = RATINGS[resultado.rating] || RATINGS.parcial;
     const finalTexto = resultado.rating === "exito" ? caso.finales.exito : resultado.rating === "parcial" ? caso.finales.parcial : caso.finales.fracaso;
+    const resumen = resultado.detalle ? resumenDiagrama(resultado.detalle) : [];
     cont.innerHTML =
       '<div class="text-center mb-5">' +
         '<span class="tag ' + r.clase + '">' + r.texto + '</span>' +
         '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
         '<p class="text-xs text-slate-400 mt-1">XP ganada por elementos correctos incluida</p>' +
       '</div>' +
-      (resultado.detalle ? '<div class="text-sm text-slate-300 mb-4">' +
-        '<b>Detalle:</b> ' + resultado.detalle.correctas + ' correctas · ' +
-        resultado.detalle.faltantes + ' faltantes · ' +
-        resultado.detalle.sobrantes + ' sobrantes' +
-        (resultado.detalle.miembrosOk !== undefined ? ' · ' + resultado.detalle.miembrosOk + ' miembros correctos' : '') +
-      '</div>' : '') +
+      (resumen.length ? '<ul class="text-sm text-slate-300 mb-4 list-disc list-inside">' +
+        resumen.map(l => "<li>" + escapar(l) + "</li>").join("") + '</ul>' : '') +
       '<div class="apunte-card mb-4">' +
         '<div class="apunte-tema">Explicación</div>' +
         '<div class="text-sm text-slate-300">' + caso.diagrama.exp + '</div>' +

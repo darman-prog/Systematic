@@ -160,7 +160,19 @@ export function crearDiagramasUI({
       if (!lienzo) return;
       const r = lienzo.getBoundingClientRect();
       if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) {
-        if (!esMiembro) colocarNodoUI(etiqueta, ev.clientX - r.left - 52, ev.clientY - r.top - 18);
+        if (esMiembro) {
+          const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
+          const nodo = bajo && bajo.closest(".nodo-puesto");
+          if (nodo) {
+            guardar(asignarMiembro(estado(), etiqueta, nodo.dataset.label));
+            renderDiagrama(itemActual(), zona());
+            setHint("«" + etiqueta + "» asignado a «" + nodo.dataset.label + "».");
+          } else {
+            setHint("Suelta el miembro sobre una clase para asignarlo (o tócalo y luego toca la clase).");
+          }
+        } else {
+          colocarNodoUI(etiqueta, ev.clientX - r.left - 52, ev.clientY - r.top - 18);
+        }
       }
     };
     window.addEventListener("pointermove", mover);
@@ -310,23 +322,27 @@ export function crearDiagramasUI({
     }
   }
 
+  function guardasDe(item) {
+    const declaradas = (item.relacionesEsperadas || [])
+      .map(r => r && r.guarda)
+      .filter(g => typeof g === "string" && g.trim().length);
+    const unicas = [...new Set(declaradas)];
+    return unicas.length ? unicas : ["[sí]", "[no]", "[verdadero]", "[falso]"];
+  }
+
   function mostrarSelectorGuarda(de, a, tipo, dirigido, item) {
     const modal = document.createElement("div");
     modal.className = "modal-guarda";
-    modal.innerHTML = `
-      <div class="modal-guarda-contenido">
-        <h3>Seleccionar guarda</h3>
-        <p>Elige la condición para esta transición:</p>
-        <div class="guardas-opciones">
-          <button class="btn-guarda" data-guarda="">Sin guarda</button>
-          <button class="btn-guarda" data-guarda="[sí]">[sí]</button>
-          <button class="btn-guarda" data-guarda="[no]">[no]</button>
-          <button class="btn-guarda" data-guarda="[verdadero]">[verdadero]</button>
-          <button class="btn-guarda" data-guarda="[falso]">[falso]</button>
-        </div>
-        <button class="btn-cancelar" id="cancelar-guarda">Cancelar</button>
-      </div>
-    `;
+    modal.innerHTML =
+      '<div class="modal-guarda-contenido">' +
+        "<h3>Seleccionar guarda</h3>" +
+        "<p>Elige la condición para esta transición:</p>" +
+        '<div class="guardas-opciones">' +
+          '<button class="btn-guarda" data-guarda="">Sin guarda</button>' +
+          guardasDe(item).map(g => '<button class="btn-guarda" data-guarda="' + escapar(g) + '">' + escapar(g) + "</button>").join("") +
+        "</div>" +
+        '<button class="btn-cancelar" id="cancelar-guarda">Cancelar</button>' +
+      "</div>";
     document.body.appendChild(modal);
     
     modal.querySelectorAll(".btn-guarda").forEach(btn => {

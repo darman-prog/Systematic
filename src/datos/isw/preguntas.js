@@ -273,7 +273,7 @@ const preguntas = [
     tipo: "diagrama",
     subtipo: "actividades",
     q: "Modela el flujo del cutover del proyecto ERP: inicio → preparar migración → ¿datos validados? → si sí: ejecutar cutover → fin exitoso; si no: revertir cambios → fin fallido.",
-    nodosPool: ["inicio", "preparar migración", "¿datos validados?", "ejecutar cutover", "revertir cambios", "fin exitoso", "fin fallido"],
+    nodosPool: ["preparar migración", "¿datos validados?", "ejecutar cutover", "revertir cambios"],
     nodosFijos: ["inicio", "fin exitoso", "fin fallido"],
     relacionesEsperadas: [
       { de: "inicio", a: "preparar migración", tipo: "transicion" },

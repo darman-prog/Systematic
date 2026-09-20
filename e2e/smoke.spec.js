@@ -179,6 +179,11 @@ test.describe('Systematic — smoke', () => {
       await page.locator('#lienzo-diagrama .nodo-puesto').first().click();
       await expect(page.locator('#lienzo-diagrama .nodo-miembros')).toBeVisible();
     }
+    // Comprueba: no debe romper y debe mostrar detalle legible (nombres, no "[object Object]").
+    await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(page.locator('#feedback-box')).toBeVisible();
+    await expect(page.locator('#feedback-box')).not.toContainText('[object Object]');
+    await expect(page.locator('#next-btn')).toBeVisible();
   });
 
   test('casos de diagramación: lista y juego', async ({ page }) => {

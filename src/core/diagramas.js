@@ -12,10 +12,26 @@ export const CONFIG_SUBTIPO = {
   "actividades": { dirigido: true, tiposArista: ["transición"] }
 };
 
+// Normaliza un tipo o guarda para comparar sin depender de acentos ni mayúsculas: el
+// contenido puede escribir "composicion"/"transicion" y la UI ofrecer "composición"/"transición".
+export function normalizarClave(texto) {
+  return String(texto == null ? "" : texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
 // Clave canónica de una conexión (guarda/no-guarda viajan dentro de `tipo`).
 export function claveArista(de, a, tipo, dirigido) {
   const extremos = dirigido ? [de, a] : [de, a].slice().sort();
-  return extremos.join("|") + "|" + tipo;
+  return extremos.join("|") + "|" + normalizarClave(tipo);
+}
+
+function claveDe(rel, dirigido) {
+  let clave = claveArista(rel.de, rel.a, rel.tipo, dirigido);
+  if (rel.guarda) clave += "|" + normalizarClave(rel.guarda);
+  return clave;
 }
 
 // Estado inicial serializable: nodos y miembros ya colocados, conexiones vacías.
@@ -74,11 +90,8 @@ export function conectar(estado, de, a, tipo, dirigido, guarda) {
   if (!dirigido && de === a) return estado;
   const nueva = { de, a, tipo };
   if (guarda) nueva.guarda = guarda;
-  const clave = claveArista(de, a, tipo, dirigido) + (guarda ? "|" + guarda : "");
-  const repetida = estado.conexiones.some(c => {
-    const cClave = claveArista(c.de, c.a, c.tipo, dirigido) + (c.guarda ? "|" + c.guarda : "");
-    return cClave === clave;
-  });
+  const clave = claveDe(nueva, dirigido);
+  const repetida = estado.conexiones.some(c => claveDe(c, dirigido) === clave);
   if (repetida) return estado;
   return Object.assign({}, estado, { conexiones: estado.conexiones.concat([nueva]) });
 }
@@ -96,38 +109,63 @@ function relacionesDe(pregunta) {
 }
 
 // Puntuación: conexiones correctas + miembros bien asignados - sobrantes.
+// Devuelve conteos y `detalle` con texto legible (nombres) para el feedback.
 export function evaluarDiagrama(pregunta, estado) {
   const dirigido = esDirigido(pregunta.subtipo);
-  const esperadas = new Set(relacionesDe(pregunta).map(r => {
-    let clave = claveArista(r.de, r.a, r.tipo, dirigido);
-    if (r.guarda) clave += "|" + r.guarda;
-    return clave;
-  }));
-  const actuales = new Set(estado.conexiones.map(c => {
-    let clave = claveArista(c.de, c.a, c.tipo, dirigido);
-    if (c.guarda) clave += "|" + c.guarda;
-    return clave;
-  }));
-  const correctas = [...actuales].filter(k => esperadas.has(k));
-  const sobrantes = [...actuales].filter(k => !esperadas.has(k));
-  const faltantes = [...esperadas].filter(k => !actuales.has(k));
+  const esperadas = new Map();
+  relacionesDe(pregunta).forEach(r => {
+    if (r && r.de && r.a && r.tipo) esperadas.set(claveDe(r, dirigido), r);
+  });
+  const actuales = new Map();
+  (estado.conexiones || []).forEach(c => actuales.set(claveDe(c, dirigido), c));
+
+  const faltantesRel = [...esperadas].filter(([k]) => !actuales.has(k)).map(([, r]) => r);
+  const sobrantesRel = [...actuales].filter(([k]) => !esperadas.has(k)).map(([, c]) => c);
+  const correctas = [...actuales.keys()].filter(k => esperadas.has(k)).length;
+
   let miembrosOk = 0;
-  let miembrosMal = 0;
+  const miembrosOkDetalle = [];
+  const miembrosMalDetalle = [];
   if (Array.isArray(pregunta.miembrosPool)) {
     pregunta.miembrosPool.forEach(m => {
-      if (estado.miembros[m.texto] === m.de) miembrosOk++;
-      else miembrosMal++;
+      if (estado.miembros[m.texto] === m.de) {
+        miembrosOk++;
+        miembrosOkDetalle.push(m);
+      } else {
+        miembrosMalDetalle.push(m);
+      }
     });
   }
+  const miembrosMal = miembrosMalDetalle.length;
   const totalEsperado = esperadas.size + (Array.isArray(pregunta.miembrosPool) ? pregunta.miembrosPool.length : 0);
+  const flecha = dirigido ? " → " : " – ";
+  const fmtRel = r => r.de + flecha + r.a + " (" + r.tipo + (r.guarda ? " " + r.guarda : "") + ")";
   return {
-    correctas: correctas.length,
-    sobrantes: sobrantes.length + miembrosMal,
-    faltantes: faltantes.length,
+    correctas,
+    sobrantes: sobrantesRel.length + miembrosMal,
+    faltantes: faltantesRel.length,
     miembrosOk,
+    miembrosMal,
     totalEsperado,
-    ok: sobrantes.length === 0 && faltantes.length === 0 && miembrosMal === 0 && totalEsperado > 0
+    ok: sobrantesRel.length === 0 && faltantesRel.length === 0 && miembrosMal === 0 && totalEsperado > 0,
+    detalle: {
+      faltantes: faltantesRel.map(fmtRel),
+      sobrantes: sobrantesRel.map(fmtRel),
+      miembrosMal: miembrosMalDetalle.map(m => m.texto + " → " + m.de),
+      miembrosOk: miembrosOkDetalle.map(m => m.texto + " → " + m.de)
+    }
   };
+}
+
+// Líneas legibles de feedback para un resultado de evaluarDiagrama (sin DOM).
+export function resumenDiagrama(res) {
+  const d = res && res.detalle;
+  if (!d) return [];
+  const lineas = [];
+  if (d.faltantes.length) lineas.push("Faltan: " + d.faltantes.join(" · "));
+  if (d.sobrantes.length) lineas.push("Sobran: " + d.sobrantes.join(" · "));
+  if (d.miembrosMal.length) lineas.push("Miembros por ubicar: " + d.miembrosMal.join(" · "));
+  return lineas;
 }
 
 export function esDirigido(subtipo) {

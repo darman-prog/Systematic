@@ -1,12 +1,15 @@
 // Validador de schema del contenido de las materias (preguntas, glosario y apuntes).
 // Sin dependencias del DOM: puede importarse desde los tests.
+import { SUBTIPOS, CONFIG_SUBTIPO, normalizarClave } from "../src/core/diagramas.js";
 
 export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
-export const SUBTIPOS_DIAGRAMA = ["er", "uml-clases", "casos-uso", "actividades"];
+// Fuente única con el motor: evita que el contenido declare tipos de arista que el lienzo no ofrece.
+export const SUBTIPOS_DIAGRAMA = SUBTIPOS;
 export const DIFICULTADES = ["facil", "media", "dificil"];
 
 const esArreglo = v => Array.isArray(v);
 const textoNoVacio = v => typeof v === "string" && v.trim().length > 0;
+const tiposDeArista = d => (esArreglo(d.tiposArista) && d.tiposArista.length ? d.tiposArista : (CONFIG_SUBTIPO[d.subtipo] || CONFIG_SUBTIPO.er).tiposArista);
 
 export function validarPregunta(p, idsVistos) {
   if (!p || typeof p !== "object") return ["[?] la pregunta no es un objeto"];
@@ -92,49 +95,7 @@ export function validarPregunta(p, idsVistos) {
       break;
     }
     case "diagrama": {
-      if (!SUBTIPOS_DIAGRAMA.includes(p.subtipo)) err(`subtipo de diagrama inválido: ${p.subtipo}`);
-      if (!esArreglo(p.nodosPool) || p.nodosPool.length < 2) err("nodosPool debe tener al menos 2 nodos");
-      else if (p.nodosPool.some(n => !textoNoVacio(n))) err("nodosPool con nodos vacíos");
-      if (p.nodosFijos !== undefined) {
-        if (!esArreglo(p.nodosFijos)) err("nodosFijos debe ser arreglo");
-        else {
-          const fuera = p.nodosFijos.filter(n => !p.nodosPool.includes(n));
-          if (fuera.length) err(`nodosFijos fuera del pool: ${fuera.join(", ")}`);
-        }
-      }
-      const nodoValido = n => p.nodosPool.includes(n) || (esArreglo(p.nodosFijos) && p.nodosFijos.includes(n));
-      if (!esArreglo(p.relacionesEsperadas) || p.relacionesEsperadas.length === 0) {
-        err("relacionesEsperadas debe tener al menos 1 relación");
-      } else {
-        p.relacionesEsperadas.forEach((r, i) => {
-          if (!r || !textoNoVacio(r.de) || !textoNoVacio(r.a) || !textoNoVacio(r.tipo)) {
-            err(`relación ${i + 1} necesita {de, a, tipo}`);
-          } else if (!nodoValido(r.de) || !nodoValido(r.a)) {
-            err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
-          }
-          if (r && p.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
-          if (r && r.guarda !== undefined && !textoNoVacio(r.guarda)) err(`relación ${i + 1} con guarda vacía`);
-        });
-      }
-      if (p.tiposArista !== undefined) {
-        if (!esArreglo(p.tiposArista) || p.tiposArista.length === 0) err("tiposArista debe tener al menos 1 tipo");
-        else {
-          const desconocidos = p.relacionesEsperadas && esArreglo(p.relacionesEsperadas)
-            ? p.relacionesEsperadas.map(r => r && r.tipo).filter(t => textoNoVacio(t) && !p.tiposArista.includes(t))
-            : [];
-          if (desconocidos.length) err(`tipos de arista no declarados: ${[...new Set(desconocidos)].join(", ")}`);
-        }
-      }
-      if (p.miembrosPool !== undefined) {
-        if (!esArreglo(p.miembrosPool)) err("miembrosPool debe ser arreglo");
-        else p.miembrosPool.forEach((m, i) => {
-          if (!m || !textoNoVacio(m.texto) || !textoNoVacio(m.de)) {
-            err(`miembro ${i + 1} necesita {texto, de}`);
-          } else if (!nodoValido(m.de)) {
-            err(`miembro "${m.texto}" asignado a un nodo fuera del pool/fijos`);
-          }
-        });
-      }
+      validarDiagramaCampos(`[${p.id || "sin-id"}]`, p).forEach(e => errores.push(e));
       break;
     }
   }
@@ -173,20 +134,56 @@ function validarDiagramaCampos(ref, d) {
   const errores = [];
   const err = msg => errores.push(ref + " " + msg);
   if (!SUBTIPOS_DIAGRAMA.includes(d.subtipo)) err(`subtipo de diagrama inválido: ${d.subtipo}`);
-  if (!esArreglo(d.nodosPool) || d.nodosPool.length < 2) err("nodosPool debe tener al menos 2 nodos");
-  else if (d.nodosPool.some(n => !textoNoVacio(n))) err("nodosPool con nodos vacíos");
+  if (!esArreglo(d.nodosPool) || d.nodosPool.length < 2) {
+    err("nodosPool debe tener al menos 2 nodos");
+  } else if (d.nodosPool.some(n => !textoNoVacio(n))) {
+    err("nodosPool con nodos vacíos");
+  }
+  if (d.nodosFijos !== undefined) {
+    if (!esArreglo(d.nodosFijos)) {
+      err("nodosFijos debe ser arreglo");
+    } else {
+      const repetidos = esArreglo(d.nodosPool) ? d.nodosFijos.filter(n => d.nodosPool.includes(n)) : [];
+      if (repetidos.length) err(`nodosFijos también están en nodosPool (se verían duplicados en el pool): ${repetidos.join(", ")}`);
+    }
+  }
+  const nodoValido = n => (esArreglo(d.nodosPool) && d.nodosPool.includes(n)) || (esArreglo(d.nodosFijos) && d.nodosFijos.includes(n));
+  const ofrecidos = new Set(tiposDeArista(d).map(normalizarClave));
   if (!esArreglo(d.relacionesEsperadas) || d.relacionesEsperadas.length === 0) {
     err("relacionesEsperadas debe tener al menos 1 relación");
   } else {
-    const nodoValido = n => (esArreglo(d.nodosPool) && d.nodosPool.includes(n)) || (esArreglo(d.nodosFijos) && d.nodosFijos.includes(n));
     d.relacionesEsperadas.forEach((r, i) => {
       if (!r || !textoNoVacio(r.de) || !textoNoVacio(r.a) || !textoNoVacio(r.tipo)) {
         err(`relación ${i + 1} necesita {de, a, tipo}`);
-      } else if (!nodoValido(r.de) || !nodoValido(r.a)) {
-        err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
+      } else {
+        if (!nodoValido(r.de) || !nodoValido(r.a)) err(`relación ${i + 1} usa nodos fuera del pool/fijos`);
+        if (!ofrecidos.has(normalizarClave(r.tipo))) {
+          err(`relación ${i + 1} usa un tipo que el lienzo no ofrece: ${r.tipo}`);
+        }
       }
       if (r && d.subtipo === "er" && r.de === r.a) err(`relación ${i + 1} con auto-conexión en ER`);
+      if (r && r.guarda !== undefined && !textoNoVacio(r.guarda)) err(`relación ${i + 1} con guarda vacía`);
     });
+  }
+  if (d.tiposArista !== undefined && (!esArreglo(d.tiposArista) || d.tiposArista.length === 0)) {
+    err("tiposArista debe tener al menos 1 tipo");
+  }
+  if (d.miembrosPool !== undefined) {
+    if (!esArreglo(d.miembrosPool)) {
+      err("miembrosPool debe ser arreglo");
+    } else {
+      const vistos = new Set();
+      d.miembrosPool.forEach((m, i) => {
+        if (!m || !textoNoVacio(m.texto) || !textoNoVacio(m.de)) {
+          err(`miembro ${i + 1} necesita {texto, de}`);
+          return;
+        }
+        if (!nodoValido(m.de)) err(`miembro "${m.texto}" asignado a un nodo fuera del pool/fijos`);
+        const clave = normalizarClave(m.texto);
+        if (vistos.has(clave)) err(`miembro "${m.texto}" repetido en el pool (no se puede asignar por separado)`);
+        else vistos.add(clave);
+      });
+    }
   }
   return errores;
 }
@@ -292,12 +289,7 @@ export function validarCasosDiagramacion(casos) {
     if (!c || !c.diagrama || typeof c.diagrama !== "object") {
       errores.push(ref + " sin diagrama");
     } else {
-      const d = c.diagrama;
-      if (!SUBTIPOS_DIAGRAMA.includes(d.subtipo)) errores.push(ref + " subtipo de diagrama inválido: " + d.subtipo);
-      if (!esArreglo(d.nodosPool) || d.nodosPool.length < 2) errores.push(ref + " nodosPool debe tener al menos 2 nodos");
-      if (!esArreglo(d.relacionesEsperadas) || d.relacionesEsperadas.length === 0) {
-        errores.push(ref + " relacionesEsperadas debe tener al menos 1 relación");
-      }
+      validarDiagramaCampos(ref, Object.assign({ tipo: "diagrama" }, c.diagrama)).forEach(e => errores.push(e));
     }
     if (!c || !c.finales || !textoNoVacio(c.finales.exito) || !textoNoVacio(c.finales.parcial) || !textoNoVacio(c.finales.fracaso)) {
       errores.push(ref + " finales incompletos (exito/parcial/fracaso)");

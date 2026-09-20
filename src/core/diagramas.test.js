@@ -1,8 +1,14 @@
 import { describe, it, expect } from "vitest";
 import {
-  SUBTIPOS, CONFIG_SUBTIPO, claveArista, crearTablero, colocarNodo, quitarNodo,
-  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, ratingDiagrama
+  SUBTIPOS, CONFIG_SUBTIPO, claveArista, normalizarClave, crearTablero, colocarNodo, quitarNodo,
+  asignarMiembro, conectar, quitarConexion, evaluarDiagrama, esDirigido, ratingDiagrama, resumenDiagrama
 } from "./diagramas.js";
+import bd2Preguntas from "../datos/bd2/preguntas.js";
+import iswPreguntas from "../datos/isw/preguntas.js";
+import aswPreguntas from "../datos/asw/preguntas.js";
+import bd2Casos from "../datos/bd2/casos.js";
+import iswCasos from "../datos/isw/casos.js";
+import aswCasos from "../datos/asw/casos.js";
 
 const preguntaER = {
   id: "P1-078",
@@ -213,5 +219,85 @@ describe("diagramas de actividades con guardas", () => {
     expect(res.ok).toBe(false);
     expect(res.faltantes).toBeGreaterThan(0);
     expect(res.sobrantes).toBeGreaterThan(0);
+  });
+});
+
+describe("normalización de tipos y guardas", () => {
+  it("compara tipos sin depender de acentos ni mayúsculas", () => {
+    const pregunta = {
+      id: "T-1",
+      subtipo: "uml-clases",
+      nodosPool: ["A", "B"],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "composicion" }]
+    };
+    let estado = crearTablero(pregunta);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    // La UI ofrece el tipo canonical con acento; el dato lo escribe sin acento.
+    estado = conectar(estado, "A", "B", "composición", true);
+    expect(evaluarDiagrama(pregunta, estado).ok).toBe(true);
+  });
+
+  it("normaliza guardas con acentos", () => {
+    expect(normalizarClave("[sí]")).toBe(normalizarClave("[si]"));
+    expect(normalizarClave("Transición")).toBe("transicion");
+  });
+
+  it("resumenDiagrama describe faltantes, sobrantes y miembros sin DOM", () => {
+    const pregunta = {
+      id: "T-2",
+      subtipo: "uml-clases",
+      nodosPool: ["A", "B"],
+      miembrosPool: [{ texto: "m1", de: "A" }],
+      relacionesEsperadas: [{ de: "A", a: "B", tipo: "herencia" }]
+    };
+    let estado = crearTablero(pregunta);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    estado = conectar(estado, "A", "B", "asociación", true); // tipo que no corresponde
+    const res = evaluarDiagrama(pregunta, estado);
+    const lineas = resumenDiagrama(res).join(" | ");
+    expect(lineas).toContain("Faltan");
+    expect(lineas).toContain("Sobran");
+    expect(lineas).toContain("Miembros por ubicar: m1 → A");
+  });
+});
+
+describe("contenido real resoluble (ISW/ASW/BD2)", () => {
+  const diagramas = [...bd2Preguntas, ...iswPreguntas, ...aswPreguntas].filter(p => p.tipo === "diagrama");
+
+  function resolver(pregunta) {
+    let estado = crearTablero(pregunta);
+    (pregunta.nodosPool || []).forEach(n => { estado = colocarNodo(estado, n); });
+    const cfg = CONFIG_SUBTIPO[pregunta.subtipo] || CONFIG_SUBTIPO.er;
+    const ofrecidos = Array.isArray(pregunta.tiposArista) && pregunta.tiposArista.length ? pregunta.tiposArista : cfg.tiposArista;
+    const dirigido = esDirigido(pregunta.subtipo);
+    (pregunta.relacionesEsperadas || []).forEach(r => {
+      // La UI ofrece el label canonical; buscamos el equivalente normalizado al del dato.
+      const tipo = ofrecidos.find(t => normalizarClave(t) === normalizarClave(r.tipo)) || r.tipo;
+      estado = conectar(estado, r.de, r.a, tipo, dirigido, r.guarda);
+    });
+    (pregunta.miembrosPool || []).forEach(m => { estado = asignarMiembro(estado, m.texto, m.de); });
+    return evaluarDiagrama(pregunta, estado);
+  }
+
+  it("detecta que hay diagramas que validar", () => {
+    expect(diagramas.length).toBeGreaterThan(0);
+  });
+
+  diagramas.forEach(p => {
+    it(`permite resolver ${p.id} tal como lo ofrece el lienzo`, () => {
+      const res = resolver(p);
+      expect(res.totalEsperado).toBeGreaterThan(0);
+      expect({ faltantes: res.faltantes, sobrantes: res.sobrantes, ok: res.ok }).toEqual({ faltantes: 0, sobrantes: 0, ok: true });
+    });
+  });
+
+  [...bd2Casos, ...iswCasos, ...aswCasos].forEach(c => {
+    it(`permite resolver el caso ${c.id} tal como lo ofrece el lienzo`, () => {
+      const res = resolver(c.diagrama);
+      expect(res.totalEsperado).toBeGreaterThan(0);
+      expect({ faltantes: res.faltantes, sobrantes: res.sobrantes, ok: res.ok }).toEqual({ faltantes: 0, sobrantes: 0, ok: true });
+    });
   });
 });

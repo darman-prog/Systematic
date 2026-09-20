@@ -6,7 +6,7 @@ import {
   TIPO_LABELS, DIF_LABELS,
   animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "./helpers.js";
-import { evaluarDiagrama } from "../core/diagramas.js";
+import { evaluarDiagrama, resumenDiagrama } from "../core/diagramas.js";
 import { crearDiagramasUI } from "./diagramas.js";
 
 const $ = id => document.getElementById(id);
@@ -365,12 +365,13 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const estado = session.diagrama;
     if (!item || item.tipo !== "diagrama" || !estado || session.answers[session.idx]) return;
     const res = evaluarDiagrama(item, estado);
-    const respuesta = { ok: res.ok, detalle: res };
+    const resumen = resumenDiagrama(res);
+    const respuesta = { ok: res.ok, detalle: resumen.join(" · ") };
     session.answers[session.idx] = {
       ok: res.ok,
       selected: res.ok
         ? "Diagrama correcto"
-        : "Faltan " + res.faltantes + " · sobran " + res.sobrantes,
+        : resumen.join(" · "),
       expected: "El diagrama esperado del tema"
     };
     registrarRespuesta(item.id, res.ok);
@@ -381,8 +382,10 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       fb.innerHTML = '<div class="font-bold mb-2">' +
         (res.ok
           ? "✅ ¡Diagrama correcto!"
-          : "❌ Aún no: revisa el lienzo") +
-        '</div><div>' + item.exp + '</div>';
+          : "❌ Aún no: revisa el detalle") +
+        '</div>' +
+        (resumen.length ? '<ul class="text-sm mb-2 list-disc list-inside">' + resumen.map(l => "<li>" + escapar(l) + "</li>").join("") + "</ul>" : "") +
+        '<div>' + item.exp + '</div>';
       fb.style.display = "block";
     }
     mostrarBotonSiguiente();

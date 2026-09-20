@@ -427,8 +427,7 @@ const preguntas = [
       { texto: "procesar()", de: "Transaccion" },
       { texto: "validarNumero()", de: "Tarjeta" },
       { texto: "codigoBanco", de: "Transferencia" },
-      { texto: "procesar()", de: "Tarjeta" },
-      { texto: "procesar()", de: "Cripto" }
+      { texto: "clavePrivada", de: "Cripto" }
     ],
     relacionesEsperadas: [
       { de: "Tarjeta", a: "Transaccion", tipo: "herencia" },
@@ -447,8 +446,8 @@ const preguntas = [
     q: "Modela un sistema de archivos: una clase Carpeta que contiene múltiples Archivos. La Carpeta gestiona el ciclo de vida de los Archivos (si eliminas la carpeta, se eliminan los archivos). Usa composición.",
     nodosPool: ["Carpeta", "Archivo"],
     miembrosPool: [
-      { texto: "nombre", de: "Archivo" },
       { texto: "tamano", de: "Archivo" },
+      { texto: "extension", de: "Archivo" },
       { texto: "nombre", de: "Carpeta" },
       { texto: "agregarArchivo()", de: "Carpeta" }
     ],
@@ -468,17 +467,16 @@ const preguntas = [
     nodosPool: ["Componente", "Archivo", "Carpeta"],
     miembrosPool: [
       { texto: "tamano()", de: "Componente" },
-      { texto: "tamano()", de: "Archivo" },
-      { texto: "tamano()", de: "Carpeta" },
+      { texto: "peso: int", de: "Archivo" },
       { texto: "hijos: Componente[]", de: "Carpeta" },
       { texto: "agregar()", de: "Carpeta" }
     ],
     relacionesEsperadas: [
-      { de: "Archivo", a: "Componente", tipo: "implementacion" },
-      { de: "Carpeta", a: "Componente", tipo: "implementacion" },
+      { de: "Archivo", a: "Componente", tipo: "herencia" },
+      { de: "Carpeta", a: "Componente", tipo: "herencia" },
       { de: "Carpeta", a: "Componente", tipo: "agregacion" }
     ],
-    exp: "El patrón <b>Composite</b> permite tratar objetos individuales (Archivo) y composiciones (Carpeta) de manera uniforme a través de una interfaz común (Componente). La Carpeta <b>implementa</b> Componente y <b>agrega</b> una lista de Componentes (pueden ser Archivos u otras Carpetas). Esto permite calcular el tamaño total recursivamente: si es Archivo devuelve su tamaño, si es Carpeta suma recursivamente el tamaño de sus hijos."
+    exp: "El patrón <b>Composite</b> permite tratar objetos individuales (Archivo) y composiciones (Carpeta) de manera uniforme a través de una interfaz común (Componente). La Carpeta <b>hereda</b> de Componente igual que Archivo y además <b>agrega</b> una lista de Componentes (pueden ser Archivos u otras Carpetas). Esto permite calcular el tamaño total recursivamente: si es Archivo devuelve su tamaño, si es Carpeta suma recursivamente el tamaño de sus hijos."
   }
 ];
 

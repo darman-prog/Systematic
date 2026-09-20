@@ -633,7 +633,9 @@ function jugarCaso(id) {
 function comprobarCaso() {
   if (!casoActual || !casoEstado) return;
   const res = evaluarDiagrama(casoActual.diagrama, casoEstado);
-  const rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
+  let rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
+  // Misma vara que el quiz: un diagrama con elementos de más no puede ser "éxito".
+  if (res.sobrantes > 0 && rating === "exito") rating = "parcial";
   const resultado = { rating, detalle: res };
   
   // Guardar resultado

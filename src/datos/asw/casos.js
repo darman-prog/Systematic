@@ -12,14 +12,8 @@ const casos = [
       miembrosPool: [
         { texto: "pagar()", de: "MetodoPago" },
         { texto: "validar()", de: "MetodoPago" },
-        { texto: "pagar()", de: "TarjetaCredito" },
-        { texto: "validar()", de: "TarjetaCredito" },
         { texto: "numeroTarjeta", de: "TarjetaCredito" },
-        { texto: "pagar()", de: "PayPal" },
-        { texto: "validar()", de: "PayPal" },
         { texto: "email", de: "PayPal" },
-        { texto: "pagar()", de: "Transferencia" },
-        { texto: "validar()", de: "Transferencia" },
         { texto: "cuentaBancaria", de: "Transferencia" }
       ],
       relacionesEsperadas: [
@@ -45,11 +39,8 @@ const casos = [
       nodosPool: ["Notificador", "Email", "SMS", "Push"],
       miembrosPool: [
         { texto: "enviar()", de: "Notificador" },
-        { texto: "enviar()", de: "Email" },
         { texto: "destinatario", de: "Email" },
-        { texto: "enviar()", de: "SMS" },
         { texto: "telefono", de: "SMS" },
-        { texto: "enviar()", de: "Push" },
         { texto: "tokenDispositivo", de: "Push" }
       ],
       relacionesEsperadas: [

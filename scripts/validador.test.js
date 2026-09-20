@@ -160,6 +160,46 @@ describe("validarPregunta tipo diagrama", () => {
     });
     expect(validarPregunta(autoConexion, new Set()).join(" ")).toContain("auto-conexión en ER");
   });
+
+  it("rechaza aristas que el lienzo no ofrece y miembros repetidos", () => {
+    const uml = {
+      id: "ASW-901",
+      parcial: "Parcial 1",
+      tema: "Relaciones",
+      dificultad: "media",
+      tipo: "diagrama",
+      subtipo: "uml-clases",
+      q: "Modela la jerarquía.",
+      exp: "Herencia y composición.",
+      nodosPool: ["Base", "Hija"],
+      relacionesEsperadas: [
+        { de: "Hija", a: "Base", tipo: "implementacion" },
+        { de: "Hija", a: "Base", tipo: "composición" }
+      ]
+    };
+    const errores = validarPregunta(uml, new Set()).join(" ");
+    expect(errores).toContain("no ofrece");
+    expect(errores).not.toContain("composición"); // el tipo canonical con acento sí está ofrecido
+
+    const repetidos = Object.assign({}, uml, {
+      relacionesEsperadas: [{ de: "Hija", a: "Base", tipo: "herencia" }],
+      miembrosPool: [
+        { texto: "procesar()", de: "Base" },
+        { texto: "procesar()", de: "Hija" }
+      ]
+    });
+    expect(validarPregunta(repetidos, new Set()).join(" ")).toContain("repetido en el pool");
+  });
+
+  it("rechaza nodosFijos que también estén en el pool", () => {
+    const conFijosDuplicados = Object.assign({}, base, {
+      subtipo: "actividades",
+      nodosPool: ["inicio", "Validar"],
+      nodosFijos: ["inicio"],
+      relacionesEsperadas: [{ de: "inicio", a: "Validar", tipo: "transicion" }]
+    });
+    expect(validarPregunta(conFijosDuplicados, new Set()).join(" ")).toContain("también están en nodosPool");
+  });
 });
 
 describe("validarCasos", () => {
@@ -229,6 +269,23 @@ describe("validarCasosDiagramacion", () => {
     expect(errores).toContain("subtipo de diagrama inválido");
     expect(errores).toContain("al menos 2 nodos");
     expect(errores).toContain("al menos 1 relación");
+  });
+
+  it("también valida tipos ofrecidos y miembros repetidos en casos", () => {
+    const malo = Object.assign({}, caso, {
+      diagrama: {
+        subtipo: "uml-clases",
+        nodosPool: ["A", "B"],
+        relacionesEsperadas: [{ de: "A", a: "B", tipo: "implementacion" }],
+        miembrosPool: [
+          { texto: "m()", de: "A" },
+          { texto: "m()", de: "B" }
+        ]
+      }
+    });
+    const errores = validarCasosDiagramacion([malo]).join(" ");
+    expect(errores).toContain("no ofrece");
+    expect(errores).toContain("repetido en el pool");
   });
 });
 
