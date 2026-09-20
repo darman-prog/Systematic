@@ -1,310 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz BD2 — Repaso interactivo</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) {
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: { sans: ["Segoe UI", "Tahoma", "Geneva", "Verdana", "sans-serif"] }
-          }
-        }
-      };
-    }
-  </script>
-  <style>
-    .hidden { display: none !important; }
-    .study-item:not(.revealed) .oculto { filter: blur(6px); pointer-events: none; user-select: none; }
-    .btn { cursor: pointer; }
-    .star-btn { cursor: pointer; }
-    .btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
-    .star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible {
-      outline: 2px solid #60a5fa; outline-offset: 2px;
-    }
-    .feedback { animation: fadeInUp 0.28s ease-out; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .anim-in { animation: fadeInUp 0.28s ease-out; }
-    @keyframes shakeX { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
-    .shake { animation: shakeX 0.4s ease; }
-    @keyframes pulseSoft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .timer-low { animation: pulseSoft 1s infinite; }
-    .score-ring {
-      width: 9.5rem; height: 9.5rem; border-radius: 9999px; margin: 0 auto 0.85rem;
-      display: flex; align-items: center; justify-content: center;
-      background: conic-gradient(var(--ring-color, #38bdf8) calc(var(--pct, 0) * 1%), #1e293b 0);
-      transition: background 0.6s ease;
-    }
-    .score-ring-inner {
-      width: 7.5rem; height: 7.5rem; border-radius: 9999px; background: #0f172a;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.8rem; font-weight: bold; color: #f8fafc;
-    }
-  </style>
-  <style type="text/tailwindcss">
-    @layer components {
-      .mode-card { @apply flex flex-col items-start gap-1 bg-slate-900 border border-slate-700 hover:border-blue-500 hover:-translate-y-0.5 rounded-xl p-4 text-left transition; }
-      .card { @apply bg-slate-800/90 border border-slate-700 rounded-2xl p-5 sm:p-7 shadow-xl w-full; }
-      .subtitle { @apply text-slate-400 leading-relaxed mb-5 text-sm sm:text-base; }
-      .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed; }
-      .btn-primary { @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 text-sm sm:text-base; }
-      .btn-secondary { @apply bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-600 px-5 py-3 text-sm sm:text-base; }
-      .btn-ghost { @apply bg-transparent hover:bg-slate-700/60 text-slate-300 border border-slate-700 px-4 py-2.5 text-sm; }
-      .btn-sm { @apply px-3 py-2 text-xs sm:text-sm; }
-      .link-btn { @apply text-blue-400 hover:underline text-xs font-semibold px-1.5 cursor-pointer bg-transparent border-0; }
-      .badge { @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-bold whitespace-nowrap; }
-      .chip { @apply rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs sm:text-sm text-slate-300 transition hover:border-blue-500 hover:text-white cursor-pointer; }
-      .chip-on { @apply bg-blue-600 border-blue-500 text-white font-semibold; }
-      .section-title { @apply text-xs sm:text-sm font-bold text-slate-300 border-b border-slate-700 pb-2 mt-7 mb-3 uppercase tracking-wide; }
-      .stat-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center; }
-      .stat-value { @apply text-lg sm:text-xl font-bold text-sky-400; }
-      .stat-label { @apply text-xs text-slate-400 mt-1; }
-      .stat-input { @apply w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-100 text-xs; }
-      .progress-track { @apply h-2 bg-slate-950 rounded-full overflow-hidden; }
-      .progress-fill { @apply h-full bg-gradient-to-r from-blue-600 to-sky-400 rounded-full transition-all duration-300; }
-      .option { @apply flex items-center gap-3 w-full text-left rounded-xl border-2 border-transparent bg-slate-700 hover:bg-slate-600 px-4 py-3.5 text-sm sm:text-base transition cursor-pointer; }
-      .option-correct { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
-      .option-wrong { @apply bg-rose-900 border-rose-500 text-rose-100; }
-      .opt-key { @apply flex-none w-7 h-7 rounded-lg bg-slate-800 text-slate-400 text-xs font-bold flex items-center justify-center; }
-      .option-correct .opt-key { @apply bg-emerald-500 text-emerald-950; }
-      .option-wrong .opt-key { @apply bg-rose-500 text-rose-950; }
-      .feedback { @apply mt-5 p-4 rounded-xl bg-slate-950 text-sm leading-relaxed; }
-      .feedback-ok { @apply border-l-4 border-emerald-500; }
-      .feedback-bad { @apply border-l-4 border-rose-500; }
-      .feedback-neutro { @apply border-l-4 border-slate-500; }
-      .code-block { @apply font-mono text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3.5 overflow-x-auto whitespace-pre leading-relaxed; }
-      .kw { @apply text-blue-400 font-bold; }
-      .str { @apply text-amber-400; }
-      .hueco { @apply inline-block min-w-[80px] text-center border-2 border-dashed border-slate-600 bg-slate-800 rounded-lg px-2 py-0.5 mx-0.5 font-mono text-blue-300 cursor-pointer align-middle; }
-      .hueco-lleno { @apply bg-blue-800 border-blue-500 border-solid text-white; }
-      .hueco-ok { @apply bg-emerald-800 border-emerald-500 border-solid text-emerald-100; }
-      .hueco-mal { @apply bg-rose-900 border-rose-500 border-solid text-rose-100; }
-      .pieza { @apply bg-slate-700 border-2 border-slate-600 hover:border-blue-500 rounded-lg px-3.5 py-2 font-mono text-xs sm:text-sm cursor-grab select-none; }
-      .pieza-sel { @apply bg-blue-700 border-blue-500 text-white; }
-      .bloque { @apply flex items-center gap-3 bg-slate-900 border border-slate-600 rounded-xl px-3 py-2.5 font-mono text-xs sm:text-sm; }
-      .bloque-ok { @apply bg-emerald-900/60 border-emerald-600 text-emerald-100; }
-      .bloque-mal { @apply bg-rose-900/60 border-rose-600 text-rose-100; }
-      .btn-mini { @apply w-8 h-8 shrink-0 rounded-lg bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-slate-200 text-xs flex items-center justify-center transition cursor-pointer; }
-      .star-btn { @apply text-2xl leading-none px-1 text-slate-500 hover:text-yellow-400 transition bg-transparent border-0; }
-      .star-on { @apply text-yellow-400; }
-      .er-card { @apply bg-slate-950 border border-slate-600 rounded-xl overflow-hidden text-xs flex-1 min-w-0; }
-      .er-head { @apply bg-blue-700 text-white px-3 py-1.5 font-bold; }
-      .er-row { @apply px-3 py-1 border-t border-slate-800 flex justify-between gap-4; }
-      .er-pk { @apply text-yellow-400 font-bold; }
-      .er-fk { @apply text-pink-400 font-bold; }
-      .er-pkfk { @apply text-orange-400 font-bold; }
-      .history-row { @apply grid grid-cols-[1fr_auto_auto] sm:grid-cols-[1fr_auto_auto_auto] gap-3 items-center bg-slate-950 rounded-xl px-4 py-2.5 text-xs sm:text-sm mb-2; }
-      .history-best { @apply border border-emerald-600; }
-      .topic-row { @apply grid grid-cols-[90px_1fr_44px] sm:grid-cols-[110px_1fr_52px] gap-3 items-center text-xs sm:text-sm; }
-      .topic-bar { @apply h-2.5 bg-slate-950 rounded-full overflow-hidden; }
-      .topic-bar-fill { @apply h-full rounded-full; }
-      .topic-score { @apply text-right text-slate-400; }
-      .peor-row { @apply flex gap-3 items-center bg-slate-950 rounded-xl px-4 py-2.5 text-xs sm:text-sm; }
-      .review-item { @apply bg-slate-950 border border-slate-700 border-l-4 rounded-xl p-4; }
-      .review-ok { @apply border-l-emerald-500; }
-      .review-bad { @apply border-l-rose-500; }
-      .tag { @apply inline-flex items-center text-xs font-bold px-2 py-1 rounded-md whitespace-nowrap; }
-      .tag-ok { @apply bg-emerald-800 text-emerald-100; }
-      .tag-bad { @apply bg-rose-900 text-rose-100; }
-      .tag-simulacro { @apply bg-violet-700 text-violet-100; }
-      .tag-practica { @apply bg-blue-800 text-blue-100; }
-      .study-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4 sm:p-5 mb-4; }
-      .study-option { @apply px-4 py-2.5 rounded-lg bg-slate-800 border border-transparent text-sm; }
-      .study-option-ok { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
-      .study-answer { @apply bg-emerald-900/50 border border-emerald-700 text-emerald-100 font-mono text-xs sm:text-sm rounded-xl p-3 mb-3; }
-      .study-exp { @apply p-3 rounded-lg bg-slate-800/60 border-l-4 border-blue-500 text-xs sm:text-sm leading-relaxed text-slate-300; }
-      .search-input { @apply w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm mb-4 focus:outline-none focus:border-blue-500; }
-      .match-item { @apply w-full text-left rounded-xl border-2 border-slate-600 bg-slate-900 hover:border-blue-500 px-3 py-2.5 text-xs sm:text-sm transition cursor-pointer; }
-      .match-sel { @apply border-blue-500 bg-blue-900/60 text-white; }
-      .match-ok { @apply border-emerald-500 bg-emerald-900/60 text-emerald-100 cursor-default opacity-90; }
-      .match-err { @apply border-rose-500 bg-rose-900/70 text-rose-100; }
-      .flash-card { @apply bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 min-h-[16rem] flex flex-col justify-center; }
-      .glosario-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4; }
-    }
-  </style>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex justify-center items-start p-4 sm:p-6 font-sans">
-
-<div id="safelist" class="hidden option-correct option-wrong hueco-lleno hueco-ok hueco-mal pieza-sel bloque-ok bloque-mal match-sel match-ok match-err star-on feedback-ok feedback-bad feedback-neutro review-ok review-bad tag-ok tag-bad tag-simulacro tag-practica study-option-ok history-best chip-on sm:inline-flex" aria-hidden="true"></div>
-
-<div id="sin-estilos" style="display:none" class="fixed top-0 inset-x-0 z-50 bg-amber-500 text-slate-900 text-center text-xs sm:text-sm font-semibold py-2">
-  Sin conexión: no se pudieron cargar los estilos de Tailwind. La app funciona igual, pero sin diseño.
-</div>
-
-<div class="app w-full max-w-3xl">
-
-  <section id="screen-start" class="card">
-    <h1 class="text-2xl sm:text-3xl font-bold mb-2 bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent">Quiz de Base de Datos</h1>
-    <p class="subtitle">
-      Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
-      Preguntas y opciones aleatorias, con explicación en cada respuesta.
-    </p>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-      <button class="mode-card col-span-2 sm:col-span-4 bg-amber-950/40 border-amber-600 hover:border-amber-400" onclick="irRepaso()">
-        <span class="text-2xl">🔥</span>
-        <span class="font-bold">RepasoQuiz — Preguntas garantizadas</span>
-        <span class="text-xs text-amber-200/90">Las preguntas reales de las capturas (salen sí o sí en el quiz). Mismo orden y redacción del examen.</span>
-      </button>
-      <button class="mode-card" onclick="irConfig()">
-        <span class="text-2xl">🎯</span>
-        <span class="font-bold">Configurar práctica</span>
-        <span class="text-xs text-slate-400">Elige tema, tipo, dificultad y cantidad</span>
-      </button>
-      <button class="mode-card" onclick="startStudy()">
-        <span class="text-2xl">📖</span>
-        <span class="font-bold">Modo Estudio</span>
-        <span class="text-xs text-slate-400">Todas las preguntas con su solución</span>
-      </button>
-      <button class="mode-card" onclick="startFlashcards()">
-        <span class="text-2xl">🃏</span>
-        <span class="font-bold">Flashcards</span>
-        <span class="text-xs text-slate-400">Memoriza con tarjetas y autoevaluación</span>
-      </button>
-      <button class="mode-card" onclick="startGlosario()">
-        <span class="text-2xl">📚</span>
-        <span class="font-bold">Glosario SQL</span>
-        <span class="text-xs text-slate-400">Términos y ejemplos por categoría</span>
-      </button>
-    </div>
-    <div id="tip-dia" class="mt-3"></div>
-    <div class="mt-3">
-      <button class="btn btn-ghost hidden" id="btn-debiles" onclick="practicarDebiles()">🧠 Repasar débiles</button>
-    </div>
-    <h3 class="section-title">Práctica rápida</h3>
-    <div class="flex flex-wrap gap-2 mb-3">
-      <button class="btn btn-primary btn-sm" onclick="practicarArrastre()">🧩 Solo arrastrar y soltar</button>
-      <button class="btn btn-secondary btn-sm" onclick="practicarCasos()">🧠 Casos técnicos</button>
-      <button class="btn btn-secondary btn-sm hidden" id="btn-vencidas" onclick="practicarVencidas()">⏰ Repaso espaciado</button>
-    </div>
-    <div id="tipos-panel" class="flex flex-wrap gap-2"></div>
-    <div id="stats-panel"></div>
-    <h3 class="section-title">Historial de intentos</h3>
-    <div id="history-section"></div>
-    <div class="flex gap-2 justify-end flex-wrap mt-2">
-      <button class="btn btn-ghost btn-sm" onclick="exportarDatos()">⬇ Exportar progreso</button>
-      <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-file').click()">⬆ Importar</button>
-      <input type="file" id="import-file" accept=".json,application/json" class="hidden" onchange="importarDatos(this)">
-      <button class="btn btn-ghost btn-sm" onclick="clearHistory()">Borrar historial</button>
-      <button class="btn btn-ghost btn-sm" onclick="resetProgreso()">Reiniciar progreso</button>
-    </div>
-  </section>
-
-  <section id="screen-repaso" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🔥 RepasoQuiz</h1>
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
-    </div>
-    <p class="subtitle">Preguntas reales tomadas de las capturas del quiz (<b>CapturasInfo</b> — 10/09/2026). Van en el mismo orden y con la misma redacción del examen: solo este conjunto, sin relleno.</p>
-    <div id="repaso-list"></div>
-    <div class="flex flex-wrap gap-3 justify-center mt-6">
-      <button class="btn btn-primary" onclick="iniciarRepasoQuiz()">Comenzar RepasoQuiz (<span id="repaso-n">10</span> preguntas)</button>
-      <button class="btn btn-secondary" onclick="estudioGarantizadas()">📖 Ver soluciones</button>
-      <button class="btn btn-ghost" onclick="flashcardsGarantizadas()">🃏 Flashcards</button>
-    </div>
-  </section>
-
-  <section id="screen-config" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
-      <h1 class="text-xl sm:text-2xl font-bold">Configurar práctica</h1>
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
-    </div>
-    <div id="config-groups"></div>
-    <div class="flex items-center gap-3 flex-wrap my-5">
-      <label class="text-sm text-slate-300">Cantidad:
-        <input type="number" id="cfg-cantidad" min="1" value="10" class="stat-input ml-2 w-20">
-      </label>
-      <button class="btn btn-ghost btn-sm" onclick="usarTodas()">Usar todas (<span id="cfg-max">0</span>)</button>
-    </div>
-    <div class="flex flex-col gap-2.5 mb-4 text-sm text-slate-300">
-      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-priorizar" checked onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Priorizar preguntas débiles (repetición espaciada)</label>
-      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-debiles" onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Solo preguntas débiles</label>
-      <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="cfg-solo-marcadas" onchange="actualizarResumen()" class="w-4 h-4 accent-blue-600"> Solo marcadas ⭐</label>
-    </div>
-    <p class="text-sm text-slate-400" id="cfg-resumen"></p>
-    <div class="flex flex-wrap gap-3 justify-center mt-6">
-      <button class="btn btn-primary w-full sm:w-auto" id="btn-comenzar" onclick="comenzarPractica()">Comenzar práctica</button>
-      <button class="btn btn-secondary w-full sm:w-auto" onclick="comenzarSimulacro()">🎯 Simulacro (10 preg · 20 min)</button>
-    </div>
-  </section>
-
-  <section id="screen-quiz" class="card hidden">
-    <div class="flex flex-wrap items-center gap-2 mb-4">
-      <span class="badge bg-slate-700" id="progress">Pregunta 1</span>
-      <span class="badge" id="topic-badge">Tema</span>
-      <span class="badge bg-slate-700" id="type-badge">Tipo</span>
-      <span class="badge hidden" id="dif-badge"></span>
-      <span class="badge hidden bg-amber-900 text-amber-200" id="timer-badge">20:00</span>
-      <span class="badge hidden bg-violet-700 text-violet-100" id="simulacro-badge">Simulacro</span>
-      <span class="badge hidden bg-amber-600 text-white" id="repaso-badge">🔥 RepasoQuiz garantizadas</span>
-      <span class="ml-auto flex items-center gap-1">
-        <button class="star-btn" id="star-btn" onclick="toggleMarcadaActual()" title="Marcar pregunta" aria-label="Marcar pregunta">☆</button>
-        <button class="btn btn-ghost btn-sm hidden" id="pause-btn" onclick="alternarPausa()" title="Pausar" aria-label="Pausar simulacro">⏸</button>
-        <button class="btn btn-ghost btn-sm" onclick="salir()" title="Salir" aria-label="Salir de la ronda">✕</button>
-      </span>
-    </div>
-    <div class="progress-track mb-5"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-
-    <div id="question-area"></div>
-    <div class="feedback hidden" id="feedback-box" role="status" aria-live="polite"></div>
-
-    <div class="mt-6 flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-3">
-      <button id="skip-btn" class="btn btn-ghost w-full sm:w-auto" onclick="saltarPregunta()">⏭ Saltar</button>
-      <button id="next-btn" class="btn btn-primary w-full sm:w-auto" style="display:none" onclick="next()">Siguiente</button>
-    </div>
-    <p class="text-center text-slate-500 text-xs mt-4">Atajos: <b>1</b> <b>2</b> <b>3</b> para responder · <b>Enter</b> para continuar</p>
-  </section>
-
-  <section id="screen-results" class="card hidden"></section>
-
-  <section id="screen-study" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Modo Estudio</h1>
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
-    </div>
-    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa ⭐ para marcar las que quieras priorizar.</p>
-    <input class="search-input" id="study-search" type="search" placeholder="Buscar por texto, tema, código o explicación..." oninput="renderStudy(this.value)">
-    <div id="study-filtros" class="flex flex-wrap gap-2 mb-3"></div>
-    <p class="text-xs text-slate-500 mb-3" id="study-count"></p>
-    <div id="study-list"></div>
-  </section>
-
-  <section id="screen-flashcards" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">🃏 Flashcards</h1>
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
-    </div>
-    <div id="flash-area"></div>
-  </section>
-
-  <section id="screen-glosario" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">📚 Glosario SQL</h1>
-      <button class="btn btn-ghost btn-sm" onclick="goHome()">← Inicio</button>
-    </div>
-    <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>
-    <input class="search-input" id="glosario-search" type="search" placeholder="Buscar término, definición o ejemplo..." oninput="renderGlosario(this.value)">
-    <div id="glosario-filtros" class="flex flex-wrap gap-2 mb-3"></div>
-    <p class="text-xs text-slate-500 mb-3" id="glosario-count"></p>
-    <div id="glosario-list"></div>
-  </section>
-
-</div>
-
-<div id="pause-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6">
-  <div class="card max-w-sm text-center">
-    <h2 class="text-2xl font-bold mb-2">Simulacro en pausa</h2>
-    <p class="text-slate-400 text-sm mb-6">El temporizador está detenido.</p>
-    <button class="btn btn-primary w-full" onclick="alternarPausa()">Reanudar</button>
-    <button class="btn btn-ghost w-full mt-3" onclick="salir()">Salir del simulacro</button>
-  </div>
-</div>
-
-<script src="banco-preguntas.js"></script>
-<script src="glosario.js"></script>
-<script>
   const banco = window.BANCO || [];
   const glosario = window.GLOSARIO || { categorias: [], terminos: [], tips: [] };
   const KEY_PROGRESO = "quizBD2.progreso";
@@ -2049,10 +1742,6 @@
     }
   });
 
-  if (!window.tailwind) {
-    $("sin-estilos").style.display = "block";
-  }
-
   if (banco.length) {
     inicializarFiltros();
     renderConfig();
@@ -2061,6 +1750,63 @@
     renderTiposPanel();
     renderTip();
   }
-</script>
-</body>
-</html>
+// Puente de funciones para atributos inline (onclick, onchange, ...):
+// este script es un modulo ES y las funciones no son globales por defecto.
+Object.assign(window, {
+  actualizarResumen,
+  alternarPausa,
+  autoevaluarDev,
+  autoevaluarResultado,
+  cambiarEstudioTipo,
+  cambiarGlosarioCat,
+  cambiarMeta,
+  clearHistory,
+  clickMatchDer,
+  clickMatchIzq,
+  comenzarPractica,
+  comenzarSimulacro,
+  comprobarMulti,
+  comprobarOrden,
+  estudioGarantizadas,
+  exportarDatos,
+  flashcardsGarantizadas,
+  goHome,
+  importarDatos,
+  iniciarArrastre,
+  iniciarArrastreBloque,
+  iniciarRepasoQuiz,
+  irConfig,
+  irRepaso,
+  moverBloque,
+  next,
+  pintarResultados,
+  practicarArrastre,
+  practicarCasos,
+  practicarDebiles,
+  practicarTipo,
+  practicarVencidas,
+  renderGlosario,
+  renderStudy,
+  repetirFalladas,
+  repetirMisma,
+  resetProgreso,
+  responderFlash,
+  revelarSolucion,
+  salir,
+  saltarFlash,
+  saltarPregunta,
+  shuffle,
+  soltarBloque,
+  startFlashcards,
+  startGlosario,
+  startStudy,
+  toggleEstudioReales,
+  toggleFiltro,
+  toggleFiltroTodos,
+  toggleMarcadaActual,
+  toggleMarcadaEstudio,
+  toggleMulti,
+  toggleStudy,
+  usarTodas,
+  voltearFlash
+});
