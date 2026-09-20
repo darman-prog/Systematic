@@ -54,6 +54,34 @@ describe("persistencia", () => {
     expect(p.historial("bd2")).toEqual([]);
   });
 
+  it("reiniciarMateria borra progreso, racha, historial y misiones; conserva meta y globales", () => {
+    p.guardarProgreso("bd2", { a: 1 });
+    p.guardarActividad("bd2", { "2026-01-01": 3 });
+    p.guardarHistorial("bd2", [{ date: 1 }]);
+    p.guardarMisiones("bd2", { m1: { estrellas: 2 } });
+    p.guardarMeta("bd2", 30);
+    p.guardarXp(120);
+    p.guardarLogros({ l1: "fecha" });
+    p.guardarCasos({ c1: { mejorRating: "exito" } });
+    p.guardarEscenarios({ e1: { mejorRating: "parcial" } });
+
+    p.reiniciarMateria("bd2");
+
+    expect(p.progreso("bd2")).toEqual({});
+    expect(p.actividad("bd2")).toEqual({});
+    expect(p.historial("bd2")).toEqual([]);
+    expect(p.misiones("bd2")).toEqual({});
+    expect(p.meta("bd2")).toBe(30);
+    expect(p.xp()).toBe(120);
+    expect(p.logros().l1).toBe("fecha");
+    expect(p.casos().c1.mejorRating).toBe("exito");
+    expect(p.escenarios().e1.mejorRating).toBe("parcial");
+    // Las otras materias no se tocan.
+    p.guardarProgreso("isw", { b: 2 });
+    p.reiniciarMateria("bd2");
+    expect(p.progreso("isw")).toEqual({ b: 2 });
+  });
+
   it("guarda y lee escenarios, casos, misiones y logros", () => {
     p.guardarEscenarios({ e1: { mejorRating: "exito", jugadas: 1 } });
     p.guardarCasos({ c1: { mejorRating: "parcial", jugadas: 2 } });

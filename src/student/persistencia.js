@@ -37,6 +37,14 @@ export function crearPersistencia(storage) {
       borrar(claves(materiaId).actividad);
     },
     borrarHistorial: materiaId => borrar(claves(materiaId).historial),
+    // Reset por materia: borra progreso, racha, historial de intentos y misiones.
+    // Conserva la meta (preferencia) y todo lo global (XP, logros, casos, escenarios).
+    reiniciarMateria: materiaId => {
+      borrar(claves(materiaId).progreso);
+      borrar(claves(materiaId).actividad);
+      borrar(claves(materiaId).historial);
+      borrar(claveMisiones(materiaId));
+    },
 
     // ---- Globales ----
     xp: () => leer(CLAVES_GLOBALES.xp, 0),

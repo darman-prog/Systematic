@@ -159,9 +159,9 @@ function clearHistory() {
 }
 
 function resetProgreso() {
-  if (!confirm("¿Borrar todo el progreso (aciertos, fallos, marcas y racha)?")) return;
+  if (!confirm("¿Borrar todo el progreso de esta materia? Se eliminan aciertos, fallos, marcas, racha, historial de intentos y misiones. Tu XP y logros globales se conservan.")) return;
   progreso = {};
-  persistencia.borrarProgresoYActividad(materia.id);
+  persistencia.reiniciarMateria(materia.id);
   renderStats();
   renderHistory();
 }
