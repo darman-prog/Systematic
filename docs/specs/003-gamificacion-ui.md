@@ -10,11 +10,13 @@ updated: 2026-09-19
 ## Objetivo y alcance
 Sobre el refactor de `src/app.js` de la spec 002: aplicar la dirección visual única “Noche
 calma” y añadir XP, niveles, logros, Contrarreloj, Supervivencia, misiones por tema, escenarios
-multi-paso y preguntas de construcción de diagramas ER. Sin backend y sin cambiar `sys.*` ni
-los ids de preguntas existentes.
+multi-paso, constructor generalizado de diagramas (ER, UML de clases, casos de uso,
+actividades) y modo independiente “Casos de diagramación”. Sin backend y sin cambiar `sys.*`
+ni los ids de preguntas existentes.
 
 ## No-objetivos
 - Modo claro/oscuro, ranking online, sincronización, simulador SQL, React, PWA y routing.
+- Escenarios con pasos de tipo diagrama (sería la evolución futura del modo de casos, no comprometida).
 
 ## Criterios de aceptación
 1. Tokens en `src/estilos/entrada.css`: fondo `#1A1C22`, superficies `#22252D/#2B2F38`, texto
@@ -25,16 +27,28 @@ los ids de preguntas existentes.
 3. Contrarreloj (30s por pregunta) y Supervivencia (3 vidas, combo) funcionan y tienen tests.
 4. Misiones por tema muestran estrellas 1/2/3, bloqueos y persistencia por materia.
 5. Escenarios BD2, ISW y ASW son navegables, tienen feedback y pasan el validador.
-6. El tipo `er` permite colocar entidades, conectar cardinalidades con mouse/touch y validar.
-7. `npm run validar`, `npm run test`, `npm run build`, `npm run e2e` y detector Impeccable verdes.
+6. El constructor soporta ER (no dirigido, cardinalidad), clases (dirigido, relaciones +
+   asignación de miembros), casos de uso (dirigido, include/extend) y actividades (dirigido,
+   con guardas); funciona con mouse y touch; `npm run validar` valida los 4 subtipos y su
+   contenido pasa revisión del usuario.
+7. El modo “Casos de diagramación” lista casos narrativos, construye el diagrama con el mismo
+   lienzo, calcula rating y persiste el mejor resultado por caso.
+8. `npm run validar`, `npm run test`, `npm run build`, `npm run e2e` y detector Impeccable verdes.
 
 ## Diseño mínimo
 - H1 usa la capa nueva `src/ui/` y tokens; no agrega `onclick` ni globals.
 - `src/core/gamificacion.js`: XP, niveles, logros y reglas puras testeables.
 - Nuevas claves: `sys.xp`, `sys.logros`, `sys.misiones.<materiaId>`, `sys.escenarios`.
-- Nuevos módulos UI: `perfil`, `misiones`, `escenarios`, `er`; reciben estado y callbacks.
+- Nuevos módulos UI: `perfil`, `misiones`, `escenarios`, `diagramas` (lienzo reutilizable),
+  `casos`; reciben estado y callbacks.
 - Escenarios: pasos con opciones, feedback, `siguiente` o `fin`; validador de enlaces.
-- ER: entidades y relaciones esperadas; comparación por conjunto no ordenado.
+- Tipo `diagrama` con `subtipo` (`er` | `uml-clases` | `casos-uso` | `actividades`):
+  `nodosPool`, `miembrosPool`, `relacionesEsperadas [{de, a, tipo}]`, `tiposArista` y
+  `nodosFijos` opcionales; validación por conjunto con dirección por subtipo (ER es no
+  dirigido). Guardas de actividades y miembros de clases viajan en el schema (sin texto libre).
+- Modo “Casos de diagramación”: lista de casos con narrativa + diagrama del mismo schema,
+  rating por % (`≥80` éxito · `≥50` parcial), XP éxito +60 / parcial +25, mejor rating en
+  `sys.casos-diagrama` y logro “Arquitecto”.
 
 ## Tareas ordenadas
 1. Tokens Noche calma, estados y microinteracciones; documentar DESIGN/PRODUCT.
@@ -42,7 +56,10 @@ los ids de preguntas existentes.
 3. Contrarreloj y Supervivencia.
 4. Misiones por tema.
 5. Motor, validador y contenido de escenarios.
-6. Tipo ER, UI táctil y preguntas BD2.
+6a. Motor del lienzo SVG + tipo ER + POC drag/touch; 3-4 preguntas ER en BD2.
+6b. Subtipos UML/casos-uso/actividades + guardas como tipo de arista + miembros en pool;
+   contenido ~10 diagramas (ER 3-4 BD2 · clases 3 ASW/ISW · casos de uso 2 · actividades 2).
+6c. Modo “Casos de diagramación” (lista → caso → lienzo → rating) + contenido de ~5-6 casos.
 7. E2E, detector visual, build y deploy.
 
 ## Riesgos
@@ -53,5 +70,6 @@ los ids de preguntas existentes.
 - XP repetible: reducir recompensa de preguntas ya dominadas.
 
 ## Trazabilidad
-Base refactorizada en `613cf28`; gates previos: validar, 42 tests, build y 6 E2E verdes.
-Pendiente completar hitos y marcar `implementada` tras QA/deploy.
+Base refactorizada en `613cf28`; H5 escenarios en `fb31527`. Gates al cierre H5: validar
+(152 preguntas), 76 unitarios, build y 9 E2E verdes. Pendiente H6a/H6b/H6c y QA/deploy para
+marcar `implementada`.
