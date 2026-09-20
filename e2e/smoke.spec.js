@@ -303,6 +303,8 @@ test.describe('Systematic — smoke', () => {
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
     await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    // "Ninguno" deja cfg-cantidad en 1; pide ambas preguntas de diagrama.
+    await page.getByRole('button', { name: /Usar todas/ }).click();
     await page.getByRole('button', { name: /Comenzar práctica/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
 

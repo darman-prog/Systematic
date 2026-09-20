@@ -12,5 +12,9 @@ export default defineConfig({
     reuseExistingServer: false,
     timeout: 60000
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]
+  projects: [
+    { name: 'chromium', testIgnore: /movil\.spec\.js/, use: { ...devices['Desktop Chrome'] } },
+    // Móvil: viewport de teléfono con eventos táctiles reales.
+    { name: 'movil', testMatch: /movil\.spec\.js/, use: { ...devices['Pixel 7'] } }
+  ]
 });
