@@ -16,7 +16,9 @@
   .card { @apply bg-slate-800/90 border border-slate-700 rounded-xl p-5 sm:p-7 w-full; }
   .subtitle { @apply text-slate-400 leading-relaxed mb-5 text-sm sm:text-base; max-width: 70ch; }
   .btn { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed; }
-  .btn-primary { @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-3 text-sm sm:text-base; color: var(--study-bg); }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed px-5 py-3 text-sm sm:text-base; background: var(--materia-accent); color: var(--materia-accent-texto); }
+  .btn-primary:hover { filter: brightness(1.06); }
+  .btn-primary:active { filter: brightness(0.96); }
   .btn-secondary { @apply bg-slate-700 hover:bg-slate-600 text-slate-100 border border-slate-600 px-5 py-3 text-sm sm:text-base; }
   .btn-ghost { @apply bg-transparent hover:bg-slate-700/60 text-slate-300 border border-slate-700 px-4 py-2.5 text-sm; }
   .btn-sm { @apply px-3 py-2 text-xs sm:text-sm; }
@@ -26,11 +28,11 @@
   .chip-on { @apply bg-blue-600 border-blue-500 text-white font-semibold; }
   .section-title { @apply text-xs sm:text-sm font-bold text-slate-400 mt-7 mb-3 uppercase tracking-wide; }
   .stat-card { @apply bg-slate-900 border border-slate-700 rounded-xl p-3.5 text-center; }
-  .stat-value { @apply text-lg sm:text-xl font-bold text-sky-400; }
+  .stat-value { @apply text-lg sm:text-xl font-bold; color: var(--materia-accent); }
   .stat-label { @apply text-xs text-slate-400 mt-1; }
   .stat-input { @apply w-16 bg-slate-950 border border-slate-700 rounded-lg px-2 py-1 text-slate-100 text-xs; }
   .progress-track { @apply h-2 bg-slate-950 rounded-full overflow-hidden; }
-  .progress-fill { @apply h-full rounded-full transition-all duration-300; background: var(--study-accent); }
+  .progress-fill { @apply h-full rounded-full transition-all duration-300; background: var(--materia-accent); }
   .option { @apply flex items-center gap-3 w-full text-left rounded-xl border-2 border-transparent bg-slate-700 hover:bg-slate-600 px-4 py-3.5 text-sm sm:text-base transition cursor-pointer; }
   .option-correct { @apply bg-emerald-800 border-emerald-500 text-emerald-100; }
   .option-wrong { @apply bg-rose-900 border-rose-500 text-rose-100; }

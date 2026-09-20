@@ -21,6 +21,14 @@
   --mov-base: 280ms;
   --mov-enfasis: 460ms;
   --mov-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Acento por materia (spec 007): app.js lo fija al seleccionar la materia; estos valores
+     base mantienen el aspecto actual en el inicio y fuera de una materia. */
+  --materia-accent: var(--study-accent-strong);
+  --materia-accent-texto: var(--study-bg);
+
+  /* Identidad tipográfica (spec 007): fuente display self-hosted solo para titulares. */
+  --fuente-display: "Source Serif 4", Georgia, "Times New Roman", serif;
 }
 
 html { background: var(--study-bg); }

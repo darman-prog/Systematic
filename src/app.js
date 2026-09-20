@@ -790,6 +790,7 @@ function renderMaterias() {
 function irMaterias() {
   clearTimer();
   session = null;
+  document.documentElement.style.removeProperty("--materia-accent");
   show("materias");
   renderMaterias();
   renderPerfil();
@@ -801,6 +802,8 @@ function seleccionarMateria(id) {
   materia = m;
   banco = m.preguntas;
   glosario = m.glosario;
+  // Acento por materia (spec 007): tiñe acciones primarias, progreso y stats de la materia.
+  document.documentElement.style.setProperty("--materia-accent", m.color);
   persistencia.migrarLegacy(m.id);
   progreso = cargarProgreso();
   inicializarFiltros();
