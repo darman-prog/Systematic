@@ -19,7 +19,9 @@ export const DIF_LABELS = { facil: "Fácil", media: "Media", dificil: "Difícil"
 export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 
 export function escapar(texto) {
-  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  // Escapa los caracteres que rompen el HTML y los atributos entre comillas dobles.
+  // La comilla simple se deja cruda: resaltarSQL() la usa para marcar strings de SQL.
+  return String(texto).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function escaparRegex(texto) {

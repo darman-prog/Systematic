@@ -13,7 +13,9 @@ export function pintarListaCasos(casos, registros) {
   if (!cont) return;
   cont.innerHTML = casos.map(c => {
     const registro = registros[c.id];
-    const mejor = registro
+    // Registro corrupto o con rating desconocido se trata como "Sin jugar" (localStorage no es confiable).
+    const ratingOk = registro && ["exito", "parcial", "fracaso"].includes(registro.mejorRating);
+    const mejor = ratingOk
       ? (registro.mejorRating === "exito" ? "Éxito" : registro.mejorRating === "parcial" ? "Parcial" : "Fracaso")
       : "Sin jugar";
     return tarjeta({

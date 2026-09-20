@@ -544,7 +544,7 @@ export function crearDiagramasUI({
           e.stopPropagation();
           const texto = dragPid.slice("miembro:".length);
           dragPid = null;
-          guardar(asignarMiembro(est, texto, nombre));
+          guardar(asignarMiembro(estado(), texto, nombre));
           pintarNodos(item, area);
           setHint("Miembro asignado a «" + nombre + "».");
           return;
@@ -579,8 +579,8 @@ export function crearDiagramasUI({
           n.style.left = nuevoX + "px";
           n.style.top = nuevoY + "px";
           dibujarAristas(item);
-          // ✅ Guardar la nueva posición en el estado
-          guardar(actualizarPosicion(est, nombre, nuevoX, nuevoY));
+          // ✅ Guardar la nueva posición en el estado (siempre fresco, no el capturado al pintar)
+          guardar(actualizarPosicion(estado(), nombre, nuevoX, nuevoY));
         }
       });
       papel.appendChild(n);
