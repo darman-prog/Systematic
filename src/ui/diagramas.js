@@ -95,7 +95,7 @@ export function crearDiagramasUI({
         pool +
       "</div>" +
       miembros +
-      '<div id="lienzo-diagrama" class="my-3"><svg id="edges-diagrama"></svg></div>' +
+      '<div id="lienzo-diagrama" class="my-3" tabindex="0" role="group" aria-label="Lienzo del diagrama"><svg id="edges-diagrama"></svg></div>' +
       '<div id="tipos-diagrama" class="flex flex-wrap gap-2.5 mt-2 items-center" hidden>' +
         "<span>Tipo:</span>" +
         tiposDe(item).map(t => '<button class="pieza" data-arista="' + escapar(t) + '">' + escapar(t) + "</button>").join("") +
@@ -125,9 +125,38 @@ export function crearDiagramasUI({
 
   function activarPool(area) {
     const cont = $("pool-diagrama");
-    if (cont) cont.querySelectorAll("[data-nodo]").forEach(n => n.addEventListener("pointerdown", inicioDesdePool));
+    if (cont) cont.querySelectorAll("[data-nodo]").forEach(n => {
+      n.addEventListener("pointerdown", inicioDesdePool);
+      n.tabIndex = 0;
+      n.setAttribute("role", "button");
+      n.setAttribute("aria-label", "Colocar " + n.dataset.nodo + " en el lienzo");
+      n.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          colocarNodoUI(n.dataset.nodo);
+        }
+      });
+    });
     const miembros = $("pool-miembros");
-    if (miembros) miembros.querySelectorAll("[data-miembro]").forEach(m => m.addEventListener("pointerdown", inicioDesdePool));
+    if (miembros) miembros.querySelectorAll("[data-miembro]").forEach(m => {
+      m.addEventListener("pointerdown", inicioDesdePool);
+      m.tabIndex = 0;
+      m.setAttribute("role", "button");
+      m.setAttribute("aria-label", "Miembro " + m.dataset.miembro + ". Enter para seleccionar y luego elegir la clase");
+      m.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          colocarMiembro(m.dataset.miembro);
+        }
+      });
+    });
+  }
+
+  // Lleva el foco a un control real del lienzo (WCAG 2.4.3) tras montar o cambiar de pregunta.
+  function enfocarLienzo() {
+    const primera = $("pool-diagrama") && $("pool-diagrama").querySelector(".pieza");
+    const destino = primera || $("lienzo-diagrama") || $("btn-comprobar-diagrama");
+    if (destino && typeof destino.focus === "function") destino.focus({ preventScroll: true });
   }
 
   function inicioDesdePool(e) {
@@ -274,14 +303,20 @@ export function crearDiagramasUI({
     cancelarSeleccion();
     dragPid = "nodo:" + nombre;
     const el = $("lienzo-diagrama").querySelector('.nodo-puesto[data-label="' + nombre + '"]');
-    if (el) el.classList.add("seleccionado");
+    if (el) {
+      el.classList.add("seleccionado");
+      el.setAttribute("aria-pressed", "true");
+    }
     setHint("«" + nombre + "» seleccionado. Toca otro nodo para conectarlo.");
   }
 
   function cancelarSeleccion() {
     dragPid = null;
     const prev = document.querySelector("#lienzo-diagrama .seleccionado");
-    if (prev) prev.classList.remove("seleccionado");
+    if (prev) {
+      prev.classList.remove("seleccionado");
+      prev.setAttribute("aria-pressed", "false");
+    }
     const tipos = $("tipos-diagrama");
     if (tipos) tipos.hidden = true;
   }
@@ -395,6 +430,10 @@ export function crearDiagramasUI({
       }
       
       n.innerHTML = contenido;
+      n.tabIndex = 0;
+      n.setAttribute("role", "button");
+      n.setAttribute("aria-pressed", "false");
+      n.setAttribute("aria-label", "Nodo " + nombre + ". Enter para seleccionar o conectar, flechas para mover" + (fijo ? "" : ", Supr para quitar") + ".");
       
       if (!fijo) {
         const quitar = document.createElement("button");
@@ -425,6 +464,33 @@ export function crearDiagramasUI({
           return;
         }
         inicioMoverNodo(e);
+      });
+      n.addEventListener("keydown", e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toqueNodo(nombre);
+          return;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          cancelarSeleccion();
+          setHint("Selección cancelada.");
+          return;
+        }
+        if (!fijo && (e.key === "Delete" || e.key === "Backspace")) {
+          e.preventDefault();
+          quitarNodoUI(nombre);
+          return;
+        }
+        const paso = 12;
+        const deltas = { ArrowLeft: [-paso, 0], ArrowRight: [paso, 0], ArrowUp: [0, -paso], ArrowDown: [0, paso] };
+        if (deltas[e.key]) {
+          e.preventDefault();
+          const [dx, dy] = deltas[e.key];
+          n.style.left = Math.max(0, n.offsetLeft + dx) + "px";
+          n.style.top = Math.max(0, n.offsetTop + dy) + "px";
+          dibujarAristas(item);
+        }
       });
       lienzo.appendChild(n);
     });
@@ -516,6 +582,7 @@ export function crearDiagramasUI({
     cancelarSeleccion,
     colocarMiembro,
     colocarNodoUI,
-    quitarNodoUI
+    quitarNodoUI,
+    enfocarLienzo
   };
 }

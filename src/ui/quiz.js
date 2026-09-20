@@ -353,6 +353,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     if (!tablero || tablero.preguntaId !== item.id) {
       ctx.session.diagrama = null;
       diagramas.renderDiagrama(item, area);
+      diagramas.enfocarLienzo();
       return;
     }
     // Mismo ítem ya montado: conserva el lienzo y las posiciones de los nodos.

@@ -157,6 +157,43 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#next-btn')).toBeVisible();
   });
 
+  test('lienzo de diagrama operable solo con teclado', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .mode-card').first().click(); // BD2
+    await page.getByRole('button', { name: /Configurar práctica/ }).click();
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="diagrama"]').click();
+    await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+
+    // Coloca dos nodos con Enter desde el pool.
+    await page.locator('#pool-diagrama .pieza').first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(1);
+    await page.locator('#pool-diagrama .pieza').first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto')).toHaveCount(2);
+
+    // Selecciona el primero y conecta con el segundo con Enter.
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto').first()).toHaveAttribute('aria-pressed', 'true');
+    await page.locator('#lienzo-diagrama .nodo-puesto').nth(1).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#tipos-diagrama')).toBeVisible();
+
+    // Elige el tipo de relación con Enter.
+    await page.locator('#tipos-diagrama [data-arista]').first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#lienzo-diagrama .etiqueta-arista')).toHaveCount(1);
+
+    // Escape deselecciona.
+    await page.locator('#lienzo-diagrama .nodo-puesto').first().focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#lienzo-diagrama .nodo-puesto.seleccionado')).toHaveCount(0);
+  });
+
   test('constructor UML con miembros: ASW muestra preguntas de diagrama de clases', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').nth(2).click(); // ASW

@@ -628,6 +628,7 @@ function jugarCaso(id) {
   pintarCaso(c, casoEstado);
   show("caso");
   diagramasUI.renderDiagrama(c.diagrama, $("lienzo-caso"));
+  $("caso-titulo").focus({ preventScroll: true });
 }
 
 function comprobarCaso() {
@@ -998,6 +999,8 @@ const diagramasUI = crearDiagramasUI({
 
 document.addEventListener("keydown", e => {
   if ($("screen-quiz").classList.contains("hidden") || !session) return;
+  const t = e.target;
+  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
   const item = session.items[session.idx];
   const answered = !!session.answers[session.idx];
   if (answered) {
