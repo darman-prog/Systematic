@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import bd2Preguntas from '../src/datos/bd2/preguntas.js';
+import iswPreguntas from '../src/datos/isw/preguntas.js';
+import aswPreguntas from '../src/datos/asw/preguntas.js';
 
 test.describe('Systematic — smoke', () => {
   test('el home lista 3 materias con su estado de contenido', async ({ page }) => {
@@ -7,12 +10,12 @@ test.describe('Systematic — smoke', () => {
     const cards = page.locator('#materias-list .mode-card');
     await expect(cards).toHaveCount(3);
     await expect(cards.nth(0)).toContainText('Base de Datos 2');
-    await expect(cards.nth(0)).toContainText('87 preguntas');
+    await expect(cards.nth(0)).toContainText(bd2Preguntas.length + ' preguntas');
     await expect(cards.nth(1)).toContainText('Ingeniería de Software');
-    await expect(cards.nth(1)).toContainText(/35 preguntas/);
+    await expect(cards.nth(1)).toContainText(iswPreguntas.length + ' preguntas');
     await expect(cards.nth(1)).not.toContainText('Contenido en preparación');
     await expect(cards.nth(2)).toContainText('Arquitectura de Software');
-    await expect(cards.nth(2)).toContainText(/30 preguntas/);
+    await expect(cards.nth(2)).toContainText(aswPreguntas.length + ' preguntas');
     await expect(cards.nth(2)).not.toContainText('Contenido en preparación');
   });
 
@@ -22,7 +25,7 @@ test.describe('Systematic — smoke', () => {
     await page.goto('/');
     await page.locator('#materias-list .mode-card').first().click();
     await expect(page.locator('#screen-start')).toBeVisible();
-    await expect(page.locator('#stat-total')).toHaveText('87');
+    await expect(page.locator('#stat-total')).toHaveText(String(bd2Preguntas.length));
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await expect(page.locator('#screen-config')).toBeVisible();
     await page.locator('#screen-config').getByRole('button', { name: '← Inicio' }).click();
