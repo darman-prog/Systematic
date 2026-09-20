@@ -1,155 +1,98 @@
-<!-- Slide number: 1 -->
+# Ingeniería de Software I — Clases 11, 12 y 13
 
-![](GoogleShape84p1.jpg)
+> Fuente: presentación de Verónica Chajín Ortiz (UNAB). Material de estudio para la cátedra.
 
-![](GoogleShape85p1.jpg)
-Ingeniería de Software I
-Verónica Chajín Ortizvchajin@unab.edu.co
+## 1. Análisis de requerimientos y modelado
 
-### Notes:
+### ¿Qué es el modelado?
 
-<!-- Slide number: 2 -->
+El análisis de requerimientos produce **modelos** que ayudan a entender el sistema. Según su naturaleza, los modelos pueden ser de distintos tipos:
 
-![](GoogleShape749p61.jpg)
+- **Escenarios**: describen situaciones del mundo real en las que el sistema participa.
+- **Clases**: representan entidades y sus relaciones.
+- **Comportamiento**: describen cómo el sistema responde a los eventos.
 
-![](GoogleShape750p61.jpg)
-Análisis de requerimientos
-Modelado de los requerimientos
+### Tipos de modelos
 
-### Notes:
+- **Modelo de comportamiento**: describe cómo el sistema responde a eventos externos.
+- **Modelo de estructura**: representa la organización estática de los componentes del sistema.
+- **Modelo de interacción**: describe cómo los componentes del sistema interactúan entre sí.
 
-<!-- Slide number: 3 -->
-# Tipos de modelos
+UML aporta la notación visual para expresar todos estos tipos de modelos.
 
-### Notes:
+## 2. Modelado basado en escenarios: UML
 
-<!-- Slide number: 4 -->
+### ¿Qué es un escenario?
 
-### Notes:
+Un escenario es una **historia de cómo el sistema, un actor y los elementos circundantes reaccionan a un evento**. Un escenario bien definido puede referirse a sí mismo como un **caso de uso**.
 
-<!-- Slide number: 5 -->
-# Modelado basado en escenarios – UML
+### Actores y perfiles de usuario
 
-### Notes:
+Un **actor** es una persona o sistema externo que interacciona con el sistema. Un **perfil de usuario** describe características, necesidades y comportamientos de un grupo de usuarios. Identificar actores y perfiles de usuario es clave para entender quiénes usarán el sistema y cómo.
 
-<!-- Slide number: 6 -->
-# Actores y perfiles de usuario
+## 3. Casos de uso
 
-### Notes:
+### ¿Qué es un caso de uso?
 
-<!-- Slide number: 7 -->
-# Actores y perfiles de usuario
+Un **caso de uso** es la narración o plantilla que describe una función o rasgo del sistema **desde el punto de vista del usuario**. Sirve como base para construir un modelo de requerimientos más completo. El escritor del caso de uso debe identificar:
 
-### Notes:
+- **Actor(es)** involucrados.
+- **Descripción** del objetivo.
+- **Flujo de eventos** (secuencia de pasos).
+- **Resultados esperados**.
 
-<!-- Slide number: 8 -->
-# ¿Qué debe contener un Caso de Uso?
+### Escenario principal y alternativas
 
-### Notes:
+El modelado basado en escenarios se apoya en la narrativa del caso de uso. Cuando la narrativa describe solo la secuencia típica, hablamos de un **escenario principal** (o escenario feliz).
 
-<!-- Slide number: 9 -->
-# Caso de Uso
+Cada paso del escenario principal debe contemplar las **alternativas**, evaluándolos con preguntas como:
 
-### Notes:
+- ¿Qué ocurre si el actor elige otra opción?
+- ¿Qué pasa si se presenta un error en un paso intermedio?
 
-<!-- Slide number: 10 -->
-# Caso de Uso
+Una **excepción** (o **escenario secundario**) describe una situación —ya sea una condición de falla o una alternativa elegida por el actor— que provoca que el sistema exhiba un comportamiento distinto.
 
-### Notes:
+> "Esta presentación secuencial no considera interacciones alternativas (la narrativa era fluida y representaba unas cuantas alternativas). Los casos de uso de este tipo se conocen algunas veces como **escenarios principales**."
 
-<!-- Slide number: 11 -->
-# Caso de Uso
+### Ejemplo
 
-### Notes:
+6. El propietario del hogar selecciona "elegir una cámara".
+7. El sistema despliega el plano con las plantas de la casa.
 
-<!-- Slide number: 12 -->
-Es importante señalar que esta presentación secuencial no considera interacciones alternativas (la narrativa era fluida y representaba unas cuantas alternativas). Los casos de uso de este tipo se conocen algunas veces como escenarios principales.
-Cada paso en el escenario principal debe contemplar las “alternativas”, portanto se evalúa haciendo las siguientes preguntas
+## 4. Diagramas de casos de uso UML
 
-<!-- Slide number: 13 -->
-Excepción
-Escenario Secundario
+Fuente: https://www.lucidchart.com/pages/uml-use-case-diagram
 
-Describe una situación (ya sea una condición de falla o una alternativa elegida por el actor) que provoca que el sistema exhiba un comportamiento algo distinto.
+- Los **casos de uso** se representan con una **forma ovalada etiquetada**.
+- Los **actores** se dibujan como **figuras de palitos**; su participación en el sistema se modela con una **línea entre el actor y el caso de uso**.
+- Para representar el **límite del sistema**, se dibuja un **cuadro alrededor de los casos de uso**.
 
-6. El propietario del hogar selecciona “elegir una cámara”.
-7. El sistema despliega el plano con las plantas de la casa
+Los diagramas de casos de uso son ideales para comunicar el **alcance funcional** con clientes y usuarios no técnicos.
 
-<!-- Slide number: 14 -->
-# Diagramas de Casos de Uso UML
-https://www.lucidchart.com/pages/uml-use-case-diagram
+### ¿Para qué sirven?
 
-<!-- Slide number: 15 -->
-# Diagramas de Casos de Uso
+- Visualizar quiénes (actores) interaccionan con el sistema y qué funcionalidades (casos de uso) están disponibles.
+- Definir el alcance del sistema de forma clara y visual.
+- Servir como punto de partida para el análisis de requerimientos.
 
-### Notes:
+## 5. Diagramas de actividades UML
 
-<!-- Slide number: 16 -->
+### ¿Qué son?
 
-# Los Diagramas de Casos de Uso son ideales para
+Los diagramas de actividades pertenecen a los **diagramas de comportamiento (dinámicos)** de UML. Modelan el **flujo de trabajo** y la lógica de un proceso mediante actividades, decisiones y transiciones.
 
-### Notes:
+### Componentes
 
-<!-- Slide number: 17 -->
+- **Actividad**: representa un trabajo que realiza el sistema.
+- **Decisión (rombo)**: representa una bifurcación en el flujo, dependiendo de una condición.
+- **Transición**: flecha que conecta actividades, mostrando la dirección del flujo.
+- **Nodo inicial**: círculo relleno que marca el punto de partida.
+- **Nodo final**: círculo con borde cuadrado que marca el punto final.
 
-# Diagramas de Casos de Uso
-Los casos de uso se representan con una forma ovalada etiquetada. Las figuras de palitos representan actores en el proceso, y la participación del actor en el sistema se modela con una línea entre el actor y el caso de uso. Para representar el límite del sistema, dibuje un cuadro alrededor del caso de uso.
+### Beneficios
 
-### Notes:
+- Visualizar procesos paralelos y flujos complejos de forma entendible para técnicos y no técnicos.
+- Identificar puntos críticos, cuellos de botella y posibles mejoras en el proceso.
+- Servir como base para la implementación del proceso en el sistema.
 
-<!-- Slide number: 18 -->
-
-![Diagrama Descripción generada automáticamente](Imagen2.jpg)
-# Diagramas de Casos de Uso
-Ver artículos
-Hacer una compra
-Completar pago
-Ingresar
-
-### Notes:
-
-<!-- Slide number: 19 -->
-# Diagramas de Actividades UML
-DIAGRAMAS DE COMPORTAMIENTO
-
-<!-- Slide number: 20 -->
-# Diagramas de Actividades
-
-### Notes:
-
-<!-- Slide number: 21 -->
-/
-# Beneficios de los Diagramas de Actividades
-
-### Notes:
-
-<!-- Slide number: 22 -->
-/
-
-# Componentes de un diagrama de actividades
-https://www.lucidchart.com/pages/es/tutorial-diagrama-de-actividades-uml
-
-https://lucid.app/lucidchart/7deefb64-7527-4738-8591-21db90c69dcb/edit?page=0_0&invitationId=inv_1318ea09-8732-4ce5-a720-1652f9a3dd8f#
-
-### Notes:
-
-<!-- Slide number: 23 -->
-
-![activity diagram](Picture4.jpg)
-
-<!-- Slide number: 24 -->
-
-![](GoogleShape862p4.jpg)
-
-![](GoogleShape863p4.jpg)
-
-![](GoogleShape866p4.jpg)
-
-![](GoogleShape864p4.jpg)
-
-![](GoogleShape868p4.jpg)
-@unab.online
-@unab_online
-@unab_online
-
-### Notes:
+Fuente: https://www.lucidchart.com/pages/es/tutorial-diagrama-de-actividades-uml

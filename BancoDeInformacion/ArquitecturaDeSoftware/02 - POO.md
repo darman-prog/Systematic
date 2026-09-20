@@ -1,178 +1,77 @@
-Fundamentos
-de la POO
-MSc. Fabian Suarez
-MSc. Javier Pinzon
-MSc. Feisar Moreno
+# Fundamentos de la POO
 
-POO - Programación Orientado a Objetos
-La Programación orientada a objetos (POO) es un paradigma basado en el
-concepto de envolver bloques de información y su comportamiento
-relacionado, en lotes especiales llamados objetos, que se construyen a partir de
-un grupo de “planos” definidos por un programador, que se denominan clases.
-UNIVERSIDAD AUTONOMA DE BUCARAMANGA
+> Fuente: presentación de MSc. Fabián Suárez, MSc. Javier Pinzón, MSc. Feisar Moreno (UNAB). Material de estudio para la cátedra.
 
-Clases
+## ¿Qué es la Programación Orientada a Objetos (POO)?
 
-Objetos
+La Programación orientada a objetos (POO) es un paradigma basado en el concepto de **envolver bloques de información y su comportamiento relacionado**, en lotes especiales llamados **objetos**, que se construyen a partir de un grupo de "planos" definidos por un programador, que se denominan **clases**.
 
-Ejercicio
-en clase El Guerrero de Coliseo
+UNIVERSIDAD AUTÓNOMA DE BUCARAMANGA
 
-Ejercicio
-en clase
-El Sistema de Ascensor Inteligente
+## Clases y objetos
 
-Ejercicio
-en clase
-El Gestor de Suscripciones (Streaming)
+- Una **clase** es un plano o molde que define cómo serán los objetos de un programa: qué datos tendrán y qué acciones podrán realizar.
+- Un **objeto** es una instancia de una clase.
 
-Desafio
-¿Qué tan buenos Arquitectos son?
-Ahora que has diseñado y programado la lógica de tus objetos de
-forma manual, utiliza una Inteligencia Artificial para generar el código
-de los tres retos en tres lenguajes de programación distintos-
-Tu misión: Analiza las diferencias sintácticas y estructurales. Observa
-cómo cada lenguaje maneja el encapsulamiento (privacidad de datos) y
-la estructura de las clases, y completa un cuadro comparativo
-resaltando qué te gustó más de cada uno.
+## Pilares de la POO
 
-Jerarquías de clase
+### Abstracción
 
-Jerarquia de clases
+La **abstracción** es el modelo de un objeto o fenómeno del mundo real, **limitado a un contexto específico**, que representa todos los datos relevantes a ese contexto con gran precisión y **omite el resto**.
 
-Ejercicio
-en clase
-El Sistema de Cobros
-Una tienda departamental necesita organizar sus finanzas. La base
-de todo es la Transacción, que registra el monto y la moneda. El
-| sistema | debe ramificarse | en tres | formas | de pago | distintas: |
-| ------- | ---------------- | ------- | ------ | ------- | ---------- |
-1. Los que pagan con Tarjeta, donde se debe validar el número de
-| plástico | y la franquicia | (Visa/Mastercard). |     |     |     |
-| -------- | --------------- | ------------------ | --- | --- | --- |
-2. Los que usan Transferencia, guardando el código del banco y
-| el  | número de cuenta | de origen. |     |     |     |
-| --- | ---------------- | ---------- | --- | --- | --- |
-3. Los que usan Cripto, donde se requiere el hash de la billetera y
-| la  | red utilizada (Blockchain). |     |     |     |     |
-| --- | --------------------------- | --- | --- | --- | --- |
+**Ejemplo:** Un avión se modela con la física de vuelo y sistemas en un **simulador de vuelo**, pero solo con **asientos, horarios y precios** en una **aplicación de reserva de vuelos**. El mismo objeto real cambia según para qué lo necesites.
 
-Ejercicio
-El Ecosistema de Transporte
-"Smart-Logistics"
-en clase
+### Encapsulación
 
-Desafio
-¿Qué tan buenos Arquitectos son?
-Pide a una IA que implemente en tres lenguajes distintos los ejercicios anteriores.
-| Centra | tu análisis | en  | las 'Cosas | Nuevas’: |     |
-| ------ | ----------- | --- | ---------- | -------- | --- |
-1. Palabras Clave de Unión: Observa cómo cada lenguaje conecta al padre con el
-| hijo | (¿Usa | extends, | : o (Padre)?). |     |     |
-| ---- | ----- | -------- | -------------- | --- | --- |
-2. Llamadas al Constructor Superior: Identifica cómo el hijo le envía datos al padre
-| (¿Usa | super(), | base() | o el | nombre | de la clase?). |
-| ----- | -------- | ------ | ---- | ------ | -------------- |
-3. Sobrescritura de Métodos: Si el Vehiculo tiene un método encender(), ¿cómo
-hace el Cisterna para cambiar ese comportamiento o añadirle algo nuevo?
+La **encapsulación** es la capacidad que tiene un objeto de **esconder partes de su estado y comportamiento** de otros objetos, **exponiendo únicamente una interfaz limitada** al resto del programa. Así se protegen los datos internos de accesos no deseados y se reduce el acoplamiento entre componentes.
 
-Pilares
-de la POO
+### Herencia
 
-Abstracción
-La Abstracción es el modelo
-de un objeto o fenómeno del
-mundo real, limitado a un
-contexto específico, que
-representa
-todos los datos relevantes a
-Ej. simulador de vuelo
-este contexto con gran
-y en una aplicación de
-reserva de vuelos
-precisión,
-omitiendo el resto.
+La **herencia** es la capacidad de **crear nuevas clases sobre otras existentes**. La principal ventaja de la herencia es la **reutilización de código**: si quieres crear una clase ligeramente diferente a una ya existente, no hay necesidad de duplicar el código.
 
-La encapsulación es la
-capacidad que tiene un objeto
-de esconder partes de su
-estado y comportamiento de
-otros objetos, exponiendo
-únicamente una interfaz
-limitada al resto del
-programa
-Encapsulación
+En los lenguajes orientados a objetos, la herencia se materializa mediante palabras clave de unión como `extends`, `:` o el nombre del padre entre paréntesis, con llamadas al constructor superior tipo `super()` o `base()`, y con la **sobrescritura de métodos** (si `Vehiculo` tiene un método `encender()`, la subclase `Cisterna` puede cambiar o ampliar ese comportamiento).
 
-Herencia
-La herencia es la capacidad de
-crear nuevas clases sobre
-otras
-existentes. La principal ventaja
-de la herencia es la
-reutilización de código. Si
-Ej. simulador de vuelo
-quieres crear una clase
-y en una aplicación de
-reserva de vuelos
-ligeramente diferente a una ya
-existente, no hay necesidad
-de duplicar el código.
+### Polimorfismo
 
-Polimorfismo
+El **polimorfismo** permite que objetos de clases distintas puedan tratarse de forma **uniforme** a través de una misma interfaz o clase base. El código cliente puede operar sobre una abstracción (por ejemplo, una interfaz `Forma`) y el objeto concreto decide en tiempo de ejecución cómo responder a cada mensaje.
 
-Relaciones
-entre Objetos
+## Relaciones entre objetos
 
-Dependencia
-La dependencia es el tipo de relación más básica y débil entre clases. Existe una
-dependencia entre dos clases cuando ciertos cambios en la definición de una
-clase puede provocar modificaciones en otra. La dependencia ocurre
-normalmente cuando utilizas nombres de clases concretas en tu código. Por
-ejemplo, al especificar tipos en las firmas de un método, al instanciar objetos
-mediante llamadas al constructor, etc. Puedes hacer más débil una dependencia
-haciendo que tu código dependa de interfaces o clases abstractas en lugar de
-clases concretas.
+La forma en que los objetos y clases se relacionan define la estructura y el acoplamiento del sistema. Las relaciones, de más débil a más fuerte, son:
 
-Asociación
-La asociación es una relación en la que un objeto utiliza o interactúa con otro. En
-diagramas UML, la relación de asociación se muestra mediante una flecha simple
-desde un objeto y apuntando hacia el objeto que utiliza. Por cierto, es totalmente
-normal tener una asociación bidireccional. En este caso, la flecha tiene una punta en
-cada extremo. La asociación puede verse como un tipo especializado de
-dependencia, en la que un objeto siempre tiene acceso a los objetos con los que
-interactúa, mientras que la dependencia simple no establece un vínculo permanente
-entre los objetos.
+### Dependencia
 
-Ejemplo dependencia y asociación
+La **dependencia** es el tipo de relación **más básica y débil** entre clases. Existe una dependencia entre dos clases cuando ciertos cambios en la definición de una clase pueden provocar modificaciones en otra. La dependencia ocurre normalmente cuando utilizas nombres de clases concretas en tu código: especificar tipos en las firmas de un método, instanciar objetos mediante llamadas al constructor, etc.
 
-Agregación
-La agregación es un tipo especializado de asociación que representa relaciones
-“uno a muchos”, “muchos a muchos” o “todo a parte” entre múltiples objetos.
-Normalmente, con la agregación, un objeto “tiene” un grupo de otros
-objetos y sirve como contenedor o colección. El componente puede existir
-sin el contenedor y puede vincularse a varios contenedores al mismo
-tiempo.
+**Puedes debilitar una dependencia** haciendo que tu código dependa de **interfaces o clases abstractas** en lugar de clases concretas. Si un método recibe `Sausage` concreta, existe una dependencia fuerte; si recibe la interfaz `Food`, la dependencia se debilita.
 
-Composición
-La composición es un tipo específico de agregación en la que un objeto se compone
-de una o más instancias del otro. La diferencia entre ésta y otras relaciones está en
-que el componente sólo puede existir como parte del contenedor. En UML, la
-relación de composición se representa igual que la de agregación, pero con un
-diamante relleno en la base de la flecha.
-“Vivir o morir”
+### Asociación
 
-En resumen…
-• Dependencia: La clase A puede verse afectada por cambios en la clase B.
-• Asociación: El objeto A conoce el objeto B. La clase A depende de B. •
-• Agregación: El objeto A conoce el objeto B y consiste en B. La clase A
-depende de B.
-• Composición: El objeto A conoce el objeto B, consiste en B y gestiona el ciclo
-vital de B. La clase A depende de B.
-• Implementación: La clase A define métodos declarados en la interfaz B. Los
-objetos A pueden tratarse como B. La clase A depende de B. •
-• Herencia: La clase A hereda la interfaz y la implementación de la clase B, pero
-puede extenderla. El objeto A puede tratarse como B. La clase A depende de B
+La **asociación** es una relación en la que un objeto **utiliza o interactúa con otro** de forma permanente. En diagramas UML, la relación de asociación se muestra mediante una **flecha simple** desde un objeto y apuntando hacia el objeto que utiliza. Es totalmente normal tener una asociación **bidireccional**: en ese caso, la flecha tiene una punta en cada extremo. Puedes ver la asociación como un tipo especializado de dependencia en la que el objeto siempre tiene acceso a los objetos con los que interactúa, mientras que la dependencia simple no establece un vínculo permanente entre los objetos.
 
-Relaciones entre objetos y clases
+### Agregación
 
-Gracias!
+La **agregación** es un tipo especializado de asociación que representa relaciones **"uno a muchos", "muchos a muchos" o "todo a parte"** entre múltiples objetos. Normalmente, con la agregación, un objeto **tiene** un grupo de otros objetos y sirve como contenedor o colección. El componente **puede existir sin el contenedor** y puede vincularse a varios contenedores al mismo tiempo.
+
+### Composición
+
+La **composición** es un tipo específico de agregación en el que el componente **solo puede existir como parte del contenedor** (relación de **"vivir o morir"**). En UML, la relación de composición se representa igual que la de agregación, pero con un **diamante relleno** en la base de la flecha. Si el contenedor desaparece, los componentes también desaparecen.
+
+### Implementación
+
+La **implementación** es una relación en la que una clase A **define los métodos declarados en la interfaz B**. Los objetos de A pueden tratarse como B. La clase A depende de B.
+
+### Herencia (relación entre clases)
+
+La **herencia** es una relación en la que la clase A **hereda la interfaz y la implementación** de la clase B, pero puede extenderlas. El objeto A puede tratarse como B. La clase A depende de B.
+
+## En resumen
+
+| Relación | ¿Conoce A? | ¿Consiste en B? | ¿Gestiona el ciclo de vida? |
+|---|---|---|---|
+| **Dependencia** | No (solo referencia) | No | No |
+| **Asociación** | Sí (tiene acceso permanente) | No | No |
+| **Agregación** | Sí | Sí | No |
+| **Composición** | Sí | Sí | Sí (vivir o morir) |
+| **Implementación** | Sí (define la interfaz) | No | No |
+| **Herencia** | Sí (hereda) | No | No |

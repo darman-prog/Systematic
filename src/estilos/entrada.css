@@ -70,7 +70,6 @@
   .topic-bar { @apply h-2.5 bg-slate-950 rounded-full overflow-hidden; }
   .topic-bar-fill { @apply h-full rounded-full; }
   .topic-score { @apply text-right text-slate-400; }
-  .peor-row { @apply flex gap-3 items-center bg-slate-950 rounded-xl px-4 py-2.5 text-xs sm:text-sm; }
   .review-item { @apply bg-slate-950 border border-slate-700 rounded-xl p-4; }
   .review-ok { @apply border-l-emerald-500; }
   .review-bad { @apply border-l-rose-500; }

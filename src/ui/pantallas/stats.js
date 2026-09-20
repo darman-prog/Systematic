@@ -11,6 +11,7 @@
 import { calcularRacha, esDebil, hoyISO, vencida } from "../../core/progreso.js";
 import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
 import { estadoVacio, aviso } from "../componentes/estados.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 
@@ -100,7 +101,7 @@ function tiempoRelativo(iso) {
 
 /* El banco puede traer la pregunta como string o como objeto; extraer con seguridad. */
 function textoPregunta(q) {
-  const t = typeof q === "string" ? q : (q && (q.pregunta || q.enunciado || q.texto)) || "";
+  const t = typeof q === "string" ? q : (q && (q.q || q.pregunta || q.enunciado || q.texto)) || "";
   return typeof t === "string" ? t : "";
 }
 
@@ -278,10 +279,16 @@ export function renderStats({ materia, banco = [], obtenerP, historial = [], act
     peores.forEach(x => {
       const dif = x.q && x.q.dificultad;
       const texto = textoPregunta(x.q);
+      const corto = texto.length > 110 ? texto.slice(0, 110) + "…" : texto;
       html += '<div class="peor-row">' +
-        (DIF_LABELS[dif] ? '<span class="tag-dif tag-dif-' + dif + '">' + DIF_LABELS[dif] + '</span>' : '') +
-        '<span class="peor-texto">' + escapar(texto.length > 95 ? texto.slice(0, 95) + "…" : texto) + '</span>' +
-        '<span class="peor-fallos tabular">' + x.fail + ' fallo' + (x.fail > 1 ? "s" : "") + '</span>' +
+        '<div class="peor-texto">' +
+          '<span class="peor-pregunta" title="' + escapar(texto) + '">' + escapar(corto) + '</span>' +
+          '<span class="peor-meta">' +
+            (x.q && x.q.tema ? '<span class="peor-tema">' + escapar(x.q.tema) + '</span>' : '') +
+            (DIF_LABELS[dif] ? '<span class="diff diff-' + dif + '">' + DIF_LABELS[dif] + '</span>' : '') +
+          '</span>' +
+        '</div>' +
+        '<span class="peor-fallos tabular" title="' + x.fail + ' fallo(s)">' + icono("cruz", "icono-sm") + x.fail + '</span>' +
       '</div>';
     });
     html += '</div>';

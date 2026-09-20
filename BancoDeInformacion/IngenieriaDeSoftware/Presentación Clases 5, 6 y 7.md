@@ -1,149 +1,63 @@
-<!-- Slide number: 1 -->
+# Ingeniería de Software I — Clases 5, 6 y 7
 
-![](GoogleShape84p1.jpg)
+> Fuente: presentación de Verónica Chajín Ortiz (UNAB). Material de estudio para la cátedra.
 
-![](GoogleShape85p1.jpg)
-Ingeniería de Software I
-Verónica Chajín Ortizvchajin@unab.edu.co
+## 1. Ágil vs. clásico: el costo del cambio
 
-### Notes:
+### El costo del cambio
 
-<!-- Slide number: 2 -->
+El enfoque clásico asume que los requerimientos se congelan al inicio del proyecto. Esto implica que el **costo del cambio** crece fuertemente con el tiempo: cuanto más adelante se descubre que algo hay que modificar, más caro es corregirlo en todas las etapas ya completadas.
 
-![](GoogleShape91p3.jpg)
+El enfoque ágil parte de una premisa distinta: **el cambio es constante** y la pregunta de negocio es cómo **controlar "lo imprevisible"**. Los métodos ágiles buscan mantener el costo del cambio bajo, mediante entregas cortas y feedback continuo del cliente en cada iteración.
 
-![](GoogleShape92p3.jpg)
-Ágil vs. Clásico
-Conceptos y Definiciones de Software
+## 2. Metodologías ágiles más utilizadas
 
-### Notes:
+- **Extreme Programming (XP)**: propuesta por **Kent Beck**. Su flujo de proceso se apoya en prácticas de ingeniería muy disciplinadas y ciclos cortos de desarrollo.
+- **Scrum**: organiza el trabajo en sprints con un backlog priorizado.
+- **Kanban**: visualiza el flujo de trabajo y limita el trabajo en curso.
+- **Agile Inception** y **Design Sprint** (la metodología de Google) para arranques y descubrimiento rápido de soluciones.
 
-<!-- Slide number: 3 -->
+## 3. Scrum — flujo del proceso
 
-![](GoogleShape104p17.jpg)
-Enfoque Clásico
+El flujo del proceso Scrum se basa en iteraciones cortas (sprints) con revisión y adaptación continua. La guía de Scrum 2020 actualizó detalles del proceso, pero su esencia sigue siendo inspeccionar el progreso y adaptar el plan del día.
 
-![Imagen que contiene Diagrama Descripción generada automáticamente](GoogleShape102p17.jpg)
+### Daily Scrum
 
-### Notes:
+- Reuniones breves de **15 minutos** a diario.
+- Dirigidas por el **maestro Scrum (Scrum Master)**.
+- Tres preguntas clave:
+  1. ¿Qué hiciste desde la última reunión del equipo?
+  2. ¿Qué obstáculos estás encontrando?
+  3. ¿Qué planeas hacer hasta la siguiente reunión?
 
-<!-- Slide number: 4 -->
+## 4. Extreme Programming (XP) — flujo del proceso
 
-![Diagrama Descripción generada automáticamente](GoogleShape110p18.jpg)
-Enfoque Agile
+Extreme Programming (XP) organiza el desarrollo en ciclos cortos con prácticas de ingeniería disciplinadas. Su enfoque promueve:
 
-![](GoogleShape112p18.jpg)
-Metodologías ágiles más utilizadas
-Extreme Programming XP.
-Scrum.
-Kanban.
-Agile Inception.
-Design Sprint, la metodología de Google.
+- Entregas frecuentes y pequeñas.
+- Refactorización continua del código.
+- Pruebas automatizadas.
+- Integración continua.
+- Comunicación directa entre programadores y clientes.
 
-### Notes:
+El objetivo es reducir riesgos y mejorar la calidad mediante la participación constante del cliente y la mejora continua del proceso.
 
-<!-- Slide number: 5 -->
-# El Costo del cambio Ágil vs. Convencional
+## 5. Kanban
 
-![https://revproxyebooks724.azurewebsites.net/epubs/31214/OPS/img/chapter02/fig_3.1_pms_286_u.jpg](Picture2.jpg)
+### Aspectos clave
 
-### Notes:
+- **Origen**: Kanban se originó en **Toyota** como un conjunto de prácticas de ingeniería industrial. Fue **David Anderson** quien lo adaptó al desarrollo de software.
+- Los miembros del equipo **gestionan el trabajo** y tienen la **libertad de organizarse por sí mismos** para completarlo.
+- Las **políticas evolucionan** según sea necesario para mejorar los resultados.
 
-<!-- Slide number: 6 -->
-# Cómo controlar “lo imprevisible”
+### Prácticas básicas
 
-### Notes:
+1. **Visualizar el flujo de trabajo**: se utiliza un tablero con columnas que representan los estados del workflow. Esto hace visible el avance y los cuellos de botella.
+2. **Limitar el trabajo en curso (WIP)**: se establece un límite máximo de tareas en cada estado para evitar el cuello de botella y mantener el flujo.
+3. **Gestionar el flujo**: se monitorea el progreso y se ajustan las políticas para optimizar la entrega.
+4. **Hacer visible el proceso de trabajo**: todos los miembros del equipo pueden ver el estado de las tareas en cualquier momento.
+5. **Definir políticas explícitas**: las reglas para mover una tarea de un estado a otro deben estar claramente definidas.
 
-<!-- Slide number: 7 -->
+### Estados de workflow recomendados
 
-![](GoogleShape749p61.jpg)
-
-![](GoogleShape750p61.jpg)
-Desarrollo Ágil
-Metodología SCRUM
-
-### Notes:
-
-<!-- Slide number: 8 -->
-
-![https://revproxyebooks724.azurewebsites.net/epubs/31214/OPS/img/chapter02/fig_3.2_pms_286_u.jpg](Picture2.jpg)
-# Flujo del proceso Scrum
-
-### Notes:
-
-<!-- Slide number: 9 -->
-
-![Daily Scrum](GoogleShape844p68.jpg)
-# Qué nos trae la nueva guía de Scrum 2020
-https://www.scrum.org/resources/blog/daily-scrum-en-la-guia-scrum-2020
-
-### Notes:
-
-<!-- Slide number: 10 -->
-
-![https://revproxyebooks724.azurewebsites.net/epubs/31214/OPS/img/chapter02/fig_3.3_pms_286_1.jpg](Picture2.jpg)
-# Flujo del proceso XP
-
-### Notes:
-
-<!-- Slide number: 11 -->
-# Proceso en metodología Xtreme Programming (XP)
-
-### Notes:
-
-<!-- Slide number: 12 -->
-
-![](GoogleShape749p61.jpg)
-
-![](GoogleShape750p61.jpg)
-Desarrollo Ágil
-Metodología Kanban
-
-### Notes:
-
-<!-- Slide number: 13 -->
-
-Metodología Kanban
-
-Aspectos claves
-
-Los miembros del equipo gestionan el trabajo y tienen la libertad de organizarse por sí mismos para completarlo.
-
-Las políticas evolucionan según sea necesario para mejorar los resultados.
-
-Se originó en Toyota como un conjunto de prácticas de ingeniería industrial; David Anderson lo adaptó al desarrollo de software.
-
-### Notes:
-
-<!-- Slide number: 14 -->
-
-# Prácticas básicas de Kanban
-
-<!-- Slide number: 15 -->
-
-# Flujo del proceso Kanban
-
-![https://revproxyebooks724.azurewebsites.net/epubs/31214/OPS/img/chapter02/fig_3.4_pms_286_u.jpg](Picture2.jpg)
-
-### Notes:
-
-<!-- Slide number: 16 -->
-
-# Prácticas básicas de Kanban
-
-<!-- Slide number: 17 -->
-
-![](GoogleShape862p4.jpg)
-
-![](GoogleShape863p4.jpg)
-
-![](GoogleShape866p4.jpg)
-
-![](GoogleShape864p4.jpg)
-
-![](GoogleShape868p4.jpg)
-@unab.online
-@unab_online
-@unab_online
-
-### Notes:
+Fuente: https://www.atlassian.com/es/agile/project-management/workfloW

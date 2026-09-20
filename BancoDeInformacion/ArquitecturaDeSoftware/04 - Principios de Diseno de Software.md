@@ -1,97 +1,71 @@
-Principios de
-Diseño de
-Software
+# Principios de Diseño de Software
 
-Caracteristicas Del Buen Diseño
-Extensibilidad
-Reutilización de código
-| El cambio | es lo único | constante | en la vida | de un |
-| --------- | ----------- | --------- | ---------- | ----- |
-La reutilización de código es una de
-programador.
-•
-las formas más habituales Lanzaste un videojuego para Windows, pero ahora la
-de reducir costos de desarrollo. El  gentedemandaunaversiónMacOS.
-| • Creaste | un framework | GUI con botones | cuadrados, | pero |
-| --------- | ------------ | --------------- | ---------- | ---- |
-propósito es obvio: en lugar
-mesesdespuéslosbotonesredondossontendencia.
-de desarrollar algo una y otra vez
-| • Diseñaste | una espectacular | arquitectura | para un | sitio web |
-| ----------- | ---------------- | ------------ | ------- | --------- |
-desde el principio, ¿por qué
-| de comercio | electrónico, | pero poco | después | los clientes |
-| ----------- | ------------ | --------- | ------- | ------------ |
-no reutilizar el código existente en
-| piden | una función | que les permita | aceptar pedidos | por |
-| ----- | ----------- | --------------- | --------------- | --- |
-nuevos proyectos? teléfono.
+## Características del buen diseño
 
-Principios de Diseño de Software
-| ¿Qué es un buen | diseño       | de software?  |       |
-| --------------- | ------------ | ------------- | ----- |
-| ¿Cómo medimos   | su calidad?  |               |       |
-| ¿Qué prácticas  | debemos      | llevar a cabo | para  |
-lograrlo?
-| ¿Cómo podemos     | hacer   | nuestra arquitectura |     |
-| ----------------- | ------- | -------------------- | --- |
-| flexible, estable | y fácil | de comprender?       |     |
+Un buen diseño de software debe tener, entre otras:
 
-1er PRINCIPIO. Encapsula lo que varía
-Identifica los aspectos de tu aplicación que
-varían y sepáralos de los que se mantienen
-inalterables
-Encapsulación a nivel del método Encapsulación a nivel de la clase
+- **Extensibilidad**: capacidad para agregar nuevas funcionalidades sin reescribir el sistema.
+- **Reutilización de código**: poder usar componentes existentes en nuevos contextos, reduciendo costos de desarrollo.
 
-Encapsulación a nivel del método
+## El cambio es lo único constante
 
-Encapsulación a nivel del método
+**El cambio es lo único constante** en la vida de un programador. Piensa en estos ejemplos:
 
-Encapsulación a nivel de la clase
+- **Lanzaste un videojuego para Windows, pero ahora la gente pide una versión MacOS.**
+- **Creaste un framework GUI con botones cuadrados, pero meses después los botones redondos son tendencia.**
+- **Diseñaste una arquitectura espectacular para un sitio de comercio electrónico, pero los clientes piden una función para aceptar pedidos por teléfono.**
 
-Encapsulación a nivel de la clase
+La **reutilización de código** es una de las formas más habituales de reducir costos de desarrollo: en lugar de desarrollar algo una y otra vez, debes poder **reutilizar el código existente en nuevos proyectos**.
 
-2do PRINCIPIO. Programa a una
-interfaz, no a una implementación
-Programa a una interfaz, no a una
-implementación. Depende de abstracciones, no
-de clases concretas.
+## ¿Qué es un buen diseño de software?
 
-Entendamos que es una interface
-Una interface es como las reglas de un juego. Dice qué acciones debe poder hacer un personaje, pero
-no dice cómolas hace.
+- **¿Qué es un buen diseño de software?**
+- **¿Cómo medimos su calidad?**
+- **¿Qué prácticas debemos llevar a cabo para lograrlo?**
+- **¿Cómo podemos hacer nuestra arquitectura flexible, estable y de fácil comprensión?**
 
-Iniciemos
-programando
-esta relación
+Responder a estas preguntas es lo que orienta la aplicación de los principios de diseño.
 
-¿Por qué es mejor así?
-| Porque ahora Cat |     | no depende de  |
-| ---------------- | --- | -------------- |
-Sausage, sino de la interfaz Food.
-Eso significa que mañana puedes crear:
-| public | class   | Fish implements |
-| ------ | ------- | --------------- |
-| Food   | { ... } |                 |
-| public | class   | Meat implements |
-| Food   | { ... } |                 |
-Y el gato podrá comerlos sin modificar
-la clase Cat.
+---
 
-Ejercicio en
-clase –
-Empresa de
-Software
+## 1.º principio: Encapsula lo que varía
 
-Ejercicio en
-clase –
-Empresa de
-Software
+**Identifica los aspectos de tu aplicación que varían y sepáralos de los que se mantienen inalterables.**
 
-Ejercicio en
-clase –
-Empresa de
-Software
+Esta separación puede hacerse a nivel de **método** o a nivel de **clase**, aislando así las partes volátiles para que los cambios no contaminen el resto del sistema.
 
-3er PRINCIPIO. Favorece la
-composición sobre la herencia
+- **Encapsulación a nivel del método**: extraer el comportamiento que cambia a un método separado, de modo que el algoritmo general permanezca estable.
+- **Encapsulación a nivel de la clase**: aislar lo que varía en una o unas pocas clases, permitiendo cambiar la estrategia sin tocar las clases cliente.
+
+## 2.º principio: Programa a una interfaz, no a una implementación
+
+**Depende de abstracciones, no de clases concretas.**
+
+Una interface es como **las reglas de un juego**: dice qué acciones debe poder hacer un personaje, pero no dice cómo las hace. Programar a la interfaz permite que el código cliente no dependa de la implementación concreta, facilitando el cambio futuro.
+
+**Ejemplo clásico:**
+
+Si la clase `Cat` depende directamente de `Sausage`, está **estrechamente acoplada** a un alimento concreto. Si en cambio depende de la **interfaz `Food`**, mañana puedes crear:
+
+```java
+public class Fish implements Food { ... }
+public class Meat implements Food { ... }
+```
+
+Y el gato podrá comerlos **sin modificar la clase `Cat`**.
+
+**¿Por qué es mejor así?**
+
+Ahora `Cat` no depende de `Sausage` en particular, sino de la abstracción `Food`. Cualquier comida que implemente `Food` funciona. Esto es **polimorfismo** aplicado a través de interfaces.
+
+## 3.º principio: Favorece la composición sobre la herencia
+
+**Ante la duda, es preferible componer objetos** (componer comportamientos mediante delegación) en lugar de construir jerarquías de herencia profundas y rígidas.
+
+La **composición** permite:
+
+- Cambiar el comportamiento en tiempo de ejecución.
+- Combinar responsabilidades de forma flexible.
+- Evitar la fragilidad de las jerarquías de herencia (donde un cambio en la clase padre puede romper a todas las subclases).
+
+La **herencia** sigue siendo útil para expresar "es-un" (un `Perro` es un `Animal`), pero para compartir comportamiento reutilizable ("tiene-un"), la composición es la opción más segura.
