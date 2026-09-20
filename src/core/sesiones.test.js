@@ -1,8 +1,21 @@
 import { describe, it, expect } from "vitest";
-import { shuffle, prepararItem, ordenarPrioridad, respuestaCorrecta } from "./sesiones.js";
+import { shuffle, prepararItem, ordenarPrioridad, respuestaCorrecta, filtrarDiagramas } from "./sesiones.js";
 import { obtenerEntrada } from "./progreso.js";
 
 const cero = () => 0;
+
+describe("filtrarDiagramas", () => {
+  const items = [{ tipo: "multiple" }, { tipo: "diagrama" }, { tipo: "vf" }, { tipo: "diagrama" }];
+
+  it("excluye los diagramas cuando el constructor no está disponible (táctil)", () => {
+    expect(filtrarDiagramas(items, false).map(q => q.tipo)).toEqual(["multiple", "vf"]);
+  });
+
+  it("conserva todo en escritorio sin mutar el arreglo original", () => {
+    expect(filtrarDiagramas(items, true)).toHaveLength(4);
+    expect(items).toHaveLength(4);
+  });
+});
 
 describe("shuffle", () => {
   it("no muta el arreglo original y permuta con rng determinista", () => {

@@ -2,7 +2,7 @@
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/progreso.js";
-import { shuffle, ordenarPrioridad, prepararItem } from "./core/sesiones.js";
+import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/sesiones.js";
 import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/pantallas/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
@@ -33,6 +33,11 @@ function pintarIconos(raiz) {
   });
 }
 pintarIconos();
+
+// El constructor de diagramas (lienzo) se ofrece solo en escritorio: en dispositivos
+// táctiles las preguntas de diagrama se excluyen de todas las rutas de sesión.
+const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").matches;
+const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 
 // Materia activa y datos asociados (se definen al seleccionar materia en el home).
 let materia = null;
@@ -291,14 +296,14 @@ function leerOpciones() {
 
 function preguntasFiltradas() {
   leerOpciones();
-  return banco.filter(q =>
+  return sinDiagramasEnTactil(banco.filter(q =>
     filtros.parciales.has(q.parcial) &&
     filtros.temas.has(q.tema) &&
     filtros.dificultades.has(q.dificultad) &&
     filtros.tipos.has(q.tipo) &&
     (!filtros.soloDebiles || esDebil(obtenerP(q.id))) &&
     (!filtros.soloMarcadas || obtenerP(q.id).marked)
-  );
+  ));
 }
 
 function renderConfig() {
@@ -310,14 +315,18 @@ function renderConfig() {
   ];
   let html = "";
   grupos.forEach(g => {
+    const valores = valoresDe(g.clave).filter(v => diagramasDisponibles() || !(g.clave === "tipos" && v === "diagrama"));
     html += '<div class="mb-5"><div class="flex items-center gap-2 mb-2.5"><span class="font-semibold text-sm text-slate-300">' + g.titulo +
       '</span><span class="ml-auto"></span><button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="true">Todos</button>' +
       '<button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="false">Ninguno</button></div><div class="flex flex-wrap gap-2">';
-    valoresDe(g.clave).forEach(v => {
+    valores.forEach(v => {
       const activa = filtros[g.clave].has(v);
       html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '"' + (g.clave === "tipos" ? ' data-tipo="' + v + '"' : "") + '>' +
         g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
     });
+    if (g.clave === "tipos" && !diagramasDisponibles()) {
+      html += '<p class="text-xs text-slate-400 mt-2 w-full" data-aviso-diagramas>El constructor de diagramas está disponible solo en escritorio.</p>';
+    }
     html += '</div></div>';
   });
   $("config-groups").innerHTML = html;
@@ -465,7 +474,7 @@ function renderMisiones() {
 }
 
 function iniciarMision(tema) {
-  const lista = banco.filter(q => q.tema === tema);
+  const lista = sinDiagramasEnTactil(banco.filter(q => q.tema === tema));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
   session.misionTema = tema;
@@ -553,31 +562,31 @@ function comprobarCaso() {
 }
 
 function practicarDebiles() {
-  const debiles = banco.filter(q => esDebil(obtenerP(q.id)));
+  const debiles = sinDiagramasEnTactil(banco.filter(q => esDebil(obtenerP(q.id))));
   if (!debiles.length) return;
   startSession(shuffle(debiles).slice(0, 10), "practica", false);
 }
 
 function practicarTipo(tipo) {
-  const lista = banco.filter(q => q.tipo === tipo);
+  const lista = sinDiagramasEnTactil(banco.filter(q => q.tipo === tipo));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarArrastre() {
-  const lista = banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar");
+  const lista = sinDiagramasEnTactil(banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar"));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarCasos() {
-  const lista = banco.filter(q => q.caso);
+  const lista = sinDiagramasEnTactil(banco.filter(q => q.caso));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarVencidas() {
-  const lista = banco.filter(q => vencida(obtenerP(q.id)));
+  const lista = sinDiagramasEnTactil(banco.filter(q => vencida(obtenerP(q.id))));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
@@ -587,7 +596,7 @@ function renderTiposPanel() {
   if (!panel) return;
   const conteos = {};
   banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
-  panel.innerHTML = TIPOS.filter(t => conteos[t]).map(t =>
+  panel.innerHTML = TIPOS.filter(t => conteos[t] && (diagramasDisponibles() || t !== "diagrama")).map(t =>
     '<button class="chip" data-action="practicarTipo" data-tipo="' + t + '">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
   ).join("");
 }

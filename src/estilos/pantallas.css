@@ -71,6 +71,14 @@
   color: #1A1C22; font-size: 14px; font-weight: 600; cursor: pointer;
   transition: background var(--mov-rapida, 150ms) var(--mov-easing, cubic-bezier(0.22, 1, 0.36, 1)); }
 .btn-cta:hover { background: #7898B0; }
+
+/* Diagramas solo en escritorio: en dispositivos táctiles se ocultan las entradas al
+   constructor (card de Casos de diagramación y botón Casos técnicos). Las preguntas de
+   diagrama se excluyen además en app.js vía pointer:coarse. */
+@media (pointer: coarse) {
+  [data-action="startCasos"],
+  [data-action="practicarCasos"] { display: none; }
+}
 .btn-mas { min-height: 44px; width: 100%; margin-top: 10px; border: 1px solid #2B2F38; border-radius: 12px;
   background: transparent; color: #A9ADB6; font-size: 13px; cursor: pointer;
   transition: border-color var(--mov-rapida, 150ms) var(--mov-easing, cubic-bezier(0.22, 1, 0.36, 1)),

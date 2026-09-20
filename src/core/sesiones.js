@@ -21,6 +21,13 @@ export function ordenarPrioridad(lista, obtenerP, rng = Math.random) {
   return grupos.reduce((acc, g) => acc.concat(shuffle(g, rng)), []);
 }
 
+// Las preguntas de diagrama requieren el lienzo del constructor (mouse/teclado), que solo
+// se ofrece en escritorio. Este filtro permite excluirlas en dispositivos táctiles.
+export function filtrarDiagramas(preguntas, disponibles) {
+  if (disponibles) return preguntas.slice();
+  return preguntas.filter(q => q.tipo !== "diagrama");
+}
+
 export function prepararItem(item, barajar = true, rng = Math.random) {
   const copia = Object.assign({}, item);
   if (item.tipo === "dragdrop") {
