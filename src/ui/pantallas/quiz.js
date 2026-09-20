@@ -8,7 +8,7 @@ import {
 } from "../helpers.js";
 import { evaluarDiagrama, resumenDiagrama } from "../../core/diagramas.js";
 import { icono } from "../iconos.js";
-import { crearDiagramasUI } from "../diagramas.js";
+import { crearDiagramasUI } from "../componentes/diagramas.js";
 
 const $ = id => document.getElementById(id);
 

@@ -1,8 +1,8 @@
-// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
+﻿// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
-import { escapar } from "./helpers.js";
-import { resumenDiagrama } from "../core/diagramas.js";
-import { icono } from "./iconos.js";
+import { escapar } from "../helpers.js";
+import { resumenDiagrama } from "../../core/diagramas.js";
+import { icono } from "../iconos.js";
 
 const $ = id => document.getElementById(id);
 
