@@ -391,6 +391,23 @@ describe("quitarConexion", () => {
     expect(estado.conexiones).toHaveLength(1);
     expect(estado.conexiones[0].tipo).toBe("1:1");
   });
+
+  it("con guardas paralelas, elimina solo la transicion con la guarda indicada", () => {
+    let estado = crearTablero(preguntaER);
+    ["Estudiante", "Matricula"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = conectar(estado, "Estudiante", "Matricula", "transición", true, "[ok]");
+    estado = conectar(estado, "Estudiante", "Matricula", "transición", true, "[error]");
+    expect(estado.conexiones).toHaveLength(2);
+    estado = quitarConexion(estado, "Estudiante", "Matricula", "transición", true, "[ok]");
+    expect(estado.conexiones).toHaveLength(1);
+    expect(estado.conexiones[0].guarda).toBe("[error]");
+    // Sin guarda, elimina solo la conexión sin guarda del par.
+    estado = conectar(estado, "Estudiante", "Matricula", "transición", true);
+    expect(estado.conexiones).toHaveLength(2);
+    estado = quitarConexion(estado, "Estudiante", "Matricula", "transición", true);
+    expect(estado.conexiones).toHaveLength(1);
+    expect(estado.conexiones[0].guarda).toBe("[error]");
+  });
 });
 
 describe("validarConexion", () => {

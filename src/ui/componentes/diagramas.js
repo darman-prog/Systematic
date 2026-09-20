@@ -580,7 +580,7 @@ export function crearDiagramasUI({
       etiqueta.style.left = (c1.x + c2.x) / 2 + "px";
       etiqueta.style.top = (c1.y + c2.y) / 2 + "px";
       etiqueta.addEventListener("click", () => {
-        guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigido));
+        guardar(quitarConexion(estado(), c.de, c.a, c.tipo, dirigido, c.guarda));
         pintarNodos(item, zona());
         dibujarAristas(item);
         setHint("Relación eliminada.");

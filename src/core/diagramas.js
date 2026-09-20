@@ -209,11 +209,15 @@ export function conectar(estado, de, a, tipo, dirigido, guarda) {
   });
 }
 
-export function quitarConexion(estado, de, a, tipo, dirigido) {
-  const clave = claveArista(de, a, tipo, dirigido);
+// Quita la conexión que coincida con de/a/tipo (y guarda, si se pasa). Sin guarda,
+// elimina solo la conexión sin guarda del par — no toca las paralelas con guarda distinta.
+export function quitarConexion(estado, de, a, tipo, dirigido, guarda) {
+  const objetivo = { de, a, tipo };
+  if (guarda) objetivo.guarda = guarda;
+  const clave = claveDe(objetivo, dirigido);
   const flecha = dirigido ? " → " : " – ";
   return Object.assign({}, estado, {
-    conexiones: estado.conexiones.filter(c => claveArista(c.de, c.a, c.tipo, dirigido) !== clave),
+    conexiones: estado.conexiones.filter(c => claveDe(c, dirigido) !== clave),
     ultimoCambio: {
       tipo: "conexion_quitada",
       mensaje: "Conexión eliminada: " + nombreAccesible(de) + flecha + nombreAccesible(a) + " (" + tipo + ")"
