@@ -78,6 +78,17 @@ h1, h2 { font-family: var(--fuente-display); letter-spacing: -0.01em; }
 .toast-out { opacity: 0; transition: opacity var(--mov-enfasis) var(--mov-ease); }
 #confeti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
 
+/* Portada de materia (spec 007): tile tintado con el acento de la materia. */
+.portada-tile { @apply flex items-center justify-center w-14 h-14 rounded-xl shrink-0; background: color-mix(in srgb, var(--materia-accent) 16%, transparent); color: var(--materia-accent); border: 1px solid var(--study-border); }
+.portada-tile .icono { width: 26px; height: 26px; }
+
+/* Superficies del navegador (spec 007): scroll y caret también llevan la paleta. */
+html { scrollbar-width: thin; scrollbar-color: var(--study-surface-3) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--study-surface-3); border-radius: 9999px; border: 2px solid var(--study-bg); }
+::-webkit-scrollbar-track { background: transparent; }
+input, textarea { caret-color: var(--study-accent); }
+
 /* Mapa de misiones (spec 003) */
 .mision-nodo { @apply flex items-center gap-3 w-full bg-slate-900 border border-slate-700 rounded-xl p-4 mb-3 text-left transition; }
 .mision-disponible { @apply hover:border-blue-500 cursor-pointer; }

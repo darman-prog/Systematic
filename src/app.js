@@ -791,6 +791,8 @@ function irMaterias() {
   clearTimer();
   session = null;
   document.documentElement.style.removeProperty("--materia-accent");
+  const temaMeta = document.querySelector('meta[name="theme-color"]');
+  if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
   show("materias");
   renderMaterias();
   renderPerfil();
@@ -818,9 +820,12 @@ function renderMateriaUI() {
   const iconoSpan = $("materia-icono");
   if (nombre) nombre.textContent = materia.nombre;
   if (iconoSpan) {
-    iconoSpan.classList.add("icono", "icono-lg");
     iconoSpan.innerHTML = icono(materia.icono);
   }
+  const sub = $("portada-sub");
+  if (sub) sub.textContent = materia.descripcion || "";
+  const temaMeta = document.querySelector('meta[name="theme-color"]');
+  if (temaMeta) temaMeta.setAttribute("content", materia.color);
   const gloTitulo = $("glosario-titulo");
   if (gloTitulo) gloTitulo.textContent = "Glosario";
   const cardRepaso = $("card-repaso");
