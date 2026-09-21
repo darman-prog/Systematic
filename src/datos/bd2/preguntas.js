@@ -82,7 +82,7 @@ const preguntas = [
     dificultad: "dificil",
     tipo: "multiple",
     diagrama: true,
-    q: "En el reto de código: quieres listar el código del profesor, su nombre y, en una sola celda, la lista de materias que dicta. ¿Qué tipo de función requieres para agrupar ese texto?",
+    q: "Quieres listar el código del profesor, su nombre y, en una sola celda, la lista de materias que dicta. ¿Qué tipo de función requieres para agrupar ese texto?",
     options: [
       "Una función de agregación de texto como LISTAGG() o GROUP_CONCAT().",
       "Un comando ALTER TABLE concatenado.",
@@ -195,7 +195,7 @@ const preguntas = [
     dificultad: "media",
     tipo: "multiple",
     diagrama: true,
-    q: "En el reto de código, debes mostrar el código del profesor, su nombre y sus materias. ¿Qué entidades debes unir?",
+    q: "Debes mostrar el código del profesor, su nombre y sus materias. ¿Qué entidades debes unir?",
     options: [
       "Profesor, Horas y Asignatura.",
       "Solo Profesor y Asignatura.",
@@ -531,7 +531,7 @@ const preguntas = [
     dificultad: "dificil",
     tipo: "desarrollo",
     diagrama: true,
-    q: "Reto abierto: escribe la consulta que muestre el código del profesor, su nombre y la lista de materias que dicta en una sola columna.",
+    q: "Escribe la consulta que muestre el código del profesor, su nombre y la lista de materias que dicta en una sola columna.",
     solucion: "SELECT P.ID_Profesor, P.nombre,\n       LISTAGG(A.nombre, ', ') WITHIN GROUP (ORDER BY A.nombre) AS materias\nFROM Profesor P\nJOIN Horas H ON P.ID_Profesor = H.ID_Profesor\nJOIN Asignatura A ON H.ID_Asignatura = A.ID_Asignatura\nGROUP BY P.ID_Profesor, P.nombre;",
     claves: ["SELECT", "LISTAGG", "WITHIN GROUP", "JOIN", "GROUP BY"],
     exp: "Se necesitan los <b>JOIN</b> con la tabla puente <b>Horas</b> para llegar de Profesor a Asignatura, y <b>LISTAGG</b> con <b>GROUP BY</b> para empaquetar las materias en una sola celda.",
@@ -543,7 +543,7 @@ const preguntas = [
     tema: "DDL",
     dificultad: "media",
     tipo: "desarrollo",
-    q: "Reto abierto: escribe la sentencia para crear la tabla Horas con llave primaria compuesta y llaves foráneas hacia Profesor y Asignatura.",
+    q: "Escribe la sentencia para crear la tabla Horas con llave primaria compuesta y llaves foráneas hacia Profesor y Asignatura.",
     solucion: "CREATE TABLE Horas (\n  ID_Profesor VARCHAR2(10) REFERENCES Profesor(ID_Profesor),\n  ID_Asignatura VARCHAR2(10) REFERENCES Asignatura(ID_Asignatura),\n  PRIMARY KEY (ID_Profesor, ID_Asignatura)\n);",
     claves: ["CREATE TABLE", "REFERENCES", "PRIMARY KEY"],
     exp: "La llave primaria compuesta se declara con <b>PRIMARY KEY (col1, col2)</b> y cada clave foránea con <b>REFERENCES tabla(columna)</b>.",
@@ -1083,7 +1083,7 @@ const preguntas = [
     dificultad: "dificil",
     tipo: "desarrollo",
     diagrama: true,
-    q: "Reto abierto: escribe la consulta que muestre cada código de asignatura y cuántos profesores la dictan, ordenado por código.",
+    q: "Escribe la consulta que muestre cada código de asignatura y cuántos profesores la dictan, ordenado por código.",
     solucion: "SELECT ID_Asignatura, COUNT(*) AS total_profesores\nFROM Horas\nGROUP BY ID_Asignatura\nORDER BY ID_Asignatura;",
     claves: ["SELECT", "COUNT", "GROUP BY", "ORDER BY"],
     exp: "Se agrupa la tabla puente <b>Horas</b> por asignatura, se cuenta con <b>COUNT</b> y se ordena el resultado con <b>ORDER BY</b>.",
@@ -1174,7 +1174,7 @@ const preguntas = [
     ],
     solucion: "SELECT P.clv_profesor, P.nom_profesor, A.clv_asign, A.nom_asign\nFROM Profesor P\nJOIN Impartir I ON P.clv_profesor = I.clv_profesor\nJOIN Asignatura A ON I.clv_asign = A.clv_asign;",
     claves: ["SELECT", "FROM", "JOIN", "ON", "Impartir"],
-    exp: "Profesor y Asignatura no se tocan directamente: se unen a través de la tabla relación <b>Impartir</b>. Cada <code>JOIN</code> necesita su condición <code>ON</code> entre las claves. En el quiz real esta pregunta quedó en blanco (0/0.5): no la vuelvas a dejar sin responder.",
+    exp: "Profesor y Asignatura no se tocan directamente: se unen a través de la tabla relación <b>Impartir</b>. Cada <code>JOIN</code> necesita su condición <code>ON</code> entre las claves.",
     ref: "CapturasInfo (quiz real P2)"
   },
   {
@@ -1202,7 +1202,7 @@ const preguntas = [
     dificultad: "media",
     tipo: "relacionar",
     real: true,
-    q: "Para el diagrama relacional, defina el tipo de dato (VARCHAR2, NUMBER, DATE) para los campos de la tabla Asignatura. Recuerde las buenas prácticas: los campos CLV hacen referencia a claves o identificadores.",
+    q: "Para el diagrama relacional, defina el tipo de dato (VARCHAR2, NUMBER, DATE) para los campos de la tabla Asignatura. Aplique las buenas prácticas: los campos CLV hacen referencia a claves o identificadores.",
     datos: [
       { tabla: "Asignatura", columnas: ["clv_asign (PK)", "cod_asign", "nom_asign", "Horas_Total", "Horas_Prac", "clv_area (FK)", "clv_titulo (FK)"], filas: [] }
     ],
@@ -1215,7 +1215,7 @@ const preguntas = [
       ["HORAS_TOTAL", "NUMBER"],
       ["HORAS_PRAC", "NUMBER"]
     ],
-    exp: "Regla del curso: los identificadores <b>CLV</b> y los códigos alfanuméricos van en <code>VARCHAR2</code> (conservan ceros y formato); los nombres en <code>VARCHAR2</code>; las horas, que se suman, en <code>NUMBER</code>. Cualquier campo que espere VARCHAR2 acepta cualquiera de las opciones VARCHAR2: lo que se evalúa es el tipo base, no la posición. OJO: en la captura real esta pregunta quedó en 0.2/0.5, así que revisa con el profesor si <code>COD_ASIGN</code> debía ser NUMBER.",
+    exp: "Regla de diseño: los identificadores <b>CLV</b> y los códigos alfanuméricos van en <code>VARCHAR2</code> (conservan ceros y formato); los nombres en <code>VARCHAR2</code>; las horas, que se suman, en <code>NUMBER</code>. Cualquier campo que espere VARCHAR2 acepta cualquiera de las opciones VARCHAR2: lo que se evalúa es el tipo base, no la posición.",
     ref: "CapturasInfo (quiz real P4)"
   },
   {
@@ -1264,7 +1264,7 @@ const preguntas = [
       "Un índice que no es primario permite valores duplicados"
     ],
     correctos: [0, 2, 3],
-    exp: "La falsa es la segunda: después de crear la tabla SÍ se pueden crear índices con <code>CREATE INDEX</code>. Las demás coinciden con la clase: opción INDEX en el CREATE TABLE, parejas (valor, posición) como el índice de un libro y índice no primario admite duplicados.",
+    exp: "La falsa es la segunda: después de crear la tabla SÍ se pueden crear índices con <code>CREATE INDEX</code>. Las demás son correctas: opción INDEX en el CREATE TABLE, parejas (valor, posición) como el índice de un libro y índice no primario admite duplicados.",
     ref: "CapturasInfo (quiz real P7)"
   },
   {
@@ -1321,7 +1321,7 @@ const preguntas = [
       "Crea muchos índices complejos"
     ],
     correctos: [0, 1, 2, 3],
-    exp: "En la captura real, marcar solo a+b+c rindió 0.4/0.5: la gradación indica que <b>d</b> también es correcta (eliminar los índices no usados, salvo los de tablas maestras). La e es falsa: acumular muchos índices complejos castiga las escrituras.",
+    exp: "Las cuatro primeras son correctas: evaluar el costo de cada índice, evitar índices poco usados, simplificar índices duplicados con prefijo común y eliminar índices no utilizados salvo los de tablas maestras. La opción e es falsa: acumular muchos índices complejos castiga las escrituras.",
     ref: "CapturasInfo (quiz real P10)"
   },
   {
@@ -1331,8 +1331,7 @@ const preguntas = [
     dificultad: "media",
     tipo: "diagrama",
     subtipo: "er",
-    q: "El colegio necesita su modelo ER: el sistema maneja Estudiante, Curso y la matrícula que los une. Coloca las 3 entidades y conecta las relaciones correctas.",
-    caso: "Profesor/Horas/Asignatura mostraron el patrón: cuando una relación muchos-a-muchos aparece, se resuelve con una tabla puente. Aquí la matrícula cumple ese papel entre Estudiante y Curso.",
+    q: "El colegio necesita su modelo ER: el sistema maneja Estudiante, Curso y la matrícula que los une. Una relación muchos-a-muchos entre Estudiante y Curso se resuelve con una tabla puente (la matrícula). Coloca las 3 entidades y conecta las relaciones correctas.",
     nodosPool: ["Estudiante", "Curso", "Matricula"],
     relacionesEsperadas: [
       { de: "Estudiante", a: "Matricula", tipo: "1:N" },
@@ -1348,7 +1347,6 @@ const preguntas = [
     tipo: "diagrama",
     subtipo: "er",
     q: "Cada profesor dicta varios horarios y cada horario pertenece a un solo profesor. Coloca ambas entidades y su relación.",
-    caso: "Este es el núcleo uno-a-muchos del sistema del colegio, el mismo que luego se extiende con la tabla Horas como puente.",
     nodosPool: ["Profesor", "Horario"],
     relacionesEsperadas: [
       { de: "Profesor", a: "Horario", tipo: "1:N" }
@@ -1362,8 +1360,7 @@ const preguntas = [
     dificultad: "dificil",
     tipo: "diagrama",
     subtipo: "er",
-    q: "Completa el modelo del colegio: agrega la tabla puente Horas y conéctala como corresponda con Profesor y Asignatura.",
-    caso: "Profesor y Asignatura tienen una relación muchos-a-muchos real: un profesor dicta varias asignaturas y cada asignatura la dictan varios profesores.",
+    q: "Profesor y Asignatura tienen una relación muchos-a-muchos real: un profesor dicta varias asignaturas y cada asignatura la dictan varios profesores. Agrega la tabla puente Horas y conéctala como corresponda con Profesor y Asignatura.",
     nodosPool: ["Profesor", "Horas", "Asignatura"],
     relacionesEsperadas: [
       { de: "Profesor", a: "Horas", tipo: "1:N" },

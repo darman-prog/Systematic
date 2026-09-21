@@ -76,3 +76,12 @@ export function acentoDe(materia) {
     texto: materia.accentText || ACENTO_BASE.texto
   };
 }
+
+export function getRegistroParaMezclador() {
+  return MATERIAS.map(materia => ({
+    id: materia.id,
+    nombre: materia.nombre,
+    // Inyectamos materiaId en cada pregunta para trazabilidad en stats/logs
+    preguntas: materia.preguntas.map(p => ({ ...p, materiaId: materia.id }))
+  }));
+}

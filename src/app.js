@@ -1,4 +1,5 @@
 ﻿import { MATERIAS, getMateria } from "./core/materias.js";
+import { crearMezclador, storeLocalStorage } from "./core/mezclador.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/progreso.js";
@@ -28,6 +29,14 @@ import { fusionarMejor, fusionarMision } from "./student/registros.js";
 import { acentoDe } from "./core/materias.js";
 
 
+const mezclador = crearMezclador({
+  registro: MATERIAS,
+  obtenerP: obtenerEntrada, 
+  store: storeLocalStorage("nexora-mezclador")
+});
+
+export default mezclador;
+
 // Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
 function pintarIconos(raiz) {
   (raiz || document).querySelectorAll("[data-icono]").forEach(el => {
@@ -35,6 +44,7 @@ function pintarIconos(raiz) {
   });
 }
 pintarIconos();
+
 
 // El constructor de diagramas (lienzo) se ofrece solo en escritorio: en dispositivos
 // táctiles las preguntas de diagrama se excluyen de todas las rutas de sesión.
@@ -852,6 +862,7 @@ function aplicarAcento(materia) {
 }
 
 
+
 function apuntesDeMateria() {
   return materia && materia.apuntes ? materia.apuntes : [];
 }
@@ -1087,3 +1098,4 @@ $("import-file").addEventListener("change", e => importarDatos(e.target));
 $("study-search").addEventListener("input", e => estudio.renderStudy(e.target.value));
 $("apuntes-search").addEventListener("input", e => renderApuntes(e.target.value));
 $("glosario-search").addEventListener("input", e => glosarioUI.renderGlosario(e.target.value));
+
