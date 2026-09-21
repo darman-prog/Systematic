@@ -15,13 +15,16 @@ import aswApuntes from "../datos/asw/apuntes.js";
 import aswEscenarios from "../datos/asw/escenarios.js";
 import aswCasos from "../datos/asw/casos.js";
 
+// accentText: color de texto sobre superficies pintadas con `color` (botones primarios).
+// Los valores cumplen WCAG AA sobre su propio color de fondo.
 export const MATERIAS = [
   {
     id: "bd2",
     nombre: "Base de Datos 2",
     icono: "datos",
     descripcion: "SQL, modelado, índices, integridad y consultas.",
-    color: "#476e84",
+    color: "#9FC5DA",
+    accentText: "#F7F6F1",
     preguntas: bd2Preguntas,
     glosario: bd2Glosario,
     apuntes: [],
@@ -35,7 +38,8 @@ export const MATERIAS = [
     nombre: "Ingeniería de Software",
     icono: "apuntes",
     descripcion: "Procesos, Scrum, requerimientos y diseño de software.",
-    color: "#624e8d",
+    color: "#A094BA",
+    accentText: "#E7E5DE",
     preguntas: iswPreguntas,
     glosario: iswGlosario,
     apuntes: iswApuntes,
@@ -47,7 +51,8 @@ export const MATERIAS = [
     nombre: "Arquitectura de Software",
     icono: "escenarios",
     descripcion: "POO, principios de diseño, SOLID y patrones.",
-    color: "#8FB3D9",
+    color: "#FA9B9B",
+    accentText: "#101418",
     preguntas: aswPreguntas,
     glosario: aswGlosario,
     apuntes: aswApuntes,
@@ -58,4 +63,16 @@ export const MATERIAS = [
 
 export function getMateria(id) {
   return MATERIAS.find(m => m.id === id) || null;
+}
+
+// Par de acento con fallbacks: nunca devuelve undefined aunque la materia
+// no declare accentText o se llame con materia nula (pantalla de materias).
+export const ACENTO_BASE = { color: "#9BB8C9", texto: "#101418" };
+
+export function acentoDe(materia) {
+  if (!materia) return ACENTO_BASE;
+  return {
+    color: materia.color || ACENTO_BASE.color,
+    texto: materia.accentText || ACENTO_BASE.texto
+  };
 }

@@ -25,6 +25,8 @@ import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
+import { acentoDe } from "./core/materias.js";
+
 
 // Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
 function pintarIconos(raiz) {
@@ -764,17 +766,32 @@ function renderMaterias() {
   if (!cont) return;
   const saludo = $("saludo-home");
   if (saludo) saludo.textContent = saludoSegunHora(persistencia.nombre());
+
   cont.innerHTML = MATERIAS.map(m => {
     const n = m.preguntas.length;
+    const nGlosario = m.glosario.terminos ? m.glosario.terminos.length : 0;
     const pendiente = n === 0;
+
     const detalles = pendiente
       ? "Contenido en preparación"
-      : n + " preguntas" + (m.glosario.terminos.length ? " · " + m.glosario.terminos.length + " términos" : "");
-    return '<button class="materia-card" data-action="seleccionarMateria" data-materia="' + m.id + '" style="border-left:4px solid ' + m.color + '">' +
-      '<span class="icono icono-lg text-slate-300">' + icono(m.icono) + '</span>' +
-      '<span class="font-bold">' + m.nombre + '</span>' +
-      '<span class="text-xs text-slate-400">' + m.descripcion + '</span>' +
-      '<span class="text-xs ' + (pendiente ? "text-amber-300" : "text-emerald-300") + '">' + detalles + '</span>' +
+      : n + " preguntas" + (nGlosario ? " · " + nGlosario + " términos" : "");
+
+    const ariaLabel = m.nombre + ". " + m.descripcion + ". " + detalles + ". " +
+      (pendiente ? "Materia no disponible aún." : "Presiona para entrar.");
+
+    return '<button class="materia-card" data-action="seleccionarMateria" data-materia="' + m.id + '" ' +
+      'aria-label="' + ariaLabel + '" ' +
+      (pendiente ? 'disabled aria-disabled="true" ' : '') +
+      'style="--materia-color:' + m.color + '">' +
+      '<span class="materia-icono">' + icono(m.icono) + '</span>' +
+      '<div class="materia-info">' +
+        '<span class="materia-nombre">' + m.nombre + '</span>' +
+        '<span class="materia-desc">' + m.descripcion + '</span>' +
+      '</div>' +
+      '<div class="materia-stats">' +
+        '<span class="materia-stats-texto' + (pendiente ? " materia-pendiente-texto" : "") + '">' + detalles + '</span>' +
+        (pendiente ? '' : '<span class="materia-arrow" aria-hidden="true">→</span>') +
+      '</div>' +
     '</button>';
   }).join("");
 }
@@ -782,7 +799,7 @@ function renderMaterias() {
 function irMaterias() {
   clearTimer();
   session = null;
-  document.documentElement.style.removeProperty("--materia-accent");
+  aplicarAcento(null);
   const temaMeta = document.querySelector('meta[name="theme-color"]');
   if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
   show("materias");
@@ -796,8 +813,7 @@ function seleccionarMateria(id) {
   materia = m;
   banco = m.preguntas;
   glosario = m.glosario;
-  // Acento por materia (spec 007): tiñe acciones primarias, progreso y stats de la materia.
-  document.documentElement.style.setProperty("--materia-accent", m.color);
+  aplicarAcento(m);
   persistencia.migrarLegacy(m.id);
   progreso = cargarProgreso();
   inicializarFiltros();
@@ -821,6 +837,20 @@ function renderMateriaUI() {
   const gloTitulo = $("glosario-titulo");
   if (gloTitulo) gloTitulo.textContent = "Glosario";
 }
+
+
+function aplicarAcento(materia) {
+  const root = document.documentElement;
+  if (!materia) {
+    root.style.removeProperty("--materia-accent");
+    root.style.removeProperty("--materia-accent-texto");
+    return;
+  }
+  const a = acentoDe(materia);
+  root.style.setProperty("--materia-accent", a.color);
+  root.style.setProperty("--materia-accent-texto", a.texto);
+}
+
 
 function apuntesDeMateria() {
   return materia && materia.apuntes ? materia.apuntes : [];

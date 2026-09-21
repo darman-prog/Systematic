@@ -103,3 +103,96 @@
 }
 /* Los estilos del constructor de diagramas viven en lienzo.css (importado desde main.js). */
 
+.materia-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: color-mix(in srgb, var(--materia-color) 8%, var(--study-surface));
+  border: 1px solid var(--study-border);
+  border-left: 4px solid var(--materia-color);
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .15s;
+  width: 100%;
+}
+
+.materia-card:hover:not(:disabled) {
+  border-color: var(--materia-color);
+  background: color-mix(in srgb, var(--materia-color) 12%, var(--study-surface));
+  transform: translateY(-2px);
+}
+
+.materia-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.materia-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.materia-icono {
+  color: var(--materia-color);
+  font-size: 2rem;
+}
+
+.materia-badge {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.materia-badge-pendiente {
+  background: rgba(217, 188, 138, 0.2);
+  color: #D9BC8A;
+}
+
+.materia-badge-disponible {
+  background: rgba(143, 191, 159, 0.2);
+  color: #8FBF9F;
+}
+
+.materia-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.materia-nombre {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--study-text);
+}
+
+.materia-desc {
+  font-size: 0.85rem;
+  color: var(--study-muted);
+  line-height: 1.4;
+}
+
+.materia-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--study-border);
+}
+
+.materia-stats-texto {
+  font-size: 0.75rem;
+  color: var(--study-muted);
+}
+
+.materia-arrow {
+  color: var(--materia-color);
+  font-size: 1.2rem;
+  font-weight: 700;
+}

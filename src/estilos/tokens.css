@@ -1,6 +1,8 @@
 ﻿/* Tokens y superficie base (spec 006). Se importa DESPUÉS de entrada.css para conservar el */
 /* orden de cascada: las utilidades de Tailwind quedan antes que estas sobreescrituras tonales. */
 :root {
+  --materia-accent: #9BB8C9;          /* acento base cuando no hay materia seleccionada */
+  --materia-accent-texto: #101418;  
   --study-bg: #1a1c22;
   --study-surface: #22252d;
   --study-surface-2: #2b2f38;

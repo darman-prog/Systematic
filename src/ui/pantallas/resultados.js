@@ -7,8 +7,14 @@ import { anilloPuntaje } from "../componentes/anillo.js";
 
 const $ = id => document.getElementById(id);
 
+/* ─── Paleta "Noche calma" ─── */
+const TEMA = {
+  exito: "#8FBF9F", alerta: "#D9BC8A", error: "#D99A8B",
+};
+
 export function crearResultadosUI({ ctx, registrarRespuesta }) {
   const keywords = () => sqlKeywordsDe(ctx.materia);
+  
   function respuestaHTML(item, texto, esCorrecta) {
     if (item.tipo === "relacionar") {
       return '<ul class="flex flex-col gap-1 text-xs sm:text-sm">' + item.pares.map(p => "<li><b>" + escapar(p[0]) + "</b> → " + escapar(p[1]) + "</li>").join("") + '</ul>';
@@ -24,16 +30,35 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     const session = ctx.session;
     if (!session || !session.resultado) return;
     const r = session.resultado;
-    const mensaje = r.aciertos === r.totalCal
-      ? "¡Perfecto! Dominas todos los conceptos."
-      : r.pct >= 70
+    
+    // Mensaje diferenciado por modo
+    let mensaje;
+    if (r.aciertos === r.totalCal) {
+      mensaje = "¡Perfecto! Dominas todos los conceptos.";
+    } else if (session.modo === "supervivencia") {
+      mensaje = r.pct >= 70
+        ? "Buen combo. Sigue practicando para superar tu récord."
+        : "La supervivencia exige precisión. Repasa y vuelve a intentarlo.";
+    } else if (session.modo === "simulacro") {
+      mensaje = r.pct >= 70
+        ? "Aprobarías este simulacro. Repasa las fallas para asegurar."
+        : "Necesitas reforzar antes del examen real.";
+    } else if (session.modo === "mision") {
+      mensaje = r.pct >= 70
+        ? "Misión completada. Avanza al siguiente nodo del mapa."
+        : "Repasa los conceptos para desbloquear el siguiente nivel.";
+    } else {
+      mensaje = r.pct >= 70
         ? "¡Muy bien! Repasa las fallas para afinar los detalles."
         : "Buen intento. Lee las explicaciones y repite el repaso.";
+    }
 
-    const colorAnillo = r.pct >= 80 ? "#10b981" : r.pct >= 60 ? "#38bdf8" : r.pct >= 40 ? "#fbbf24" : "#f43f5e";
+    // Color del anillo usando TEMA
+    const colorAnillo = r.pct >= 75 ? TEMA.exito : r.pct >= 50 ? TEMA.alerta : TEMA.error;
+    
     let html = '<div class="text-center mb-6">' +
-      anilloPuntaje(r.pct, colorAnillo) +
-      '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "supervivencia" ? " en Supervivencia." : ".") + '</p>' +
+      anilloPuntaje(r.pct, colorAnillo, r.aciertos + " de " + r.totalCal + " correctas (" + r.pct + "%)") +
+      '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "supervivencia" ? " en Supervivencia." : session.modo === "mision" ? " en la misión." : ".") + '</p>' +
       (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
       (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +
       '<p class="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">' + icono("reloj", "icono-sm") + '<span>Tiempo: ' + r.tiempo + '</span></p>' +
@@ -75,7 +100,9 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
         const i = r.items.indexOf(item);
         const a = session.answers[i] || {};
         const pendiente = a.skipped || a.ok === null || a.ok === undefined;
-        html += '<div class="review-item review-bad">' +
+        // Solo aplicar review-bad si ya fue autoevaluada como incorrecta
+        const claseReview = pendiente ? "" : (a.ok ? "review-ok" : "review-bad");
+        html += '<div class="review-item ' + claseReview + '">' +
           '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
           '<div class="flex items-start gap-2 text-sm mb-2"><span class="tag tag-bad mt-0.5">Tu respuesta</span><div class="flex-1 min-w-0"><pre class="code-block">' + escapar(a.selected || "(sin escribir)") + '</pre></div></div>' +
           '<div class="text-sm mb-2"><span class="tag tag-ok">Solución modelo</span></div>' +
@@ -94,7 +121,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
       (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">Volver al mapa</button>' : "") +
       (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
-      (r.calificables.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
+      (r.calificables.length && r.falladas.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
       '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +
       '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>' +
     '</div>';
