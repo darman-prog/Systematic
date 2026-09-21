@@ -8,8 +8,12 @@ export const CLAVES_GLOBALES = {
   xpEventos: "sys.xp-eventos",
   logros: "sys.logros",
   escenarios: "sys.escenarios",
-  casos: "sys.casos-diagrama"
+  casos: "sys.casos-diagrama",
+  nombre: "sys.nombre",
+  onboarding: "sys.onboarding.v1"
 };
+
+const NOMBRE_MAX = 24;
 
 export const claveMisiones = materiaId => "sys.misiones." + materiaId;
 
@@ -58,6 +62,15 @@ export function crearPersistencia(storage) {
     escenarios: () => leer(CLAVES_GLOBALES.escenarios, {}),
     guardarEscenarios: valor => escribir(CLAVES_GLOBALES.escenarios, valor),
     casos: () => leer(CLAVES_GLOBALES.casos, {}),
-    guardarCasos: valor => escribir(CLAVES_GLOBALES.casos, valor)
+    guardarCasos: valor => escribir(CLAVES_GLOBALES.casos, valor),
+
+    // ---- Identidad (onboarding) ----
+    nombre: () => String(leer(CLAVES_GLOBALES.nombre, "") || "").slice(0, NOMBRE_MAX),
+    guardarNombre: valor => {
+      const limpio = String(valor || "").trim().slice(0, NOMBRE_MAX);
+      return escribir(CLAVES_GLOBALES.nombre, limpio);
+    },
+    onboardingHecho: () => leer(CLAVES_GLOBALES.onboarding, false) === true,
+    guardarOnboardingHecho: () => escribir(CLAVES_GLOBALES.onboarding, true)
   };
 }

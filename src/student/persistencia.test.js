@@ -99,4 +99,15 @@ describe("persistencia", () => {
     expect(pr.progreso("bd2")).toEqual({});
     expect(pr.guardarXp(10)).toBe(false);
   });
+
+  it("guarda el nombre recortado y el flag de onboarding", () => {
+    expect(p.nombre()).toBe("");
+    p.guardarNombre("  Diego  ");
+    expect(p.nombre()).toBe("Diego");
+    p.guardarNombre("x".repeat(40));
+    expect(p.nombre().length).toBe(24);
+    expect(p.onboardingHecho()).toBe(false);
+    p.guardarOnboardingHecho();
+    expect(p.onboardingHecho()).toBe(true);
+  });
 });
