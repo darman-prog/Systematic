@@ -36,3 +36,21 @@ test('se puede continuar sin nombre y el saludo queda neutro', async ({ page }) 
   await expect(page.locator('#screen-onboarding')).toBeHidden();
   await expect(page.locator('#screen-materias')).toBeVisible();
 });
+
+test('el nombre se puede cambiar desde ajustes y viaja al saludo', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Continuar sin nombre' }).click();
+  await page.locator('#materias-list .materia-card').first().click();
+
+  // Editor de nombre en ajustes (pantalla de la materia).
+  await page.locator('[data-action="toggleNombreEditor"]').click();
+  await expect(page.locator('#nombre-editor')).toBeVisible();
+  await page.locator('#nombre-input').fill('Ana');
+  await page.locator('[data-action="guardarNombreAjustes"]').click();
+  await expect(page.locator('#nombre-editor')).toBeHidden();
+
+  // El saludo del home usa el nuevo nombre.
+  await page.locator('[data-action="irMaterias"]').click();
+  await expect(page.locator('#saludo-home')).toContainText('Ana');
+  await expect(page.locator('#perfil-panel')).toContainText('Perfil de Ana');
+});

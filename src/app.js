@@ -182,6 +182,7 @@ function exportarDatos() {
     version: 2,
     materia: materia.id,
     exportado: new Date().toISOString(),
+    nombre: persistencia.nombre(),
     progreso: cargarProgreso(),
     historial: cargarHistorial(),
     actividad: cargarActividad(),
@@ -216,6 +217,7 @@ function importarDatos(input) {
       if (datos.historial) persistencia.guardarHistorial(materia.id, datos.historial);
       if (datos.actividad) persistencia.guardarActividad(materia.id, datos.actividad);
       if (datos.meta) persistencia.guardarMeta(materia.id, datos.meta);
+      if (typeof datos.nombre === "string") persistencia.guardarNombre(datos.nombre);
       goHome();
       alert("Progreso importado correctamente.");
     } catch (e) {
@@ -957,6 +959,23 @@ const ACCIONES = {
     renderMaterias();
     renderPerfil();
     show("materias");
+  },
+  toggleNombreEditor: () => {
+    const editor = $("nombre-editor");
+    if (!editor) return;
+    const entrada = $("nombre-input");
+    entrada.value = persistencia.nombre();
+    editor.classList.toggle("hidden");
+    if (!editor.classList.contains("hidden")) entrada.focus();
+  },
+  guardarNombreAjustes: () => {
+    const entrada = $("nombre-input");
+    if (!entrada) return;
+    persistencia.guardarNombre(entrada.value);
+    persistencia.guardarOnboardingHecho();
+    $("nombre-editor").classList.add("hidden");
+    renderPerfil();
+    toast(icono("check", "icono-sm") + saludoSegunHora(persistencia.nombre()) + (persistencia.nombre() ? ", " + persistencia.nombre() : ""));
   },
   actualizarResumen: () => actualizarResumen(),
   alternarPausa: () => alternarPausa(),

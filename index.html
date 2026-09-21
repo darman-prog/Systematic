@@ -149,7 +149,12 @@
     <div id="stats-panel"></div>
     <h2 class="section-title">Historial de intentos</h2>
     <div id="history-section"></div>
-    <div class="flex gap-2 justify-end flex-wrap mt-2">
+    <div class="flex gap-2 justify-end flex-wrap mt-2 items-center">
+      <button class="btn btn-ghost btn-sm" data-action="toggleNombreEditor">Cambiar nombre</button>
+      <div id="nombre-editor" class="hidden flex gap-2 items-center">
+        <input id="nombre-input" class="stat-input w-44" maxlength="24" placeholder="Tu nombre" aria-label="Tu nombre">
+        <button class="btn btn-primary btn-sm" data-action="guardarNombreAjustes">Guardar nombre</button>
+      </div>
       <button class="btn btn-ghost btn-sm" data-action="exportarDatos">Exportar progreso</button>
       <button class="btn btn-ghost btn-sm" data-action="importarArchivo">Importar</button>
       <input type="file" id="import-file" accept=".json,application/json" class="hidden">
