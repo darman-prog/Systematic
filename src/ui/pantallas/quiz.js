@@ -348,7 +348,9 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     // comparado normalizado (equivale por tipo base: p. ej. cualquier opción VARCHAR2
     // vale para cualquier campo que espere VARCHAR2). Requiere que los datos balanceen
     // las opciones repetidas con la cantidad de campos que las esperan.
-    if (normalizarClave(e.pares[e.seleccion][1]) === normalizarClave(e.derecha[idx].texto)) {
+    // OJO: e.derecha está barajada — la entrada se busca por idx, no por posición.
+    const derechaEntrada = e.derecha.find(d => d.idx === idx);
+    if (derechaEntrada && normalizarClave(e.pares[e.seleccion][1]) === normalizarClave(derechaEntrada.texto)) {
       // Par correcto (spec 009): número correlativo y color compartido en ambas columnas.
       e.parDeIzq[e.seleccion] = e.parContador;
       e.parContador++;
