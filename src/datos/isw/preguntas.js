@@ -284,6 +284,115 @@ const preguntas = [
       { de: "revertir cambios", a: "fin fallido", tipo: "transición" }
     ],
     exp: "Los <b>diagramas de actividad</b> modelan flujos de trabajo con nodos de acción y decisiones. Los nodos de <b>decisión</b> (rombos) tienen salidas con <b>guardas</b> [condición] que determinan qué camino tomar. En este caso, el cutover solo procede si los datos están validados; si no, se revierten los cambios. Los nodos de inicio/fin son puntos fijos del flujo."
+  },
+  {
+    id: "ISW-038", parcial: "Parcial 1", tema: "Interesados del proyecto", dificultad: "media", tipo: "multiple",
+    q: "En el caso ERP de Naibe, ¿cuál de las siguientes tareas es responsabilidad del proveedor Pepesoft (y no del equipo interno de Naibe)?",
+    options: ["Garantizar los recursos del proyecto distintos del personal de TI", "Documentar los procesos del negocio mediante Blueprinting", "Ser el punto único de contacto y comunicación del proyecto", "Decidir qué personas del proyecto deben ser cambiadas"],
+    correct: 1,
+    exp: "Entre las responsabilidades del proveedor están <b>levantar y documentar la información de procesos (Blueprinting)</b>, parametrizar el software, entrenar a los usuarios clave (KUs) y guiar el cutover. Garantizar recursos y reorganizar personal corresponden al gerente del país, y el punto de contacto es rol del gerente de proyecto interno."
+  },
+  {
+    id: "ISW-039", parcial: "Parcial 1", tema: "Interesados del proyecto", dificultad: "facil", tipo: "multiple",
+    q: "Según Diego Sin Miedo (gerente de proyecto interno de Naibe Colombia), ¿en cuáles tres temas es el responsable directo?",
+    options: ["Compras, accesos y licenciamiento del software", "Pruebas, entrenamiento de usuarios finales y migración de datos", "Blueprinting, cutover y soporte de tercer nivel", "Presupuesto, contratación internacional y hosting"],
+    correct: 1,
+    exp: "Diego Sin Miedo declara ser responsable directo de <b>las pruebas, el entrenamiento de los usuarios finales y la migración de datos</b>, además de ser el punto de contacto y comunicación. El blueprinting y el cutover son del proveedor; las compras y accesos son su día a día pero no las lista como responsabilidades directas del proyecto."
+  },
+  {
+    id: "ISW-040", parcial: "Parcial 1", tema: "Interesados del proyecto", dificultad: "dificil", tipo: "relacionar",
+    q: "Relaciona cada personaje del guión de interesados con su rol en el proyecto ERP de Naibe.",
+    pares: [
+      ["Diego Sin Miedo", "Gerente de proyecto interno de Naibe Colombia"],
+      ["Andrew Belt", "Nuevo gerente del país, que garantiza los recursos y pide lecciones aprendidas"],
+      ["Herman Monster", "Gerente regional de TI con respaldo del Gerente Global de TI"],
+      ["Papa Jeff", "Arquitecto empresarial con dedicación parcial al proyecto"],
+      ["Lucho Chávez", "Gerente financiero que delegó en un usuario financiero"]
+    ],
+    exp: "Cada personaje del guión representa un interesado distinto: Diego es el <b>gerente de proyecto interno</b>, Andrew el <b>gerente del país</b>, Herman el <b>gerente regional de TI</b>, Papa Jeff el <b>arquitecto empresarial</b> y Lucho el <b>gerente financiero</b> que se aleja del proyecto delegando en su representante."
+  },
+  {
+    id: "ISW-041", parcial: "Parcial 1", tema: "Interesados del proyecto", dificultad: "media", tipo: "vf",
+    q: "En el caso Naibe, la mejor fecha para salir a producción sería el cambio de año fiscal (primeros días de enero), pero esa fecha no es factible y la operación iniciará en febrero.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>: el guión indica que la fecha ideal coincidiría con el fin del año fiscal e inicio del nuevo (primeros días de enero), pero <b>no es factible</b> y se empezará a operar en <b>febrero</b>, a pesar de que el proyecto tiene presupuesto aprobado."
+  },
+  {
+    id: "ISW-042", parcial: "Parcial 1", tema: "Metodologías ágiles", dificultad: "facil", tipo: "multiple",
+    q: "¿Quién propuso Extreme Programming (XP)?",
+    options: ["David Anderson", "Kent Beck", "James Rumbaugh", "Ken Schwaber"],
+    correct: 1,
+    exp: "XP fue propuesta por <b>Kent Beck</b> y se apoya en prácticas de ingeniería muy disciplinadas y ciclos cortos de desarrollo. David Anderson adaptó Kanban al software y Rumbaugh está asociado a UML."
+  },
+  {
+    id: "ISW-043", parcial: "Parcial 1", tema: "Metodologías ágiles", dificultad: "media", tipo: "multi",
+    q: "¿Cuáles de las siguientes prácticas promueve Extreme Programming (XP) según su flujo de proceso?",
+    options: ["Entregas frecuentes y pequeñas", "Refactorización continua del código", "Integración continua y pruebas automatizadas", "Limitar el trabajo en curso (WIP) por estado"],
+    correctos: [0, 1, 2],
+    exp: "XP promueve entregas pequeñas y frecuentes, <b>refactorización continua</b>, pruebas automatizadas, <b>integración continua</b> y comunicación directa entre programadores y clientes. Limitar el WIP por estado es una práctica básica de <b>Kanban</b>, no de XP."
+  },
+  {
+    id: "ISW-044", parcial: "Parcial 1", tema: "Metodologías ágiles", dificultad: "media", tipo: "multiple",
+    q: "Frente al enfoque clásico (que asume requerimientos congelados y un costo del cambio creciente con el tiempo), ¿cuál es la premisa del enfoque ágil respecto al costo del cambio?",
+    options: ["Acepta que el costo del cambio crece y por eso congela los requerimientos temprano", "Busca mantener el costo del cambio bajo mediante entregas cortas y feedback continuo del cliente", "Elimina el costo del cambio porque no permite modificaciones tras el despliegue", "Traslada el costo del cambio al cliente mediante contratos rígidos"],
+    correct: 1,
+    exp: "Para el enfoque ágil <b>el cambio es constante</b> y la pregunta de negocio es cómo controlar lo imprevisible; los métodos ágiles mantienen <b>bajo el costo del cambio</b> con entregas cortas y <b>realimentación del cliente en cada iteración</b>. Congelar requerimientos temprano es justamente el supuesto clásico que encarece los cambios."
+  },
+  {
+    id: "ISW-045", parcial: "Parcial 1", tema: "UML y casos de uso", dificultad: "facil", tipo: "multiple",
+    q: "En el modelado basado en escenarios de UML, un escenario se define como:",
+    options: ["la lista jerárquica de requerimientos funcionales del sistema", "una historia de cómo el sistema, un actor y los elementos circundantes reaccionan a un evento", "el diagrama de la estructura estática de las clases del sistema", "una tabla de decisiones con todas las combinaciones de entradas"],
+    correct: 1,
+    exp: "Un escenario es una <b>historia de cómo el sistema, un actor y los elementos circundantes reaccionan a un evento</b>; un escenario bien definido puede referirse a sí mismo como un caso de uso."
+  },
+  {
+    id: "ISW-046", parcial: "Parcial 1", tema: "UML y casos de uso", dificultad: "media", tipo: "multiple",
+    q: "¿Con qué tipo de audiencia se señala que los diagramas de casos de uso son especialmente útiles para comunicar el alcance funcional?",
+    options: ["Con los desarrolladores que codifican los componentes internos", "Con clientes y usuarios no técnicos", "Con los administradores de bases de datos", "Con el equipo de pruebas de rendimiento"],
+    correct: 1,
+    exp: "Los diagramas de casos de uso son <b>ideales para comunicar el alcance funcional con clientes y usuarios no técnicos</b>: visualizan quiénes interactúan con el sistema y qué funcionalidades están disponibles, y definen el alcance de forma clara y visual."
+  },
+  {
+    id: "ISW-047", parcial: "Parcial 1", tema: "UML y casos de uso", dificultad: "media", tipo: "ordenar",
+    q: "Ordena los elementos que el escritor de un caso de uso debe identificar, según la plantilla vista en clase.",
+    bloques: ["Actor(es) involucrados", "Descripción del objetivo", "Flujo de eventos (secuencia de pasos)", "Resultados esperados"],
+    exp: "La plantilla del caso de uso pide identificar primero los <b>actores</b>, luego la <b>descripción del objetivo</b>, después el <b>flujo de eventos</b> y finalmente los <b>resultados esperados</b>. El caso de uso describe la función del sistema desde el punto de vista del usuario."
+  },
+  {
+    id: "ISW-048", parcial: "Parcial 1", tema: "Scrum", dificultad: "facil", tipo: "multiple",
+    q: "El nombre de la metodología Scrum proviene de:",
+    options: ["un acrónimo en inglés sobre gestión de requerimientos", "una jugada del Rugby", "el apellido de su creador japonés", "una herramienta de la ingeniería industrial de Toyota"],
+    correct: 1,
+    exp: "El nombre proviene de una <b>jugada de Rugby</b>. Scrum es eficaz para proyectos con plazos de entrega muy cortos, requerimientos cambiantes y negocios críticos, e incorpora las actividades estructurales del proceso."
+  },
+  {
+    id: "ISW-049", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "multiple",
+    q: "En Scrum, ¿en qué consisten las \"demostraciones preliminares\"?",
+    options: ["En presentar el acta de constitución del proyecto al comité directivo", "En entregar el incremento de software al cliente para demostrar y evaluar la funcionalidad implementada", "En mostrar el diagrama de Gantt actualizado cada fin de mes", "En ejecutar las pruebas beta con usuarios externos antes del lanzamiento"],
+    correct: 1,
+    exp: "Las demostraciones preliminares <b>entregan el incremento de software al cliente</b> para que la funcionalidad que se va implementando pueda <b>demostrarse y evaluarse</b>. Son una de las cuatro acciones de desarrollo de Scrum junto con el retraso, los sprints y las reuniones diarias."
+  },
+  {
+    id: "ISW-050", parcial: "Parcial 1", tema: "Modelos de proceso", dificultad: "dificil", tipo: "multiple",
+    q: "El modelo en V se caracteriza por ser:",
+    options: ["un modelo evolutivo que construye prototipos desechables antes del producto real", "una variante de la cascada que relaciona las acciones de aseguramiento de la calidad con las etapas de comunicación, modelado y construcción temprana", "un modelo incremental donde cada incremento agrega funcionalidad operable al cliente", "un marco extensible impulsado por UML con fases de concepción y transición"],
+    correct: 1,
+    exp: "El modelo en V es una <b>variante del modelo de cascada</b> que vincula el <b>aseguramiento de la calidad</b> con las acciones de comunicación, modelado y construcción temprana. La opción del marco impulsado por UML describe al Proceso Unificado y la de prototipos, al paradigma de prototipos."
+  },
+  {
+    id: "ISW-051", parcial: "Parcial 1", tema: "Modelos de proceso", dificultad: "dificil", tipo: "multi",
+    q: "¿Cuáles de las siguientes afirmaciones corresponden a los modelos evolutivos del proceso de software?",
+    options: ["Cada iteración genera una versión final más completa del software", "Los productos del trabajo, el aseguramiento de la calidad y los mecanismos de control del cambio son características de estos modelos", "Asumen requerimientos bien definidos y estabilidad razonable desde el inicio", "Combinan el proceso lineal con el paralelo para entregar incrementos operables"],
+    correctos: [0, 1],
+    exp: "En los modelos <b>evolutivos</b> el software cambia y evoluciona: cada iteración produce una versión más completa, y entre sus características están los productos del trabajo, el aseguramiento de la calidad y el control del cambio; el prototipo (desechable o evolutivo) es un ejemplo. Las otras dos opciones describen respectivamente la <b>Cascada</b> y el modelo <b>incremental</b>."
+  },
+  {
+    id: "ISW-052", parcial: "Parcial 1", tema: "Diseño de software", dificultad: "facil", tipo: "multiple",
+    q: "Según la clase de diseño de software, ¿quién debe realizar las tareas de diseño?",
+    options: ["El cliente, pues conoce sus necesidades de negocio", "Los ingenieros de software, entendiendo tanto el problema como las limitaciones del entorno de implementación", "Un gerente de proyecto externo especializado en estimaciones", "El equipo de pruebas, al validar cada componente terminado"],
+    correct: 1,
+    exp: "Las tareas de diseño las realizan los <b>ingenieros de software</b>: el diseñador debe entender <b>tanto el problema como las limitaciones del entorno</b> donde se implementará la solución, combinando creatividad y conocimiento técnico."
   }
 ];
 

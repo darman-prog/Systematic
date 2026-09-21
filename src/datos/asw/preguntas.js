@@ -477,6 +477,174 @@ const preguntas = [
       { de: "Carpeta", a: "Componente", tipo: "agregación" }
     ],
     exp: "El patrón <b>Composite</b> permite tratar objetos individuales (Archivo) y composiciones (Carpeta) de manera uniforme a través de una interfaz común (Componente). La Carpeta <b>hereda</b> de Componente igual que Archivo y además <b>agrega</b> una lista de Componentes (pueden ser Archivos u otras Carpetas). Esto permite calcular el tamaño total recursivamente: si es Archivo devuelve su tamaño, si es Carpeta suma recursivamente el tamaño de sus hijos."
+  },
+  {
+    id: "ASW-034",
+    parcial: "Parcial 1",
+    tema: "Patrones Estructurales",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según el material, ¿qué problema aparece si creas e inicializas de inmediato, al arrancar la aplicación, un objeto que consume muchos recursos (una consulta pesada a base de datos o la descarga de un archivo grande)?",
+    options: ["El objeto real pierde su interfaz y el cliente ya no puede llamarlo", "Se desperdician memoria y recursos si el usuario finalmente no usa esa funcionalidad, y no hay un lugar limpio para verificar permisos, aplicar caché o registrar auditorías antes de la operación", "El objeto se clona automáticamente y provoca una explosión de clases", "El compilador duplica el constructor y la aplicación tarda más en iniciar"],
+    correct: 1,
+    exp: "Crear un objeto costoso al arrancar <b>desperdicia recursos</b> si nunca se usa y deja sin punto de control para <b>permisos, caché o auditoría</b>. El <b>Proxy</b> resuelve ambas cosas: intercepta las llamadas y delega al objeto real solo cuando es necesario."
+  },
+  {
+    id: "ASW-035",
+    parcial: "Parcial 1",
+    tema: "Patrones de Diseño",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Según la clasificación vista en clase, selecciona TODOS los patrones que son CREACIONALES:",
+    options: ["Adapter", "Singleton", "Observer", "Factory", "Builder", "Decorator"],
+    correctos: [1, 3, 4],
+    exp: "Los <b>creacionales</b> se encargan de crear objetos según la situación: <b>Singleton, Factory, Builder y Prototype</b>. <b>Adapter</b> y <b>Decorator</b> son estructurales; <b>Observer</b> es de comportamiento."
+  },
+  {
+    id: "ASW-036",
+    parcial: "Parcial 1",
+    tema: "Patrones de Comportamiento",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En el patrón Template Method, todos los pasos del algoritmo deben ser métodos abstractos que las subclases están obligadas a implementar.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "<b>Falso.</b> El método plantilla llama a los pasos en orden: algunos tienen <b>implementación predeterminada</b> en la clase base y solo los pasos específicos son <b>métodos abstractos</b> que las subclases deben o pueden sobrescribir."
+  },
+  {
+    id: "ASW-037",
+    parcial: "Parcial 1",
+    tema: "Patrones de Comportamiento",
+    dificultad: "dificil",
+    tipo: "ordenar",
+    q: "Ordena lo que ocurre cuando una petición llega a un manejador en el patrón Chain of Responsibility:",
+    bloques: ["El manejador actual evalúa la petición", "Si puede (o debe) procesarla, la procesa", "Decide si corta el flujo o llama al siguiente manejador de la cadena", "El siguiente manejador repite el mismo proceso"],
+    exp: "En <b>Chain of Responsibility</b> cada manejador implementa una interfaz común y <b>guarda una referencia al siguiente</b>: evalúa, procesa si corresponde y decide si corta o continúa. Así se evita el bloque enorme de <b>if/else frágil y acoplado</b> del material."
+  },
+  {
+    id: "ASW-038",
+    parcial: "Parcial 1",
+    tema: "Principios de Diseño",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "El primer principio de diseño (\"encapsula lo que varía\") puede aplicarse a dos niveles. ¿Cuáles?",
+    options: ["A nivel de paquete y a nivel de módulo", "A nivel de base de datos y a nivel de red", "A nivel de método (extraer el comportamiento que cambia a un método separado) y a nivel de clase (aislar lo que varía en unas pocas clases)", "A nivel de compilación y a nivel de ejecución"],
+    correct: 2,
+    exp: "La separación se hace a nivel de <b>método</b> (el algoritmo general queda estable) o a nivel de <b>clase</b> (se puede cambiar la estrategia sin tocar las clases cliente), aislando las partes volátiles del resto del sistema."
+  },
+  {
+    id: "ASW-039",
+    parcial: "Parcial 1",
+    tema: "Principios de Diseño",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según el material, ¿por qué conviene componer comportamientos mediante delegación en lugar de construir jerarquías de herencia profundas?",
+    options: ["Porque la herencia está prohibida en los lenguajes orientados a objetos", "Porque la composición permite cambiar el comportamiento en tiempo de ejecución, combinar responsabilidades con flexibilidad y evita la fragilidad de las jerarquías, donde un cambio en la clase padre puede romper a todas las subclases", "Porque la composición elimina la necesidad de escribir interfaces", "Porque la herencia impide que las subclases sobrescriban métodos"],
+    correct: 1,
+    exp: "Componer es más flexible: permite <b>cambiar el comportamiento en tiempo de ejecución</b> y evita la <b>fragilidad</b> de las jerarquías rígidas. La herencia sigue siendo útil para expresar <b>\"es-un\"</b>, pero para compartir comportamiento reutilizable (<b>\"tiene-un\"</b>) la composición es la opción más segura."
+  },
+  {
+    id: "ASW-040",
+    parcial: "Parcial 1",
+    tema: "Principios de Diseño",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "El material compara una interface con \"las reglas de un juego\". ¿Qué significa esa analogía?",
+    options: ["Obliga a que todos los personajes del juego tengan exactamente el mismo comportamiento", "Define qué acciones debe poder hacer un personaje, pero no dice cómo las hace", "Es una lista de errores que el compilador debe reportar antes de ejecutar", "Es el contrato que fija el precio de las suscripciones del juego"],
+    correct: 1,
+    exp: "La interface dice <b>qué</b> debe poder hacerse, pero no <b>cómo</b>: así el código cliente no depende de la implementación concreta y el cambio futuro es más fácil. Es <b>polimorfismo</b> aplicado a través de interfaces."
+  },
+  {
+    id: "ASW-041",
+    parcial: "Parcial 1",
+    tema: "Principios de Diseño",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué característica del buen diseño se define como la capacidad de agregar nuevas funcionalidades sin reescribir el sistema?",
+    options: ["Reutilización de código", "Encapsulación", "Extensibilidad", "Cohesión"],
+    correct: 2,
+    exp: "La <b>extensibilidad</b> es agregar funcionalidades sin reescribir el sistema. La <b>reutilización</b>, en cambio, es usar componentes existentes en nuevos contextos para reducir costos de desarrollo."
+  },
+  {
+    id: "ASW-042",
+    parcial: "Parcial 1",
+    tema: "Principios de Diseño",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "El material afirma que \"el cambio es lo único constante\" en la vida de un programador. ¿Cuál es, según ese mismo texto, una de las formas más habituales de reducir los costos de desarrollo?",
+    options: ["Reescribir los módulos desde cero en cada proyecto para evitar dependencias", "Reutilizar el código existente en nuevos proyectos", "Congelar los requisitos para que nada cambie después del lanzamiento", "Elegir un lenguaje de programación que no necesite actualizaciones"],
+    correct: 1,
+    exp: "La <b>reutilización de código</b> es una de las formas más habituales de reducir costos: en lugar de desarrollar algo una y otra vez, se reutiliza el código existente en nuevos proyectos. El cambio igual llegará (versiones para otro SO, botones redondos, nuevas funciones)."
+  },
+  {
+    id: "ASW-043",
+    parcial: "Parcial 1",
+    tema: "POO",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según el material, ¿qué permite el polimorfismo?",
+    options: ["Que todas las clases del programa hereden de una única clase raíz", "Que un objeto pueda cambiar de clase durante la ejecución del programa", "Que los métodos privados puedan invocarse desde cualquier otra clase", "Que objetos de clases distintas puedan tratarse de forma uniforme a través de una misma interfaz o clase base, y que el objeto concreto decida en tiempo de ejecución cómo responder a cada mensaje"],
+    correct: 3,
+    exp: "El <b>polimorfismo</b> permite operar sobre una abstracción (por ejemplo, una interfaz <b>Forma</b>) y que el objeto concreto decida <b>en tiempo de ejecución</b> cómo responder a cada mensaje. No cambia de clase ni expone métodos privados."
+  },
+  {
+    id: "ASW-044",
+    parcial: "Parcial 1",
+    tema: "POO",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Además de esconder partes de su estado y comportamiento, ¿qué otros efectos tiene la encapsulación según el material?",
+    options: ["Convierte automáticamente la clase en abstracta", "Protege los datos internos de accesos no deseados y reduce el acoplamiento entre componentes", "Garantiza que los métodos se ejecuten más rápido", "Elimina la necesidad de usar interfaces en el resto del programa"],
+    correct: 1,
+    exp: "Al exponer solo una <b>interfaz limitada</b>, la encapsulación <b>protege los datos internos</b> de accesos no deseados y <b>reduce el acoplamiento</b> entre componentes. No tiene relación con velocidad ni con clases abstractas."
+  },
+  {
+    id: "ASW-045",
+    parcial: "Parcial 1",
+    tema: "Relaciones entre Objetos",
+    dificultad: "dificil",
+    tipo: "relacionar",
+    q: "Relaciona cada relación entre objetos con su descripción según la tabla resumen del material:",
+    pares: [
+      ["Dependencia", "A no conoce realmente a B: solo hay una referencia sin vínculo permanente"],
+      ["Asociación", "A conoce a B con acceso permanente, pero no lo contiene"],
+      ["Agregación", "A consiste en B, pero B puede existir sin A y vincularse a varios contenedores"],
+      ["Composición", "A consiste en B y gestiona su ciclo de vida (vivir o morir)"]
+    ],
+    exp: "La escalera de la tabla resumen: <b>dependencia</b> (ni siquiera conoce), <b>asociación</b> (conoce, no contiene), <b>agregación</b> (contiene pero sin control del ciclo de vida) y <b>composición</b> (contiene y controla el ciclo de vida)."
+  },
+  {
+    id: "ASW-046",
+    parcial: "Parcial 1",
+    tema: "SOLID",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Una clase ya funciona y está probada. Según el Open/Closed Principle, ¿cómo se le agregan nuevos comportamientos?",
+    options: ["Modificando directamente su código interno para cubrir los nuevos casos", "Haciendo públicos todos sus atributos para facilitar los cambios futuros", "Mediante herencia, decoradores o composición, sin modificar su código interno; algunos lenguajes incluso permiten restringir la extensión con palabras clave como final", "Renombrando la clase y publicándola de nuevo como versión 2"],
+    correct: 2,
+    exp: "Una clase está <b>abierta</b> si puedes extenderla (subclases, nuevos métodos o campos, sobrescribir comportamiento) y <b>cerrada</b> a la modificación de su código ya probado. Palabras clave como <b>final</b> permiten incluso restringir la extensión."
+  },
+  {
+    id: "ASW-047",
+    parcial: "Parcial 1",
+    tema: "SOLID",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "Aplicar los principios SOLID siempre mejora el diseño y no tiene ningún costo asociado.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "<b>Falso.</b> Su uso debe ir acompañado de un <b>análisis previo</b>: aplicados de forma descuidada pueden hacer más mal que bien y volver la arquitectura <b>más complicada de lo que debería</b>. Fueron presentados por Robert Martin en 2002."
+  },
+  {
+    id: "ASW-048",
+    parcial: "Parcial 1",
+    tema: "SOLID",
+    dificultad: "dificil",
+    tipo: "multi",
+    q: "En la práctica, ¿qué cosas NO debe hacer una subclase para respetar el Principio de Sustitución de Liskov? Selecciona TODAS las que apliquen:",
+    options: ["Forzar condiciones imposibles", "Añadir nuevos métodos o campos propios", "Cambiar precondiciones o postcondiciones de forma incompatible", "Lanzar excepciones que el cliente no espera"],
+    correctos: [0, 2, 3],
+    exp: "LSP se rompe con <b>condiciones imposibles, pre/postcondiciones incompatibles o excepciones inesperadas</b>. Añadir métodos o campos nuevos es <b>extensión legítima</b> (lo que fomenta el Open/Closed), no una violación de sustituibilidad."
   }
 ];
 
