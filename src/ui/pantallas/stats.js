@@ -425,18 +425,17 @@ const kpisHTML = s => html`
   </section>`;
 
 const diagnosticoHTML = s => html`
-  <section class="diagnostico" style="margin-top: 24px; margin-bottom: 24px;" aria-label="Diagnóstico">
+  <section class="diagnostico" aria-label="Diagnóstico">
     <div class="diagnostico-ico" aria-hidden="true">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>
       </svg>
     </div>
     <p class="diagnostico-texto">${crudo(generarDiagnostico(s))}</p>
-    ${s.debiles > 3 && $("btn-debiles")
-      ? html`<button type="button" class="diagnostico-cta" data-accion="repasar-debiles">Repasar las débiles</button>`
+    ${s.debiles > 0
+      ? html`<button type="button" class="diagnostico-cta mt-4" data-action="practicarDebiles">Repasar las débiles (${s.debiles})</button>`
       : ""}
-  </section>
-  `;
+  </section>`;
 
 const metaHTML = s => html`
   <section class="meta-card${s.cumplida ? " meta-ok" : ""}" aria-label="Meta diaria">
@@ -875,12 +874,9 @@ export function renderStats({ materia, banco = [], obtenerP, historial = [], act
   setTxt("stat-parciales-txt", s.parciales === 1 ? "parcial" : "parciales");
   setTxt("stat-temas", s.totalTemas);
 
-  const btnV = $("btn-vencidas"), btnD = $("btn-debiles");
-  if (btnV) {
-    btnV.classList.toggle("hidden", !s.vencidas);
-    btnV.textContent = `Repaso espaciado (${s.vencidas})`;
-  }
-  if (btnD) btnD.classList.toggle("hidden", !s.debiles);
+  const vencidasCount = banco.filter(q => vencida(obtenerP(q.id))).length;
+  const btnV = $("btn-vencidas");
+  if (btnV) { btnV.classList.toggle("hidden", !vencidasCount); btnV.textContent = "Repaso espaciado (" + vencidasCount + ")"; }
 
   /* Gráfica + redibujo al cambiar el ancho (con rAF para no redibujar en ráfaga) */
   dibujarGrafica(s.hist, repetido);
