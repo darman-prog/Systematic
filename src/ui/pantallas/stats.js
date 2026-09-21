@@ -107,12 +107,12 @@ function textoPregunta(q) {
 
 /* ------------------------------- Historial ------------------------------- */
 
-function pintarHistorial(historial, limite, onEmpezar) {
+function pintarHistorial(historial, limite, onEmpezar, nombre = "") {
   const box = $("history-section");
   if (!box) return;
   if (!historial.length) {
     box.innerHTML =
-      estadoVacio("Aún no hay intentos registrados. ¡Empieza con una práctica o el simulacro!") +
+      estadoVacio((nombre ? nombre + ", " : "") + "aún no hay intentos registrados. ¡Empieza con una práctica o el simulacro!") +
       (onEmpezar ? '<button type="button" class="btn-cta mt-3" data-accion="empezar">Empezar una práctica</button>' : "");
     const btn = box.querySelector('[data-accion="empezar"]');
     if (btn && onEmpezar) btn.addEventListener("click", onEmpezar);
@@ -152,8 +152,8 @@ function pintarHistorial(historial, limite, onEmpezar) {
     pintarHistorial(historial, btn.dataset.expandir === "1" ? historial.length : 6, onEmpezar));
 }
 
-export function renderHistory(historial, onEmpezar) {
-  pintarHistorial(historial || [], 6, onEmpezar);
+export function renderHistory(historial, onEmpezar, nombre = "") {
+  pintarHistorial(historial || [], 6, onEmpezar, nombre);
 }
 
 /* ------------------------------ Estadísticas ----------------------------- */

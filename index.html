@@ -15,8 +15,36 @@
 
 <div class="app w-full max-w-3xl">
 
+  <section id="screen-onboarding" class="card hidden">
+    <h1 class="brand-title text-2xl sm:text-3xl font-bold mb-2">Systematic</h1>
+    <p class="subtitle">Convierte el material de tus materias en sesiones cortas de estudio activo: preguntas con explicación en cada error, simulacros, flashcards y repaso espaciado. Tu progreso se guarda en este navegador.</p>
+    <div class="max-w-md">
+      <label for="onboarding-nombre" class="block text-sm font-semibold text-slate-300 mb-2">¿Cómo te llamas? Así el sistema te saluda y te habla por tu nombre.</label>
+      <div class="flex gap-2">
+        <input id="onboarding-nombre" class="stat-input flex-1" maxlength="24" placeholder="Tu nombre" autocomplete="given-name">
+        <button class="btn btn-primary btn-sm" data-action="guardarNombreOnboarding">¡Empezar!</button>
+      </div>
+      <button type="button" class="link-btn mt-2" data-action="saltarOnboarding">Continuar sin nombre</button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-7">
+      <div class="stat-card text-left">
+        <span class="text-xs font-bold text-slate-400">PASO 1</span>
+        <p class="text-sm mt-1">Elige tu materia: cada una guarda su progreso por separado.</p>
+      </div>
+      <div class="stat-card text-left">
+        <span class="text-xs font-bold text-slate-400">PASO 2</span>
+        <p class="text-sm mt-1">Practica: cada error te dice exactamente qué revisar y cómo mejorarlo.</p>
+      </div>
+      <div class="stat-card text-left">
+        <span class="text-xs font-bold text-slate-400">PASO 3</span>
+        <p class="text-sm mt-1">Vuelve cada día: repaso espaciado, misiones y tu racha te esperan.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="screen-materias" class="card hidden">
     <h1 class="brand-title text-2xl sm:text-3xl font-bold mb-2">Systematic</h1>
+    <p class="text-sm text-slate-400 mb-2" id="saludo-home"></p>
     <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
     <div id="perfil-panel" class="mb-4"></div>
     <div id="materias-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>

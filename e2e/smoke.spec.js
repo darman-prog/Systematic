@@ -402,6 +402,7 @@ test.describe('Systematic — smoke', () => {
   test('migra el progreso legacy quizBD2.* a sys.*.bd2', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.clear();
+      localStorage.setItem('sys.onboarding.v1', 'true');
       localStorage.setItem('quizBD2.progreso', JSON.stringify({ 'P1-001': { ok: 3, fail: 1, box: 2, marked: true } }));
       localStorage.setItem('quizBD2.meta', '30');
     });

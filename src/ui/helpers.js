@@ -112,6 +112,15 @@ export function respuestaEstudio(item, keywords) {
   return '<div class="flex flex-col gap-2 mb-3">' + item.options.map((o, j) => '<div class="study-option' + (j === item.correct ? " study-option-ok" : "") + '">' + escapar(o) + '</div>').join("") + '</div>';
 }
 
+// Saludo por hora del día (onboarding): días 6-12, tardes 12-19, noches el resto.
+// Sin nombre devuelve el saludo a secas; es puro para poder testearlo con fecha fija.
+export function saludoSegunHora(nombre, fecha = new Date()) {
+  const h = fecha.getHours();
+  const tramo = h >= 6 && h < 12 ? "Buenos días" : h >= 12 && h < 19 ? "Buenas tardes" : "Buenas noches";
+  const quien = String(nombre || "").trim();
+  return quien ? tramo + ", " + quien : tramo;
+}
+
 // Renderiza el plan de corrección (core/diagramas.js → planCorreccion) como secciones
 // con pasos numerados: aciertos, qué crear, qué eliminar y qué reubicar. La línea de
 // aciertos solo aparece cuando el diagrama aún no está completo. Compartido por quiz y casos.

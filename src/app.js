@@ -5,7 +5,7 @@ import {
 import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/sesiones.js";
 import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/gamificacion.js";
 import { apunteAHTML, filtrarApuntes } from "./ui/pantallas/apuntes.js";
-import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar } from "./ui/helpers.js";
+import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/pantallas/quiz.js";
 import { crearResultadosUI } from "./ui/pantallas/resultados.js";
 import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/pantallas/stats.js";
@@ -56,14 +56,19 @@ const $ = id => document.getElementById(id);
 // Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
 // dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
 const persistencia = crearPersistencia(localStorage);
+// El sistema le habla al estudiante por su nombre en los hitos (onboarding).
+const conNombre = texto => {
+  const n = persistencia.nombre();
+  return n ? texto.replace("@", n) : texto.replace(" @", "").replace("@", "");
+};
 const gamificacion = crearGamificacion({
   persistencia,
   materias: MATERIAS,
   alSubirNivel: nivel => {
-    toast(icono("nivel", "icono-sm") + " ¡Nivel " + nivel + " alcanzado!");
+    toast(icono("nivel", "icono-sm") + conNombre("¡Nivel " + nivel + ", @!"));
     confeti();
   },
-  alLogro: l => toast(icono(l.icono, "icono-sm") + " Logro: " + l.nombre + " (+" + XP_EVENTOS.logro + " XP)"),
+  alLogro: l => toast(icono(l.icono, "icono-sm") + conNombre("Logro nuevo, @: " + l.nombre) + " (+" + XP_EVENTOS.logro + " XP)"),
   alCambiarPerfil: () => renderPerfil()
 });
 
@@ -77,7 +82,7 @@ const ctx = {
 };
 
 function show(screen) {
-    ["materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario"].forEach(s =>
+    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -259,6 +264,7 @@ function renderPerfil() {
     '<div class="perfil-card">' +
       '<div class="perfil-nivel"><span class="perfil-num">' + p.nivel + '</span><span class="perfil-etq">nivel</span></div>' +
       '<div class="perfil-datos">' +
+        '<p class="text-xs font-semibold text-slate-300 mb-1">' + (persistencia.nombre() ? "Perfil de " + escapar(persistencia.nombre()) : "Tu perfil") + '</p>' +
         '<div class="text-sm"><b id="perfil-xp">' + desde + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
         '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
         '<div class="perfil-mini">Racha: ' + p.racha + ' día(s) · ' + p.insignias + ' logro(s) desbloqueado(s)</div>' +
@@ -748,12 +754,14 @@ function renderStats() {
 }
 
 function renderHistory() {
-  renderHistoryUI(cargarHistorial());
+  renderHistoryUI(cargarHistorial(), null, persistencia.nombre());
 }
 
 function renderMaterias() {
   const cont = $("materias-list");
   if (!cont) return;
+  const saludo = $("saludo-home");
+  if (saludo) saludo.textContent = saludoSegunHora(persistencia.nombre());
   cont.innerHTML = MATERIAS.map(m => {
     const n = m.preguntas.length;
     const pendiente = n === 0;
@@ -917,14 +925,39 @@ document.addEventListener("visibilitychange", () => {
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
 // namespace al arrancar, antes de que el usuario seleccione materia.
 persistencia.migrarLegacy("bd2");
-renderMaterias();
-renderPerfil();
-show("materias");
+// Onboarding (primera impresión): si nunca dijimos quién es, la pantalla de bienvenida
+// pide el nombre. Con flag o nombre guardado se entra directo al home con saludo.
+if (!persistencia.nombre() && !persistencia.onboardingHecho()) {
+  show("onboarding");
+  const entrada = $("onboarding-nombre");
+  if (entrada) entrada.focus();
+} else {
+  renderMaterias();
+  renderPerfil();
+  show("materias");
+}
 
 // Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre
 // de la función que ejecutan y sus parámetros en data-*; un único listener delegado de
 // click los resuelve desde este mapa. No se publica nada en window.
 const ACCIONES = {
+  guardarNombreOnboarding: () => {
+    const entrada = $("onboarding-nombre");
+    const valor = entrada ? entrada.value : "";
+    if (!valor.trim()) { if (entrada) entrada.focus(); return; }
+    persistencia.guardarNombre(valor);
+    persistencia.guardarOnboardingHecho();
+    renderMaterias();
+    renderPerfil();
+    show("materias");
+    toast(icono("nivel", "icono-sm") + saludoSegunHora(persistencia.nombre()) + ". ¡Vamos a estudiar!");
+  },
+  saltarOnboarding: () => {
+    persistencia.guardarOnboardingHecho();
+    renderMaterias();
+    renderPerfil();
+    show("materias");
+  },
   actualizarResumen: () => actualizarResumen(),
   alternarPausa: () => alternarPausa(),
   autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),

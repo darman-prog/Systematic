@@ -4,7 +4,10 @@ export default defineConfig({
   testDir: './e2e',
   timeout: 30000,
   use: {
-    baseURL: 'http://localhost:4173'
+    baseURL: 'http://localhost:4173',
+    // La mayoría de tests necesitan un visitante que ya pasó el onboarding; la spec
+    // de onboarding sobreescribe con un contexto fresco (sin localStorage).
+    storageState: 'e2e/.auth/visitante.json'
   },
   webServer: {
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
