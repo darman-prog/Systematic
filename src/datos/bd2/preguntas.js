@@ -1207,15 +1207,15 @@ const preguntas = [
       { tabla: "Asignatura", columnas: ["clv_asign (PK)", "cod_asign", "nom_asign", "Horas_Total", "Horas_Prac", "clv_area (FK)", "clv_titulo (FK)"], filas: [] }
     ],
     pares: [
-      ["CLV_ASIGN", "VARCHAR2(8)"],
-      ["CLV_AREA", "VARCHAR2(3)"],
-      ["CLV_TITULO", "VARCHAR2(4)"],
-      ["COD_ASIGN", "VARCHAR2(10)"],
-      ["NOMB_ASIGN", "VARCHAR2(60)"],
-      ["HORAS_TOTAL", "NUMBER(3)"],
-      ["HORAS_PRAC", "NUMBER(2)"]
+      ["CLV_ASIGN", "VARCHAR2"],
+      ["CLV_AREA", "VARCHAR2"],
+      ["CLV_TITULO", "VARCHAR2"],
+      ["COD_ASIGN", "VARCHAR2"],
+      ["NOMB_ASIGN", "VARCHAR2"],
+      ["HORAS_TOTAL", "NUMBER"],
+      ["HORAS_PRAC", "NUMBER"]
     ],
-    exp: "Regla del curso: las claves <b>CLV</b> y los códigos alfanuméricos van en <code>VARCHAR2</code> corto (conservan ceros y formato); el nombre en <code>VARCHAR2</code> largo; y las horas, que se suman, en <code>NUMBER</code>. Los tamaños son los del ejercicio: lo evaluable es elegir el tipo base correcto para cada campo. OJO: en la captura real esta pregunta quedó en 0.2/0.5, así que revisa con el profesor si <code>COD_ASIGN</code> debía ser NUMBER.",
+    exp: "Regla del curso: los identificadores <b>CLV</b> y los códigos alfanuméricos van en <code>VARCHAR2</code> (conservan ceros y formato); los nombres en <code>VARCHAR2</code>; las horas, que se suman, en <code>NUMBER</code>. Cualquier campo que espere VARCHAR2 acepta cualquiera de las opciones VARCHAR2: lo que se evalúa es el tipo base, no la posición. OJO: en la captura real esta pregunta quedó en 0.2/0.5, así que revisa con el profesor si <code>COD_ASIGN</code> debía ser NUMBER.",
     ref: "CapturasInfo (quiz real P4)"
   },
   {

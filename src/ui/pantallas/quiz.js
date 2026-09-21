@@ -6,7 +6,7 @@ import {
   TIPO_LABELS, DIF_LABELS,
   animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, seccionesCorreccion, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
-import { evaluarDiagrama, planCorreccion, resumenDiagrama } from "../../core/diagramas.js";
+import { evaluarDiagrama, normalizarClave, planCorreccion, resumenDiagrama } from "../../core/diagramas.js";
 import { icono } from "../iconos.js";
 import { crearDiagramasUI } from "../componentes/diagramas.js";
 
@@ -344,9 +344,13 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const session = ctx.session;
     const e = session.rel;
     if (!e || e.bloqueado || e.usadosDerecha[idx] !== undefined || e.seleccion === null || session.answers[session.idx]) return;
-    if (e.seleccion === idx) {
+    // Par correcto si el texto de la derecha corresponde al esperado por la izquierda,
+    // comparado normalizado (equivale por tipo base: p. ej. cualquier opción VARCHAR2
+    // vale para cualquier campo que espere VARCHAR2). Requiere que los datos balanceen
+    // las opciones repetidas con la cantidad de campos que las esperan.
+    if (normalizarClave(e.pares[e.seleccion][1]) === normalizarClave(e.derecha[idx].texto)) {
       // Par correcto (spec 009): número correlativo y color compartido en ambas columnas.
-      e.parDeIzq[idx] = e.parContador;
+      e.parDeIzq[e.seleccion] = e.parContador;
       e.parContador++;
       e.emparejados[e.seleccion] = true;
       e.usadosDerecha[idx] = e.seleccion;
