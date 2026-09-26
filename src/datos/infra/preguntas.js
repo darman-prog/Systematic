@@ -220,6 +220,241 @@ const preguntas = [
     respuestas: ["cat"],
     codigo: "cat {1}",
     exp: "<b>cat</b> concatena y muestra el contenido del fichero. «ls» lista el directorio, «echo» imprime texto por pantalla y «grep» busca patrones dentro de un fichero."
+  },
+  {
+    id: "INF-019",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando añade un usuario indicando en la misma línea el grupo principal, la carpeta home, si se debe crear dicha carpeta y el intérprete de comandos?",
+    options: ["useradd", "usermod", "adduser --home", "passwd"],
+    correct: 0,
+    exp: "<b>useradd</b> crea el usuario con parámetros como «-g» (grupo principal), «-d» (carpeta home), «-m» (crear la carpeta home) y «-s» (shell). «usermod» modifica un usuario que ya existe y «passwd» solo cambia la contraseña."
+  },
+  {
+    id: "INF-020",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando permite añadir un grupo al sistema?",
+    options: ["groupadd", "useradd -g", "addgroup", "groupmod"],
+    correct: 0,
+    exp: "<b>groupadd nombre-grupo</b> crea el grupo. «groupmod» modifica un grupo existente (nombre o GID), y «useradd -g» solo asigna el grupo principal al crear un usuario."
+  },
+  {
+    id: "INF-021",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿En qué archivo se guarda la información de los usuarios del sistema (nombre, UID, GID, carpeta home y shell)?",
+    options: ["/etc/passwd", "/etc/shadow", "/etc/group", "/etc/users"],
+    correct: 0,
+    exp: "<b>/etc/passwd</b> guarda por usuario: nombre de cuenta, campo de clave («x»), UID, GID, nombre, carpeta home y shell. «/etc/shadow» guarda las contraseñas cifradas y «/etc/group» los grupos."
+  },
+  {
+    id: "INF-022",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿En qué archivo se guardan las contraseñas cifradas de los usuarios?",
+    options: ["/etc/shadow", "/etc/passwd", "/etc/gshadow", "/etc/keys"],
+    correct: 0,
+    exp: "<b>/etc/shadow</b> guarda las contraseñas cifradas. En /etc/passwd el campo de clave quedó como «x»: las contraseñas reales se movieron a shadow por seguridad."
+  },
+  {
+    id: "INF-023",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando permite modificar un usuario cambiando su nombre, carpeta home, intérprete de comandos o los grupos a los que pertenece?",
+    options: ["usermod", "useradd", "chpasswd", "userdel"],
+    correct: 0,
+    exp: "<b>usermod</b> modifica usuarios existentes: «-l» cambia el nombre, «-d» la carpeta home, «-s» el shell y «-g» el grupo principal. «useradd» crea usuarios nuevos."
+  },
+  {
+    id: "INF-024",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué hace el comando «userdel -r nombre-usuario»?",
+    options: [
+      "Elimina el usuario y también su carpeta home",
+      "Elimina solo la carpeta home, conservando la cuenta",
+      "Restablece la contraseña del usuario",
+      "Renueva los permisos de la cuenta"
+    ],
+    correct: 0,
+    exp: "<b>userdel -r</b> elimina la cuenta y, con «-r», también su carpeta home. Sin la opción «-r» solo se borra la cuenta y la carpeta home queda en disco."
+  },
+  {
+    id: "INF-025",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Se tiene un usuario «sunombre» cuyo grupo principal es «mycatedra». ¿Qué comando cambia su grupo principal a «sistemas»?",
+    options: ["usermod -g sistemas sunombre", "groupmod -g sistemas sunombre", "usermod -l sistemas sunombre", "chgrp sistemas sunombre"],
+    correct: 0,
+    exp: "<b>usermod -g sistemas sunombre</b> cambia el grupo principal del usuario. «groupmod» modifica grupos (no asigna usuarios), «usermod -l» cambia el nombre de la cuenta y «chgrp» cambia el grupo propietario de un archivo."
+  },
+  {
+    id: "INF-026",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "En Linux, ¿a qué tres tipos de usuarios se aplican los permisos de un archivo o directorio?",
+    options: [
+      "Propietario, grupo propietario y resto de usuarios",
+      "Administrador, usuarios e invitados",
+      "Creador, lectores y ejecutores",
+      "Dueño, propietario y público"
+    ],
+    correct: 0,
+    exp: "Los tres niveles son <b>propietario</b> (dueño del archivo), <b>grupo propietario</b> (el grupo al que pertenece el archivo) y <b>otros</b> (el resto de usuarios del sistema). Linux no permite asignar permisos a usuarios o grupos concretos fuera de estos tres niveles."
+  },
+  {
+    id: "INF-027",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué permiso simboliza la letra «r» en un archivo de Linux?",
+    options: ["Lectura", "Escritura", "Ejecución", "Propiedad"],
+    correct: 0,
+    exp: "«r» es <b>lectura</b> (read): permite ver el contenido del archivo, o listar el contenido de un directorio. «w» es escritura y «x» ejecución."
+  },
+  {
+    id: "INF-028",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué permiso simboliza la letra «w» en un archivo de Linux?",
+    options: ["Escritura", "Lectura", "Ejecución", "Borrar"],
+    correct: 0,
+    exp: "«w» es <b>escritura</b> (write): permite modificar el contenido del archivo o, en un directorio, crear y eliminar archivos dentro de él."
+  },
+  {
+    id: "INF-029",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué permiso simboliza la letra «x» en un archivo de Linux?",
+    options: ["Ejecución", "Lectura", "Escritura", "Expansión"],
+    correct: 0,
+    exp: "«x» es <b>ejecución</b> (eXecute): permite ejecutar el archivo como programa. En un directorio, el permiso «x» permite entrar en él con «cd»."
+  },
+  {
+    id: "INF-030",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En formato octal, ¿qué valor tiene la combinación «rwx»?",
+    options: ["7", "6", "5", "8"],
+    correct: 0,
+    exp: "<b>rwx = 7</b> porque r=4, w=2 y x=1, y 4+2+1=7. Es la combinación de permisos completa: lectura, escritura y ejecución."
+  },
+  {
+    id: "INF-031",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando se usa para cambiar los permisos de un archivo o directorio?",
+    options: ["chmod", "chown", "chgrp", "chattr"],
+    correct: 0,
+    exp: "<b>chmod</b> (change mode) cambia los permisos. «chown» cambia el propietario, «chgrp» el grupo propietario y «chattr» atributos extendidos."
+  },
+  {
+    id: "INF-032",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace el comando «chmod u+x archivo»?",
+    options: [
+      "Da permiso de ejecución al propietario del archivo",
+      "Quita el permiso de ejecución a todos los usuarios",
+      "Da permiso de ejecución a todos los usuarios",
+      "Quita el permiso de escritura al grupo"
+    ],
+    correct: 0,
+    exp: "<b>u+x</b> añade (+) el permiso de ejecución (x) al propietario (u). Sin la letra de usuario se afectarían todos los usuarios simultáneamente."
+  },
+  {
+    id: "INF-033",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando cambia el usuario propietario de un archivo?",
+    options: ["chown", "chgrp", "chmod", "usermod"],
+    correct: 0,
+    exp: "<b>chown nuevopropietario archivo</b> cambia el propietario. «chgrp» cambia el grupo propietario, «chmod» los permisos y «usermod» datos de la cuenta de usuario."
+  },
+  {
+    id: "INF-034",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando agrupa varios archivos o directorios en un solo archivo (empaqueta)?",
+    options: ["tar", "zip -r", "gzip", "cp"],
+    correct: 0,
+    exp: "<b>tar</b> empaqueta: «tar cvf destino.tar carpeta» agrupa sin comprimir. «zip» también agrupa y comprime, «gzip» solo comprime archivos sueltos y «cp» copia."
+  },
+  {
+    id: "INF-035",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué sintaxis de tar crea un archivo empaquetado y comprimido con gzip (.tar.gz)?",
+    options: ["tar czvf", "tar cvf", "tar jcvf", "tar xzvf"],
+    correct: 0,
+    exp: "<b>tar czvf</b> crea (c) y comprime con gzip (z). «tar jcvf» usa bzip2, «tar cvf» solo empaqueta sin comprimir y «tar xzvf» extrae y descomprime un .tar.gz."
+  },
+  {
+    id: "INF-036",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué sintaxis de tar extrae y descomprime un archivo .tar.bz2?",
+    options: ["tar jxvf", "tar czvf", "tar tzvf", "tar xvf"],
+    correct: 0,
+    exp: "<b>tar jxvf</b> extrae (x) y descomprime con bzip2 (j). «tar czvf» y «tar jcvf» crean, «tar tzvf» lista el contenido de un .tar.gz y «tar xvf» extrae sin descomprimir."
+  },
+  {
+    id: "INF-037",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué sintaxis de zip comprime un directorio y pide una contraseña al crear el archivo?",
+    options: ["zip -e", "zip -r", "zip -p", "unzip -e"],
+    correct: 0,
+    exp: "<b>zip -e</b> pide una contraseña al crear el archivo comprimido. «zip -r» es recursivo (necesario para directorios), pero no pide contraseña; «unzip» descomprime."
+  },
+  {
+    id: "INF-038",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando descomprime un archivo .zip?",
+    options: ["unzip", "gzip -d", "tar -d", "zip -u"],
+    correct: 0,
+    exp: "<b>unzip archivo.zip</b> descomprime. «gzip -d» descomprime archivos .gz, «zip -u» actualiza un .zip existente y «tar -d» compara diferencias."
   }
 ];
 
