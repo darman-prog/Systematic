@@ -455,6 +455,257 @@ const preguntas = [
     options: ["unzip", "gzip -d", "tar -d", "zip -u"],
     correct: 0,
     exp: "<b>unzip archivo.zip</b> descomprime. «gzip -d» descomprime archivos .gz, «zip -u» actualiza un .zip existente y «tar -d» compara diferencias."
+  },
+  {
+    id: "INF-039",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es un script en Linux?",
+    options: [
+      "Un archivo que contiene un conjunto de comandos ejecutados de forma secuencial",
+      "Un programa compilado en lenguaje C",
+      "Un archivo de configuración del sistema",
+      "Un comando que solo puede ejecutar root"
+    ],
+    correct: 0,
+    exp: "Un <b>script</b> es un archivo con un conjunto de comandos que se ejecutan desde el primero hasta el último de forma secuencial. Se crea con «touch» o un editor como «nano» y se le agrega la extensión «.sh»."
+  },
+  {
+    id: "INF-040",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué se coloca como primera línea de un script para indicarle al sistema que es un script y qué shell debe usar?",
+    options: ["#! /bin/bash", "#!/bin/sh", "# script bash", "#!/usr/bin/env"],
+    correct: 0,
+    exp: "La primera línea es el <b>shebang</b>: «#! /bin/bash». El «#!» indica al sistema que lo que sigue son instrucciones de comando, y «/bin/bash» indica el shell que ejecutará el script."
+  },
+  {
+    id: "INF-041",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando se usa para dar permisos de ejecución a un script?",
+    options: ["chmod", "chown", "chgrp", "chattr"],
+    correct: 0,
+    exp: "<b>chmod</b> da los permisos de ejecución (por ejemplo «chmod 755 script.sh»). Sin el permiso «x» el script no se puede ejecutar, aunque exista."
+  },
+  {
+    id: "INF-042",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cómo se ejecuta un script que está en el directorio actual?",
+    options: ["./script.sh", "bash script.sh", "exec script.sh", "run script.sh"],
+    correct: 0,
+    exp: "<b>./script.sh</b> lo ejecuta indicando la ruta relativa. El «./» es necesario porque el directorio actual no está en el PATH; «bash script.sh» también funciona pero no requiere el permiso de ejecución."
+  },
+  {
+    id: "INF-043",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué símbolo se usa para agregar comentarios en un script bash?",
+    options: ["#", "//", "/*", "--"],
+    correct: 0,
+    exp: "El símbolo <b>#</b> marca comentarios en bash. Todo lo que sigue en esa línea se ignora al ejecutar el script."
+  },
+  {
+    id: "INF-044",
+    parcial: "Linux",
+    tema: "Linux: scripts bash",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En el ejemplo del manual, el script «prueba.sh» crea una carpeta «documentos» en /root, dentro de ella otra llamada «prueba» y un texto «tareas.txt». ¿Qué comando introduce el texto «hola mundo» en ese archivo?",
+    options: ["echo 'hola mundo' > /root/documentos/prueba/tareas.txt", "cat 'hola mundo' > tareas.txt", "touch /root/documentos/prueba/tareas.txt", "nano 'hola mundo' tareas.txt"],
+    correct: 0,
+    exp: "<b>echo 'hola mundo' > archivo</b> escribe el texto en el archivo (el «>» redirige la salida). «touch» solo crea el archivo vacío, «cat» lee y «nano» abre el editor."
+  },
+  {
+    id: "INF-045",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué paquete se instala en Fedora para disponer del servicio SSH?",
+    options: ["openssh-server", "openssh-client", "ssh-service", "sshd-config"],
+    correct: 0,
+    exp: "<b>dnf -y install openssh-server</b> instala el servidor SSH. El cliente («ssh») suele venir instalado; el servidor es el que acepta conexiones entrantes."
+  },
+  {
+    id: "INF-046",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿En qué archivo se encuentra la configuración del servicio SSH?",
+    options: ["/etc/ssh/sshd_config", "/etc/ssh/ssh_config", "/etc/sshd.conf", "/var/ssh/config"],
+    correct: 0,
+    exp: "<b>/etc/ssh/sshd_config</b> es el archivo de configuración del demonio SSH (sshd). Ahí se editan opciones como «PermitRootLogin»."
+  },
+  {
+    id: "INF-047",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué directiva del archivo de configuración de SSH se debe editar para permitir que root inicie sesión por SSH?",
+    options: ["PermitRootLogin yes", "RootLogin yes", "AllowRoot yes", "LoginRoot yes"],
+    correct: 0,
+    exp: "<b>PermitRootLogin yes</b> permite el acceso de root por SSH. La directiva viene comentada por defecto; hay que quitarle el «#» y poner «yes»."
+  },
+  {
+    id: "INF-048",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comandos inician el servicio SSH y lo activan para que arranque con el sistema?",
+    options: [
+      "systemctl start sshd.service y systemctl enable sshd.service",
+      "systemctl stop sshd.service y systemctl disable sshd.service",
+      "systemctl status sshd.service y systemctl reload sshd.service",
+      "systemctl restart sshd.service y systemctl mask sshd.service"
+    ],
+    correct: 0,
+    exp: "<b>systemctl start</b> inicia el servicio y <b>systemctl enable</b> lo activa para los siguientes arranques. «stop» lo frena, «status» lo consulta y «restart» lo reinicia."
+  },
+  {
+    id: "INF-049",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando verifica que el puerto 22 (el de SSH) está activo y escuchando?",
+    options: ["netstat -ant | grep 22", "ping 22", "ssh -p 22 localhost", "systemctl port 22"],
+    correct: 0,
+    exp: "<b>netstat -ant | grep 22</b> filtra las conexiones TCP activas por el puerto 22. «ping» prueba conectividad de red, no puertos, y «systemctl» no tiene subcomando «port»."
+  },
+  {
+    id: "INF-050",
+    parcial: "Linux",
+    tema: "Linux: arranque y recuperación de root",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "Para recuperar la contraseña de root desde el ISO de instalación, ¿qué opciones se seleccionan en el menú de arranque?",
+    options: [
+      "Troubleshooting y luego Rescue a Fedora System",
+      "Install Fedora y luego Troubleshooting",
+      "Rescue a Fedora System y luego Install Fedora",
+      "Boot y luego Recovery Mode"
+    ],
+    correct: 0,
+    exp: "Se arranca desde el ISO, se elige <b>Troubleshooting</b> y luego <b>Rescue a Fedora System</b>. Desde ahí se accede al shell de recuperación."
+  },
+  {
+    id: "INF-051",
+    parcial: "Linux",
+    tema: "Linux: arranque y recuperación de root",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En el modo de rescate, ¿qué comando monta la partición del sistema para poder cambiar la contraseña de root?",
+    options: ["chroot /mnt/sysroot", "mount /dev/sda1", "passwd /mnt/sysroot", "rescue --chroot"],
+    correct: 0,
+    exp: "<b>chroot /mnt/sysroot</b> monta la partición del sistema en /mnt/sysroot y permite trabajar sobre ella. Después se ejecuta «passwd» para asignar la nueva contraseña."
+  },
+  {
+    id: "INF-052",
+    parcial: "Linux",
+    tema: "Linux: arranque y recuperación de root",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "Una vez dentro del sistema montado en el modo de rescate, ¿qué comando asigna la nueva contraseña de root?",
+    options: ["passwd", "chpasswd", "usermod -p", "password"],
+    correct: 0,
+    exp: "<b>passwd</b> pide la nueva contraseña dos veces y la asigna. Al terminar aparece el aviso de que todos los tokens de autenticación se actualizaron correctamente."
+  },
+  {
+    id: "INF-053",
+    parcial: "Linux",
+    tema: "Linux: HTTP y servidores",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué paquete instala el servidor web Apache en Fedora?",
+    options: ["httpd", "apache2", "nginx", "php-fpm"],
+    correct: 0,
+    exp: "<b>dnf install httpd</b> instala Apache en Fedora. En Debian/Ubuntu el paquete se llama «apache2», pero en Fedora es «httpd»."
+  },
+  {
+    id: "INF-054",
+    parcial: "Linux",
+    tema: "Linux: HTTP y servidores",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿En qué puerto escucha el servidor Apache por defecto?",
+    options: ["80", "22", "443", "8080"],
+    correct: 0,
+    exp: "Apache escucha en el <b>puerto 80</b> (HTTP) por defecto. El 22 es SSH, el 443 es HTTPS y el 8080 se usa a menudo como alternativo cuando el 80 está ocupado."
+  },
+  {
+    id: "INF-055",
+    parcial: "Linux",
+    tema: "Linux: HTTP y servidores",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿En qué directorio se alojan los sitios web que publica Apache en Fedora?",
+    options: ["/var/www/html", "/etc/httpd", "/srv/www", "/home/httpd"],
+    correct: 0,
+    exp: "<b>/var/www/html</b> es el directorio de publicación. Ahí se colocan los archivos del sitio (por ejemplo «phpinfo.php») para que Apache los sirva."
+  },
+  {
+    id: "INF-056",
+    parcial: "Linux",
+    tema: "Linux: HTTP y servidores",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comandos de systemctl inician, verifican el estado y reinician el servicio httpd?",
+    options: [
+      "start, status y restart",
+      "enable, start y stop",
+      "status, reload y mask",
+      "restart, disable y stop"
+    ],
+    correct: 0,
+    exp: "<b>systemctl start httpd.service</b> lo inicia, <b>systemctl status httpd.service</b> verifica que corra y <b>systemctl restart httpd.service</b> lo reinicia para que tome los cambios de configuración."
+  },
+  {
+    id: "INF-057",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando inicializa la base de datos PostgreSQL después de instalar el paquete?",
+    options: ["postgresql-setup --initdb", "psql --init", "systemctl initdb", "postgres --setup"],
+    correct: 0,
+    exp: "<b>postgresql-setup --initdb</b> inicializa el clúster de datos de PostgreSQL. Después se inicia el servicio con «systemctl start postgresql.service»."
+  },
+  {
+    id: "INF-058",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Dentro de la consola psql, ¿qué comando cambia la contraseña de un usuario de PostgreSQL?",
+    options: ["ALTER USER usuario WITH PASSWORD 'clave'", "SET PASSWORD usuario = 'clave'", "UPDATE pg_user SET password", "passwd usuario"],
+    correct: 0,
+    exp: "<b>ALTER USER postgres WITH PASSWORD 'clave';</b> cambia la contraseña dentro de psql. «passwd» es el comando del sistema operativo, no de PostgreSQL."
+  },
+  {
+    id: "INF-059",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando de psql se usa para salir de la consola?",
+    options: ["\\q", "\\exit", "quit;", "exit"],
+    correct: 0,
+    exp: "<b>\\q</b> sale de la consola psql. Después se usa «exit» para volver a la consola de Fedora."
   }
 ];
 
