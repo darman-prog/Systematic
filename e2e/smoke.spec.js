@@ -2,13 +2,14 @@
 import bd2Preguntas from '../src/datos/bd2/preguntas.js';
 import iswPreguntas from '../src/datos/isw/preguntas.js';
 import aswPreguntas from '../src/datos/asw/preguntas.js';
+import infraPreguntas from '../src/datos/infra/preguntas.js';
 
 test.describe('Systematic — smoke', () => {
-  test('el home lista 3 materias con su estado de contenido', async ({ page }) => {
+  test('el home lista 4 materias con su estado de contenido', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Systematic' })).toBeVisible();
     const cards = page.locator('#materias-list .materia-card');
-    await expect(cards).toHaveCount(3);
+    await expect(cards).toHaveCount(4);
     await expect(cards.nth(0)).toContainText('Base de Datos 2');
     await expect(cards.nth(0)).toContainText(bd2Preguntas.length + ' preguntas');
     await expect(cards.nth(1)).toContainText('Ingeniería de Software');
@@ -17,6 +18,9 @@ test.describe('Systematic — smoke', () => {
     await expect(cards.nth(2)).toContainText('Arquitectura de Software');
     await expect(cards.nth(2)).toContainText(aswPreguntas.length + ' preguntas');
     await expect(cards.nth(2)).not.toContainText('Contenido en preparación');
+    await expect(cards.nth(3)).toContainText('Infraestructura');
+    await expect(cards.nth(3)).toContainText(infraPreguntas.length + ' preguntas');
+    await expect(cards.nth(3)).not.toContainText('Contenido en preparación');
   });
 
   test('seleccionar BD2 muestra estadísticas y permite practicar', async ({ page }) => {

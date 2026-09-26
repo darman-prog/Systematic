@@ -14,6 +14,11 @@ import aswGlosario from "../datos/asw/glosario.js";
 import aswApuntes from "../datos/asw/apuntes.js";
 import aswEscenarios from "../datos/asw/escenarios.js";
 import aswCasos from "../datos/asw/casos.js";
+import infraPreguntas from "../datos/infra/preguntas.js";
+import infraGlosario from "../datos/infra/glosario.js";
+import infraApuntes from "../datos/infra/apuntes.js";
+import infraEscenarios from "../datos/infra/escenarios.js";
+import infraCasos from "../datos/infra/casos.js";
 
 // accentText: color de texto sobre superficies pintadas con `color` (botones primarios).
 // Los valores cumplen WCAG AA sobre su propio color de fondo.
@@ -58,6 +63,19 @@ export const MATERIAS = [
     apuntes: aswApuntes,
     escenarios: aswEscenarios,
     casos: aswCasos
+  },
+  {
+    id: "infra",
+    nombre: "Infraestructura",
+    icono: "terminal",
+    descripcion: "Comandos de Linux, permisos, SSH y redes Cisco.",
+    color: "#7FC8B0",
+    accentText: "#101418",
+    preguntas: infraPreguntas,
+    glosario: infraGlosario,
+    apuntes: infraApuntes,
+    escenarios: infraEscenarios,
+    casos: infraCasos
   }
 ];
 
