@@ -709,4 +709,281 @@ const preguntas = [
   }
 ];
 
-export default preguntas;
+// ============================================================================
+// BLOQUE LINUX — termina en INF-059
+// ============================================================================
+
+// ============================================================================
+// BLOQUE REDES — empieza en INF-060 y termina en INF-099
+// Contenido generado (no hay manual de redes en la cátedra): subnetting, rutas,
+// gateway y DNS. Revisar cada lote antes de commitear.
+// ============================================================================
+const preguntasRedes = [
+  {
+    id: "INF-060",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cuántas direcciones de host útiles tiene una red /24?",
+    options: ["254", "255", "256", "253"],
+    correct: 0,
+    exp: "Una /24 tiene 256 direcciones en total; se reservan la primera (dirección de red) y la última (broadcast), quedan <b>254 hosts útiles</b>."
+  },
+  {
+    id: "INF-061",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué máscara de subred corresponde a la notación /24?",
+    options: ["255.255.255.0", "255.255.0.0", "255.255.255.128", "255.0.0.0"],
+    correct: 0,
+    exp: "<b>/24 = 255.255.255.0</b>: los primeros 24 bits (tres octetos) son de red y el último octeto es de host."
+  },
+  {
+    id: "INF-062",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En una red /24 como 192.168.1.0, ¿qué direcciones se reservan y no se asignan a hosts?",
+    options: [
+      "La .0 (red) y la .255 (broadcast)",
+      "La .1 (gateway) y la .254 (último host)",
+      "La .128 (mitad) y la .255 (broadcast)",
+      "Ninguna: todas se pueden asignar"
+    ],
+    correct: 0,
+    exp: "Se reservan la <b>dirección de red</b> (192.168.1.0) y la <b>dirección de broadcast</b> (192.168.1.255). Los hosts van de la .1 a la .254."
+  },
+  {
+    id: "INF-063",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál de estas direcciones IPv4 es privada (RFC 1918)?",
+    options: ["192.168.1.10", "8.8.8.8", "172.32.0.1", "203.0.113.5"],
+    correct: 0,
+    exp: "<b>192.168.1.10</b> es privada (rango 192.168.0.0/16). 8.8.8.8 es pública (DNS de Google), 172.32.0.1 es pública (el rango privado es 172.16.0.0/12) y 203.0.113.5 es pública."
+  },
+  {
+    id: "INF-064",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es la dirección de broadcast de una subred?",
+    options: [
+      "La última dirección de la subred, usada para enviar un paquete a todos los hosts de esa subred",
+      "La primera dirección de la subred, que identifica a la red",
+      "La dirección del router que conecta con otras redes",
+      "Una dirección que se asigna a un solo host de forma fija"
+    ],
+    correct: 0,
+    exp: "El <b>broadcast</b> es la última dirección de la subred (por ejemplo .255 en una /24). Un paquete enviado ahí lo reciben todos los hosts de la subred."
+  },
+  {
+    id: "INF-065",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cuántos bits tiene una dirección IPv4?",
+    options: ["32", "16", "64", "128"],
+    correct: 0,
+    exp: "Una dirección IPv4 tiene <b>32 bits</b>, escritos como cuatro octetos separados por puntos (por ejemplo 192.168.1.10). IPv6 usa 128 bits."
+  },
+  {
+    id: "INF-066",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "En la notación 192.168.1.0/26, ¿qué indica el número 26?",
+    options: [
+      "Que los primeros 26 bits de la dirección identifican la red",
+      "Que la subred tiene 26 hosts útiles",
+      "Que la máscara es 255.255.255.26",
+      "Que es una red de clase B"
+    ],
+    correct: 0,
+    exp: "El <b>/26</b> es la longitud del prefijo: los primeros 26 bits son de red y los 6 restantes son de host. No es el número de hosts ni un octeto de la máscara."
+  },
+  {
+    id: "INF-067",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuántos hosts útiles tiene una subred /26?",
+    options: ["62", "64", "30", "126"],
+    correct: 0,
+    exp: "Una /26 deja 6 bits de host: 2^6 = 64 direcciones, menos la de red y la de broadcast = <b>62 hosts útiles</b>."
+  },
+  {
+    id: "INF-068",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es la máscara de subred de una /26?",
+    options: ["255.255.255.192", "255.255.255.128", "255.255.255.224", "255.255.255.240"],
+    correct: 0,
+    exp: "<b>/26 = 255.255.255.192</b>: 26 bits de red = 11111111.11111111.11111111.11000000. La /25 es .128, la /27 es .224 y la /28 es .240."
+  },
+  {
+    id: "INF-069",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuántas subredes /26 se pueden crear a partir de una red /24?",
+    options: ["4", "2", "8", "16"],
+    correct: 0,
+    exp: "De /24 a /26 se toman 2 bits de la parte de host: 2^2 = <b>4 subredes</b> (.0, .64, .128 y .192)."
+  },
+  {
+    id: "INF-070",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es el rango de direcciones de host de la subred 192.168.10.64/27?",
+    options: [
+      "192.168.10.65 a 192.168.10.94",
+      "192.168.10.64 a 192.168.10.95",
+      "192.168.10.65 a 192.168.10.95",
+      "192.168.10.64 a 192.168.10.96"
+    ],
+    correct: 0,
+    exp: "Una /27 tiene bloques de 32: red .64, broadcast .95. Los hosts van de <b>.65 a .94</b>."
+  },
+  {
+    id: "INF-071",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Con VLSM, de la red 192.168.10.0/24 hay que crear subredes de 60, 30 y 10 hosts. ¿Qué máscara se asigna a la subred de 60 hosts?",
+    options: ["/26", "/27", "/28", "/25"],
+    correct: 0,
+    exp: "Para 60 hosts se necesitan 6 bits de host (2^6 - 2 = 62 ≥ 60), es decir <b>/26</b>. La /27 da 30 hosts (insuficiente) y la /25 desperdicia direcciones."
+  },
+  {
+    id: "INF-072",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es el resumen de rutas (route summarization / supernetting)?",
+    options: [
+      "Agrupar varias subredes contiguas en una sola ruta con un prefijo más corto",
+      "Dividir una red grande en subredes más pequeñas",
+      "Eliminar rutas de la tabla de enrutamiento",
+      "Asignar la misma IP a varios routers"
+    ],
+    correct: 0,
+    exp: "El <b>resumen de rutas</b> agrupa subredes contiguas (por ejemplo cuatro /26) en una sola ruta /24, reduciendo el tamaño de la tabla de enrutamiento."
+  },
+  {
+    id: "INF-073",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Si en la tabla de enrutamiento coinciden una ruta /24 y una /32 para el mismo destino, ¿cuál se elige?",
+    options: [
+      "La /32, porque es la más específica (longest prefix match)",
+      "La /24, porque es más corta y rápida",
+      "La que se configuró primero",
+      "Se reparte el tráfico entre las dos"
+    ],
+    correct: 0,
+    exp: "El router aplica <b>longest prefix match</b>: gana la ruta con el prefijo más largo (más específica). Una /32 identifica un solo host y prevalece sobre la /24."
+  },
+  {
+    id: "INF-074",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuántos hosts útiles tiene una subred /30?",
+    options: ["2", "4", "6", "0"],
+    correct: 0,
+    exp: "Una /30 deja 2 bits de host: 2^2 = 4 direcciones, menos red y broadcast = <b>2 hosts útiles</b>. Es el tamaño típico de un enlace punto a punto."
+  },
+  {
+    id: "INF-075",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es el gateway por defecto de un host?",
+    options: [
+      "La IP del router que usa para enviar paquetes fuera de su red local",
+      "La dirección de broadcast de la subred",
+      "El servidor DNS de la red",
+      "La IP del switch al que está conectado"
+    ],
+    correct: 0,
+    exp: "El <b>gateway por defecto</b> es la interfaz del router en la red local. Todo paquete con destino fuera de la subred se envía ahí."
+  },
+  {
+    id: "INF-076",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando muestra la tabla de enrutamiento en Linux?",
+    options: ["ip route", "ifconfig", "netstat -a", "traceroute"],
+    correct: 0,
+    exp: "<b>ip route</b> muestra las rutas (destino, gateway e interfaz). «ifconfig» muestra las interfaces, «netstat -a» las conexiones y «traceroute» la ruta de un paquete."
+  },
+  {
+    id: "INF-077",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es una ruta estática?",
+    options: [
+      "Una ruta configurada a mano por el administrador",
+      "Una ruta que el router aprende automáticamente de otro router",
+      "Una ruta que cambia según la carga de la red",
+      "Una ruta temporal que se borra al reiniciar"
+    ],
+    correct: 0,
+    exp: "Una <b>ruta estática</b> se configura a mano (por ejemplo «ip route 10.0.0.0 255.0.0.0 192.168.1.1»). Las dinámicas se aprenden con protocolos como OSPF o RIP."
+  },
+  {
+    id: "INF-078",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es el next-hop en una ruta de enrutamiento?",
+    options: [
+      "La IP del siguiente router al que se envía el paquete para llegar al destino",
+      "El último router antes de llegar al host de destino",
+      "El número de saltos que faltan para llegar al destino",
+      "La interfaz por la que sale el paquete del host"
+    ],
+    correct: 0,
+    exp: "El <b>next-hop</b> es la dirección del siguiente salto: el router al que se entrega el paquete. El router reenvía al siguiente next-hop hasta llegar al destino."
+  },
+  {
+    id: "INF-079",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando de Cisco IOS muestra la tabla de enrutamiento de un router?",
+    options: ["show ip route", "show interfaces", "show running-config", "show arp"],
+    correct: 0,
+    exp: "<b>show ip route</b> muestra la tabla de enrutamiento. «show interfaces» el estado de las interfaces, «show running-config» la configuración y «show arp» la tabla ARP."
+  }
+];
+
+export default [...preguntas, ...preguntasRedes];
