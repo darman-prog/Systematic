@@ -983,7 +983,301 @@ const preguntasRedes = [
     options: ["show ip route", "show interfaces", "show running-config", "show arp"],
     correct: 0,
     exp: "<b>show ip route</b> muestra la tabla de enrutamiento. «show interfaces» el estado de las interfaces, «show running-config» la configuración y «show arp» la tabla ARP."
+  },
+  {
+    id: "INF-080",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué función cumple el servicio DNS en una red?",
+    options: [
+      "Traducir nombres de dominio (como www.ejemplo.com) a direcciones IP",
+      "Asignar direcciones IP automáticamente a los equipos",
+      "Cifrar el tráfico entre el cliente y el servidor",
+      "Filtrar el tráfico no autorizado"
+    ],
+    correct: 0,
+    exp: "El <b>DNS</b> (Domain Name System) traduce nombres a IP: en vez de recordar 192.168.1.10, usas «servidor». El DHCP es el que asigna IPs automáticamente."
+  },
+  {
+    id: "INF-081",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿En qué archivo de Linux se configuran los servidores DNS?",
+    options: ["/etc/resolv.conf", "/etc/hosts", "/etc/dns.conf", "/etc/network/dns"],
+    correct: 0,
+    exp: "<b>/etc/resolv.conf</b> define los servidores DNS (líneas «nameserver 8.8.8.8»). En Windows la configuración se ve con «ipconfig /all»."
+  },
+  {
+    id: "INF-082",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué registro DNS asocia un nombre de dominio con una dirección IPv4?",
+    options: ["Registro A", "Registro CNAME", "Registro MX", "Registro NS"],
+    correct: 0,
+    exp: "El registro <b>A</b> (address) asocia un nombre con una IPv4. El CNAME crea un alias, el MX indica el servidor de correo y el NS el servidor de nombres autoritativo."
+  },
+  {
+    id: "INF-083",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué comando de Linux resuelve un nombre de dominio contra el servidor DNS?",
+    options: ["nslookup", "ip route", "ping -r", "netstat -rn"],
+    correct: 0,
+    exp: "<b>nslookup</b> (también «host» o «dig») consulta el servidor DNS. «ip route» muestra rutas, «ping» prueba conectividad y «netstat -rn» la tabla de rutas."
+  },
+  {
+    id: "INF-084",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué ventaja tiene la caché DNS de un host?",
+    options: [
+      "Evita volver a consultar el servidor DNS para nombres ya resueltos recientemente",
+      "Asigna direcciones IP automáticamente",
+      "Cifra las consultas DNS",
+      "Bloquea el acceso a dominios desconocidos"
+    ],
+    correct: 0,
+    exp: "La <b>caché DNS</b> guarda las resoluciones recientes (con su TTL) para no repetir la consulta al servidor, acelerando la navegación y reduciendo tráfico."
+  },
+  {
+    id: "INF-085",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cuál es la diferencia principal entre un switch y un hub?",
+    options: [
+      "El switch envía las tramas solo al puerto del destino; el hub las repite a todos los puertos",
+      "El switch solo funciona con fibra óptica y el hub con cobre",
+      "El hub tiene más puertos que el switch",
+      "El switch no permite crear VLAN y el hub sí"
+    ],
+    correct: 0,
+    exp: "El <b>switch</b> aprende las direcciones MAC y reenvía la trama solo al puerto de destino. El <b>hub</b> repite la trama a todos los puertos, generando colisiones y tráfico innecesario."
+  },
+  {
+    id: "INF-086",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es una VLAN?",
+    options: [
+      "Una red lógica independiente creada dentro de un mismo switch físico",
+      "Un tipo de cable de red",
+      "Un protocolo de enrutamiento",
+      "Una dirección IP reservada para el administrador"
+    ],
+    correct: 0,
+    exp: "Una <b>VLAN</b> (Virtual LAN) divide un switch físico en varias redes lógicas independientes: los puertos de una VLAN no ven el tráfico de otra, aunque estén en el mismo equipo."
+  },
+  {
+    id: "INF-087",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es un enlace trunk entre dos switches?",
+    options: [
+      "Un puerto que transporta el tráfico de varias VLAN a la vez",
+      "El cable que conecta el switch con el router",
+      "Un puerto reservado para la administración del switch",
+      "Un enlace de respaldo que solo se usa si cae el principal"
+    ],
+    correct: 0,
+    exp: "Un <b>trunk</b> (normalmente con etiquetado 802.1Q) lleva el tráfico de varias VLAN por un mismo puerto. Un puerto de acceso (access) pertenece a una sola VLAN."
+  },
+  {
+    id: "INF-088",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Para qué se usa el protocolo STP en una red con switches?",
+    options: [
+      "Evitar bucles (loops) entre switches bloqueando puertos redundantes",
+      "Cifrar el tráfico entre switches",
+      "Asignar VLAN automáticamente a cada puerto",
+      "Aumentar el ancho de banda entre switches"
+    ],
+    correct: 0,
+    exp: "<b>STP</b> (Spanning Tree Protocol) detecta rutas redundantes y bloquea los puertos que formarían un bucle, manteniendo una sola ruta activa. Si cae el enlace activo, despierta los bloqueados."
+  },
+  {
+    id: "INF-089",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cómo aprende un switch la dirección MAC de los equipos conectados?",
+    options: [
+      "Observando el origen de las tramas que recibe por cada puerto",
+      "Consultando al servidor DHCP",
+      "Enviando una petición ARP a todos los puertos",
+      "Leyendo la configuración del router"
+    ],
+    correct: 0,
+    exp: "El switch mantiene una <b>tabla MAC</b> que asocia cada dirección MAC con el puerto por donde llegó. Si la tabla se llena o expira, inunda la trama por todos los puertos."
+  },
+  {
+    id: "INF-090",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es una ACL en un router?",
+    options: [
+      "Una lista de reglas que permite o deniega tráfico según criterios como IP o puerto",
+      "Un protocolo para asignar direcciones IP",
+      "Un tipo de cable blindado",
+      "Una tabla de direcciones MAC"
+    ],
+    correct: 0,
+    exp: "Una <b>ACL</b> (Access Control List) filtra el tráfico: cada regla «permit» o «deny» evalúa origen, destino, protocolo y puerto. Se aplica sobre una interfaz, en entrada o salida."
+  },
+  {
+    id: "INF-091",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué tipo de ACL filtra únicamente por la dirección IP de origen?",
+    options: ["ACL estándar", "ACL extendida", "ACL con nombre", "ACL dinámica"],
+    correct: 0,
+    exp: "Una <b>ACL estándar</b> solo mira la IP de origen (numeradas 1-99). Una <b>extendida</b> también filtra destino, protocolo y puerto (100-199)."
+  },
+  {
+    id: "INF-092",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es una wildcard mask en una ACL de Cisco?",
+    options: [
+      "Una máscara invertida que indica qué bits de la IP deben coincidir (0) y cuáles no (1)",
+      "Una máscara de subred normal escrita al revés",
+      "Una clave de acceso al router",
+      "Un tipo de cifrado para las reglas"
+    ],
+    correct:  0,
+    exp: "La <b>wildcard mask</b> es la inversa de la máscara de subred: 0 = el bit debe coincidir, 1 = no importa. Por ejemplo 0.0.0.255 coincide con cualquier host de la subred /24."
+  },
+  {
+    id: "INF-093",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué hace el orden de las reglas en una ACL?",
+    options: [
+      "Se evalúan de arriba abajo y la primera regla que coincide decide; el resto no se evalúa",
+      "Se evalúan todas y se aplica la más restrictiva",
+      "Se ordenan automáticamente por número de puerto",
+      "No importa: el router elige la más adecuada"
+    ],
+    correct: 0,
+    exp: "Las ACL se evalúan <b>en orden, de arriba abajo</b>. La primera regla que coincide decide (permit o deny) y el resto se ignora. Al final hay un «deny implícito» que bloquea todo lo no permitido."
+  },
+  {
+    id: "INF-094",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es NAT/PAT en un router?",
+    options: [
+      "Traducir direcciones IP privadas a una IP pública (o a un puerto) para salir a internet",
+      "Asignar direcciones IP a los equipos de la red",
+      "Crear VLAN de forma automática",
+      "Cifrar el tráfico que pasa por el router"
+    ],
+    correct: 0,
+    exp: "<b>NAT</b> (Network Address Translation) traduce IP privadas a una IP pública. <b>PAT</b> (Port Address Translation) usa el puerto para distinguir varios equipos internos que comparten la misma IP pública."
+  },
+  {
+    id: "INF-095",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "Un equipo tiene IP 192.168.1.50/24 y gateway 192.168.1.1, pero no llega a internet. ¿Qué se comprueba primero?",
+    options: [
+      "Hacer ping al gateway (192.168.1.1)",
+      "Reiniciar el servidor DNS",
+      "Cambiar la máscara de subred",
+      "Configurar una VLAN nueva"
+    ],
+    correct: 0,
+    exp: "Lo primero es comprobar la <b>conectividad local</b>: «ping 192.168.1.1» verifica que el host llega a su gateway. Si eso falla, el problema es local (cable, IP, máscara); si pasa, sigue hacia afuera."
+  },
+  {
+    id: "INF-096",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Un equipo no resuelve nombres de dominio, pero sí hace ping a una IP pública (8.8.8.8). ¿Cuál es la causa más probable?",
+    options: [
+      "El servidor DNS está mal configurado o no responde",
+      "La dirección IP del equipo está duplicada",
+      "El gateway está apagado",
+      "El cable de red está desconectado"
+    ],
+    correct: 0,
+    exp: "Si el ping a la IP funciona, la conectividad y el gateway están bien; el problema es la <b>resolución de nombres</b>: revisar /etc/resolv.conf o la configuración DNS del adaptador."
+  },
+  {
+    id: "INF-097",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué comando muestra la ruta que siguen los paquetes hasta un destino, salto a salto?",
+    options: ["traceroute", "ping -a", "ifconfig", "nslookup"],
+    correct: 0,
+    exp: "<b>traceroute</b> («tracert» en Windows) muestra cada router por el que pasa el paquete, útil para ver dónde se corta la ruta. «ping» solo dice si llega o no."
+  },
+  {
+    id: "INF-098",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué protocolo usa un equipo para descubrir la dirección MAC que corresponde a una IP de su red local?",
+    options: ["ARP", "DNS", "DHCP", "ICMP"],
+    correct: 0,
+    exp: "<b>ARP</b> (Address Resolution Protocol) pregunta por broadcast «¿quién tiene esta IP?» y el dueño responde con su MAC. El resultado se guarda en la tabla ARP del equipo. DHCP asigna IPs y DNS resuelve nombres."
+  },
+  {
+    id: "INF-099",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué se puede comprobar a simple vista ante un equipo que no tiene red?",
+    options: [
+      "Que el cable esté conectado y las luces del puerto estén activas",
+      "Que la tabla ARP esté vacía",
+      "Que el DNS sea 8.8.8.8",
+      "Que la máscara sea 255.255.255.0"
+    ],
+    correct: 0,
+    exp: "Lo primero es lo físico: <b>cable conectado y luces del puerto</b> (enlace). Sin capa física no hay red, así que se descarta todo lo demás."
   }
 ];
 
 export default [...preguntas, ...preguntasRedes];
+
+// ============================================================================
+// BLOQUE REDES — termina en INF-099
+// ============================================================================
