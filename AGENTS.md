@@ -43,7 +43,7 @@ apuntes. Sitio estático desplegado en Vercel.
 
 - Código e identificadores técnicos en inglés; contenido de estudio y UI en español.
 - Archivos en `kebab-case`. Ids de BD2 (`P1-*`) se conservan; materias nuevas usan prefijo
-  `ISW-*` / `ASW-*`.
+  `ISW-*` / `ASW-*` / `INF-*`.
 - Contenido de materias nuevas: derivado únicamente de los `.md` de `BancoDeInformacion/`,
   con revisión humana por lote antes de commitear.
 - Commits: Conventional Commits (`feat`, `fix`, `chore`, `build`, `test`, `docs`), uno por paso

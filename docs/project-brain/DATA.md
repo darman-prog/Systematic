@@ -66,7 +66,7 @@ versión standalone sin `id`).
 ## Convenciones de ids
 
 - BD2 conserva `P1-*` y `PR-*`.
-- Materias nuevas: `ISW-*` y `ASW-*`; apuntes `AP-ISW-*` y `AP-ASW-*`.
+- Materias nuevas: `ISW-*`, `ASW-*` e `INF-*`; apuntes `AP-ISW-*`, `AP-ASW-*` y `AP-INF-*`.
 - Formato validado: `PREFIJO-NNN` (prefijo alfanumérico en mayúsculas, 2 o más dígitos).
 
 ## Presentación por materia

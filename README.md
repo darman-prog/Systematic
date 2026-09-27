@@ -40,4 +40,4 @@ Rollback: en Vercel, *Deployments → Instant Rollback*; en el repo, `git revert
   `escenarios.js`, `casos.js`) y se deriva del material fuente en `BancoDeInformacion/` (los
   PDF/PPTX/DOCX no se versionan, solo los `.md` convertidos).
 - Toda pregunta/apunte/glosario debe pasar `npm run validar` antes de commitear.
-- Ids: BD2 conserva `P1-*` / `PR-*`; materias nuevas usan `ISW-*` / `ASW-*` (apuntes `AP-ISW-*` / `AP-ASW-*`).
+- Ids: BD2 conserva `P1-*` / `PR-*`; materias nuevas usan `ISW-*` / `ASW-*` / `INF-*` (apuntes `AP-ISW-*` / `AP-ASW-*` / `AP-INF-*`).
