@@ -25,6 +25,9 @@ test.describe('Infraestructura', () => {
 
     await page.getByRole('button', { name: /Configurar práctica/ }).click();
     await expect(page.locator('#screen-config')).toBeVisible();
+    // Filtrar por tipo multiple: ahora el banco mezcla tipos y el orden es aleatorio.
+    await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+    await page.locator('#screen-config [data-clave="tipos"][data-valor="multiple"]').click();
     await page.getByRole('button', { name: /Comenzar práctica/ }).click();
 
     await expect(page.locator('#screen-quiz')).toBeVisible();
