@@ -121,22 +121,22 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Cuál de estos comandos apaga el sistema?",
-    options: ["init 6", "reboot", "logout", "shutdown -h now"],
-    correct: 3,
-    exp: "<b>shutdown -h now</b> apaga el sistema (-h = halt). «init 6» y «reboot» lo reinician, y «logout» solo cierra la sesión del usuario actual."
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos apagan el sistema? (seleccioná todas las correctas)",
+    options: ["init 0", "reboot", "logout", "shutdown -h now"],
+    correctos: [0, 3],
+    exp: "<b>shutdown -h now</b> y <b>init 0</b> apagan el sistema. «reboot» lo reinicia y «logout» solo cierra la sesión del usuario actual."
   },
   {
     id: "INF-011",
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando reinicia el sistema?",
-    options: ["init 0", "halt", "reboot", "shutdown -h now"],
-    correct: 2,
-    exp: "<b>reboot</b> reinicia el sistema. «init 0» y «shutdown -h now» lo apagan, y «halt» detiene la máquina (apagado sin reinicio)."
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos reinician el sistema? (seleccioná todas las correctas)",
+    options: ["init 6", "halt", "reboot", "shutdown -h now"],
+    correctos: [0, 2],
+    exp: "<b>reboot</b> y <b>init 6</b> reinician el sistema. «halt» lo apaga sin reiniciar y «shutdown -h now» lo apaga."
   },
   {
     id: "INF-012",
@@ -187,11 +187,11 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando permite crear dos carpetas al mismo tiempo?",
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos crean directorios? (seleccioná todas las correctas)",
     options: ["mkdir cp1 cp2", "mkdir -p cp1 cp2", "touch cp1 cp2", "cp cp1 cp2"],
-    correct: 0,
-    exp: "<b>mkdir</b> acepta varios nombres en una sola línea: «mkdir cp1 cp2» crea las dos. «touch» crea ficheros vacíos, no carpetas, y «cp» copia lo que ya existe."
+    correctos: [0, 1],
+    exp: "<b>mkdir</b> crea directorios y acepta varios nombres en una línea. «mkdir -p» también crea los padres. «touch» crea ficheros vacíos y «cp» copia lo que ya existe."
   },
   {
     id: "INF-017",
@@ -303,15 +303,10 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "En Linux, ¿a qué tres tipos de usuarios se aplican los permisos de un archivo o directorio?",
-    options: [
-      "Propietario, grupo propietario y resto de usuarios",
-      "Administrador, usuarios e invitados",
-      "Creador, lectores y ejecutores",
-      "Dueño, propietario y público"
-    ],
-    correct: 0,
+    tipo: "multi",
+    q: "¿Cuáles de estos son los tres niveles a los que se aplican los permisos de un archivo en Linux? (seleccioná todas las correctas)",
+    options: ["Propietario", "Grupo propietario", "Resto de usuarios", "Administrador"],
+    correctos: [0, 1, 2],
     exp: "Los tres niveles son <b>propietario</b> (dueño del archivo), <b>grupo propietario</b> (el grupo al que pertenece el archivo) y <b>otros</b> (el resto de usuarios del sistema). Linux no permite asignar permisos a usuarios o grupos concretos fuera de estos tres niveles."
   },
   {
@@ -401,11 +396,11 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: empaquetamiento y compresión",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando agrupa varios archivos o directorios en un solo archivo (empaqueta)?",
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos agrupan archivos en uno solo? (seleccioná todas las correctas)",
     options: ["tar", "zip -r", "gzip", "cp"],
-    correct: 0,
-    exp: "<b>tar</b> empaqueta: «tar cvf destino.tar carpeta» agrupa sin comprimir. «zip» también agrupa y comprime, «gzip» solo comprime archivos sueltos y «cp» copia."
+    correctos: [0, 1],
+    exp: "<b>tar</b> empaqueta sin comprimir y <b>zip -r</b> agrupa y comprime. «gzip» solo comprime archivos sueltos y «cp» copia."
   },
   {
     id: "INF-035",
@@ -434,22 +429,22 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: empaquetamiento y compresión",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué sintaxis de zip comprime un directorio y pide una contraseña al crear el archivo?",
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos trabajan con archivos zip? (seleccioná todas las correctas)",
     options: ["zip -e", "zip -r", "zip -p", "unzip -e"],
-    correct: 0,
-    exp: "<b>zip -e</b> pide una contraseña al crear el archivo comprimido. «zip -r» es recursivo (necesario para directorios), pero no pide contraseña; «unzip» descomprime."
+    correctos: [0, 1],
+    exp: "<b>zip -e</b> pide contraseña y <b>zip -r</b> es recursivo (necesario para directorios). «unzip» descomprime, no trabaja en la creación del .zip."
   },
   {
     id: "INF-038",
     parcial: "Linux",
     tema: "Linux: empaquetamiento y compresión",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando descomprime un archivo .zip?",
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos descomprimen archivos? (seleccioná todas las correctas)",
     options: ["unzip", "gzip -d", "tar -d", "zip -u"],
-    correct: 0,
-    exp: "<b>unzip archivo.zip</b> descomprime. «gzip -d» descomprime archivos .gz, «zip -u» actualiza un .zip existente y «tar -d» compara diferencias."
+    correctos: [0, 1],
+    exp: "<b>unzip</b> descomprime .zip y <b>gzip -d</b> descomprime .gz. «tar -d» compara diferencias y «zip -u» actualiza un .zip existente."
   },
   {
     id: "INF-039",
@@ -746,11 +741,67 @@ const preguntas = [
     options: ["Verdadero", "Falso"],
     correct: 0,
     exp: "Verdadero: en Fedora el paquete es «httpd». En Debian/Ubuntu se llama «apache2»."
+  },
+  // Preguntas nuevas de selección múltiple (agregadas en la diversificación de tipos).
+  {
+    id: "INF-104",
+    parcial: "Linux",
+    tema: "Linux: comandos básicos",
+    dificultad: "media",
+    tipo: "multi",
+    q: "¿Cuáles de estos son comandos de red en Linux? (seleccioná todas las correctas)",
+    options: ["ping", "ip", "curl", "cat"],
+    correctos: [0, 1, 2],
+    exp: "<b>ping</b> prueba conectividad, <b>ip</b> configura la red y <b>curl</b> transfiere datos. «cat» muestra el contenido de un fichero, no es un comando de red."
+  },
+  {
+    id: "INF-105",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "media",
+    tipo: "multi",
+    q: "¿Cuáles de estas son direcciones IP privadas según RFC 1918? (seleccioná todas las correctas)",
+    options: ["192.168.1.10", "10.0.0.5", "8.8.8.8", "172.16.0.1"],
+    correctos: [0, 1, 3],
+    exp: "Las privadas son <b>10.0.0.0/8</b>, <b>172.16.0.0/12</b> y <b>192.168.0.0/16</b>. 8.8.8.8 es pública (DNS de Google)."
+  },
+  {
+    id: "INF-106",
+    parcial: "Linux",
+    tema: "Linux: usuarios y grupos",
+    dificultad: "facil",
+    tipo: "multi",
+    q: "¿Cuáles de estos archivos se encuentran en el directorio /etc? (seleccioná todas las correctas)",
+    options: ["/etc/passwd", "/etc/shadow", "/etc/group", "/home/usuario"],
+    correctos: [0, 1, 2],
+    exp: "<b>/etc/passwd</b> guarda los usuarios, <b>/etc/shadow</b> las contraseñas cifradas y <b>/etc/group</b> los grupos. «/home/usuario» es la carpeta personal, no está en /etc."
+  },
+  {
+    id: "INF-107",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "facil",
+    tipo: "multi",
+    q: "¿Cuáles de estos son servicios de Linux? (seleccioná todas las correctas)",
+    options: ["httpd", "sshd", "postgresql", "gimp"],
+    correctos: [0, 1, 2],
+    exp: "<b>httpd</b> es el servidor web, <b>sshd</b> el servicio SSH y <b>postgresql</b> el motor de bases de datos. «gimp» es un editor de imágenes, no un servicio."
+  },
+  {
+    id: "INF-108",
+    parcial: "Linux",
+    tema: "Linux: comandos básicos",
+    dificultad: "media",
+    tipo: "multi",
+    q: "¿Cuáles de estos comandos muestran información del sistema? (seleccioná todas las correctas)",
+    options: ["uname -r", "free", "df -h", "ls"],
+    correctos: [0, 1, 2],
+    exp: "<b>uname -r</b> muestra la versión del kernel, <b>free</b> la memoria y <b>df -h</b> el espacio en disco. «ls» lista el contenido de un directorio, no información del sistema."
   }
 ];
 
 // ============================================================================
-// BLOQUE LINUX — núcleo hasta INF-059 · agregadas hasta INF-103
+// BLOQUE LINUX — núcleo hasta INF-059 · agregadas hasta INF-108
 // ============================================================================
 
 // ============================================================================
