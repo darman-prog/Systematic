@@ -179,11 +179,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra el listado de comandos que se han utilizado en la sesión?",
-    options: ["history", "last", "who -u", "ls"],
+    tipo: "codigo",
+    q: "¿Qué muestra este comando?",
+    codigo: "history",
+    options: ["El listado de comandos utilizados en la sesión", "Los accesos al sistema", "Los usuarios conectados", "El contenido del directorio"],
     correct: 0,
-    exp: "<b>history</b> lista los comandos ejecutados en la sesión actual. «last» muestra los accesos al sistema, «who -u» los usuarios conectados y «ls» el contenido del directorio."
+    exp: "«history» lista los comandos ejecutados en la sesión actual. «last» muestra los accesos al sistema, «who -u» los usuarios conectados y «ls» el contenido del directorio."
   },
   {
     id: "INF-015",
@@ -311,8 +312,9 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué hace el comando «userdel -r nombre-usuario»?",
+    tipo: "codigo",
+    q: "¿Qué hace este comando?",
+    codigo: "userdel -r nombre-usuario",
     options: [
       "Elimina el usuario y también su carpeta home",
       "Elimina solo la carpeta home, conservando la cuenta",
@@ -320,7 +322,7 @@ const preguntas = [
       "Renueva los permisos de la cuenta"
     ],
     correct: 0,
-    exp: "<b>userdel -r</b> elimina la cuenta y, con «-r», también su carpeta home. Sin la opción «-r» solo se borra la cuenta y la carpeta home queda en disco."
+    exp: "«userdel -r» elimina la cuenta y, con «-r», también su carpeta home. Sin la opción «-r» solo se borra la cuenta y la carpeta home queda en disco."
   },
   {
     id: "INF-025",
@@ -382,11 +384,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
-    tipo: "multiple",
-    q: "En formato octal, ¿qué valor tiene la combinación «rwx»?",
+    tipo: "codigo",
+    q: "¿Qué valor en octal tiene la combinación de permisos del recuadro?",
+    codigo: "rwx",
     options: ["7", "6", "5", "8"],
     correct: 0,
-    exp: "<b>rwx = 7</b> porque r=4, w=2 y x=1, y 4+2+1=7. Es la combinación de permisos completa: lectura, escritura y ejecución."
+    exp: "«rwx = 7» porque r=4, w=2 y x=1, y 4+2+1=7. Es la combinación completa: lectura, escritura y ejecución."
   },
   {
     id: "INF-031",
@@ -1020,16 +1023,17 @@ const preguntasRedes = [
     parcial: "Redes",
     tema: "Redes: subnetting y CIDR",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "En la notación 192.168.1.0/26, ¿qué indica el número 26?",
+    tipo: "codigo",
+    q: "En la dirección del recuadro, ¿qué indica el número 26?",
+    codigo: "192.168.1.0/26",
     options: [
-      "Que los primeros 26 bits de la dirección identifican la red",
+      "Que los primeros 26 bits identifican la red",
       "Que la subred tiene 26 hosts útiles",
       "Que la máscara es 255.255.255.26",
       "Que es una red de clase B"
     ],
     correct: 0,
-    exp: "El <b>/26</b> es la longitud del prefijo: los primeros 26 bits son de red y los 6 restantes son de host. No es el número de hosts ni un octeto de la máscara."
+    exp: "El «/26» es la longitud del prefijo: los primeros 26 bits son de red y los 6 restantes son de host. No es el número de hosts ni un octeto de la máscara."
   },
   {
     id: "INF-067",
@@ -1047,11 +1051,12 @@ const preguntasRedes = [
     parcial: "Redes",
     tema: "Redes: subnetting y CIDR",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Cuál es la máscara de subred de una /26?",
+    tipo: "codigo",
+    q: "¿Qué máscara de subred corresponde al prefijo del recuadro?",
+    codigo: "/26",
     options: ["255.255.255.192", "255.255.255.128", "255.255.255.224", "255.255.255.240"],
     correct: 0,
-    exp: "<b>/26 = 255.255.255.192</b>: 26 bits de red = 11111111.11111111.11111111.11000000. La /25 es .128, la /27 es .224 y la /28 es .240."
+    exp: "«/26 = 255.255.255.192»: 26 bits de red = 11111111.11111111.11111111.11000000. La /25 es .128, la /27 es .224 y la /28 es .240."
   },
   {
     id: "INF-069",
@@ -1155,11 +1160,12 @@ const preguntasRedes = [
     parcial: "Redes",
     tema: "Redes: gateway y enrutamiento",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra la tabla de enrutamiento en Linux?",
-    options: ["ip route", "ifconfig", "netstat -a", "traceroute"],
+    tipo: "codigo",
+    q: "¿Qué muestra este comando?",
+    codigo: "ip route",
+    options: ["La tabla de enrutamiento", "La configuración de las interfaces", "Las conexiones activas", "La ruta de un paquete"],
     correct: 0,
-    exp: "<b>ip route</b> muestra las rutas (destino, gateway e interfaz). «ifconfig» muestra las interfaces, «netstat -a» las conexiones y «traceroute» la ruta de un paquete."
+    exp: "«ip route» muestra las rutas (destino, gateway e interfaz). «ifconfig» muestra las interfaces, «netstat -a» las conexiones y «traceroute» la ruta de un paquete."
   },
   {
     id: "INF-077",
@@ -1247,11 +1253,12 @@ const preguntasRedes = [
     parcial: "Redes",
     tema: "Redes: DNS",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando de Linux resuelve un nombre de dominio contra el servidor DNS?",
-    options: ["nslookup", "ip route", "ping -r", "netstat -rn"],
+    tipo: "codigo",
+    q: "¿Qué hace este comando?",
+    codigo: "nslookup www.ejemplo.com",
+    options: ["Resuelve un nombre de dominio contra el servidor DNS", "Muestra la tabla de enrutamiento", "Prueba la conectividad", "Muestra la tabla de rutas"],
     correct: 0,
-    exp: "<b>nslookup</b> (también «host» o «dig») consulta el servidor DNS. «ip route» muestra rutas, «ping» prueba conectividad y «netstat -rn» la tabla de rutas."
+    exp: "«nslookup» (también «host» o «dig») consulta el servidor DNS. «ip route» muestra rutas, «ping» prueba conectividad y «netstat -rn» la tabla de rutas."
   },
   {
     id: "INF-084",
@@ -1381,16 +1388,17 @@ const preguntasRedes = [
     parcial: "Redes",
     tema: "Redes: ACL y seguridad",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué es una wildcard mask en una ACL de Cisco?",
+    tipo: "codigo",
+    q: "¿Qué representa la máscara del recuadro en una ACL de Cisco?",
+    codigo: "0.0.0.255",
     options: [
-      "Una máscara invertida que indica qué bits de la IP deben coincidir (0) y cuáles no (1)",
+      "Una máscara invertida: 0 exige coincidencia y 1 permite cualquier valor",
       "Una máscara de subred normal escrita al revés",
       "Una clave de acceso al router",
       "Un tipo de cifrado para las reglas"
     ],
-    correct:  0,
-    exp: "La <b>wildcard mask</b> es la inversa de la máscara de subred: 0 = el bit debe coincidir, 1 = no importa. Por ejemplo 0.0.0.255 coincide con cualquier host de la subred /24."
+    correct: 0,
+    exp: "La «wildcard mask» es la inversa de la máscara de subred: 0 = el bit debe coincidir, 1 = no importa. Por ejemplo 0.0.0.255 coincide con cualquier host de la subred /24."
   },
   {
     id: "INF-093",
@@ -1599,6 +1607,41 @@ const preguntasRedes = [
       ["NS", "Indica el servidor de nombres autoritativo"]
     ],
     exp: "El registro A apunta a una IPv4, CNAME crea un alias, MX indica el correo y NS el servidor de nombres autoritativo del dominio."
+  },
+  // Preguntas nuevas sobre código (agregadas en la diversificación de tipos).
+  {
+    id: "INF-157",
+    parcial: "Linux",
+    tema: "Linux: permisos de archivos y directorios",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué permisos asigna el comando del recuadro?",
+    codigo: "chmod 755 script.sh",
+    options: [
+      "Propietario: lectura, escritura y ejecución. Grupo y otros: lectura y ejecución",
+      "Todos los permisos para todos los usuarios",
+      "Solo lectura y escritura para el propietario",
+      "Solo ejecución para el propietario"
+    ],
+    correct: 0,
+    exp: "«chmod 755» equivale a rwxr-xr-x: el propietario tiene rwx y el grupo y otros r-x (lectura y ejecución)."
+  },
+  {
+    id: "INF-158",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué hace el comando del recuadro?",
+    codigo: "tar czvf backup.tar.gz /var/www",
+    options: [
+      "Empaqueta y comprime /var/www en un archivo .tar.gz",
+      "Extrae un archivo .tar.gz",
+      "Lista el contenido de un archivo .tar.gz",
+      "Comprime solo los ficheros sueltos"
+    ],
+    correct: 0,
+    exp: "«tar czvf» crea (c) un archivo .tar, comprime con gzip (z), muestra el progreso (v) y usa el fichero indicado (f)."
   }
 ];
 
