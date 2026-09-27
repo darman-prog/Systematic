@@ -215,11 +215,11 @@ const preguntas = [
     tema: "Linux: archivos y directorios",
     dificultad: "media",
     tipo: "dragdrop",
-    q: "Completa el comando que muestra el contenido de un fichero de texto:",
+    q: "Arrastra el comando que muestra el contenido del fichero tareas.txt:",
     piezas: ["cat", "ls", "echo", "grep"],
     respuestas: ["cat"],
-    codigo: "cat {1}",
-    exp: "<b>cat</b> concatena y muestra el contenido del fichero. «ls» lista el directorio, «echo» imprime texto por pantalla y «grep» busca patrones dentro de un fichero."
+    codigo: "{1} tareas.txt",
+    exp: "<b>cat</b> concatena y muestra el contenido del fichero: «cat tareas.txt». «ls» lista el directorio, «echo» imprime texto por pantalla y «grep» busca patrones dentro de un fichero."
   },
   {
     id: "INF-019",
