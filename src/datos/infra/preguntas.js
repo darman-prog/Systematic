@@ -2,7 +2,7 @@
 // Preguntas autocontenidas: todo lo necesario para responder está en el enunciado.
 //
 // ============================================================================
-// BLOQUE LINUX — empieza en INF-001 y termina en INF-059
+// BLOQUE LINUX — empieza en INF-001 · núcleo INF-001…INF-059 · nuevas INF-100…INF-103
 // Contenido derivado de los manuales de la cátedra (BancoDeInformacion/Infraestructura/*.md),
 // convertidos con markitdown y verificados contra el material original.
 // ============================================================================
@@ -12,19 +12,25 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: máquina virtual e instalación",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "Para instalar Fedora Server en VirtualBox sobre un procesador de arquitectura x64, ¿qué se debe verificar primero en la BIOS del equipo anfitrión?",
-    options: [
-      "Que el disco duro tenga al menos 80 GB de espacio",
-      "Que esté activada la opción de virtualización del procesador",
-      "Que la máquina tenga 4 GB de memoria RAM",
-      "Que el adaptador de red esté configurado en modo NAT"
-    ],
-    correct: 1,
-    exp: "<b>Virtualización activada en la BIOS.</b> El manual arranca por verificar que la opción de virtualización del procesador (VT-x/AMD-V) esté activada en la BIOS; sin ella VirtualBox no puede ejecutar un sistema operativo de 64 bits. Lo demás (disco, RAM, NAT) se configura dentro de la máquina virtual, no en la BIOS."
+    tipo: "vf",
+    q: "El puerto 22 es el que usa por defecto el servicio SSH.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "Verdadero: el puerto 22 es el de SSH por defecto. Apache (HTTP) escucha en el 80, HTTPS en el 443 y PostgreSQL en el 5432."
   },
   {
     id: "INF-002",
+    parcial: "Linux",
+    tema: "Linux: máquina virtual e instalación",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En VirtualBox, el formato de disco VDI es el nativo de la aplicación.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "Verdadero: VDI (Virtual Disk Image) es el formato nativo de VirtualBox. VMDK es de VMware, VHD de Hyper-V y QCOW2 de QEMU/KVM."
+  },
+  {
+    id: "INF-003",
     parcial: "Linux",
     tema: "Linux: máquina virtual e instalación",
     dificultad: "facil",
@@ -33,17 +39,6 @@ const preguntas = [
     options: ["256 MB", "512 MB", "1024 MB", "2048 MB"],
     correct: 2,
     exp: "El manual asigna <b>1024 MB</b>, un valor suficiente para una instalación mínima sin entorno gráfico. Aconseja además que la RAM de la máquina anfitriona sea lo bastante grande como para que funcionen bien la máquina real y la virtual a la vez."
-  },
-  {
-    id: "INF-003",
-    parcial: "Linux",
-    tema: "Linux: máquina virtual e instalación",
-    dificultad: "facil",
-    tipo: "multiple",
-    q: "En VirtualBox, ¿qué formato de disco duro virtual se selecciona en el paso 5 del manual?",
-    options: ["VMDK", "VDI", "VHD", "QCOW2"],
-    correct: 1,
-    exp: "El manual selecciona <b>VDI</b> (Virtual Disk Image), el formato nativo de VirtualBox. VMDK es de VMware, VHD de Hyper-V y QCOW2 de QEMU/KVM."
   },
   {
     id: "INF-004",
@@ -93,11 +88,11 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra la versión del kernel que está usando el sistema?",
-    options: ["uname -r", "cat /proc/cpuinfo", "dmidecode -q", "arch"],
+    tipo: "vf",
+    q: "El comando «uname -r» muestra la versión del kernel que está usando el sistema.",
+    options: ["Verdadero", "Falso"],
     correct: 0,
-    exp: "<b>uname -r</b> imprime la versión del kernel. «cat /proc/cpuinfo» muestra información del procesador, «dmidecode -q» el hardware del sistema y «arch» solo la arquitectura (64 o 32 bits)."
+    exp: "Verdadero: «uname -r» imprime la versión del kernel. «cat /proc/cpuinfo» muestra el procesador, «dmidecode -q» el hardware y «arch» solo la arquitectura."
   },
   {
     id: "INF-008",
@@ -324,33 +319,33 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué permiso simboliza la letra «r» en un archivo de Linux?",
-    options: ["Lectura", "Escritura", "Ejecución", "Propiedad"],
+    tipo: "vf",
+    q: "La letra «r» en los permisos de Linux simboliza el permiso de lectura.",
+    options: ["Verdadero", "Falso"],
     correct: 0,
-    exp: "«r» es <b>lectura</b> (read): permite ver el contenido del archivo, o listar el contenido de un directorio. «w» es escritura y «x» ejecución."
+    exp: "Verdadero: «r» es lectura (read). «w» es escritura y «x» ejecución."
   },
   {
     id: "INF-028",
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué permiso simboliza la letra «w» en un archivo de Linux?",
-    options: ["Escritura", "Lectura", "Ejecución", "Borrar"],
+    tipo: "vf",
+    q: "La letra «w» en los permisos de Linux simboliza el permiso de escritura.",
+    options: ["Verdadero", "Falso"],
     correct: 0,
-    exp: "«w» es <b>escritura</b> (write): permite modificar el contenido del archivo o, en un directorio, crear y eliminar archivos dentro de él."
+    exp: "Verdadero: «w» es escritura (write). En un directorio, permite crear y eliminar archivos dentro de él."
   },
   {
     id: "INF-029",
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué permiso simboliza la letra «x» en un archivo de Linux?",
-    options: ["Ejecución", "Lectura", "Escritura", "Expansión"],
+    tipo: "vf",
+    q: "En un directorio de Linux, el permiso «x» permite entrar en él con el comando cd.",
+    options: ["Verdadero", "Falso"],
     correct: 0,
-    exp: "«x» es <b>ejecución</b> (eXecute): permite ejecutar el archivo como programa. En un directorio, el permiso «x» permite entrar en él con «cd»."
+    exp: "Verdadero: sin el permiso de ejecución «x» en un directorio no se puede entrar en él, ni con «cd» ni con un explorador."
   },
   {
     id: "INF-030",
@@ -706,15 +701,60 @@ const preguntas = [
     options: ["\\q", "\\exit", "quit;", "exit"],
     correct: 0,
     exp: "<b>\\q</b> sale de la consola psql. Después se usa «exit» para volver a la consola de Fedora."
+  },
+  // Preguntas nuevas de verdadero/falso (agregadas en la diversificación de tipos).
+  {
+    id: "INF-100",
+    parcial: "Linux",
+    tema: "Linux: comandos básicos",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En Linux, el UID 0 pertenece al usuario administrador (root).",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "Verdadero: el UID 0 es el de root. Los UID por debajo de 1000 están reservados para el sistema y los superiores a 1000 son los usuarios normales."
+  },
+  {
+    id: "INF-101",
+    parcial: "Linux",
+    tema: "Linux: archivos y directorios",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "El comando rmdir puede eliminar un directorio que contiene archivos.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "Falso: rmdir solo elimina directorios vacíos. Para borrar un directorio con todo su contenido se usa «rm -r -f -v»."
+  },
+  {
+    id: "INF-102",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "media",
+    tipo: "vf",
+    q: "SSH encripta la sesión de conexión a diferencia de Telnet.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "Verdadero: SSH (Secure Shell) encripta la sesión, haciendo imposible que alguien obtenga contraseñas sin encriptar. Telnet no encripta."
+  },
+  {
+    id: "INF-103",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En Fedora, el paquete que instala el servidor web Apache se llama httpd.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "Verdadero: en Fedora el paquete es «httpd». En Debian/Ubuntu se llama «apache2»."
   }
 ];
 
 // ============================================================================
-// BLOQUE LINUX — termina en INF-059
+// BLOQUE LINUX — núcleo hasta INF-059 · agregadas hasta INF-103
 // ============================================================================
 
 // ============================================================================
-// BLOQUE REDES — empieza en INF-060 y termina en INF-099
+// BLOQUE REDES — empieza en INF-060 · núcleo INF-060…INF-099 · nuevas INF-150…
 // Contenido generado (no hay manual de redes en la cátedra): subnetting, rutas,
 // gateway y DNS. Revisar cada lote antes de commitear.
 // ============================================================================
