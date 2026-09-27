@@ -77,11 +77,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra el directorio actual de trabajo en Linux?",
-    options: ["pwd", "ls", "who", "arch"],
-    correct: 0,
-    exp: "<b>pwd</b> (print working directory) imprime la ruta completa del directorio en el que estás parado. «ls» lista el contenido del directorio, «who» muestra los usuarios conectados y «arch» la arquitectura del procesador."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["pwd", "Muestra el directorio actual de trabajo"],
+      ["ls", "Lista el contenido de un directorio"],
+      ["who", "Muestra los usuarios conectados"],
+      ["arch", "Muestra la arquitectura del procesador"]
+    ],
+    exp: "«pwd» muestra el directorio actual, «ls» lista el contenido, «who» los usuarios conectados y «arch» la arquitectura del procesador."
   },
   {
     id: "INF-007",
@@ -99,11 +103,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra el menú de ayuda sobre un comando concreto?",
-    options: ["help", "man", "info --help", "whatis"],
-    correct: 1,
-    exp: "<b>man comando</b> abre la página del manual de ese comando (por ejemplo «man rm»). «whatis» solo da una línea descriptiva y «help» es interno del shell, no sirve para cualquier comando."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["help", "Ayuda interna del shell"],
+      ["man", "Abre el manual de un comando"],
+      ["info --help", "Muestra la ayuda de info"],
+      ["whatis", "Da una línea descriptiva de un comando"]
+    ],
+    exp: "«man comando» abre la página del manual de ese comando (por ejemplo «man rm»). «whatis» solo da una línea descriptiva y «help» es interno del shell, no sirve para cualquier comando."
   },
   {
     id: "INF-009",
@@ -143,11 +151,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué comando muestra todos los procesos en ejecución con su identificador (PID)?",
-    options: ["ps -A", "top -n 1", "free", "who -u"],
-    correct: 0,
-    exp: "<b>ps -A</b> lista todos los procesos con su PID. «top» es una vista interactiva en vivo («top -n 1» la limita a una pasada), «free» muestra la memoria y «who -u» los usuarios conectados."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["ps -A", "Lista todos los procesos con su PID"],
+      ["top -n 1", "Muestra una pasada de procesos en vivo"],
+      ["free", "Muestra la memoria libre"],
+      ["who -u", "Muestra los usuarios conectados"]
+    ],
+    exp: "«ps -A» lista todos los procesos con su PID, «top» es una vista interactiva en vivo, «free» muestra la memoria y «who -u» los usuarios conectados."
   },
   {
     id: "INF-013",
@@ -176,11 +188,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra el contenido de un fichero de texto desde la primera línea?",
-    options: ["cat", "head -n 5", "tail", "grep"],
-    correct: 0,
-    exp: "<b>cat nombrearchivo</b> vuelca el contenido completo del fichero por la salida estándar. «head» y «tail» muestran solo el principio o el final, y «grep» filtra líneas por un patrón."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["cat", "Muestra el contenido de un fichero"],
+      ["head -n 5", "Muestra las primeras líneas de un fichero"],
+      ["tail", "Muestra el final de un fichero"],
+      ["grep", "Busca patrones dentro de un fichero"]
+    ],
+    exp: "«cat nombrearchivo» vuelca el contenido completo del fichero. «head» y «tail» muestran solo el principio o el final, y «grep» filtra líneas por un patrón."
   },
   {
     id: "INF-016",
@@ -221,33 +237,45 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando añade un usuario indicando en la misma línea el grupo principal, la carpeta home, si se debe crear dicha carpeta y el intérprete de comandos?",
-    options: ["useradd", "usermod", "adduser --home", "passwd"],
-    correct: 0,
-    exp: "<b>useradd</b> crea el usuario con parámetros como «-g» (grupo principal), «-d» (carpeta home), «-m» (crear la carpeta home) y «-s» (shell). «usermod» modifica un usuario que ya existe y «passwd» solo cambia la contraseña."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["useradd", "Crea un usuario nuevo"],
+      ["usermod", "Modifica un usuario existente"],
+      ["adduser --home", "Crea un usuario con home"],
+      ["passwd", "Cambia la contraseña"]
+    ],
+    exp: "«useradd» crea el usuario con parámetros como «-g», «-d», «-m» y «-s». «usermod» modifica un usuario existente y «passwd» solo cambia la contraseña."
   },
   {
     id: "INF-020",
     parcial: "Linux",
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando permite añadir un grupo al sistema?",
-    options: ["groupadd", "useradd -g", "addgroup", "groupmod"],
-    correct: 0,
-    exp: "<b>groupadd nombre-grupo</b> crea el grupo. «groupmod» modifica un grupo existente (nombre o GID), y «useradd -g» solo asigna el grupo principal al crear un usuario."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["groupadd", "Crea un grupo"],
+      ["groupmod", "Modifica un grupo existente"],
+      ["useradd -g", "Asigna el grupo principal al crear un usuario"],
+      ["groupdel", "Elimina un grupo"]
+    ],
+    exp: "«groupadd nombre-grupo» crea el grupo. «groupmod» modifica un grupo existente (nombre o GID), y «useradd -g» solo asigna el grupo principal al crear un usuario."
   },
   {
     id: "INF-021",
     parcial: "Linux",
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿En qué archivo se guarda la información de los usuarios del sistema (nombre, UID, GID, carpeta home y shell)?",
-    options: ["/etc/passwd", "/etc/shadow", "/etc/group", "/etc/users"],
-    correct: 0,
-    exp: "<b>/etc/passwd</b> guarda por usuario: nombre de cuenta, campo de clave («x»), UID, GID, nombre, carpeta home y shell. «/etc/shadow» guarda las contraseñas cifradas y «/etc/group» los grupos."
+    tipo: "relacionar",
+    q: "Emparejá cada archivo de /etc con lo que guarda.",
+    pares: [
+      ["/etc/passwd", "La información de los usuarios"],
+      ["/etc/shadow", "Las contraseñas cifradas"],
+      ["/etc/group", "Los grupos del sistema"],
+      ["/etc/hosts", "Los nombres de host locales"]
+    ],
+    exp: "<b>/etc/passwd</b> guarda por usuario: nombre de cuenta, UID, GID, nombre, carpeta home y shell. «/etc/shadow» guarda las contraseñas cifradas y «/etc/group» los grupos."
   },
   {
     id: "INF-022",
@@ -265,11 +293,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: usuarios y grupos",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué comando permite modificar un usuario cambiando su nombre, carpeta home, intérprete de comandos o los grupos a los que pertenece?",
-    options: ["usermod", "useradd", "chpasswd", "userdel"],
-    correct: 0,
-    exp: "<b>usermod</b> modifica usuarios existentes: «-l» cambia el nombre, «-d» la carpeta home, «-s» el shell y «-g» el grupo principal. «useradd» crea usuarios nuevos."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["usermod", "Modifica un usuario existente"],
+      ["useradd", "Crea un usuario nuevo"],
+      ["chpasswd", "Cambia contraseñas en lote"],
+      ["userdel", "Elimina un usuario"]
+    ],
+    exp: "«usermod» modifica usuarios existentes: «-l» cambia el nombre, «-d» la carpeta home, «-s» el shell y «-g» el grupo principal. «useradd» crea usuarios nuevos."
   },
   {
     id: "INF-024",
@@ -358,11 +390,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué comando se usa para cambiar los permisos de un archivo o directorio?",
-    options: ["chmod", "chown", "chgrp", "chattr"],
-    correct: 0,
-    exp: "<b>chmod</b> (change mode) cambia los permisos. «chown» cambia el propietario, «chgrp» el grupo propietario y «chattr» atributos extendidos."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["chmod", "Cambia los permisos de un archivo"],
+      ["chown", "Cambia el propietario de un archivo"],
+      ["chgrp", "Cambia el grupo propietario de un archivo"],
+      ["chattr", "Cambia atributos extendidos de un archivo"]
+    ],
+    exp: "«chmod» (change mode) cambia los permisos. «chown» cambia el propietario, «chgrp» el grupo propietario y «chattr» atributos extendidos."
   },
   {
     id: "INF-032",
@@ -385,11 +421,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué comando cambia el usuario propietario de un archivo?",
-    options: ["chown", "chgrp", "chmod", "usermod"],
-    correct: 0,
-    exp: "<b>chown nuevopropietario archivo</b> cambia el propietario. «chgrp» cambia el grupo propietario, «chmod» los permisos y «usermod» datos de la cuenta de usuario."
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["chown", "Cambia el propietario de un archivo"],
+      ["chgrp", "Cambia el grupo propietario de un archivo"],
+      ["chmod", "Cambia los permisos de un archivo"],
+      ["usermod", "Modifica un usuario del sistema"]
+    ],
+    exp: "«chown nuevopropietario archivo» cambia el propietario. «chgrp» cambia el grupo propietario, «chmod» los permisos y «usermod» datos de la cuenta de usuario."
   },
   {
     id: "INF-034",
@@ -407,11 +447,15 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: empaquetamiento y compresión",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué sintaxis de tar crea un archivo empaquetado y comprimido con gzip (.tar.gz)?",
-    options: ["tar czvf", "tar cvf", "tar jcvf", "tar xzvf"],
-    correct: 0,
-    exp: "<b>tar czvf</b> crea (c) y comprime con gzip (z). «tar jcvf» usa bzip2, «tar cvf» solo empaqueta sin comprimir y «tar xzvf» extrae y descomprime un .tar.gz."
+    tipo: "relacionar",
+    q: "Emparejá cada sintaxis de tar con lo que hace.",
+    pares: [
+      ["tar czvf", "Crea y comprime con gzip"],
+      ["tar cvf", "Crea sin comprimir"],
+      ["tar jcvf", "Crea y comprime con bzip2"],
+      ["tar xzvf", "Extrae y descomprime un .tar.gz"]
+    ],
+    exp: "«tar czvf» crea (c) y comprime con gzip (z). «tar jcvf» usa bzip2, «tar cvf» solo empaqueta y «tar xzvf» extrae y descomprime un .tar.gz."
   },
   {
     id: "INF-036",
@@ -1364,11 +1408,117 @@ const preguntasRedes = [
     ],
     correct: 0,
     exp: "Lo primero es lo físico: <b>cable conectado y luces del puerto</b> (enlace). Sin capa física no hay red, así que se descarta todo lo demás."
+  },
+  // Preguntas nuevas de emparejamiento (agregadas en la diversificación de tipos).
+  {
+    id: "INF-150",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada concepto con su descripción.",
+    pares: [
+      ["IPv4", "Dirección de 32 bits"],
+      ["IPv6", "Dirección de 128 bits"],
+      ["MAC", "Dirección física de una red"],
+      ["Puerto", "Identifica un servicio dentro de un host"]
+    ],
+    exp: "IPv4 usa 32 bits, IPv6 128 bits, la MAC es la dirección física de la tarjeta de red y el puerto identifica un servicio dentro del host."
+  },
+  {
+    id: "INF-151",
+    parcial: "Redes",
+    tema: "Redes: subnetting y CIDR",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada prefijo con su máscara de subred.",
+    pares: [
+      ["/24", "255.255.255.0"],
+      ["/26", "255.255.255.192"],
+      ["/27", "255.255.255.224"],
+      ["/30", "255.255.255.252"]
+    ],
+    exp: "Cada prefijo define cuántos bits son de red: /24 = 255.255.255.0, /26 = 255.255.255.192, /27 = 255.255.255.224 y /30 = 255.255.255.252."
+  },
+  {
+    id: "INF-152",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada concepto con su descripción.",
+    pares: [
+      ["Gateway por defecto", "La IP del router para salir de la red local"],
+      ["Next-hop", "La IP del siguiente router"],
+      ["Broadcast", "Envía un paquete a todos los hosts de la subred"],
+      ["DNS", "Traduce nombres de dominio a direcciones IP"]
+    ],
+    exp: "El gateway es la salida a otras redes, el next-hop es el siguiente salto, el broadcast alcanza a toda la subred y el DNS traduce nombres a IP."
+  },
+  {
+    id: "INF-153",
+    parcial: "Redes",
+    tema: "Redes: switching y VLAN",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada concepto con su descripción.",
+    pares: [
+      ["Switch", "Reenvía tramas solo al puerto de destino"],
+      ["Hub", "Repite tramas a todos los puertos"],
+      ["Router", "Conecta redes distintas"],
+      ["VLAN", "Segmenta un switch en redes lógicas"]
+    ],
+    exp: "El switch aprende MACs y reenvía al destino, el hub repite a todos, el router conecta redes y la VLAN segmenta lógicamente un switch."
+  },
+  {
+    id: "INF-154",
+    parcial: "Redes",
+    tema: "Redes: ACL y seguridad",
+    dificultad: "dificil",
+    tipo: "relacionar",
+    q: "Emparejá cada mecanismo con su descripción.",
+    pares: [
+      ["ACL estándar", "Filtra solo por la IP de origen"],
+      ["ACL extendida", "Filtra por origen, destino y puerto"],
+      ["NAT", "Traduce IP privadas a una IP pública"],
+      ["PAT", "Usa el puerto para distinguir equipos"]
+    ],
+    exp: "La ACL estándar mira solo el origen, la extendida también destino y puerto. NAT traduce direcciones y PAT usa puertos para compartir una IP pública."
+  },
+  {
+    id: "INF-155",
+    parcial: "Redes",
+    tema: "Redes: troubleshooting",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada comando con lo que hace.",
+    pares: [
+      ["ping", "Prueba conectividad con un host"],
+      ["traceroute", "Muestra la ruta salto a salto"],
+      ["nslookup", "Resuelve nombres de dominio"],
+      ["ipconfig", "Muestra la configuración de red en Windows"]
+    ],
+    exp: "«ping» prueba si un host responde, «traceroute» muestra la ruta, «nslookup» resuelve nombres y «ipconfig» (Windows) muestra la configuración de red."
+  },
+  {
+    id: "INF-156",
+    parcial: "Redes",
+    tema: "Redes: DNS",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Emparejá cada registro DNS con su función.",
+    pares: [
+      ["A", "Asocia un nombre con una IPv4"],
+      ["CNAME", "Crea un alias de otro nombre"],
+      ["MX", "Indica el servidor de correo"],
+      ["NS", "Indica el servidor de nombres autoritativo"]
+    ],
+    exp: "El registro A apunta a una IPv4, CNAME crea un alias, MX indica el correo y NS el servidor de nombres autoritativo del dominio."
   }
 ];
 
 export default [...preguntas, ...preguntasRedes];
 
 // ============================================================================
-// BLOQUE REDES — termina en INF-099
+// BLOQUE REDES — núcleo hasta INF-099 · agregadas hasta INF-156
 // ============================================================================
