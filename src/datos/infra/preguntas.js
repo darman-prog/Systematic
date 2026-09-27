@@ -118,11 +118,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué comando lista también los ficheros ocultos de un directorio?",
-    options: ["ls -l", "ls -a", "ls -t", "ls -R"],
-    correct: 1,
-    exp: "<b>ls -a</b> muestra todos los ficheros, incluidos los ocultos (los que empiezan con punto, como .bashrc). «ls -l» da el formato largo, «ls -t» ordena por fecha y «ls -R» lista subdirectorios de forma recursiva."
+    tipo: "dragdrop",
+    q: "Completa el comando que muestra los ficheros ocultos de un directorio:",
+    piezas: ["-a", "-l", "-t", "-R"],
+    respuestas: ["-a"],
+    codigo: "ls {1}",
+    exp: "«ls -a» muestra todos los ficheros, incluidos los ocultos (los que empiezan con punto, como .bashrc). «ls -l» da el formato largo, «ls -t» ordena por fecha y «ls -R» lista subdirectorios de forma recursiva."
   },
   {
     id: "INF-010",
@@ -166,11 +167,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: comandos básicos",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando muestra el espacio libre en memoria?",
-    options: ["df -h", "du /home -h", "free", "uptime"],
-    correct: 2,
-    exp: "<b>free</b> muestra la memoria total, usada y libre (RAM y swap). «df -h» es espacio en disco, «du -h» el tamaño de directorios y «uptime» cuánto tiempo lleva encendido el sistema."
+    tipo: "dragdrop",
+    q: "Completa el comando que muestra el espacio libre en memoria:",
+    piezas: ["free", "df -h", "du /home -h", "uptime"],
+    respuestas: ["free"],
+    codigo: "{1}",
+    exp: "«free» muestra la memoria total, usada y libre (RAM y swap). «df -h» es espacio en disco, «du -h» el tamaño de directorios y «uptime» cuánto tiempo lleva encendido el sistema."
   },
   {
     id: "INF-014",
@@ -214,11 +216,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: archivos y directorios",
     dificultad: "facil",
-    tipo: "multiple",
-    q: "¿Qué comando elimina un directorio especificado y todo su contenido?",
-    options: ["rmdir", "rm -r -f -v", "mv", "shred -u"],
-    correct: 1,
-    exp: "<b>rm -r -f -v</b> borra recursivamente (-r) sin pedir confirmación (-f) y mostrando lo que elimina (-v). «rmdir» solo funciona con directorios vacíos, «mv» mueve o renombra, y «shred -u» borra un fichero de forma segura (no el directorio con todo su contenido de forma sencilla)."
+    tipo: "dragdrop",
+    q: "Completa el comando que elimina un directorio y todo su contenido:",
+    piezas: ["-r", "-f", "-v", "-i"],
+    respuestas: ["-r", "-f"],
+    codigo: "rm {1} {2}",
+    exp: "«rm -r -f» borra recursivamente (-r) sin pedir confirmación (-f). «rmdir» solo funciona con directorios vacíos, «mv» mueve o renombra, y «shred -u» borra un fichero de forma segura."
   },
   {
     id: "INF-018",
@@ -405,16 +408,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué hace el comando «chmod u+x archivo»?",
-    options: [
-      "Da permiso de ejecución al propietario del archivo",
-      "Quita el permiso de ejecución a todos los usuarios",
-      "Da permiso de ejecución a todos los usuarios",
-      "Quita el permiso de escritura al grupo"
-    ],
-    correct: 0,
-    exp: "<b>u+x</b> añade (+) el permiso de ejecución (x) al propietario (u). Sin la letra de usuario se afectarían todos los usuarios simultáneamente."
+    tipo: "dragdrop",
+    q: "Completa el comando que da permiso de ejecución al propietario de un archivo:",
+    piezas: ["u", "g", "+x", "-x"],
+    respuestas: ["u", "+x"],
+    codigo: "chmod {1} {2} archivo",
+    exp: "«chmod u+x archivo» añade (+) el permiso de ejecución (x) al propietario (u). Sin la letra de usuario se afectarían todos los usuarios simultáneamente."
   },
   {
     id: "INF-033",
@@ -462,11 +461,12 @@ const preguntas = [
     parcial: "Linux",
     tema: "Linux: empaquetamiento y compresión",
     dificultad: "media",
-    tipo: "multiple",
-    q: "¿Qué sintaxis de tar extrae y descomprime un archivo .tar.bz2?",
-    options: ["tar jxvf", "tar czvf", "tar tzvf", "tar xvf"],
-    correct: 0,
-    exp: "<b>tar jxvf</b> extrae (x) y descomprime con bzip2 (j). «tar czvf» y «tar jcvf» crean, «tar tzvf» lista el contenido de un .tar.gz y «tar xvf» extrae sin descomprimir."
+    tipo: "dragdrop",
+    q: "Completa el comando que extrae y descomprime un archivo .tar.bz2:",
+    piezas: ["jxvf", "czvf", "xzvf", "cvf"],
+    respuestas: ["jxvf"],
+    codigo: "tar {1} archivo.tar.bz2",
+    exp: "«tar jxvf» extrae (x) y descomprime con bzip2 (j). «tar czvf» y «tar jcvf» crean, «tar xvf» extrae sin descomprimir y «tar xzvf» es para .tar.gz."
   },
   {
     id: "INF-037",
@@ -841,11 +841,96 @@ const preguntas = [
     options: ["uname -r", "free", "df -h", "ls"],
     correctos: [0, 1, 2],
     exp: "<b>uname -r</b> muestra la versión del kernel, <b>free</b> la memoria y <b>df -h</b> el espacio en disco. «ls» lista el contenido de un directorio, no información del sistema."
+  },
+  // Preguntas nuevas para completar (agregadas en la diversificación de tipos).
+  {
+    id: "INF-109",
+    parcial: "Linux",
+    tema: "Linux: empaquetamiento y compresión",
+    dificultad: "media",
+    tipo: "dragdrop",
+    q: "Completa el comando que crea un archivo .tar.gz:",
+    piezas: ["czvf", "cvf", "jcvf", "xzvf"],
+    respuestas: ["czvf"],
+    codigo: "tar {1} backup.tar.gz /var/www",
+    exp: "«tar czvf» crea (c) y comprime con gzip (z). «tar jcvf» usa bzip2, «tar cvf» solo empaqueta y «tar xzvf» extrae y descomprime un .tar.gz."
+  },
+  {
+    id: "INF-110",
+    parcial: "Redes",
+    tema: "Redes: gateway y enrutamiento",
+    dificultad: "facil",
+    tipo: "dragdrop",
+    q: "Completa el comando que muestra la tabla de enrutamiento en Linux:",
+    piezas: ["route", "addr", "link", "netstat"],
+    respuestas: ["route"],
+    codigo: "ip {1}",
+    exp: "«ip route» muestra las rutas (destino, gateway e interfaz). «ifconfig» muestra las interfaces, «netstat -rn» la tabla de rutas y «traceroute» la ruta de un paquete."
+  },
+  {
+    id: "INF-111",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "facil",
+    tipo: "dragdrop",
+    q: "Completa el comando que inicializa la base de datos PostgreSQL:",
+    piezas: ["--initdb", "--start", "--stop", "--restart"],
+    respuestas: ["--initdb"],
+    codigo: "postgresql-setup {1}",
+    exp: "«postgresql-setup --initdb» inicializa el clúster de datos. Después se inicia el servicio con «systemctl start postgresql.service»."
+  },
+  {
+    id: "INF-112",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "media",
+    tipo: "dragdrop",
+    q: "Completa la ruta del archivo que configura las conexiones remotas de PostgreSQL:",
+    piezas: ["/var/lib/pgsql/data/pg_hba.conf", "/etc/ssh/sshd_config", "/etc/httpd/conf/httpd.conf", "/etc/resolv.conf"],
+    respuestas: ["/var/lib/pgsql/data/pg_hba.conf"],
+    codigo: "nano {1}",
+    exp: "<b>/var/lib/pgsql/data/pg_hba.conf</b> configura las conexiones remotas (tipo, base de datos, usuario, dirección y método). «/etc/ssh/sshd_config» es la de SSH y «/etc/httpd/conf/httpd.conf» la de Apache."
+  },
+  {
+    id: "INF-113",
+    parcial: "Linux",
+    tema: "Linux: SSH",
+    dificultad: "media",
+    tipo: "dragdrop",
+    q: "Completa el comando que reinicia el servicio SSH:",
+    piezas: ["restart", "start", "stop", "status"],
+    respuestas: ["restart"],
+    codigo: "systemctl {1} sshd.service",
+    exp: "«systemctl restart sshd.service» reinicia el servicio. «start» lo inicia, «stop» lo frena y «status» consulta su estado."
+  },
+  {
+    id: "INF-114",
+    parcial: "Linux",
+    tema: "Linux: bases de datos",
+    dificultad: "facil",
+    tipo: "dragdrop",
+    q: "Completa el comando que cambia al usuario postgres:",
+    piezas: ["postgres", "root", "user1", "admin"],
+    respuestas: ["postgres"],
+    codigo: "su {1}",
+    exp: "«su postgres» cambia al usuario postgres. Después se abre la consola con «psql» y se sale con «\\q»."
+  },
+  {
+    id: "INF-115",
+    parcial: "Linux",
+    tema: "Linux: arranque y recuperación de root",
+    dificultad: "facil",
+    tipo: "dragdrop",
+    q: "Completa el comando que asigna la nueva contraseña de root en modo rescate:",
+    piezas: ["passwd", "chpasswd", "usermod", "password"],
+    respuestas: ["passwd"],
+    codigo: "{1}",
+    exp: "«passwd» pide la nueva contraseña dos veces y la asigna. Después se sale con «exit» y se reinicia con «reboot»."
   }
 ];
 
 // ============================================================================
-// BLOQUE LINUX — núcleo hasta INF-059 · agregadas hasta INF-108
+// BLOQUE LINUX — núcleo hasta INF-059 · agregadas hasta INF-115
 // ============================================================================
 
 // ============================================================================
