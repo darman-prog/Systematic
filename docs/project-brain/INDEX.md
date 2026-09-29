@@ -19,8 +19,8 @@ No cargues el cerebro completo: leé este índice y solo los documentos que nece
 | [DATA.md](DATA.md) | Persistencia, claves `sys.*`, migración y schema de datos | Al tocar progreso, export/import o contenido | vigente |
 | [TESTING.md](TESTING.md) | Estrategia y suites de tests | Al agregar tests o antes de cerrar un cambio | vigente |
 | [OPERATIONS.md](OPERATIONS.md) | Build, deploy en Vercel y rollback | Antes de publicar o revertir | vigente |
-| [PRODUCT.md](../../PRODUCT.md) | Problema, usuarios y principios de producto | Al decidir alcance o prioridades | vigente |
-| [DESIGN.md](../../DESIGN.md) | Dirección visual "Noche calma", tokens, movimiento y accesibilidad | Al tocar UI visible | vigente |
+| [PRODUCT.md](../PRODUCT.md) | Problema, usuarios y principios de producto | Al decidir alcance o prioridades | vigente |
+| [DESIGN.md](../DESIGN.md) | Dirección visual "Noche calma", tokens, movimiento y accesibilidad | Al tocar UI visible | vigente |
 
 ## Decisiones y planes
 
@@ -31,4 +31,4 @@ No cargues el cerebro completo: leé este índice y solo los documentos que nece
 
 - Cada documento abre con frontmatter `status` / `last_reviewed` / `confidence` / `source`.
 - Los ADRs viven en `docs/adr/` y no se duplican acá.
-- `PRODUCT.md` y `DESIGN.md` viven en la raíz y usan su propio schema; este índice solo los enlaza.
+- `PRODUCT.md` y `DESIGN.md` viven en `docs/` y usan su propio schema; este índice solo los enlaza.
