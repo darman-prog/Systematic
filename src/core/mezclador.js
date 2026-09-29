@@ -19,11 +19,13 @@ export function crearMezclador({ registro, obtenerP, store = memoria(), config =
   const guardar = () => store.guardar(estado);
 
   /* Pool elegible de una materia: excluye sesión + ciclo actual.
-     Si el ciclo se agotó, abre ciclo nuevo (único momento en que "reinicia"). */
-  function elegiblesDe(materia, sesionIds) {
+     Si el ciclo no alcanza para la cuota pedida, abre ciclo nuevo (único momento
+     en que "reinicia"): esperar a pool vacío entregaba rondas cortas por el
+     sobrante del ciclo anterior. */
+  function elegiblesDe(materia, sesionIds, n) {
     const vistos = estado.ciclos[materia.id] || [];
     let pool = materia.preguntas.filter(p => !sesionIds.includes(p.id) && !vistos.includes(p.id));
-    if (pool.length === 0) {
+    if (pool.length < n) {
       estado.ciclos[materia.id] = [];
       pool = materia.preguntas.filter(p => !sesionIds.includes(p.id));
     }
@@ -52,7 +54,7 @@ export function crearMezclador({ registro, obtenerP, store = memoria(), config =
     materias.forEach((m, i) => {
       let n = cuotas[i];
       if (n <= 0) return;
-      let pool = elegiblesDe(m, sesionIds);
+      let pool = elegiblesDe(m, sesionIds, n);
       if (filtros) pool = pool.filter(filtros);
       n = Math.min(n, pool.length);
       if (n <= 0) return;

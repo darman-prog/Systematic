@@ -126,6 +126,14 @@ describe("Mezclador", () => {
     expect(algunaRepetida).toBe(true);
   });
 
+  it("entrega la ronda completa aunque al ciclo le sobre un resto", () => {
+    // Regresión: ASW tiene 10 preguntas y la cuota es 3. Tras 3 rondas (9 vistas)
+    // el ciclo quedaba con 1 sobrante y la 4ª ronda salía corta (8 en vez de 9).
+    for (let i = 0; i < 4; i++) {
+      expect(mezclador.siguienteRonda({ tamaño: 9 })).toHaveLength(9);
+    }
+  });
+
   it("permite dar más peso a una materia específica", () => {
     const ronda = mezclador.siguienteRonda({
       tamaño: 9,
