@@ -42,6 +42,20 @@ export function crearMezclador({ registro, obtenerP, store = memoria(), config =
     return base;
   }
 
+  /* Round-robin sobre las materias: una de cada grupo por pasada, así ninguna
+     materia monopoliza la ronda mientras queden grupos con preguntas. */
+  function intercalar(grupos) {
+    const activos = grupos.filter(g => g.length).map(g => [...g]);
+    const final = [];
+    while (activos.length) {
+      for (let i = 0; i < activos.length; i++) {
+        final.push(activos[i].shift());
+        if (!activos[i].length) activos.splice(i--, 1);
+      }
+    }
+    return final;
+  }
+
   function siguienteRonda({ tamaño = 10, pesos = {}, modos = {}, sesionIds = [], filtros } = {}) {
     const materias = registro.filter(m => m.preguntas.length);
     if (!materias.length) return [];
@@ -50,7 +64,7 @@ export function crearMezclador({ registro, obtenerP, store = memoria(), config =
     const totalPeso = materias.reduce((s, m) => s + pesoDe(m), 0);
     const cuotas = repartir(tamaño, materias.map(m => pesoDe(m) / totalPeso));
 
-    const ronda = [];
+    const grupos = [];
     materias.forEach((m, i) => {
       let n = cuotas[i];
       if (n <= 0) return;
@@ -69,12 +83,14 @@ export function crearMezclador({ registro, obtenerP, store = memoria(), config =
       const scores = pool.map(p => calcularScore(p, ctx));
       const sel = muestrearPonderado(pool, scores, n, Math.random);
 
-      ronda.push(...sel);
+      grupos.push(sel);
       estado.ciclos[m.id] = [...(estado.ciclos[m.id] || []), ...sel.map(p => p.id)];
     });
 
-    // Barajar para intercalar materias (que no salgan bloqueadas por materia)
-    const final = ronda.sort(() => Math.random() - 0.5);
+    // Intercalar por materia (round-robin) en vez de barajar al azar: el shuffle
+    // con `Math.random() - 0.5` es sesgado y dejaba rachas largas de la misma
+    // materia de forma aleatoria; el round-robin da la garantía de intercala.
+    const final = intercalar(grupos);
 
     // Cooldown global suave (preferencia, no exclusión dura)
     estado.recientes = [...estado.recientes, ...final.map(p => p.id)].slice(-cfg.cooldown * 2);
