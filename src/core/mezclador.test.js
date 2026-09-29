@@ -68,16 +68,33 @@ describe("Mezclador", () => {
   });
 
   it("no repite preguntas dentro de la misma sesión", () => {
+    // Banco propio: 5 rondas × 3 por materia = 15 pidios por materia, así que
+    // cada banco debe tener >= 15 para que la garantía sea exigible sin reinicio
+    // de ciclo (con el banco de pruebas, ASW tiene 10 y el ciclo reinicia antes).
+    const amplio = crearMezclador({
+      registro: ["bd2", "isw", "asw"].map((id, i) => ({
+        id,
+        nombre: id.toUpperCase(),
+        preguntas: Array.from({ length: 20 }, (_, j) => ({
+          id: `${id.toUpperCase()}-${j}`,
+          tema: `T${j % 3}`,
+          tipo: "multiple",
+          dificultad: ["facil", "media", "dificil"][(i + j) % 3],
+        })),
+      })),
+      obtenerP,
+      store: { cargar: () => null, guardar: () => {} },
+    });
+
     const idsVistos = new Set();
-    // 5 rondas × 9 preguntas = 45 preguntas
     for (let i = 0; i < 5; i++) {
-      const ronda = mezclador.siguienteRonda({ tamaño: 9 });
+      const ronda = amplio.siguienteRonda({ tamaño: 9 });
       ronda.forEach(p => {
         expect(idsVistos.has(p.id)).toBe(false);
         idsVistos.add(p.id);
       });
     }
-    // Deberíamos haber visto 45 preguntas distintas
+    // 45 preguntas servidas = 45 preguntas distintas
     expect(idsVistos.size).toBe(45);
   });
 
