@@ -1068,6 +1068,212 @@ const preguntas = [
     correct: 0,
     exp: "`lista[0]` es 10 y el tipo de retorno `T | undefined` recuerda que un arreglo puede estar vacío. Devolver undefined es correcto, no un bug.",
     claseError: "logica"
+  },
+  // --- Ampliación de Asincronía y errores (lote 4) ---
+  {
+    id: "TS-075",
+    parcial: "Asincronía y errores",
+    tema: "Event loop",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿En qué orden imprime?",
+    codigo: "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nconsole.log(\"C\");",
+    options: ["A, C, B", "A, B, C", "B, A, C", "C, A, B"],
+    correct: 0,
+    exp: "El setTimeout, aunque sea 0 ms, va a la cola de macrotareas: el código sincrónico (A, C) corre primero y B al final. Confundir esto rompe el orden esperado.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-076",
+    parcial: "Asincronía y errores",
+    tema: "Microtareas",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Cuál corre antes: una promesa resuelta o un setTimeout de 0 ms?",
+    options: [
+      "La promesa: las microtareas van antes que las macrotareas",
+      "El setTimeout",
+      "Depende del navegador",
+      "Se ejecutan a la vez"
+    ],
+    correct: 0,
+    exp: "Las microtareas (promesas, queueMicrotask) se vacían antes de la siguiente macrotarea (setTimeout). Es la base del orden en el event loop.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-077",
+    parcial: "Asincronía y errores",
+    tema: "Promesas",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "Promise.resolve(1).then(v => console.log(v + 1));\nconsole.log(\"fin\");",
+    options: ["fin, luego 2", "2, luego fin", "1, luego fin", "Error"],
+    correct: 0,
+    exp: "El callback de `then` es asincrónico: \"fin\" (sincrónico) se imprime primero y 2 después. No se puede leer el resultado de una promesa fuera de su callback.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-078",
+    parcial: "Asincronía y errores",
+    tema: "Promise.all",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué diferencia hay entre `Promise.all` y `Promise.allSettled`?",
+    options: [
+      "`all` rechaza si una falla; `allSettled` espera todas y reporta el estado de cada una",
+      "Son iguales",
+      "`allSettled` cancela las demás",
+      "`all` solo acepta dos promesas"
+    ],
+    correct: 0,
+    exp: "`all` es todo-o-nada: el primer rechazo corta. `allSettled` nunca rechaza y devuelve {status, value|reason} de cada promesa. Elegir mal esconde fallos.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-079",
+    parcial: "Asincronía y errores",
+    tema: "Try/catch",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime si `cargar()` rechaza?",
+    codigo: "async function init() {\n  try {\n    await cargar();\n  } catch (e) {\n    console.log(\"error controlado\");\n  }\n}\ninit();",
+    options: ["error controlado", "Unhandled rejection", "undefined", "Error de compilación"],
+    correct: 0,
+    exp: "Con `await` dentro del try, el rechazo se convierte en excepción y lo captura el catch: imprime \"error controlado\". Sin await, el catch no lo vería.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-080",
+    parcial: "Asincronía y errores",
+    tema: "Async",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "async function f() { return 5; }\nconsole.log(f());",
+    options: ["Promise { 5 }", "5", "undefined", "Error"],
+    correct: 0,
+    exp: "Una función async siempre devuelve una promesa: `f()` da Promise resuelta con 5. Para obtener 5 hay que usar `await f()` o `.then`.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-081",
+    parcial: "Asincronía y errores",
+    tema: "Await",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué pasa con este código?",
+    codigo: "function cargar() {\n  const datos = await fetch(\"/api\");\n}",
+    options: [
+      "Error de sintaxis: await solo se usa en funciones async",
+      "Funciona igual",
+      "Devuelve undefined",
+      "Lanza una promesa"
+    ],
+    correct: 0,
+    exp: "`await` solo es válido dentro de una función `async` (o en el nivel superior de un módulo). Fuera, es error de sintaxis. La IA a veces lo olvida.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-082",
+    parcial: "Asincronía y errores",
+    tema: "Rechazo sin manejar",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué pasa si una promesa rechaza y nadie la captura?",
+    options: [
+      "Unhandled promise rejection: el error se pierde o cae el proceso",
+      "Se ignora sin consecuencias",
+      "Se convierte en un valor null",
+      "Se reintenta sola"
+    ],
+    correct: 0,
+    exp: "Sin `.catch` ni `try/catch`, el rechazo queda sin manejar: en Node puede tumbar el proceso. Es el bug silencioso clásico de `fetch` sin manejo.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-083",
+    parcial: "Asincronía y errores",
+    tema: "Finally",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Cuándo se ejecuta el bloque `finally`?",
+    codigo: "try {\n  return 1;\n} finally {\n  console.log(\"cierre\");\n}",
+    options: [
+      "Siempre, incluso si hay return o error",
+      "Solo si hay error",
+      "Solo si no hay return",
+      "Nunca, el return lo saltea"
+    ],
+    correct: 0,
+    exp: "`finally` corre siempre, con o sin error y aunque haya `return`. Sirve para cerrar recursos (conexiones, archivos).",
+    claseError: "logica"
+  },
+  {
+    id: "TS-084",
+    parcial: "Asincronía y errores",
+    tema: "Promise.race",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué devuelve `Promise.race([p1, p2])`?",
+    options: [
+      "El resultado de la primera promesa que se resuelva o rechace",
+      "Un arreglo con ambos resultados",
+      "La suma de ambos",
+      "Siempre la primera del arreglo"
+    ],
+    correct: 0,
+    exp: "`race` gana la primera en asentarse (resuelta o rechazada), no la primera del arreglo. Se usa para timeouts: competir la petición contra un temporizador.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-085",
+    parcial: "Asincronía y errores",
+    tema: "Async",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué devuelve `f()`?",
+    codigo: "async function f() {\n  return Promise.resolve(3);\n}",
+    options: [
+      "Una promesa resuelta con 3 (el return se aplana)",
+      "Una promesa que contiene otra promesa",
+      "3",
+      "undefined"
+    ],
+    correct: 0,
+    exp: "Una función async aplana lo que devuelve: devolver una promesa no anida promesas, la promesa externa se resuelve con 3.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-086",
+    parcial: "Asincronía y errores",
+    tema: "Try/catch",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Captura el catch el rechazo de `cargar()`?",
+    codigo: "try {\n  cargar();\n} catch (e) {\n  console.log(\"atrapado\");\n}",
+    options: [
+      "No: sin await, el rechazo es asincrónico y el catch ya terminó",
+      "Sí, lo atrapa",
+      "Solo si cargar es async",
+      "Depende del navegador"
+    ],
+    correct: 0,
+    exp: "Sin `await`, `cargar()` devuelve una promesa y el try/catch no la observa: el rechazo queda sin manejar. El catch solo atrapa errores sincrónicos de esa llamada.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-087",
+    parcial: "Asincronía y errores",
+    tema: "Encadenamiento",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "Promise.resolve(2)\n  .then(v => v * 3)\n  .then(v => console.log(v));",
+    options: ["6", "2", "3", "undefined"],
+    correct: 0,
+    exp: "Cada `then` recibe lo que devolvió el anterior: 2 * 3 = 6. Encadenar permite transformar el valor paso a paso sin anidar callbacks.",
+    claseError: "logica"
   }
 ];
 

@@ -38,9 +38,11 @@ const roadmap = {
       id: "asincronia",
       nombre: "Asincronía y errores",
       lecciones: [
-        { id: "async-orden", nombre: "Orden de ejecución", preguntas: ["TS-016", "TS-017"] }
+        { id: "async-orden", nombre: "Orden de ejecución", preguntas: ["TS-016", "TS-017", "TS-075", "TS-076"] },
+        { id: "async-promesas", nombre: "Promesas", preguntas: ["TS-018", "TS-032", "TS-077", "TS-078"] },
+        { id: "async-errores", nombre: "Async/await y errores", preguntas: ["TS-019", "TS-033", "TS-079", "TS-080"] }
       ],
-      examen: { version: 1, umbral: 0.8, preguntas: ["TS-018", "TS-019", "TS-020", "TS-032", "TS-033"] }
+      examen: { version: 2, umbral: 0.8, preguntas: ["TS-020", "TS-081", "TS-082", "TS-083", "TS-084", "TS-085", "TS-086", "TS-087"] }
     },
     {
       id: "auditoria",

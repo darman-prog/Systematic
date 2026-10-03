@@ -10,7 +10,7 @@ test.describe('Lenguajes — TypeScript', () => {
     await expect(seccion).toBeVisible();
     const card = page.locator('#lenguajes-list .materia-card').first();
     await expect(card).toContainText('TypeScript');
-    await expect(card).toContainText('74 preguntas');
+    await expect(card).toContainText('87 preguntas');
     await expect(card.locator('.competencia-texto')).toContainText('0 de 5');
   });
 
