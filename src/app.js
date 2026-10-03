@@ -196,22 +196,28 @@ function resetProgreso() {
 }
 
 function exportarDatos() {
+  // En un track de lenguaje se exporta la competencia; en una materia, su progreso.
+  const esLenguaje = !!lenguaje;
   const datos = {
     app: "systematic",
     version: 2,
-    materia: materia.id,
     exportado: new Date().toISOString(),
     nombre: persistencia.nombre(),
-    progreso: cargarProgreso(),
-    historial: cargarHistorial(),
-    actividad: cargarActividad(),
-    meta: cargarMeta()
+    ...(esLenguaje
+      ? { lenguaje: lenguaje.id, competencia: persistencia.competencia(lenguaje.id) }
+      : {
+          materia: materia.id,
+          progreso: cargarProgreso(),
+          historial: cargarHistorial(),
+          actividad: cargarActividad(),
+          meta: cargarMeta()
+        })
   };
   const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "systematic-" + materia.id + "-" + hoyISO() + ".json";
+  a.download = "systematic-" + (esLenguaje ? lenguaje.id : materia.id) + "-" + hoyISO() + ".json";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -226,8 +232,26 @@ function importarDatos(input) {
     try {
       const datos = JSON.parse(lector.result);
       const esLegacy = !!datos && datos.app === "quiz-bd2" && typeof datos.progreso === "object";
+      const esCompetencia = !!datos && datos.app === "systematic" && typeof datos.competencia === "object";
       const esActual = !!datos && datos.app === "systematic" && typeof datos.progreso === "object";
-      if (!esLegacy && !esActual) throw new Error("formato");
+      if (!esLegacy && !esActual && !esCompetencia) throw new Error("formato");
+
+      // Import de competencia de un lenguaje.
+      if (esCompetencia) {
+        if (!lenguaje) {
+          alert("Este archivo es de un lenguaje. Entrá al lenguaje para importarlo.");
+          return;
+        }
+        if (datos.lenguaje && datos.lenguaje !== lenguaje.id &&
+            !confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + lenguaje.nombre + "»?")) return;
+        if (!confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
+        competencia = datos.competencia || {};
+        persistencia.guardarCompetencia(lenguaje.id, competencia);
+        pintarLenguaje();
+        alert("Competencia importada correctamente.");
+        return;
+      }
+
       if (esActual && datos.materia && datos.materia !== materia.id &&
           !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + materia.nombre + "»?")) return;
       if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
@@ -883,6 +907,9 @@ function irMaterias() {
 async function seleccionarMateria(id) {
   const m = getMateria(id);
   if (!m) return;
+  // Al entrar a una materia, el track de lenguaje deja de estar activo (export/import).
+  lenguaje = null;
+  lenguajeContenido = null;
 
   // Cargar el contenido del track bajo demanda (spec 012) antes de navegar: los
   // chunks son pequeños y llevan hash inmutable, así que después del primer paint

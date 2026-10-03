@@ -71,4 +71,35 @@ test.describe('Lenguajes — TypeScript', () => {
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('0 de 5');
     await expect(page.locator('#lenguaje-etapas .etapa').nth(1).locator('.etapa-examen')).toBeDisabled();
   });
+
+  test('exporta e importa la competencia del lenguaje', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+      localStorage.setItem('sys.onboarding.v1', 'true');
+    });
+    await page.on('dialog', d => d.accept());
+    await page.goto('/');
+    await page.locator('#lenguajes-list .materia-card').first().click();
+    await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('0 de 5');
+
+    // Importar un archivo de competencia con la etapa 1 aprobada.
+    const archivo = {
+      app: 'systematic', version: 2, lenguaje: 'lenguaje-ts',
+      competencia: { fundamentos: { aprobado: true, version: 1, ultimoPct: 1, intentos: 1 } },
+    };
+    await page.locator('#import-file').setInputFiles({
+      name: 'competencia.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(archivo)),
+    });
+    await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('1 de 5');
+    await expect(page.locator('#lenguaje-etapas .etapa').nth(1).locator('.etapa-examen')).toBeEnabled();
+
+    // Exportar: el nombre del archivo identifica el lenguaje.
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Exportar competencia' }).click(),
+    ]);
+    expect(download.suggestedFilename()).toContain('lenguaje-ts');
+  });
 });
