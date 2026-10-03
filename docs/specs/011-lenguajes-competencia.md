@@ -1,6 +1,6 @@
 ---
 id: 011
-status: planificada
+status: en progreso
 created: 2026-10-03
 updated: 2026-10-03
 ---
@@ -34,11 +34,11 @@ adaptativa, varios lenguajes simultáneos, XP propio por lenguaje, logros nuevos
 | 5 | Auditoría de código de IA | el bug silencioso y las APIs inexistentes | `auditoria` |
 
 El `id` de etapa y el de examen son ids del roadmap, no de pregunta: solo las preguntas siguen el
-formato `TS-NNN` que exige el validador (`scripts/validador.mjs:20`).
+formato `TS-NNN` que exige el validador (`scripts/validador.mjs:23`).
 
 - **15 lecciones** (3 por etapa) y **15 pruebas** formativas (~7 preguntas cada una).
 - **~165 preguntas** con prefijo `TS-` y formato `TS-NNN`, IDs únicos globales (el validador
-  comparte `idsVistos` y exige `PREFIJO-NNN` con dos o más dígitos, `scripts/validador.mjs:20`).
+  comparte `idsVistos` y exige `PREFIJO-NNN` con dos o más dígitos, `scripts/validador.mjs:23`).
 - **1 glosario** de términos de TypeScript reutilizando el motor existente.
 - **Etapa 5 es el capstone**: permanece bloqueada hasta aprobar la 4 y mezcla todo lo anterior con
   bugs silenciosos.
@@ -114,7 +114,7 @@ Persistencia nueva, en el mismo esquema `sys.*` y sin tocar las claves por mater
 
 | Clave | Contenido |
 |---|---|
-| `sys.competencia.lenguaje-ts` | `{ etapas: { <etapaId>: { aprobado, version, ultimoPct, intentos } } }` |
+| `sys.competencia.lenguaje-ts` | `{ <etapaId>: { aprobado, version, ultimoPct, intentos } }` |
 
 ## Plan por tareas (orden de dependencia)
 

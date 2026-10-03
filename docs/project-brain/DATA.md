@@ -27,6 +27,7 @@ No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/
 | `sys.misiones.<materiaId>` | Estrellas y mejor porcentaje por tema |
 | `sys.escenarios` | Mejor rating y cantidad de jugadas por escenario |
 | `sys.casos-diagrama` | Mejor rating y cantidad de jugadas por caso de diagramación |
+| `sys.competencia.<lenguajeId>` | Competencia por lenguaje (spec 011): `{ <etapaId>: { aprobado, version, ultimoPct, intentos } }` |
 
 Si `localStorage` está bloqueado o lleno, la app degrada sin persistir.
 
