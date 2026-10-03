@@ -2,23 +2,25 @@ import { describe, it, expect } from "vitest";
 import {
   umbralDeExamen,
   apruebaExamen,
+  aprobadoVigente,
   barraDeCompetencia,
   etapaDesbloqueada,
   registrarExamen,
 } from "./competencia.js";
 
+const examen = (version, preguntas, umbral = 0.8) => ({ version, umbral, preguntas });
+
 const etapas = [
-  { id: "fundamentos", examen: { preguntas: ["TS-031", "TS-032"] } },
-  { id: "funciones", examen: { preguntas: ["TS-033", "TS-034", "TS-035"] } },
-  { id: "tipos", examen: { preguntas: Array.from({ length: 12 }, (_, i) => "T-" + i) } },
-  { id: "asincronia", examen: { preguntas: ["A-1"] } },
-  { id: "auditoria", examen: { preguntas: ["AU-1", "AU-2"] } },
+  { id: "fundamentos", examen: examen(1, ["TS-031", "TS-032"]) },
+  { id: "funciones", examen: examen(1, ["TS-033", "TS-034", "TS-035"]) },
+  { id: "tipos", examen: examen(1, Array.from({ length: 12 }, (_, i) => "T-" + i)) },
+  { id: "asincronia", examen: examen(1, ["A-1"]) },
+  { id: "auditoria", examen: examen(1, ["AU-1", "AU-2"]) },
 ];
 
 describe("Competencia (dominio)", () => {
   describe("umbralDeExamen", () => {
-    it("redondea hacia arriba con Math.ceil (evita coma flotante)", () => {
-      // 12 preguntas al 80% = 9.6 → exige 10
+    it("redondea hacia arriba (12 preguntas al 80% exige 10)", () => {
       expect(umbralDeExamen(12, 0.8)).toBe(10);
       expect(umbralDeExamen(2, 0.8)).toBe(2);
       expect(umbralDeExamen(10, 0.8)).toBe(8);
@@ -44,12 +46,29 @@ describe("Competencia (dominio)", () => {
     });
   });
 
+  describe("aprobadoVigente", () => {
+    it("cuenta un aprobado con la versión del roadmap", () => {
+      expect(aprobadoVigente(etapas[0], { fundamentos: { aprobado: true, version: 1 } })).toBe(true);
+    });
+
+    it("no cuenta un aprobado sin aprobar", () => {
+      expect(aprobadoVigente(etapas[0], { fundamentos: { aprobado: false, version: 1 } })).toBe(false);
+      expect(aprobadoVigente(etapas[0], {})).toBe(false);
+    });
+
+    it("no cuenta un aprobado de una versión vieja del examen", () => {
+      // El roadmap ya está en v2, pero el estudiante aprobó la v1.
+      const etapaV2 = { id: "fundamentos", examen: examen(2, ["TS-031", "TS-032"]) };
+      expect(aprobadoVigente(etapaV2, { fundamentos: { aprobado: true, version: 1 } })).toBe(false);
+    });
+  });
+
   describe("barraDeCompetencia", () => {
     it("calcula aprobadas / total", () => {
       const resultados = {
-        fundamentos: { aprobado: true },
-        funciones: { aprobado: true },
-        tipos: { aprobado: false },
+        fundamentos: { aprobado: true, version: 1 },
+        funciones: { aprobado: true, version: 1 },
+        tipos: { aprobado: false, version: 1 },
       };
       const barra = barraDeCompetencia(etapas, resultados);
       expect(barra.aprobadas).toBe(2);
@@ -57,15 +76,17 @@ describe("Competencia (dominio)", () => {
       expect(barra.pct).toBeCloseTo(0.4);
     });
 
-    it("barra vacía sin resultados", () => {
-      const barra = barraDeCompetencia(etapas, {});
-      expect(barra.aprobadas).toBe(0);
-      expect(barra.pct).toBe(0);
+    it("barra vacía sin resultados ni etapas", () => {
+      expect(barraDeCompetencia(etapas, {}).aprobadas).toBe(0);
+      expect(barraDeCompetencia([], {}).total).toBe(0);
     });
 
-    it("barra vacía sin etapas", () => {
-      const barra = barraDeCompetencia([], {});
-      expect(barra.total).toBe(0);
+    it("no cuenta un aprobado de versión vieja", () => {
+      const etapasV2 = etapas.map((e, i) =>
+        i === 0 ? { ...e, examen: examen(2, e.examen.preguntas) } : e
+      );
+      const resultados = { fundamentos: { aprobado: true, version: 1 } };
+      expect(barraDeCompetencia(etapasV2, resultados).aprobadas).toBe(0);
     });
   });
 
@@ -74,16 +95,23 @@ describe("Competencia (dominio)", () => {
       expect(etapaDesbloqueada(etapas, 0, {})).toBe(true);
     });
 
-    it("bbloquea la etapa 5 (capstone) hasta aprobar la 4", () => {
+    it("bloquea el capstone (etapa 5) hasta aprobar la 4", () => {
       const resultados = {
-        fundamentos: { aprobado: true },
-        funciones: { aprobado: true },
-        tipos: { aprobado: true },
-        asincronia: { aprobado: false },
+        fundamentos: { aprobado: true, version: 1 },
+        funciones: { aprobado: true, version: 1 },
+        tipos: { aprobado: true, version: 1 },
+        asincronia: { aprobado: false, version: 1 },
       };
       expect(etapaDesbloqueada(etapas, 4, resultados)).toBe(false);
-      resultados.asincronia = { aprobado: true };
+      resultados.asincronia = { aprobado: true, version: 1 };
       expect(etapaDesbloqueada(etapas, 4, resultados)).toBe(true);
+    });
+
+    it("no desbloquea con un aprobado de versión vieja", () => {
+      const etapasV2 = etapas.map((e, i) =>
+        i === 0 ? { ...e, examen: examen(2, e.examen.preguntas) } : e
+      );
+      expect(etapaDesbloqueada(etapasV2, 1, { fundamentos: { aprobado: true, version: 1 } })).toBe(false);
     });
 
     it("índice fuera de rango devuelve false", () => {
@@ -93,14 +121,8 @@ describe("Competencia (dominio)", () => {
   });
 
   describe("registrarExamen", () => {
-    it("aprueba y registra con la versión del examen", () => {
-      const etapas0 = [etapas[0]]; // 2 preguntas
-      const resultados = registrarExamen({
-        etapa: etapas0[0],
-        resultados: {},
-        aciertos: 2,
-        versionExamen: 1,
-      });
+    it("aprueba y registra con la versión del roadmap", () => {
+      const resultados = registrarExamen({ etapa: etapas[0], resultados: {}, aciertos: 2 });
       expect(resultados.fundamentos.aprobado).toBe(true);
       expect(resultados.fundamentos.version).toBe(1);
       expect(resultados.fundamentos.intentos).toBe(1);
@@ -108,45 +130,51 @@ describe("Competencia (dominio)", () => {
     });
 
     it("no aprueba y cuenta el intento", () => {
-      const resultados = registrarExamen({
-        etapa: etapas[0], // 2 preguntas
-        resultados: {},
-        aciertos: 1,
-        versionExamen: 1,
-      });
+      const resultados = registrarExamen({ etapa: etapas[0], resultados: {}, aciertos: 1 });
       expect(resultados.fundamentos.aprobado).toBe(false);
       expect(resultados.fundamentos.intentos).toBe(1);
       expect(resultados.fundamentos.ultimoPct).toBeCloseTo(0.5);
     });
 
-    it("invalida un aprobado anterior si la versión del examen cambió", () => {
-      const resultadosV1 = registrarExamen({
-        etapa: etapas[0],
-        resultados: {},
-        aciertos: 2,
-        versionExamen: 1,
-      });
-      expect(resultadosV1.fundamentos.aprobado).toBe(true);
-
-      // Cambia la versión del examen: el aprobado se invalida aunque vuelva a aprobar.
-      const resultadosV2 = registrarExamen({
-        etapa: etapas[0],
-        resultados: resultadosV1,
-        aciertos: 2,
-        versionExamen: 2,
-      });
-      expect(resultadosV2.fundamentos.aprobado).toBe(true); // aprobó de nuevo con v2
-      expect(resultadosV2.fundamentos.version).toBe(2);
-      expect(resultadosV2.fundamentos.intentos).toBe(2);
+    it("usa el umbral declarado en el examen", () => {
+      // 4 preguntas con umbral 0.5 → exige 2; con 0.8 exigiría 4.
+      const etapa = { id: "x", examen: examen(1, ["a", "b", "c", "d"], 0.5) };
+      expect(registrarExamen({ etapa, resultados: {}, aciertos: 2 }).x.aprobado).toBe(true);
     });
 
-    it("acumula intentos", () => {
+    it("reprobar con una versión nueva invalida el aprobado anterior", () => {
+      const v1 = { id: "fund", examen: examen(1, ["a", "b"]) };
+      const v2 = { id: "fund", examen: examen(2, ["a", "b"]) };
+      const r1 = registrarExamen({ etapa: v1, resultados: {}, aciertos: 2 });
+      expect(r1.fund.aprobado).toBe(true);
+
+      // El roadmap cambió a v2 y el estudiante reprueba: el aprobado viejo se invalida.
+      const r2 = registrarExamen({ etapa: v2, resultados: r1, aciertos: 0 });
+      expect(r2.fund.aprobado).toBe(false);
+      expect(r2.fund.version).toBe(2);
+      expect(r2.fund.intentos).toBe(2);
+    });
+
+    it("aprobar con una versión nueva deja el aprobado vigente", () => {
+      const v1 = { id: "fund", examen: examen(1, ["a", "b"]) };
+      const v2 = { id: "fund", examen: examen(2, ["a", "b"]) };
+      const r1 = registrarExamen({ etapa: v1, resultados: {}, aciertos: 2 });
+      const r2 = registrarExamen({ etapa: v2, resultados: r1, aciertos: 2 });
+      expect(r2.fund.aprobado).toBe(true);
+      expect(r2.fund.version).toBe(2);
+    });
+
+    it("acumula intentos y mantiene el aprobado en reintentos", () => {
       let r = {};
-      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 0, versionExamen: 1 });
-      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 1, versionExamen: 1 });
-      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 2, versionExamen: 1 });
+      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 0 });
+      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 1 });
+      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 2 });
       expect(r.fundamentos.intentos).toBe(3);
       expect(r.fundamentos.aprobado).toBe(true);
+      // Reintento posterior reprobado no revoca el aprobado (sin castigo).
+      r = registrarExamen({ etapa: etapas[0], resultados: r, aciertos: 0 });
+      expect(r.fundamentos.aprobado).toBe(true);
+      expect(r.fundamentos.intentos).toBe(4);
     });
   });
 });
