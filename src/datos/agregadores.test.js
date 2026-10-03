@@ -1,15 +1,17 @@
-// Verifica que cada track tenga un agregador (index.js) que expone las 5 piezas
-// de contenido con la forma esperada. Es un gate de build: si un track nuevo se
-// agrega sin su index.js o con una pieza mal exportada, la suite falla.
+// Verifica que cada track tenga un agregador (index.js) que expone las piezas de
+// contenido con la forma esperada. Es un gate de build: si un track nuevo se agrega
+// sin su index.js o con una pieza mal exportada, la suite falla.
 import { describe, it, expect } from "vitest";
-import { MATERIAS } from "../../src/core/materias.js";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../../src/core/materias.js";
+
+const todos = [...MATERIAS, ...LENGUAJES];
 
 describe("agregadores de datos por track", () => {
   it("cada track expone preguntas, glosario, apuntes, escenarios y casos", async () => {
-    expect(MATERIAS.length).toBeGreaterThan(0);
+    expect(todos.length).toBeGreaterThan(0);
 
-    for (const m of MATERIAS) {
-      const mod = await import(`../../src/datos/${m.id}/index.js`);
+    for (const m of todos) {
+      const mod = await cargarContenido(m);
 
       expect(Array.isArray(mod.preguntas), `${m.id}: preguntas debe ser arreglo`).toBe(true);
       expect(Array.isArray(mod.apuntes), `${m.id}: apuntes debe ser arreglo`).toBe(true);
@@ -19,6 +21,15 @@ describe("agregadores de datos por track", () => {
       expect(mod.glosario, `${m.id}: falta glosario`).toBeTruthy();
       expect(Array.isArray(mod.glosario.terminos), `${m.id}: glosario.terminos debe ser arreglo`).toBe(true);
       expect(Array.isArray(mod.glosario.categorias), `${m.id}: glosario.categorias debe ser arreglo`).toBe(true);
+    }
+  });
+
+  it("solo los lenguajes declaran roadmap", async () => {
+    for (const m of MATERIAS) {
+      expect((await cargarContenido(m)).roadmap, `${m.id} no debería tener roadmap`).toBeNull();
+    }
+    for (const l of LENGUAJES) {
+      expect((await cargarContenido(l)).roadmap, `${l.id} debería tener roadmap`).toBeTruthy();
     }
   });
 });

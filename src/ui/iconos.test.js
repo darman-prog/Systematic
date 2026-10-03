@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { icono, existeIcono, NOMBRES_ICONO } from "./iconos.js";
 import { LOGROS } from "../core/gamificacion.js";
-import { MATERIAS } from "../core/materias.js";
+import { MATERIAS, LENGUAJES } from "../core/materias.js";
 
 describe("iconos", () => {
   it("expone un set base y resuelve alias", () => {
@@ -18,8 +18,9 @@ describe("iconos", () => {
     expect(existeIcono("no-existe")).toBe(false);
   });
 
-  it("cada logro y materia apunta a un icono existente", () => {
+  it("cada logro, materia y lenguaje apunta a un icono existente", () => {
     LOGROS.forEach(l => expect(existeIcono(l.icono), "logro " + l.id).toBe(true));
     MATERIAS.forEach(m => expect(existeIcono(m.icono), "materia " + m.id).toBe(true));
+    LENGUAJES.forEach(l => expect(existeIcono(l.icono), "lenguaje " + l.id).toBe(true));
   });
 });

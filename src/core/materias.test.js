@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { MATERIAS, getMateria, cargarContenido } from "./materias.js";
+import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido } from "./materias.js";
 
 describe("Materias (metadata + carga lazy)", () => {
   it("MATERIAS expone metadata y conteos, pero no contenido embebido", () => {
@@ -38,5 +38,41 @@ describe("Materias (metadata + carga lazy)", () => {
     const c = await cargarContenido(bd2);
     expect(c.apuntes).toEqual([]);
     expect(c.preguntas.length).toBeGreaterThan(0);
+  });
+
+  describe("tracks de lenguaje (spec 011)", () => {
+    it("registra el lenguaje TypeScript con tipo lenguaje", () => {
+      const ts = getLenguaje("lenguaje-ts");
+      expect(ts).toBeTruthy();
+      expect(ts.tipo).toBe("lenguaje");
+      expect(ts.nombre).toBe("TypeScript");
+      expect(getLenguaje("no-existe")).toBeNull();
+    });
+
+    it("carga el roadmap de 5 etapas y su conteo coincide", async () => {
+      const ts = getLenguaje("lenguaje-ts");
+      const c = await cargarContenido(ts);
+      expect(c.roadmap).toBeTruthy();
+      expect(c.roadmap.etapas).toHaveLength(5);
+      expect(c.roadmap.etapas).toHaveLength(ts.conteo.etapas);
+      expect(c.preguntas.length).toBe(ts.conteo.preguntas);
+      // Un lenguaje no trae apuntes, escenarios ni casos.
+      expect(c.apuntes).toEqual([]);
+      expect(c.escenarios).toEqual([]);
+      expect(c.casos).toEqual([]);
+    });
+
+    it("todas las preguntas del roadmap existen en el banco del lenguaje", async () => {
+      const ts = getLenguaje("lenguaje-ts");
+      const c = await cargarContenido(ts);
+      const ids = new Set(c.preguntas.map(p => p.id));
+      const referenciadas = [];
+      for (const etapa of c.roadmap.etapas) {
+        for (const leccion of etapa.lecciones) referenciadas.push(...leccion.preguntas);
+        referenciadas.push(...etapa.examen.preguntas);
+      }
+      const faltantes = referenciadas.filter(id => !ids.has(id));
+      expect(faltantes).toEqual([]);
+    });
   });
 });

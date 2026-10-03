@@ -3,6 +3,7 @@
 // escenarios, casos) se carga bajo demanda desde src/datos/<id>/index.js (spec 012).
 // Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
+import { tsKeywords } from "../datos/ts/presentacion.js";
 
 export async function cargarContenido(materia) {
   const mod = await materia.cargar();
@@ -12,6 +13,8 @@ export async function cargarContenido(materia) {
     apuntes: mod.apuntes ?? [],
     escenarios: mod.escenarios ?? [],
     casos: mod.casos ?? [],
+    // Solo los tracks de lenguaje declaran roadmap (spec 011).
+    roadmap: mod.roadmap ?? null,
   };
 }
 
@@ -67,6 +70,28 @@ export const MATERIAS = [
 
 export function getMateria(id) {
   return MATERIAS.find(m => m.id === id) || null;
+}
+
+// Tracks de lenguaje (spec 011): misma infraestructura de contenido que las materias,
+// pero con progresión por etapas/exámenes (competencia). Se mantienen separados de
+// MATERIAS para no arrastrar el flujo de materia (config/quiz/stats) a su UI.
+export const LENGUAJES = [
+  {
+    id: "lenguaje-ts",
+    tipo: "lenguaje",
+    nombre: "TypeScript",
+    icono: "codigo",
+    descripcion: "Leé y verificá código generado por IA: trazar, detectar y auditar.",
+    color: "#6FA8DC",
+    accentText: "#101418",
+    conteo: { preguntas: 35, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
+    sqlKeywords: tsKeywords,
+    cargar: () => import("../datos/ts/index.js"),
+  }
+];
+
+export function getLenguaje(id) {
+  return LENGUAJES.find(l => l.id === id) || null;
 }
 
 export const ACENTO_BASE = { color: "#9BB8C9", texto: "#101418" };
