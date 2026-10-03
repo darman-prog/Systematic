@@ -10,7 +10,7 @@ const preguntas = [
   {
     id: "TS-001",
     parcial: "Fundamentos",
-    tema: "Tipos y variables",
+    tema: "Tipos y valores",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime este fragmento?",
@@ -23,7 +23,7 @@ const preguntas = [
   {
     id: "TS-002",
     parcial: "Fundamentos",
-    tema: "Tipos y variables",
+    tema: "Tipos y valores",
     dificultad: "facil",
     tipo: "multiple",
     q: "¿Cuál es el tipo inferido de `const activo = true;`?",
@@ -35,7 +35,7 @@ const preguntas = [
   {
     id: "TS-003",
     parcial: "Fundamentos",
-    tema: "Tipos y variables",
+    tema: "Tipos y valores",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué valor imprime la consola?",
@@ -48,7 +48,7 @@ const preguntas = [
   {
     id: "TS-004",
     parcial: "Fundamentos",
-    tema: "Control de flujo",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué devuelve la función con `edad = 17`?",
@@ -61,7 +61,7 @@ const preguntas = [
   {
     id: "TS-005",
     parcial: "Fundamentos",
-    tema: "Control de flujo",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "dragdrop",
     q: "Completá el bucle para que recorra del 1 al 3 y sume.",
@@ -102,7 +102,7 @@ const preguntas = [
   {
     id: "TS-008",
     parcial: "Funciones y datos",
-    tema: "Arreglos",
+    tema: "Arreglos y métodos",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué devuelve `numeros.map(n => n * 2)`?",
@@ -115,7 +115,7 @@ const preguntas = [
   {
     id: "TS-009",
     parcial: "Funciones y datos",
-    tema: "Arreglos",
+    tema: "Arreglos y métodos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime la consola?",
@@ -143,7 +143,7 @@ const preguntas = [
   {
     id: "TS-011",
     parcial: "Tipos y genéricos",
-    tema: "Interfaces",
+    tema: "Interfaces y tipos",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Cuál es la diferencia clave entre `interface` y `type` en TypeScript?",
@@ -160,7 +160,7 @@ const preguntas = [
   {
     id: "TS-012",
     parcial: "Tipos y genéricos",
-    tema: "Narrowing",
+    tema: "Narrowing y uniones",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué imprime con `dato = \"hola\"`?",
@@ -173,7 +173,7 @@ const preguntas = [
   {
     id: "TS-013",
     parcial: "Tipos y genéricos",
-    tema: "Utility types",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "multi",
     q: "¿Cuáles de estos son utility types de TypeScript?",
@@ -185,7 +185,7 @@ const preguntas = [
   {
     id: "TS-014",
     parcial: "Tipos y genéricos",
-    tema: "Inferencia",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué tipo tiene `valor`?",
@@ -198,7 +198,7 @@ const preguntas = [
   {
     id: "TS-015",
     parcial: "Tipos y genéricos",
-    tema: "any vs unknown",
+    tema: "Genéricos y utilidades",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Por qué `unknown` es más seguro que `any`?",
@@ -220,7 +220,7 @@ const preguntas = [
     tema: "Orden de ejecución",
     dificultad: "dificil",
     tipo: "codigo",
-    q: "¿En qué orden imprime?",
+    q: "¿En qué orden imprime con `await`?",
     codigo: "console.log(\"A\");\nasync function f() {\n  console.log(\"B\");\n  await null;\n  console.log(\"C\");\n}\nf();\nconsole.log(\"D\");",
     options: ["A, B, D, C", "A, B, C, D", "A, D, B, C", "B, A, C, D"],
     correct: 0,
@@ -254,7 +254,7 @@ const preguntas = [
   {
     id: "TS-019",
     parcial: "Asincronía y errores",
-    tema: "Await faltante",
+    tema: "Async/await",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime este código?",
@@ -282,7 +282,7 @@ const preguntas = [
   {
     id: "TS-021",
     parcial: "Auditoría de código de IA",
-    tema: "Bug lógico",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "La IA escribió esta función para sumar los precios. ¿Qué está mal?",
@@ -301,7 +301,7 @@ const preguntas = [
   {
     id: "TS-022",
     parcial: "Auditoría de código de IA",
-    tema: "API inexistente",
+    tema: "APIs inventadas",
     dificultad: "dificil",
     tipo: "multiple",
     q: "La IA usó `array.remove(2)`. ¿Qué pasa?",
@@ -335,7 +335,7 @@ const preguntas = [
   {
     id: "TS-024",
     parcial: "Auditoría de código de IA",
-    tema: "Bug silencioso",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué devuelve `contar(null)`?",
@@ -348,7 +348,7 @@ const preguntas = [
   {
     id: "TS-025",
     parcial: "Auditoría de código de IA",
-    tema: "Casts que mienten",
+    tema: "Señales de alarma",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -363,7 +363,7 @@ const preguntas = [
   {
     id: "TS-026",
     parcial: "Fundamentos",
-    tema: "Tipos y variables",
+    tema: "Tipos y valores",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime `typeof []`?",
@@ -375,7 +375,7 @@ const preguntas = [
   {
     id: "TS-027",
     parcial: "Fundamentos",
-    tema: "Tipos y variables",
+    tema: "Tipos y valores",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Cuál es la diferencia entre `undefined` y `null`?",
@@ -392,10 +392,10 @@ const preguntas = [
   {
     id: "TS-028",
     parcial: "Funciones y datos",
-    tema: "Arreglos",
+    tema: "Arreglos y métodos",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve `nums.forEach(n => n * 2)`?",
     codigo: "const nums = [1, 2, 3];\nconst r = nums.forEach(n => n * 2);\nconsole.log(r);",
     options: ["undefined", "[2, 4, 6]", "6", "[1, 2, 3]"],
     correct: 0,
@@ -418,7 +418,7 @@ const preguntas = [
   {
     id: "TS-030",
     parcial: "Tipos y genéricos",
-    tema: "Narrowing",
+    tema: "Narrowing y uniones",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime con `animal = { ladra: true }`?",
@@ -431,7 +431,7 @@ const preguntas = [
   {
     id: "TS-031",
     parcial: "Tipos y genéricos",
-    tema: "Interfaces",
+    tema: "Interfaces y tipos",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué impide `readonly` en una propiedad?",
@@ -465,7 +465,7 @@ const preguntas = [
   {
     id: "TS-033",
     parcial: "Asincronía y errores",
-    tema: "Await faltante",
+    tema: "Async/await",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué está mal en `[1,2].forEach(async n => { await guardar(n); });`?",
@@ -482,7 +482,7 @@ const preguntas = [
   {
     id: "TS-034",
     parcial: "Auditoría de código de IA",
-    tema: "Bug silencioso",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "La IA quiso devolver los primeros 3 elementos. ¿Qué devuelve?",
@@ -501,7 +501,7 @@ const preguntas = [
   {
     id: "TS-035",
     parcial: "Auditoría de código de IA",
-    tema: "API inexistente",
+    tema: "APIs inventadas",
     dificultad: "dificil",
     tipo: "multi",
     q: "¿Cuáles de estos métodos NO existen en un arreglo de JavaScript?",
@@ -514,7 +514,7 @@ const preguntas = [
   {
     id: "TS-036",
     parcial: "Fundamentos",
-    tema: "Template literals",
+    tema: "Tipos y valores",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -527,7 +527,7 @@ const preguntas = [
   {
     id: "TS-037",
     parcial: "Fundamentos",
-    tema: "Igualdad",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué diferencia hay entre `==` y `===`?",
@@ -544,7 +544,7 @@ const preguntas = [
   {
     id: "TS-038",
     parcial: "Fundamentos",
-    tema: "Condicionales",
+    tema: "Operadores y control de flujo",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime con `nota = 75`?",
@@ -557,10 +557,10 @@ const preguntas = [
   {
     id: "TS-039",
     parcial: "Fundamentos",
-    tema: "Cortocircuito",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve `usuario && usuario.nombre`?",
     codigo: "const usuario = null;\nconsole.log(usuario && usuario.nombre);",
     options: ["null", "undefined", "Error", "false"],
     correct: 0,
@@ -570,7 +570,7 @@ const preguntas = [
   {
     id: "TS-040",
     parcial: "Fundamentos",
-    tema: "Bucles",
+    tema: "Bucles y trazas",
     dificultad: "facil",
     tipo: "dragdrop",
     q: "Completá el bucle para que reste hasta llegar a 0.",
@@ -583,23 +583,23 @@ const preguntas = [
   {
     id: "TS-041",
     parcial: "Fundamentos",
-    tema: "Bucles",
+    tema: "Bucles y trazas",
     dificultad: "facil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué valor tiene `suma` al final?",
     codigo: "let suma = 0;\nfor (let i = 1; i <= 4; i++) {\n  suma += i;\n}\nconsole.log(suma);",
     options: ["10", "6", "4", "0"],
     correct: 0,
-    exp: "Suma 1+2+3+4 = 10. El `<=` incluye el 4; con `<` daría 6.",
+    exp: "Suma 1+2+3+4 = 10. El operador `<=` incluye el 4; con `<` el bucle pararía en 3 y la suma daría 6.",
     claseError: "logica"
   },
   {
     id: "TS-042",
     parcial: "Fundamentos",
-    tema: "Switch",
+    tema: "Operadores y control de flujo",
     dificultad: "dificil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué imprime el `switch`?",
     codigo: "const color = \"rojo\";\nswitch (color) {\n  case \"rojo\":\n    console.log(\"A\");\n  case \"azul\":\n    console.log(\"B\");\n    break;\n  default:\n    console.log(\"C\");\n}",
     options: ["A y B", "Solo A", "Solo B", "A, B y C"],
     correct: 0,
@@ -609,7 +609,7 @@ const preguntas = [
   {
     id: "TS-043",
     parcial: "Fundamentos",
-    tema: "NaN",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué devuelve `NaN === NaN`?",
@@ -626,10 +626,10 @@ const preguntas = [
   {
     id: "TS-044",
     parcial: "Fundamentos",
-    tema: "Precedencia",
+    tema: "Operadores y control de flujo",
     dificultad: "facil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué resultado da `2 + 3 * 4`?",
     codigo: "console.log(2 + 3 * 4);",
     options: ["14", "20", "24", "9"],
     correct: 0,
@@ -639,10 +639,10 @@ const preguntas = [
   {
     id: "TS-045",
     parcial: "Fundamentos",
-    tema: "Truthiness",
+    tema: "Operadores y control de flujo",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué imprime el `if` con `valor = \"0\"`?",
     codigo: "const valor = \"0\";\nif (valor) console.log(\"verdadero\");\nelse console.log(\"falso\");",
     options: ["verdadero", "falso", "Error", "undefined"],
     correct: 0,
@@ -652,7 +652,7 @@ const preguntas = [
   {
     id: "TS-046",
     parcial: "Fundamentos",
-    tema: "typeof",
+    tema: "Tipos y valores",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué devuelve `typeof null`?",
@@ -664,7 +664,7 @@ const preguntas = [
   {
     id: "TS-047",
     parcial: "Fundamentos",
-    tema: "Bucles",
+    tema: "Bucles y trazas",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué pasa con este bucle?",
@@ -682,10 +682,10 @@ const preguntas = [
   {
     id: "TS-048",
     parcial: "Fundamentos",
-    tema: "Bucles",
+    tema: "Bucles y trazas",
     dificultad: "dificil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué valor tiene `x` al salir del `while`?",
     codigo: "let x = 5;\nwhile (x > 0) {\n  x -= 2;\n}\nconsole.log(x);",
     options: ["-1", "0", "1", "-2"],
     correct: 0,
@@ -696,7 +696,7 @@ const preguntas = [
   {
     id: "TS-049",
     parcial: "Funciones y datos",
-    tema: "Parámetros",
+    tema: "Funciones",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -709,7 +709,7 @@ const preguntas = [
   {
     id: "TS-050",
     parcial: "Funciones y datos",
-    tema: "Arrow functions",
+    tema: "Funciones",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué devuelve `doble(3)`?",
@@ -722,10 +722,10 @@ const preguntas = [
   {
     id: "TS-051",
     parcial: "Funciones y datos",
-    tema: "Map",
+    tema: "Arreglos y métodos",
     dificultad: "facil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve `[1, 2, 3].map(n => n * 2)`?",
     codigo: "console.log([1, 2, 3].map(n => n * 2));",
     options: ["[2, 4, 6]", "[1, 2, 3, 1, 2, 3]", "[2, 4, 6, 8]", "6"],
     correct: 0,
@@ -735,10 +735,10 @@ const preguntas = [
   {
     id: "TS-052",
     parcial: "Funciones y datos",
-    tema: "Reduce",
+    tema: "Arreglos y métodos",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve el `reduce`?",
     codigo: "const total = [1, 2, 3].reduce((acc, n) => acc + n, 0);\nconsole.log(total);",
     options: ["6", "3", "123", "0"],
     correct: 0,
@@ -748,10 +748,10 @@ const preguntas = [
   {
     id: "TS-053",
     parcial: "Funciones y datos",
-    tema: "Destructuring",
+    tema: "Objetos y destructuring",
     dificultad: "facil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué valor tiene `nombre`?",
     codigo: "const persona = { nombre: \"Ana\", edad: 30 };\nconst { nombre } = persona;\nconsole.log(nombre);",
     options: ["Ana", "{ nombre: \"Ana\", edad: 30 }", "undefined", "Error"],
     correct: 0,
@@ -761,7 +761,7 @@ const preguntas = [
   {
     id: "TS-054",
     parcial: "Funciones y datos",
-    tema: "Spread",
+    tema: "Objetos y destructuring",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué hace `const copia = [...original];`?",
@@ -778,10 +778,10 @@ const preguntas = [
   {
     id: "TS-055",
     parcial: "Funciones y datos",
-    tema: "Filter",
+    tema: "Arreglos y métodos",
     dificultad: "facil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve `filter`?",
     codigo: "const pares = [1, 2, 3, 4].filter(n => n % 2 === 0);\nconsole.log(pares);",
     options: ["[2, 4]", "[1, 3]", "[true, false, true, false]", "2"],
     correct: 0,
@@ -791,7 +791,7 @@ const preguntas = [
   {
     id: "TS-056",
     parcial: "Funciones y datos",
-    tema: "Map + parseInt",
+    tema: "Arreglos y métodos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime? (bug clásico)",
@@ -804,12 +804,12 @@ const preguntas = [
   {
     id: "TS-057",
     parcial: "Funciones y datos",
-    tema: "Return faltante",
+    tema: "Funciones",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué devuelve `sumar(2, 3)`?",
     codigo: "function sumar(a, b) {\n  a + b;\n}",
-    options: ["undefined", "5", "NaN", "Error"],
+    options: ["undefined (se descarta el cálculo)", "5", "NaN", "Error"],
     correct: 0,
     exp: "Sin `return`, la función devuelve undefined aunque calcule a + b. El resultado se descarta: bug silencioso muy común en código generado.",
     claseError: "silencioso"
@@ -817,7 +817,7 @@ const preguntas = [
   {
     id: "TS-058",
     parcial: "Funciones y datos",
-    tema: "Mutabilidad",
+    tema: "Arreglos y métodos",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué método devuelve un arreglo nuevo sin mutar el original?",
@@ -829,7 +829,7 @@ const preguntas = [
   {
     id: "TS-059",
     parcial: "Funciones y datos",
-    tema: "Reduce",
+    tema: "Arreglos y métodos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué pasa con `[].reduce((a, b) => a + b)`?",
@@ -846,10 +846,10 @@ const preguntas = [
   {
     id: "TS-060",
     parcial: "Funciones y datos",
-    tema: "Sort",
+    tema: "Arreglos y métodos",
     dificultad: "dificil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué vale `a` después de `sort`?",
     codigo: "const a = [3, 1, 2];\nconst b = a.sort();\nconsole.log(a);",
     options: ["[1, 2, 3]", "[3, 1, 2]", "undefined", "Error"],
     correct: 0,
@@ -859,10 +859,10 @@ const preguntas = [
   {
     id: "TS-061",
     parcial: "Funciones y datos",
-    tema: "Destructuring",
+    tema: "Objetos y destructuring",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué valor tiene `puerto`?",
     codigo: "const { puerto = 3000 } = { host: \"localhost\" };\nconsole.log(puerto);",
     options: ["3000", "undefined", "null", "Error"],
     correct: 0,
@@ -873,7 +873,7 @@ const preguntas = [
   {
     id: "TS-062",
     parcial: "Tipos y genéricos",
-    tema: "Interface vs type",
+    tema: "Interfaces y tipos",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué es cierto sobre `interface` y `type`?",
@@ -890,7 +890,7 @@ const preguntas = [
   {
     id: "TS-063",
     parcial: "Tipos y genéricos",
-    tema: "Propiedades opcionales",
+    tema: "Interfaces y tipos",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -903,10 +903,10 @@ const preguntas = [
   {
     id: "TS-064",
     parcial: "Tipos y genéricos",
-    tema: "Narrowing",
+    tema: "Narrowing y uniones",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué devuelve `largo(\"hola\")`?",
     codigo: "function largo(x: string | number): number {\n  if (typeof x === \"string\") return x.length;\n  return x;\n}\nconsole.log(largo(\"hola\"));",
     options: ["4", "\"hola\"", "undefined", "Error"],
     correct: 0,
@@ -916,10 +916,10 @@ const preguntas = [
   {
     id: "TS-065",
     parcial: "Tipos y genéricos",
-    tema: "Unión discriminada",
+    tema: "Narrowing y uniones",
     dificultad: "dificil",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué área calcula para el cuadrado?",
     codigo: "type Forma =\n  | { tipo: \"circulo\"; radio: number }\n  | { tipo: \"cuadrado\"; lado: number };\nfunction area(f: Forma): number {\n  if (f.tipo === \"circulo\") return 3.14 * f.radio ** 2;\n  return f.lado ** 2;\n}\nconsole.log(area({ tipo: \"cuadrado\", lado: 3 }));",
     options: ["9", "3.14 * 9", "3", "Error"],
     correct: 0,
@@ -929,7 +929,7 @@ const preguntas = [
   {
     id: "TS-066",
     parcial: "Tipos y genéricos",
-    tema: "Genéricos",
+    tema: "Genéricos y utilidades",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué devuelve `identidad(5)`?",
@@ -942,7 +942,7 @@ const preguntas = [
   {
     id: "TS-067",
     parcial: "Tipos y genéricos",
-    tema: "Restricciones",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Para qué sirve `T extends { id: number }` en un genérico?",
@@ -959,7 +959,7 @@ const preguntas = [
   {
     id: "TS-068",
     parcial: "Tipos y genéricos",
-    tema: "Readonly",
+    tema: "Genéricos y utilidades",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué pasa con `lista.push(4)`?",
@@ -977,7 +977,7 @@ const preguntas = [
   {
     id: "TS-069",
     parcial: "Tipos y genéricos",
-    tema: "as const",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué tipo infiere `const direcciones = [\"norte\", \"sur\"] as const;`?",
@@ -994,7 +994,7 @@ const preguntas = [
   {
     id: "TS-070",
     parcial: "Tipos y genéricos",
-    tema: "unknown vs any",
+    tema: "Genéricos y utilidades",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué diferencia hay entre `any` y `unknown`?",
@@ -1011,7 +1011,7 @@ const preguntas = [
   {
     id: "TS-071",
     parcial: "Tipos y genéricos",
-    tema: "Enum",
+    tema: "Genéricos y utilidades",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -1024,7 +1024,7 @@ const preguntas = [
   {
     id: "TS-072",
     parcial: "Tipos y genéricos",
-    tema: "Tipos literales",
+    tema: "Narrowing y uniones",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué pasa al asignar `direccion = \"arriba\"`?",
@@ -1042,7 +1042,7 @@ const preguntas = [
   {
     id: "TS-073",
     parcial: "Tipos y genéricos",
-    tema: "Non-null assertion",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué hace `valor!.toString()`?",
@@ -1059,7 +1059,7 @@ const preguntas = [
   {
     id: "TS-074",
     parcial: "Tipos y genéricos",
-    tema: "Genéricos",
+    tema: "Genéricos y utilidades",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué devuelve `primero([10, 20, 30])`?",
@@ -1073,10 +1073,10 @@ const preguntas = [
   {
     id: "TS-075",
     parcial: "Asincronía y errores",
-    tema: "Event loop",
+    tema: "Orden de ejecución",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿En qué orden imprime?",
+    q: "¿En qué orden imprime con `setTimeout`?",
     codigo: "console.log(\"A\");\nsetTimeout(() => console.log(\"B\"), 0);\nconsole.log(\"C\");",
     options: ["A, C, B", "A, B, C", "B, A, C", "C, A, B"],
     correct: 0,
@@ -1086,7 +1086,7 @@ const preguntas = [
   {
     id: "TS-076",
     parcial: "Asincronía y errores",
-    tema: "Microtareas",
+    tema: "Orden de ejecución",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Cuál corre antes: una promesa resuelta o un setTimeout de 0 ms?",
@@ -1106,7 +1106,7 @@ const preguntas = [
     tema: "Promesas",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué se imprime primero, el `then` o `fin`?",
     codigo: "Promise.resolve(1).then(v => console.log(v + 1));\nconsole.log(\"fin\");",
     options: ["fin, luego 2", "2, luego fin", "1, luego fin", "Error"],
     correct: 0,
@@ -1116,7 +1116,7 @@ const preguntas = [
   {
     id: "TS-078",
     parcial: "Asincronía y errores",
-    tema: "Promise.all",
+    tema: "Promesas",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué diferencia hay entre `Promise.all` y `Promise.allSettled`?",
@@ -1133,7 +1133,7 @@ const preguntas = [
   {
     id: "TS-079",
     parcial: "Asincronía y errores",
-    tema: "Try/catch",
+    tema: "Errores",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué imprime si `cargar()` rechaza?",
@@ -1146,7 +1146,7 @@ const preguntas = [
   {
     id: "TS-080",
     parcial: "Asincronía y errores",
-    tema: "Async",
+    tema: "Async/await",
     dificultad: "facil",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -1159,7 +1159,7 @@ const preguntas = [
   {
     id: "TS-081",
     parcial: "Asincronía y errores",
-    tema: "Await",
+    tema: "Async/await",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué pasa con este código?",
@@ -1177,7 +1177,7 @@ const preguntas = [
   {
     id: "TS-082",
     parcial: "Asincronía y errores",
-    tema: "Rechazo sin manejar",
+    tema: "Errores",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué pasa si una promesa rechaza y nadie la captura?",
@@ -1194,7 +1194,7 @@ const preguntas = [
   {
     id: "TS-083",
     parcial: "Asincronía y errores",
-    tema: "Finally",
+    tema: "Errores",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Cuándo se ejecuta el bloque `finally`?",
@@ -1212,7 +1212,7 @@ const preguntas = [
   {
     id: "TS-084",
     parcial: "Asincronía y errores",
-    tema: "Promise.race",
+    tema: "Promesas",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué devuelve `Promise.race([p1, p2])`?",
@@ -1229,7 +1229,7 @@ const preguntas = [
   {
     id: "TS-085",
     parcial: "Asincronía y errores",
-    tema: "Async",
+    tema: "Async/await",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué devuelve `f()`?",
@@ -1247,7 +1247,7 @@ const preguntas = [
   {
     id: "TS-086",
     parcial: "Asincronía y errores",
-    tema: "Try/catch",
+    tema: "Errores",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Captura el catch el rechazo de `cargar()`?",
@@ -1265,10 +1265,10 @@ const preguntas = [
   {
     id: "TS-087",
     parcial: "Asincronía y errores",
-    tema: "Encadenamiento",
+    tema: "Promesas",
     dificultad: "media",
     tipo: "codigo",
-    q: "¿Qué imprime?",
+    q: "¿Qué valor imprime la cadena de `then`?",
     codigo: "Promise.resolve(2)\n  .then(v => v * 3)\n  .then(v => console.log(v));",
     options: ["6", "2", "3", "undefined"],
     correct: 0,
@@ -1279,7 +1279,7 @@ const preguntas = [
   {
     id: "TS-088",
     parcial: "Auditoría de código de IA",
-    tema: "Condición invertida",
+    tema: "Bugs silenciosos",
     dificultad: "media",
     tipo: "codigo",
     q: "La IA quería devolver true para mayores de edad. ¿Qué devuelve con edad = 20?",
@@ -1293,7 +1293,7 @@ const preguntas = [
   {
     id: "TS-089",
     parcial: "Auditoría de código de IA",
-    tema: "Off-by-one",
+    tema: "Bugs silenciosos",
     dificultad: "facil",
     tipo: "codigo",
     q: "La IA quería imprimir del 1 al 5. ¿Qué imprime?",
@@ -1307,7 +1307,7 @@ const preguntas = [
   {
     id: "TS-090",
     parcial: "Auditoría de código de IA",
-    tema: "API inexistente",
+    tema: "APIs inventadas",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué método NO existe en un string de JavaScript?",
@@ -1319,7 +1319,7 @@ const preguntas = [
   {
     id: "TS-091",
     parcial: "Auditoría de código de IA",
-    tema: "Conversión",
+    tema: "Bugs silenciosos",
     dificultad: "media",
     tipo: "codigo",
     q: "La IA quería convertir \"12px\" a número. ¿Qué devuelve `Number(\"12px\")`?",
@@ -1331,7 +1331,7 @@ const preguntas = [
   {
     id: "TS-092",
     parcial: "Auditoría de código de IA",
-    tema: "Igualdad de objetos",
+    tema: "Bugs silenciosos",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué imprime?",
@@ -1344,7 +1344,7 @@ const preguntas = [
   {
     id: "TS-093",
     parcial: "Auditoría de código de IA",
-    tema: "Mutación",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué imprime `console.log(lista)` tras llamar `agregar(lista)`?",
@@ -1357,7 +1357,7 @@ const preguntas = [
   {
     id: "TS-094",
     parcial: "Auditoría de código de IA",
-    tema: "Async en forEach",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué problema tiene este guardado?",
@@ -1375,7 +1375,7 @@ const preguntas = [
   {
     id: "TS-095",
     parcial: "Auditoría de código de IA",
-    tema: "Señales de bug",
+    tema: "Señales de alarma",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Cuál es la señal más clara de que el código de la IA no está verificado?",
@@ -1392,7 +1392,7 @@ const preguntas = [
   {
     id: "TS-096",
     parcial: "Auditoría de código de IA",
-    tema: "Catch vacío",
+    tema: "Señales de alarma",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué problema tiene este catch?",
@@ -1410,7 +1410,7 @@ const preguntas = [
   {
     id: "TS-097",
     parcial: "Auditoría de código de IA",
-    tema: "Coerción",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "¿Qué problema tiene esta validación?",
@@ -1428,7 +1428,7 @@ const preguntas = [
   {
     id: "TS-098",
     parcial: "Auditoría de código de IA",
-    tema: "indexOf",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "La IA quiso comprobar si el arreglo contiene el 1. ¿Qué imprime?",
@@ -1446,7 +1446,7 @@ const preguntas = [
   {
     id: "TS-099",
     parcial: "Auditoría de código de IA",
-    tema: "Null sin comprobar",
+    tema: "Señales de alarma",
     dificultad: "media",
     tipo: "codigo",
     q: "¿Qué pasa si `usuario` es null?",
@@ -1464,7 +1464,7 @@ const preguntas = [
   {
     id: "TS-100",
     parcial: "Auditoría de código de IA",
-    tema: "Filter sin return",
+    tema: "Bugs silenciosos",
     dificultad: "dificil",
     tipo: "codigo",
     q: "La IA quiso quedarse con los mayores de 18. ¿Qué devuelve el filtro?",
