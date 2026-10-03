@@ -16,6 +16,8 @@ export const CLAVES_GLOBALES = {
 const NOMBRE_MAX = 24;
 
 export const claveMisiones = materiaId => "sys.misiones." + materiaId;
+// Competencia por lenguaje (spec 011): separada de las claves por materia.
+export const claveCompetencia = lenguajeId => "sys.competencia." + lenguajeId;
 
 export function crearPersistencia(storage) {
   const leer = (clave, porDefecto) => leerJSON(storage, clave, porDefecto);
@@ -59,7 +61,9 @@ export function crearPersistencia(storage) {
     guardarLogros: valor => escribir(CLAVES_GLOBALES.logros, valor),
     misiones: materiaId => leer(claveMisiones(materiaId), {}),
     guardarMisiones: (materiaId, valor) => escribir(claveMisiones(materiaId), valor),
-    escenarios: () => leer(CLAVES_GLOBALES.escenarios, {}),
+    // Competencia por lenguaje: estado por etapa { aprobado, version, ultimoPct, intentos }.
+    competencia: lenguajeId => leer(claveCompetencia(lenguajeId), {}),
+    guardarCompetencia: (lenguajeId, valor) => escribir(claveCompetencia(lenguajeId), valor),    escenarios: () => leer(CLAVES_GLOBALES.escenarios, {}),
     guardarEscenarios: valor => escribir(CLAVES_GLOBALES.escenarios, valor),
     casos: () => leer(CLAVES_GLOBALES.casos, {}),
     guardarCasos: valor => escribir(CLAVES_GLOBALES.casos, valor),

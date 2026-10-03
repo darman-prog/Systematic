@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { crearPersistencia, CLAVES_GLOBALES, claveMisiones } from "./persistencia.js";
+import { crearPersistencia, CLAVES_GLOBALES, claveMisiones, claveCompetencia } from "./persistencia.js";
 
 function storageMemoria() {
   const datos = {};
@@ -91,6 +91,16 @@ describe("persistencia", () => {
     expect(p.casos().c1.jugadas).toBe(2);
     expect(p.misiones("asw").t1.estrellas).toBe(3);
     expect(p.logros().l1).toBe("fecha");
+  });
+
+  it("guarda la competencia por lenguaje en su propia clave", () => {
+    expect(claveCompetencia("lenguaje-ts")).toBe("sys.competencia.lenguaje-ts");
+    expect(p.competencia("lenguaje-ts")).toEqual({});
+    p.guardarCompetencia("lenguaje-ts", { fundamentos: { aprobado: true, version: 1 } });
+    expect(p.competencia("lenguaje-ts").fundamentos.aprobado).toBe(true);
+    // No toca las claves por materia ni las de otro lenguaje.
+    expect(p.progreso("lenguaje-ts")).toEqual({});
+    expect(p.competencia("otro")).toEqual({});
   });
 
   it("degrada en silencio si el storage falla", () => {
