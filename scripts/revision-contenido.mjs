@@ -7,7 +7,7 @@
 //
 //   node scripts/revision-contenido.mjs            → resumen de todas las materias
 //   node scripts/revision-contenido.mjs infra      → detalle de una materia
-import { MATERIAS, cargarContenido } from "../src/core/materias.js";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/materias.js";
 import { validarTodo } from "./validador.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -139,9 +139,9 @@ function imprimirMateria(m) {
 
 async function main() {
   const baseDir = process.cwd();
-  // Cargar el contenido bajo demanda (spec 012): MATERIAS solo tiene metadatos.
+  // Cargar el contenido bajo demanda (spec 012): MATERIAS/LENGUAJES solo tienen metadatos.
   const cargadas = [];
-  for (const m of MATERIAS) cargadas.push({ ...m, ...(await cargarContenido(m)) });
+  for (const m of [...MATERIAS, ...LENGUAJES]) cargadas.push({ ...m, ...(await cargarContenido(m)) });
 
   const { errores, resumen } = validarTodo(cargadas, {
     existeFuente: f => fs.existsSync(path.resolve(baseDir, f))

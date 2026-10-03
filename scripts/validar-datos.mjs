@@ -1,36 +1,50 @@
-// CLI: valida el schema de datos de todas las tracks. Uso: npm run validar
-// Carga el contenido bajo demanda (spec 012) y verifica que el conteo declarado
-// en metadata coincida con el contenido real: si diverge, el build se bloquea.
+// CLI: valida el schema de datos de todos los tracks. Uso: npm run validar
+// Carga el contenido bajo demanda (spec 012) y verifica que el conteo declarado en
+// metadata coincida con el contenido real: si diverge, el build se bloquea.
 import fs from "node:fs";
 import path from "node:path";
-import { MATERIAS, cargarContenido } from "../src/core/materias.js";
-import { validarTodo } from "./validador.mjs";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/materias.js";
+import { validarTodo, validarRoadmap } from "./validador.mjs";
 
 const baseDir = process.cwd();
+const CLAVES_CONTEO = ["preguntas", "terminos", "apuntes", "escenarios", "casos", "etapas"];
 
-const cargadas = [];
-for (const m of MATERIAS) {
-  const contenido = await cargarContenido(m);
+async function cargarTrack(track) {
+  const contenido = await cargarContenido(track);
   const real = {
     preguntas: contenido.preguntas.length,
     terminos: contenido.glosario?.terminos?.length ?? 0,
     apuntes: contenido.apuntes.length,
     escenarios: contenido.escenarios.length,
     casos: contenido.casos.length,
+    etapas: contenido.roadmap?.etapas?.length ?? 0,
   };
-  const declarado = m.conteo || {};
-  for (const k of ["preguntas", "terminos", "apuntes", "escenarios", "casos"]) {
+  const declarado = track.conteo || {};
+  for (const k of CLAVES_CONTEO) {
     if (declarado[k] !== undefined && declarado[k] !== real[k]) {
-      console.error(`✖ [${m.id}] conteo de ${k}: declara ${declarado[k]}, tiene ${real[k]}.`);
+      console.error(`✖ [${track.id}] conteo de ${k}: declara ${declarado[k]}, tiene ${real[k]}.`);
       process.exit(1);
     }
   }
-  cargadas.push({ ...m, ...contenido });
+  return { ...track, ...contenido };
 }
 
-const { errores, resumen } = validarTodo(cargadas, {
+const materias = [];
+for (const m of MATERIAS) materias.push(await cargarTrack(m));
+const lenguajes = [];
+for (const l of LENGUAJES) lenguajes.push(await cargarTrack(l));
+
+// idsVistos compartido: los ids de pregunta deben ser únicos en todos los tracks.
+const { errores, resumen } = validarTodo([...materias, ...lenguajes], {
   existeFuente: f => fs.existsSync(path.resolve(baseDir, f))
 });
+
+// El roadmap de cada lenguaje debe referenciar preguntas que existan en su banco.
+for (const l of lenguajes) {
+  if (!l.roadmap) continue;
+  const idsBanco = new Set(l.preguntas.map(p => p.id));
+  errores.push(...validarRoadmap(l.roadmap, { idsBanco }).map(e => `[${l.id}] ${e}`));
+}
 
 if (errores.length) {
   errores.forEach(e => console.error("✖ " + e));
@@ -38,4 +52,10 @@ if (errores.length) {
   process.exit(1);
 }
 
-console.log(`✔ Datos válidos: ${resumen.materias} materias · ${resumen.preguntas} preguntas · ${resumen.terminos} términos de glosario.`);
+const nLenguajes = lenguajes.length;
+const nMaterias = resumen.materias - nLenguajes;
+console.log(
+  `✔ Datos válidos: ${nMaterias} materias` +
+  (nLenguajes ? ` · ${nLenguajes} lenguaje(s)` : "") +
+  ` · ${resumen.preguntas} preguntas · ${resumen.terminos} términos de glosario.`
+);

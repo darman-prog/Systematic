@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarCasos, validarCasosDiagramacion, validarTodo } from "./validador.mjs";
+import { validarPregunta, validarGlosario, validarApuntes, validarEscenarios, validarCasos, validarCasosDiagramacion, validarTodo, validarRoadmap } from "./validador.mjs";
 
 const base = {
   id: "X-001",
@@ -346,5 +346,49 @@ describe("validarTodo", () => {
     const { errores, resumen } = validarTodo([materia, { ...materia, id: "m2" }]);
     expect(errores.join(" ")).toContain("id duplicado");
     expect(resumen).toEqual({ materias: 2, preguntas: 2, terminos: 0 });
+  });
+});
+
+describe("validarRoadmap", () => {
+  const roadmapOk = {
+    lenguaje: "lenguaje-ts",
+    etapas: [
+      {
+        id: "fundamentos",
+        nombre: "Fundamentos",
+        lecciones: [{ id: "l1", nombre: "Tipos", preguntas: ["TS-001"] }],
+        examen: { version: 1, umbral: 0.8, preguntas: ["TS-002"] },
+      },
+    ],
+  };
+
+  it("acepta un roadmap correcto", () => {
+    expect(validarRoadmap(roadmapOk, { idsBanco: new Set(["TS-001", "TS-002"]) })).toEqual([]);
+  });
+
+  it("detecta una pregunta referenciada que no existe en el banco", () => {
+    const errores = validarRoadmap(roadmapOk, { idsBanco: new Set(["TS-001"]) }).join(" ");
+    expect(errores).toContain("pregunta inexistente: TS-002");
+  });
+
+  it("detecta umbral fuera de rango y versión inválida", () => {
+    const malo = {
+      ...roadmapOk,
+      etapas: [{ ...roadmapOk.etapas[0], examen: { version: 0, umbral: 1.5, preguntas: ["TS-002"] } }],
+    };
+    const errores = validarRoadmap(malo).join(" ");
+    expect(errores).toContain("version debe ser entero");
+    expect(errores).toContain("umbral debe estar en (0, 1]");
+  });
+
+  it("detecta etapa duplicada y sin lecciones", () => {
+    const malo = { lenguaje: "x", etapas: [{ id: "e", nombre: "E", lecciones: [] }, { id: "e", nombre: "E", lecciones: [] }] };
+    const errores = validarRoadmap(malo).join(" ");
+    expect(errores).toContain("duplicada");
+    expect(errores).toContain("necesita al menos una lección");
+  });
+
+  it("rechaza un roadmap que no es objeto", () => {
+    expect(validarRoadmap(null).join(" ")).toContain("no es un objeto");
   });
 });

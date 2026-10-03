@@ -325,3 +325,65 @@ export function validarTodo(materias, { existeFuente } = {}) {
   });
   return { errores, resumen };
 }
+
+// Valida el roadmap de un track de lenguaje (spec 011): etapas con lecciones y un
+// examen, y que cada pregunta referenciada exista en el banco del track.
+export function validarRoadmap(roadmap, { idsBanco } = {}) {
+  const errores = [];
+  if (!roadmap || typeof roadmap !== "object") return ["[roadmap] no es un objeto"];
+  if (!textoNoVacio(roadmap.lenguaje)) errores.push("[roadmap] sin lenguaje");
+  if (!esArreglo(roadmap.etapas) || roadmap.etapas.length === 0) {
+    errores.push("[roadmap] etapas debe ser un arreglo no vacío");
+    return errores;
+  }
+
+  const idsEtapas = new Set();
+  const refs = [];
+  roadmap.etapas.forEach((etapa, i) => {
+    const ref = "[roadmap] etapa \"" + (etapa && etapa.id || i) + "\"";
+    if (!etapa || !textoNoVacio(etapa.id)) errores.push(ref + " sin id");
+    else if (idsEtapas.has(etapa.id)) errores.push(ref + " duplicada");
+    else idsEtapas.add(etapa.id);
+    if (!etapa || !textoNoVacio(etapa.nombre)) errores.push(ref + " sin nombre");
+
+    if (!esArreglo(etapa?.lecciones) || etapa.lecciones.length === 0) {
+      errores.push(ref + " necesita al menos una lección");
+    } else {
+      etapa.lecciones.forEach((leccion, j) => {
+        const refL = ref + " lección " + (j + 1);
+        if (!leccion || !textoNoVacio(leccion.id)) errores.push(refL + " sin id");
+        if (!leccion || !textoNoVacio(leccion.nombre)) errores.push(refL + " sin nombre");
+        if (!esArreglo(leccion?.preguntas) || leccion.preguntas.length === 0) {
+          errores.push(refL + " sin preguntas");
+        } else {
+          refs.push(...leccion.preguntas.map(id => [refL, id]));
+        }
+      });
+    }
+
+    const examen = etapa?.examen;
+    if (!examen || typeof examen !== "object") {
+      errores.push(ref + " sin examen");
+    } else {
+      if (!Number.isInteger(examen.version) || examen.version < 1) {
+        errores.push(ref + " examen.version debe ser entero >= 1");
+      }
+      if (typeof examen.umbral !== "number" || examen.umbral <= 0 || examen.umbral > 1) {
+        errores.push(ref + " examen.umbral debe estar en (0, 1]");
+      }
+      if (!esArreglo(examen.preguntas) || examen.preguntas.length === 0) {
+        errores.push(ref + " examen sin preguntas");
+      } else {
+        refs.push(...examen.preguntas.map(id => [ref + " examen", id]));
+      }
+    }
+  });
+
+  if (idsBanco) {
+    for (const [ref, id] of refs) {
+      if (!idsBanco.has(id)) errores.push(ref + " referencia una pregunta inexistente: " + id);
+    }
+  }
+
+  return errores;
+}

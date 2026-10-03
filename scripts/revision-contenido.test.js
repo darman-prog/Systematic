@@ -2,13 +2,13 @@
 // opciones duplicadas o explicaciones vacías, la suite falla. Los avisos (temas con
 // pocas preguntas, enunciados repetidos) se informan pero no bloquean: se revisan a mano.
 import { describe, it, expect } from "vitest";
-import { MATERIAS, cargarContenido } from "../src/core/materias.js";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/materias.js";
 import { analizarMateria, formatearPregunta, indicesCorrectos } from "./revision-contenido.mjs";
 
 // Carga el contenido de cada track bajo demanda (spec 012) y lo fusiona con los metadatos.
 async function cargadas() {
   const out = [];
-  for (const m of MATERIAS) out.push({ ...m, ...(await cargarContenido(m)) });
+  for (const m of [...MATERIAS, ...LENGUAJES]) out.push({ ...m, ...(await cargarContenido(m)) });
   return out;
 }
 
