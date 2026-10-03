@@ -232,9 +232,10 @@ function importarDatos(input) {
     try {
       const datos = JSON.parse(lector.result);
       const esLegacy = !!datos && datos.app === "quiz-bd2" && typeof datos.progreso === "object";
-      const esCompetencia = !!datos && datos.app === "systematic" && typeof datos.competencia === "object";
-      const esActual = !!datos && datos.app === "systematic" && typeof datos.progreso === "object";
-      if (!esLegacy && !esActual && !esCompetencia) throw new Error("formato");
+      const esCompetencia = !!datos && datos.app === "systematic" &&
+        datos.competencia && typeof datos.competencia === "object" && !Array.isArray(datos.competencia);
+      const esMateria = !!datos && datos.app === "systematic" && typeof datos.progreso === "object";
+      if (!esLegacy && !esMateria && !esCompetencia) throw new Error("formato");
 
       // Import de competencia de un lenguaje.
       if (esCompetencia) {
@@ -242,17 +243,26 @@ function importarDatos(input) {
           alert("Este archivo es de un lenguaje. Entrá al lenguaje para importarlo.");
           return;
         }
+        // Validar la forma antes de persistir: no aceptar basura que rompa la UI.
+        const valida = Object.values(datos.competencia).every(r =>
+          r && typeof r === "object" && typeof r.aprobado === "boolean" && Number.isInteger(r.version));
+        if (!valida) throw new Error("formato");
         if (datos.lenguaje && datos.lenguaje !== lenguaje.id &&
             !confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + lenguaje.nombre + "»?")) return;
         if (!confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
-        competencia = datos.competencia || {};
+        competencia = datos.competencia;
         persistencia.guardarCompetencia(lenguaje.id, competencia);
         pintarLenguaje();
         alert("Competencia importada correctamente.");
         return;
       }
 
-      if (esActual && datos.materia && datos.materia !== materia.id &&
+      // Import de materia: no se permite estando dentro de un lenguaje (claves distintas).
+      if (lenguaje) {
+        alert("Este archivo es de una materia. Entrá a la materia para importarlo.");
+        return;
+      }
+      if (esMateria && datos.materia && datos.materia !== materia.id &&
           !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + materia.nombre + "»?")) return;
       if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
       progreso = datos.progreso || {};
@@ -746,6 +756,8 @@ function finalizar() {
   const segundos = Math.max(0, Math.round((Date.now() - session.inicio) / 1000));
   const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
   session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
+  // Una sesión de lenguaje (prueba o examen) vuelve al mapa de etapas, no al inicio de materia.
+  if (session.lenguajeId) session.resultado.lenguaje = true;
   // Examen de un track de lenguaje: registra el aprobado (con versión) y mueve la barra.
   if (session.modo === "examen" && session.examenEtapa && lenguaje) {
     const nuevo = registrarExamen({ etapa: session.examenEtapa, resultados: competencia, aciertos });
@@ -786,7 +798,12 @@ function repetirFalladas() {
 }
 
 function repetirMisma() {
+  // Conserva el contexto de examen/lenguaje para que "Repetir ronda" siga registrando competencia.
+  const examenEtapa = session.examenEtapa;
+  const lenguajeId = session.lenguajeId;
   startSession(session.items, session.modo, session.modo === "simulacro");
+  if (examenEtapa) session.examenEtapa = examenEtapa;
+  if (lenguajeId) session.lenguajeId = lenguajeId;
 }
 
 function guardarIntento(score, total, modo) {
@@ -849,9 +866,16 @@ function renderMaterias() {
 
   renderLenguajes();
 }
-
 // Sección de lenguajes del home (spec 011): tarjeta por track con su barra de competencia.
-function renderLenguajes() {
+// La barra reconcilia la versión del examen contra el roadmap, así que se carga solo el
+// roadmap (chunk chico) y se cachea; no se descargan las preguntas hasta entrar al track.
+const roadmapCache = new Map();
+async function roadmapDe(l) {
+  if (!roadmapCache.has(l.id)) roadmapCache.set(l.id, await l.cargarRoadmap());
+  return roadmapCache.get(l.id);
+}
+
+async function renderLenguajes() {
   const seccion = $("lenguajes-seccion");
   const cont = $("lenguajes-list");
   if (!seccion || !cont) return;
@@ -861,17 +885,19 @@ function renderLenguajes() {
   }
   seccion.classList.remove("hidden");
 
-  cont.innerHTML = LENGUAJES.map(l => {
+  const tarjetas = await Promise.all(LENGUAJES.map(async l => {
     const registro = persistencia.competencia(l.id);
-    const aprobadas = Object.values(registro).filter(r => r && r.aprobado).length;
-    const total = l.conteo?.etapas ?? 0;
+    const roadmap = await roadmapDe(l);
+    const barra = barraDeCompetencia(roadmap.etapas, registro);
+    const total = barra.total;
     const pendiente = (l.conteo?.preguntas ?? 0) === 0;
     const detalles = pendiente
       ? "Contenido en preparación"
       : l.conteo.preguntas + " preguntas · " + total + " etapas";
-    // La barra es aria-hidden visual; el conteo entra en el nombre accesible del botón para
-    // que un lector de pantalla lo anuncie al enfocar la tarjeta.
-    const competenciaTexto = aprobadas + " de " + total + (total === 1 ? " etapa aprobada" : " etapas aprobadas");
+
+    // La barra es visual; el conteo entra en el nombre accesible del botón para que un
+    // lector de pantalla lo anuncie al enfocar la tarjeta.
+    const competenciaTexto = barra.aprobadas + " de " + total + (total === 1 ? " etapa aprobada" : " etapas aprobadas");
 
     const ariaLabel = l.nombre + ". " + l.descripcion + ". " + detalles + ". Competencia: " +
       competenciaTexto + ". " + (pendiente ? "No disponible aún." : "Presiona para entrar.");
@@ -887,15 +913,20 @@ function renderLenguajes() {
       '</div>' +
       '<div class="materia-stats">' +
         '<span class="materia-stats-texto">' + detalles + '</span>' +
-        barraCompetencia({ aprobadas, total, color: l.color }) +
+        barraCompetencia({ ...barra, color: l.color }) +
       '</div>' +
     '</button>';
-  }).join("");
+  }));
+
+  cont.innerHTML = tarjetas.join("");
 }
 
 function irMaterias() {
   clearTimer();
   session = null;
+  // Salir del track de lenguaje: que no quede activo para export/import ni para el quiz.
+  lenguaje = null;
+  lenguajeContenido = null;
   aplicarAcento(null);
   const temaMeta = document.querySelector('meta[name="theme-color"]');
   if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
@@ -943,6 +974,11 @@ async function seleccionarLenguaje(id) {
   materia = { ...l, ...lenguajeContenido };
   banco = lenguajeContenido.preguntas;
   glosario = lenguajeContenido.glosario;
+  // Progreso y filtros propios del lenguaje: si no se recargan, se arrastra el de la
+  // materia anterior y se persiste bajo la clave equivocada.
+  progreso = persistencia.progreso(l.id);
+  apunteTema = "todos";
+  inicializarFiltros();
   aplicarAcento(l);
   pintarLenguaje();
   show("lenguaje");
@@ -978,6 +1014,7 @@ function practicarLeccion(etapaId, leccionId) {
   if (!leccion) return;
   const items = itemsDeIds(leccion.preguntas);
   if (items.length) startSession(items, "practica", false);
+  if (session) session.lenguajeId = lenguaje.id;
 }
 
 // Examen sumativo: al terminar, finalizar() registra el resultado y mueve la barra.
@@ -988,6 +1025,7 @@ function rendirExamen(etapaId) {
   if (!items.length) return;
   startSession(items, "examen", false);
   session.examenEtapa = etapa;
+  session.lenguajeId = lenguaje.id;
 }
 
 function renderMateriaUI() {

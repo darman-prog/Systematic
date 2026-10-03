@@ -87,6 +87,8 @@ export const LENGUAJES = [
     conteo: { preguntas: 35, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
     sqlKeywords: tsKeywords,
     cargar: () => import("../datos/ts/index.js"),
+    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
+    cargarRoadmap: () => import("../datos/ts/roadmap.js").then(m => m.default),
   }
 ];
 

@@ -36,6 +36,27 @@ test.describe('Lenguajes — TypeScript', () => {
     await expect(page.locator('#progress')).toContainText('Pregunta 1');
   });
 
+  test('una prueba completada no mueve la barra ni crea competencia', async ({ page }) => {
+    await page.on('dialog', d => d.accept());
+    await page.goto('/');
+    await page.locator('#lenguajes-list .materia-card').first().click();
+    // La lección de "Fundamentos" tiene 2 preguntas de opción (TS-001 y TS-002).
+    await page.locator('#lenguaje-etapas .etapa-leccion').first().click();
+    await expect(page.locator('#screen-quiz')).toBeVisible();
+    for (let i = 0; i < 2; i++) {
+      await page.locator('#options-container .option').first().click();
+      await page.locator('#next-btn').click();
+    }
+    await expect(page.locator('#screen-results')).toBeVisible();
+
+    // Criterio 2: la prueba no crea competencia.
+    expect(await page.evaluate(() => localStorage.getItem('sys.competencia.lenguaje-ts'))).toBeNull();
+    // El retorno de una sesión de lenguaje es al mapa de etapas, no al inicio de materia.
+    await page.getByRole('button', { name: '← Etapas' }).click();
+    await expect(page.locator('#screen-lenguaje')).toBeVisible();
+    await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('0 de 5');
+  });
+
   test('un examen aprobado sube la barra y desbloquea la etapa siguiente', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.clear();

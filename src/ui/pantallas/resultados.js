@@ -118,8 +118,8 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
       html += '</div>';
     }
 
-    // En un examen de lenguaje, el veredicto y el retorno al mapa de etapas.
-    const volver = r.examen
+    // En una sesión de lenguaje (prueba o examen), el retorno es al mapa de etapas.
+    const volver = (r.examen || r.lenguaje)
       ? '<button class="btn btn-ghost w-full sm:w-auto" data-action="irLenguaje">← Etapas</button>'
       : '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>';
     const veredictoExamen = r.examen
