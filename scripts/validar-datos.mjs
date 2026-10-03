@@ -39,9 +39,16 @@ const { errores, resumen } = validarTodo([...materias, ...lenguajes], {
   existeFuente: f => fs.existsSync(path.resolve(baseDir, f))
 });
 
-// El roadmap de cada lenguaje debe referenciar preguntas que existan en su banco.
+// El roadmap de cada lenguaje debe referenciar preguntas que existan en su banco y
+// declarar el mismo id que el track.
 for (const l of lenguajes) {
-  if (!l.roadmap) continue;
+  if (!l.roadmap) {
+    errores.push(`[${l.id}] el track de lenguaje no declara roadmap`);
+    continue;
+  }
+  if (l.roadmap.lenguaje !== l.id) {
+    errores.push(`[${l.id}] el roadmap declara lenguaje "${l.roadmap.lenguaje}"`);
+  }
   const idsBanco = new Set(l.preguntas.map(p => p.id));
   errores.push(...validarRoadmap(l.roadmap, { idsBanco }).map(e => `[${l.id}] ${e}`));
 }

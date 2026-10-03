@@ -3,7 +3,8 @@
 // validador de schema no ve (temas con pocas preguntas, enunciados repetidos,
 // opciones duplicadas, explicaciones muy cortas).
 //
-// No modifica nada. Sale con código 1 si encuentra errores de schema o avisos.
+// No modifica nada. Sale con código 1 si encuentra errores de schema; los avisos de
+// calidad se informan pero no bloquean (se revisan a mano).
 //
 //   node scripts/revision-contenido.mjs            → resumen de todas las materias
 //   node scripts/revision-contenido.mjs infra      → detalle de una materia

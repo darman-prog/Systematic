@@ -74,5 +74,16 @@ describe("Materias (metadata + carga lazy)", () => {
       const faltantes = referenciadas.filter(id => !ids.has(id));
       expect(faltantes).toEqual([]);
     });
+
+    it("cada examen declara version, umbral 0.8 y 5 preguntas; el capstone va ultimo", async () => {
+      const ts = getLenguaje("lenguaje-ts");
+      const c = await cargarContenido(ts);
+      for (const etapa of c.roadmap.etapas) {
+        expect(Number.isInteger(etapa.examen.version)).toBe(true);
+        expect(etapa.examen.umbral).toBe(0.8);
+        expect(etapa.examen.preguntas).toHaveLength(5);
+      }
+      expect(c.roadmap.etapas[c.roadmap.etapas.length - 1].id).toBe("auditoria");
+    });
   });
 });

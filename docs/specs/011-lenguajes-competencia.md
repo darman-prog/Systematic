@@ -43,6 +43,12 @@ formato `TS-NNN` que exige el validador (`scripts/validador.mjs:23`).
 - **Etapa 5 es el capstone**: permanece bloqueada hasta aprobar la 4 y mezcla todo lo anterior con
   bugs silenciosos.
 
+> **Estado (2026-10-03)**: se implementó una **primera tanda base** con las 5 etapas, 5 lecciones
+> (1 por etapa) y 35 preguntas —suficiente para que el roadmap valide y el gate funcione de punta a
+> punta—. La expansión a las 15 lecciones y ~165 preguntas es la tarea 7 (un lote por etapa). El
+> umbral de 0.8 se sostiene porque cada examen ya tiene 5 preguntas (con menos, `Math.ceil` lo
+> volvería un 100%).
+
 Los nombres de etapa, el orden, el umbral y la versión de cada examen viven en
 `src/datos/ts/roadmap.js` (datos, no `src/core/`), siguiendo el patrón de `presentacion.js`
 (ADR 003).

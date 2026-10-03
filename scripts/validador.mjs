@@ -368,7 +368,7 @@ export function validarRoadmap(roadmap, { idsBanco } = {}) {
       if (!Number.isInteger(examen.version) || examen.version < 1) {
         errores.push(ref + " examen.version debe ser entero >= 1");
       }
-      if (typeof examen.umbral !== "number" || examen.umbral <= 0 || examen.umbral > 1) {
+      if (typeof examen.umbral !== "number" || !Number.isFinite(examen.umbral) || examen.umbral <= 0 || examen.umbral > 1) {
         errores.push(ref + " examen.umbral debe estar en (0, 1]");
       }
       if (!esArreglo(examen.preguntas) || examen.preguntas.length === 0) {

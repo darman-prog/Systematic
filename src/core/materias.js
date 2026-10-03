@@ -1,4 +1,4 @@
-﻿// Registro de tracks de la app (materias hoy; lenguajes en el futuro, spec 011).
+﻿// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
 // Solo guarda metadatos y conteos: el contenido pesado (preguntas, glosario, apuntes,
 // escenarios, casos) se carga bajo demanda desde src/datos/<id>/index.js (spec 012).
 // Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.

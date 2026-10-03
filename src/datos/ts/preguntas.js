@@ -56,7 +56,7 @@ const preguntas = [
     options: ["\"no puede\"", "\"puede\"", "undefined", "Error de compilación"],
     correct: 0,
     exp: "Con 17 la segunda condición se cumple y retorna \"no puede\". Ojo: la función no contempla el caso en que ninguna rama retorne, así que TypeScript marcaría el retorno como posiblemente `undefined`. Eso es una señal de que falta un `return` final.",
-    claseError: "sintaxis"
+    claseError: "silencioso"
   },
   {
     id: "TS-005",
@@ -132,7 +132,7 @@ const preguntas = [
     dificultad: "media",
     tipo: "dragdrop",
     q: "Completá la función para que devuelva el cuadrado.",
-    codigo: "const cuadrado = (n: number): number {1} {2} n * n;",
+    codigo: "const cuadrado = (n: number): number {1} { {2} n * n; }",
     piezas: ["=>", "return", "function", "void"],
     respuestas: ["=>", "return"],
     exp: "Es una arrow function (`=>`) con cuerpo entre llaves, así que necesita `return` explícito. Sin `return`, devolvería `undefined` (el bug de TS-006).",
