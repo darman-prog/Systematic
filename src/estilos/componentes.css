@@ -4,7 +4,8 @@
 .btn { cursor: pointer; }
 .star-btn { cursor: pointer; }
 .btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
-.star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible {
+.star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible,
+.materia-card:focus-visible, .etapa-leccion:focus-visible, .etapa-examen:focus-visible {
   outline: 2px solid var(--study-accent); outline-offset: 3px;
 }
 .feedback { animation: fadeInUp var(--mov-base) var(--mov-ease); }
@@ -128,30 +129,62 @@ input, textarea { caret-color: var(--study-accent); }
 .mision-bloqueada .mision-ico { color: var(--study-sutil); }
 
 /* Barra de competencia y etapas del track de lenguaje (spec 011). */
-.competencia { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.competencia { display: flex; flex-direction: column; gap: 6px; width: 100%; min-width: 0; }
 .competencia-track { height: 8px; border-radius: 9999px; background: var(--study-surface-3); overflow: hidden; }
-.competencia-fill { height: 100%; border-radius: 9999px; background: var(--competencia-color, var(--study-accent)); transition: width .3s; }
+.competencia-fill { height: 100%; border-radius: 9999px; background: var(--competencia-color, var(--study-accent)); transition: width var(--mov-base) var(--mov-ease); }
 .competencia-texto { font-size: .75rem; color: var(--study-muted); }
 
+/* En la tarjeta del home la barra va debajo del conteo: track ancho y legible; así el track
+   de lenguaje se distingue de una materia sin salirse del estilo de tarjeta. */
+.materia-card--lenguaje .materia-stats { flex-direction: column; align-items: stretch; gap: 8px; }
+
 .etapas-camino { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
-.etapa { border: 1px solid var(--study-border); border-radius: 12px; padding: 14px 16px; background: var(--study-surface); }
-.etapa-aprobada { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 55%, var(--study-border)); }
-.etapa-bloqueada { opacity: .6; }
+.etapa-item { margin: 0; }
+.etapa { border: 1px solid var(--study-border); border-radius: 12px; padding: 14px 16px; background: var(--study-surface); transition: border-color var(--mov-rapida) var(--mov-ease); }
 .etapa-cabecera { display: flex; align-items: center; gap: 10px; }
 .etapa-num { flex: 0 0 28px; height: 28px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: var(--study-surface-3); color: var(--study-text); }
-.etapa-aprobada .etapa-num { background: var(--competencia-color, var(--study-accent)); color: #101418; }
-.etapa-nombre { flex: 1 1 auto; font-weight: 600; color: var(--study-text); }
-.etapa-ico { color: var(--study-muted); }
-.etapa-aprobada .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
+.etapa-nombre { flex: 1 1 auto; min-width: 0; font-weight: 600; color: var(--study-text); }
+.etapa-ico { flex: none; color: var(--study-muted); }
 .etapa-estado { font-size: .75rem; color: var(--study-muted); margin: 4px 0 10px; }
+
+/* Etapa en curso: acento en borde y número; la fila sigue mostrando "Disponible" o el
+   último porcentaje, así el estado no depende solo del color. */
+.etapa-actual { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
+.etapa-actual .etapa-num { border: 1px solid color-mix(in srgb, var(--competencia-color, var(--study-accent)) 65%, transparent); }
+.etapa-actual .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
+
+/* Etapa bloqueada: borde punteado + candado + texto. Sin opacidad global, para que el
+   mensaje "Bloqueada" y las etiquetas sigan siendo legibles. */
+.etapa-bloqueada { border-style: dashed; }
+.etapa-bloqueada .etapa-ico { color: var(--study-muted); }
+
+.etapa-aprobada { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 55%, var(--study-border)); }
+.etapa-aprobada .etapa-num { background: var(--competencia-color, var(--study-accent)); color: var(--study-bg); border: 0; }
+.etapa-aprobada .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
+
 .etapa-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
 .etapa-leccion, .etapa-examen {
+  flex: 1 1 150px; min-width: 0; min-height: 44px;
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 12px; border-radius: 10px; cursor: pointer;
+  padding: 10px 14px; border-radius: 10px; cursor: pointer;
   background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-text);
-  font-size: .85rem; transition: border-color .15s, background .15s;
+  font-size: .85rem; text-align: left;
+  transition: border-color var(--mov-rapida) var(--mov-ease), background var(--mov-rapida) var(--mov-ease);
 }
-.etapa-leccion:hover:not(:disabled), .etapa-examen:hover:not(:disabled) { border-color: var(--competencia-color, var(--study-accent)); }
+.etapa-leccion:hover:not(:disabled), .etapa-examen:hover:not(:disabled) { border-color: var(--competencia-color, var(--study-accent)); background: var(--study-surface-3); }
+.etapa-btn-titulo { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.etapa-leccion-meta { flex: none; white-space: nowrap; font-size: .7rem; color: var(--study-muted); }
+.etapa-examen { background: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 12%, var(--study-surface-2)); border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
+.etapa-examen .etapa-btn-titulo { font-weight: 600; }
 .etapa-leccion:disabled, .etapa-examen:disabled { opacity: .5; cursor: not-allowed; }
-.etapa-examen { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
-.etapa-leccion-meta { font-size: .7rem; color: var(--study-muted); }
+
+/* Veredicto de un examen de lenguaje en resultados (spec 011): bloque con icono y texto,
+   el color acompaña pero no es el único portador del estado. */
+.veredicto-examen {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
+  padding: 10px 14px; border-radius: 12px; font-size: .9rem; font-weight: 600;
+  background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-text);
+}
+.veredicto-examen .icono { flex: none; }
+.veredicto-ok { color: #8FBF9F; border-color: color-mix(in srgb, #8FBF9F 45%, var(--study-border)); background: color-mix(in srgb, #8FBF9F 12%, var(--study-surface)); }
+.veredicto-no { color: var(--study-warning); border-color: color-mix(in srgb, var(--study-warning) 45%, var(--study-border)); background: color-mix(in srgb, var(--study-warning) 12%, var(--study-surface)); }

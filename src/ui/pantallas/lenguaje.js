@@ -53,21 +53,28 @@ export function pintarEtapas(nodos, lenguaje) {
     const necesita = umbralDeExamen(etapa.examen.preguntas.length, etapa.examen.umbral);
     const total = etapa.examen.preguntas.length;
 
-    const clases = ["etapa", nodo.aprobada ? "etapa-aprobada" : "", nodo.desbloqueada ? "" : "etapa-bloqueada"].filter(Boolean).join(" ");
+    // Una sola etapa queda "en curso" (desbloqueada sin aprobar); las aprobadas y bloqueadas
+    // se distinguen con icono, texto y borde además del color.
+    const clases = [
+      "etapa",
+      nodo.aprobada ? "etapa-aprobada" : "",
+      nodo.desbloqueada ? "" : "etapa-bloqueada",
+      nodo.desbloqueada && !nodo.aprobada ? "etapa-actual" : "",
+    ].filter(Boolean).join(" ");
 
     const lecciones = etapa.lecciones.map(lec =>
       '<button class="etapa-leccion" data-action="practicarLeccion" data-etapa="' + etapa.id +
         '" data-leccion="' + lec.id + '"' + (nodo.desbloqueada ? "" : " disabled aria-disabled=\"true\"") +
-        ' aria-label="Prueba: ' + escapar(lec.nombre) + '">' +
-        icono("practica", "icono-sm") + '<span>' + escapar(lec.nombre) + '</span>' +
+        ' aria-label="Prueba: ' + escapar(lec.nombre) + '. ' + lec.preguntas.length + ' preguntas.">' +
+        icono("practica", "icono-sm") + '<span class="etapa-btn-titulo">' + escapar(lec.nombre) + '</span>' +
         '<span class="etapa-leccion-meta">' + lec.preguntas.length + ' preguntas</span>' +
       '</button>'
     ).join("");
 
     const examen = '<button class="etapa-examen" data-action="rendirExamen" data-etapa="' + etapa.id + '"' +
       (nodo.desbloqueada ? "" : " disabled aria-disabled=\"true\"") +
-      ' aria-label="Examen de ' + escapar(etapa.nombre) + '">' +
-      icono("medalla", "icono-sm") + '<span>Examen</span>' +
+      ' aria-label="Examen de ' + escapar(etapa.nombre) + '. ' + total + ' preguntas, se aprueba con ' + necesita + '.">' +
+      icono("medalla", "icono-sm") + '<span class="etapa-btn-titulo">Examen</span>' +
       '<span class="etapa-leccion-meta">' + total + ' preguntas · aprueba con ' + necesita + '</span>' +
     '</button>';
 

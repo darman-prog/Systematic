@@ -845,11 +845,14 @@ function renderLenguajes() {
     const detalles = pendiente
       ? "Contenido en preparación"
       : l.conteo.preguntas + " preguntas · " + total + " etapas";
+    // La barra es aria-hidden visual; el conteo entra en el nombre accesible del botón para
+    // que un lector de pantalla lo anuncie al enfocar la tarjeta.
+    const competenciaTexto = aprobadas + " de " + total + (total === 1 ? " etapa aprobada" : " etapas aprobadas");
 
-    const ariaLabel = l.nombre + ". " + l.descripcion + ". " + detalles + ". " +
-      (pendiente ? "No disponible aún." : "Presiona para entrar.");
+    const ariaLabel = l.nombre + ". " + l.descripcion + ". " + detalles + ". Competencia: " +
+      competenciaTexto + ". " + (pendiente ? "No disponible aún." : "Presiona para entrar.");
 
-    return '<button class="materia-card" data-action="seleccionarLenguaje" data-lenguaje="' + l.id + '" ' +
+    return '<button class="materia-card materia-card--lenguaje" data-action="seleccionarLenguaje" data-lenguaje="' + l.id + '" ' +
       'aria-label="' + ariaLabel + '" ' +
       (pendiente ? 'disabled aria-disabled="true" ' : '') +
       'style="--materia-color:' + l.color + '">' +

@@ -123,8 +123,9 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
       ? '<button class="btn btn-ghost w-full sm:w-auto" data-action="irLenguaje">← Etapas</button>'
       : '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>';
     const veredictoExamen = r.examen
-      ? '<p class="w-full text-center text-sm font-semibold ' + (r.examen.aprobado ? 'text-emerald-300' : 'text-amber-200') + '">' +
-        (r.examen.aprobado ? "Examen aprobado" : "Examen no aprobado") + ' · ' + r.examen.etapa.nombre + '</p>'
+      ? '<p class="veredicto-examen ' + (r.examen.aprobado ? 'veredicto-ok' : 'veredicto-no') + '">' +
+        icono(r.examen.aprobado ? "check" : "aviso", "icono-sm") +
+        '<span>' + (r.examen.aprobado ? "Examen aprobado" : "Examen no aprobado") + ' · ' + escapar(r.examen.etapa.nombre) + '</span></p>'
       : "";
 
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
