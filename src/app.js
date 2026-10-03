@@ -1,4 +1,7 @@
-﻿import { MATERIAS, getMateria, cargarContenido, acentoDe } from "./core/materias.js";
+﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido, acentoDe } from "./core/materias.js";
+import { barraDeCompetencia, registrarExamen } from "./core/competencia.js";
+import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/pantallas/lenguaje.js";
+import { barraCompetencia } from "./ui/componentes/competencia.js";
 import { crearMezclador, storeLocalStorage } from "./core/mezclador.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
@@ -26,7 +29,6 @@ import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
-// import { acentoDe } from "./core/materias.js";
 
 
 const mezclador = crearMezclador({
@@ -55,6 +57,11 @@ const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 let materia = null;
 let banco = [];
 let glosario = { categorias: [], terminos: [], tips: [] };
+
+// Track de lenguaje activo (spec 011): contenido, roadmap y competencia por etapa.
+let lenguaje = null;
+let lenguajeContenido = null;
+let competencia = {};
 
 let progreso = {};
 let session = null;
@@ -94,7 +101,7 @@ const ctx = {
 };
 
 function show(screen) {
-    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario"].forEach(s =>
+    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -715,6 +722,17 @@ function finalizar() {
   const segundos = Math.max(0, Math.round((Date.now() - session.inicio) / 1000));
   const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
   session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
+  // Examen de un track de lenguaje: registra el aprobado (con versión) y mueve la barra.
+  if (session.modo === "examen" && session.examenEtapa && lenguaje) {
+    const nuevo = registrarExamen({ etapa: session.examenEtapa, resultados: competencia, aciertos });
+    competencia = nuevo;
+    persistencia.guardarCompetencia(lenguaje.id, nuevo);
+    const aprobado = nuevo[session.examenEtapa.id].aprobado;
+    session.resultado.examen = { aprobado, etapa: session.examenEtapa };
+    toast(aprobado
+      ? conNombre("¡Examen aprobado, @! ") + session.examenEtapa.nombre
+      : "Aún no: " + pct + "% en " + session.examenEtapa.nombre + ". Repasá y volvé a intentar.");
+  }
   if (session.modo === "supervivencia") {
     session.resultado.supervivencia = { jugadas: Object.keys(session.answers).length, mejorCombo: session.mejorCombo || 0 };
   }
@@ -804,6 +822,48 @@ function renderMaterias() {
       '</div>' +
     '</button>';
   }).join("");
+
+  renderLenguajes();
+}
+
+// Sección de lenguajes del home (spec 011): tarjeta por track con su barra de competencia.
+function renderLenguajes() {
+  const seccion = $("lenguajes-seccion");
+  const cont = $("lenguajes-list");
+  if (!seccion || !cont) return;
+  if (!LENGUAJES.length) {
+    seccion.classList.add("hidden");
+    return;
+  }
+  seccion.classList.remove("hidden");
+
+  cont.innerHTML = LENGUAJES.map(l => {
+    const registro = persistencia.competencia(l.id);
+    const aprobadas = Object.values(registro).filter(r => r && r.aprobado).length;
+    const total = l.conteo?.etapas ?? 0;
+    const pendiente = (l.conteo?.preguntas ?? 0) === 0;
+    const detalles = pendiente
+      ? "Contenido en preparación"
+      : l.conteo.preguntas + " preguntas · " + total + " etapas";
+
+    const ariaLabel = l.nombre + ". " + l.descripcion + ". " + detalles + ". " +
+      (pendiente ? "No disponible aún." : "Presiona para entrar.");
+
+    return '<button class="materia-card" data-action="seleccionarLenguaje" data-lenguaje="' + l.id + '" ' +
+      'aria-label="' + ariaLabel + '" ' +
+      (pendiente ? 'disabled aria-disabled="true" ' : '') +
+      'style="--materia-color:' + l.color + '">' +
+      '<span class="materia-icono">' + icono(l.icono) + '</span>' +
+      '<div class="materia-info">' +
+        '<span class="materia-nombre">' + l.nombre + '</span>' +
+        '<span class="materia-desc">' + l.descripcion + '</span>' +
+      '</div>' +
+      '<div class="materia-stats">' +
+        '<span class="materia-stats-texto">' + detalles + '</span>' +
+        barraCompetencia({ aprobadas, total, color: l.color }) +
+      '</div>' +
+    '</button>';
+  }).join("");
 }
 
 function irMaterias() {
@@ -839,6 +899,65 @@ async function seleccionarMateria(id) {
   renderConfig();
   renderMateriaUI();
   goHome();
+}
+
+// ─── Track de lenguaje (spec 011) ─────────────────────────────────────
+async function seleccionarLenguaje(id) {
+  const l = getLenguaje(id);
+  if (!l) return;
+  lenguaje = l;
+  lenguajeContenido = await cargarContenido(l);
+  competencia = persistencia.competencia(l.id);
+  // El track de lenguaje actúa como "materia" activa para el motor de quiz y resultados
+  // (resaltado por sqlKeywords, acento, historial). No toca sys.progreso.<materia>.
+  materia = { ...l, ...lenguajeContenido };
+  banco = lenguajeContenido.preguntas;
+  glosario = lenguajeContenido.glosario;
+  aplicarAcento(l);
+  pintarLenguaje();
+  show("lenguaje");
+}
+
+function pintarLenguaje() {
+  if (!lenguaje || !lenguajeContenido) return;
+  const nombre = $("lenguaje-nombre");
+  if (nombre) nombre.textContent = lenguaje.nombre;
+  const barra = barraDeCompetencia(lenguajeContenido.roadmap?.etapas || [], competencia);
+  pintarCompetencia(barra, lenguaje.color);
+  pintarEtapas(estadoEtapas(lenguajeContenido.roadmap, competencia), lenguaje);
+}
+
+function irLenguaje() {
+  if (lenguaje && lenguajeContenido) {
+    pintarLenguaje();
+    show("lenguaje");
+  } else {
+    goHome();
+  }
+}
+
+function itemsDeIds(ids) {
+  const porId = new Map((lenguajeContenido?.preguntas || []).map(p => [p.id, p]));
+  return ids.map(id => porId.get(id)).filter(Boolean);
+}
+
+// Prueba formativa: sesión sobre las preguntas de una lección. No mueve la competencia.
+function practicarLeccion(etapaId, leccionId) {
+  const etapa = lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
+  const leccion = etapa?.lecciones.find(x => x.id === leccionId);
+  if (!leccion) return;
+  const items = itemsDeIds(leccion.preguntas);
+  if (items.length) startSession(items, "practica", false);
+}
+
+// Examen sumativo: al terminar, finalizar() registra el resultado y mueve la barra.
+function rendirExamen(etapaId) {
+  const etapa = lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
+  if (!etapa) return;
+  const items = itemsDeIds(etapa.examen.preguntas);
+  if (!items.length) return;
+  startSession(items, "examen", false);
+  session.examenEtapa = etapa;
 }
 
 function renderMateriaUI() {
@@ -1066,7 +1185,11 @@ const ACCIONES = {
   startContrarreloj: () => startContrarreloj(),
   startSupervivencia: () => startSupervivencia(),
   salir: () => salir(),
-  seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
+    seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
+    seleccionarLenguaje: el => seleccionarLenguaje(el.dataset.lenguaje),
+    practicarLeccion: el => practicarLeccion(el.dataset.etapa, el.dataset.leccion),
+    rendirExamen: el => rendirExamen(el.dataset.etapa),
+    irLenguaje: () => irLenguaje(),
   startApuntes: () => startApuntes(),
   startEscenarios: () => startEscenarios(),
   jugarEscenario: el => jugarEscenario(el.dataset.id),

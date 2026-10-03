@@ -118,12 +118,22 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
       html += '</div>';
     }
 
+    // En un examen de lenguaje, el veredicto y el retorno al mapa de etapas.
+    const volver = r.examen
+      ? '<button class="btn btn-ghost w-full sm:w-auto" data-action="irLenguaje">← Etapas</button>'
+      : '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>';
+    const veredictoExamen = r.examen
+      ? '<p class="w-full text-center text-sm font-semibold ' + (r.examen.aprobado ? 'text-emerald-300' : 'text-amber-200') + '">' +
+        (r.examen.aprobado ? "Examen aprobado" : "Examen no aprobado") + ' · ' + r.examen.etapa.nombre + '</p>'
+      : "";
+
     html += '<div class="flex flex-wrap gap-3 justify-center mt-7">' +
+      veredictoExamen +
       (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">Volver al mapa</button>' : "") +
       (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
       (r.calificables.length && r.falladas.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
       '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +
-      '<button class="btn btn-ghost w-full sm:w-auto" data-action="goHome">Inicio</button>' +
+      volver +
     '</div>';
 
     $("screen-results").innerHTML = html;

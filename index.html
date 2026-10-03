@@ -48,6 +48,11 @@
     <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
     <div id="perfil-panel" class="mb-4"></div>
     <div id="materias-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    <div id="lenguajes-seccion" class="mt-7 hidden">
+      <h2 class="section-title">Lenguajes</h2>
+      <p class="subtitle">Leé y verificá código generado por IA. Avanzá por etapas con exámenes.</p>
+      <div id="lenguajes-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+    </div>
   </section>
 
   <section id="screen-start" class="card hidden">
@@ -243,6 +248,16 @@
     <div id="apuntes-filtros" class="flex flex-wrap gap-2 mb-3"></div>
     <p class="text-xs text-slate-500 mb-3" id="apuntes-count"></p>
     <div id="apuntes-list"></div>
+  </section>
+
+  <section id="screen-lenguaje" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold" id="lenguaje-nombre">Lenguaje</h1>
+      <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+    </div>
+    <div id="lenguaje-competencia" class="mb-4"></div>
+    <p class="subtitle">Avanzá por etapas: cada prueba te prepara y el examen desbloquea la siguiente.</p>
+    <div id="lenguaje-etapas"></div>
   </section>
 
   <section id="screen-misiones" class="card hidden">

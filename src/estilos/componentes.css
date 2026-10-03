@@ -126,3 +126,32 @@ input, textarea { caret-color: var(--study-accent); }
 }
 
 .mision-bloqueada .mision-ico { color: var(--study-sutil); }
+
+/* Barra de competencia y etapas del track de lenguaje (spec 011). */
+.competencia { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+.competencia-track { height: 8px; border-radius: 9999px; background: var(--study-surface-3); overflow: hidden; }
+.competencia-fill { height: 100%; border-radius: 9999px; background: var(--competencia-color, var(--study-accent)); transition: width .3s; }
+.competencia-texto { font-size: .75rem; color: var(--study-muted); }
+
+.etapas-camino { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.etapa { border: 1px solid var(--study-border); border-radius: 12px; padding: 14px 16px; background: var(--study-surface); }
+.etapa-aprobada { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 55%, var(--study-border)); }
+.etapa-bloqueada { opacity: .6; }
+.etapa-cabecera { display: flex; align-items: center; gap: 10px; }
+.etapa-num { flex: 0 0 28px; height: 28px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: var(--study-surface-3); color: var(--study-text); }
+.etapa-aprobada .etapa-num { background: var(--competencia-color, var(--study-accent)); color: #101418; }
+.etapa-nombre { flex: 1 1 auto; font-weight: 600; color: var(--study-text); }
+.etapa-ico { color: var(--study-muted); }
+.etapa-aprobada .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
+.etapa-estado { font-size: .75rem; color: var(--study-muted); margin: 4px 0 10px; }
+.etapa-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.etapa-leccion, .etapa-examen {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 10px; cursor: pointer;
+  background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-text);
+  font-size: .85rem; transition: border-color .15s, background .15s;
+}
+.etapa-leccion:hover:not(:disabled), .etapa-examen:hover:not(:disabled) { border-color: var(--competencia-color, var(--study-accent)); }
+.etapa-leccion:disabled, .etapa-examen:disabled { opacity: .5; cursor: not-allowed; }
+.etapa-examen { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
+.etapa-leccion-meta { font-size: .7rem; color: var(--study-muted); }
