@@ -48,9 +48,11 @@ const roadmap = {
       id: "auditoria",
       nombre: "Auditoría de código de IA",
       lecciones: [
-        { id: "audit-bugs", nombre: "Bugs y APIs inventadas", preguntas: ["TS-021", "TS-022"] }
+        { id: "audit-bugs", nombre: "Bugs silenciosos", preguntas: ["TS-021", "TS-022", "TS-088", "TS-089"] },
+        { id: "audit-apis", nombre: "APIs inventadas", preguntas: ["TS-023", "TS-034", "TS-090", "TS-091"] },
+        { id: "audit-codigo", nombre: "Auditoría en acción", preguntas: ["TS-024", "TS-035", "TS-092", "TS-093"] }
       ],
-      examen: { version: 1, umbral: 0.8, preguntas: ["TS-023", "TS-024", "TS-025", "TS-034", "TS-035"] }
+      examen: { version: 2, umbral: 0.8, preguntas: ["TS-025", "TS-094", "TS-095", "TS-096", "TS-097", "TS-098", "TS-099", "TS-100"] }
     }
   ]
 };

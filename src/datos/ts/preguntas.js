@@ -1274,6 +1274,210 @@ const preguntas = [
     correct: 0,
     exp: "Cada `then` recibe lo que devolvió el anterior: 2 * 3 = 6. Encadenar permite transformar el valor paso a paso sin anidar callbacks.",
     claseError: "logica"
+  },
+  // --- Ampliación de Auditoría de código de IA (lote 5, capstone) ---
+  {
+    id: "TS-088",
+    parcial: "Auditoría de código de IA",
+    tema: "Condición invertida",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "La IA quería devolver true para mayores de edad. ¿Qué devuelve con edad = 20?",
+    codigo: "function esMayor(edad: number): boolean {\n  return edad <= 18;\n}",
+    options: ["false", "true", "undefined", "Error"],
+    correct: 0,
+    exp: "El operador está invertido: debería ser `edad >= 18`. Con 20 devuelve false, justo lo contrario. El bug compila y pasa desapercibido.",
+    claseError: "logica",
+    focoLinea: 2
+  },
+  {
+    id: "TS-089",
+    parcial: "Auditoría de código de IA",
+    tema: "Off-by-one",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "La IA quería imprimir del 1 al 5. ¿Qué imprime?",
+    codigo: "for (let i = 1; i < 5; i++) {\n  console.log(i);\n}",
+    options: ["1, 2, 3, 4", "1, 2, 3, 4, 5", "0, 1, 2, 3, 4", "1, 2, 3"],
+    correct: 0,
+    exp: "`i < 5` corta en 4: imprime 1..4, falta el 5. Para incluir el 5 hay que usar `i <= 5`. Off-by-one clásico.",
+    claseError: "logica",
+    focoLinea: 1
+  },
+  {
+    id: "TS-090",
+    parcial: "Auditoría de código de IA",
+    tema: "API inexistente",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué método NO existe en un string de JavaScript?",
+    options: ["reverse", "toUpperCase", "slice", "includes"],
+    correct: 0,
+    exp: "`reverse` no existe en String (sí en Array). Para invertir un string hay que hacer `[...s].reverse().join(\"\")`. La IA lo inventa porque suena lógico.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-091",
+    parcial: "Auditoría de código de IA",
+    tema: "Conversión",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "La IA quería convertir \"12px\" a número. ¿Qué devuelve `Number(\"12px\")`?",
+    options: ["NaN", "12", "0", "\"12px\""],
+    correct: 0,
+    exp: "`Number` es estricto: si el string no es un número completo, da NaN. `parseInt(\"12px\")` sí devuelve 12. Elegir el conversor equivocado rompe el cálculo.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-092",
+    parcial: "Auditoría de código de IA",
+    tema: "Igualdad de objetos",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const a = { x: 1 };\nconst b = { x: 1 };\nconsole.log(a === b);",
+    options: ["false: compara referencias, no contenido", "true", "undefined", "Error"],
+    correct: 0,
+    exp: "`===` en objetos compara referencias, no campos: dos objetos con el mismo contenido son distintos. Para comparar por valor hay que revisar cada propiedad.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-093",
+    parcial: "Auditoría de código de IA",
+    tema: "Mutación",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime `console.log(lista)` tras llamar `agregar(lista)`?",
+    codigo: "function agregar(items: number[]) {\n  items.push(4);\n}\nconst lista = [1, 2, 3];\nagregar(lista);\nconsole.log(lista);",
+    options: ["[1, 2, 3, 4]: el push muta el arreglo original", "[1, 2, 3]", "undefined", "Error"],
+    correct: 0,
+    exp: "El arreglo se pasa por referencia: `push` muta `lista`. Si se esperaba una copia, hay que hacer `[...items, 4]`. Efecto colateral silencioso.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-094",
+    parcial: "Auditoría de código de IA",
+    tema: "Async en forEach",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué problema tiene este guardado?",
+    codigo: "async function guardarTodo(items: Item[]) {\n  items.forEach(async (it) => {\n    await api.guardar(it);\n  });\n}",
+    options: [
+      "forEach no espera: la función termina antes de que se guarden los ítems",
+      "Falta el return",
+      "api.guardar no es async",
+      "Ninguno, está correcto"
+    ],
+    correct: 0,
+    exp: "`forEach` ignora las promesas del callback: `guardarTodo` resuelve sin que los guardados terminen. Se arregla con `for...of` + await o `Promise.all(items.map(...))`.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-095",
+    parcial: "Auditoría de código de IA",
+    tema: "Señales de bug",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es la señal más clara de que el código de la IA no está verificado?",
+    options: [
+      "Usa métodos o parámetros que no existen en la API real",
+      "Tiene comentarios",
+      "Usa nombres en inglés",
+      "Está formateado"
+    ],
+    correct: 0,
+    exp: "La IA inventa APIs plausibles (`remove`, `insertAt`, `reverse` en string). Verificar que cada método exista y haga lo esperado es el núcleo de la auditoría.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-096",
+    parcial: "Auditoría de código de IA",
+    tema: "Catch vacío",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué problema tiene este catch?",
+    codigo: "try {\n  await procesar();\n} catch (e) {\n  // nada\n}",
+    options: [
+      "Traga el error: el fallo desaparece sin aviso ni log",
+      "No compila",
+      "Es correcto para ignorar errores",
+      "Falta un return"
+    ],
+    correct: 0,
+    exp: "Un catch vacío oculta el fallo: el programa sigue como si todo hubiera ido bien. Mejor registrar (`console.error(e)`) o propagar. Bug silencioso por excelencia.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-097",
+    parcial: "Auditoría de código de IA",
+    tema: "Coerción",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué problema tiene esta validación?",
+    codigo: "function esCero(n) {\n  return n == 0;\n}\nconsole.log(esCero(\"\"));",
+    options: [
+      "Devuelve true: \"\" == 0 por coerción, aunque no sea un cero",
+      "Devuelve false",
+      "Lanza error",
+      "Devuelve undefined"
+    ],
+    correct: 0,
+    exp: "Con `==`, el string vacío se convierte a 0 y da true. Con `===` sería false. En validaciones, `==` deja pasar valores que no querías.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-098",
+    parcial: "Auditoría de código de IA",
+    tema: "indexOf",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "La IA quiso comprobar si el arreglo contiene el 1. ¿Qué imprime?",
+    codigo: "const numeros = [1, 2, 3];\nconsole.log(numeros.indexOf(1) > 0);",
+    options: [
+      "false: indexOf(1) es 0, y 0 > 0 es falso",
+      "true",
+      "1",
+      "undefined"
+    ],
+    correct: 0,
+    exp: "`indexOf(1)` devuelve 0 (está en la primera posición), y `0 > 0` es false: el bug clásico de usar `> 0` en vez de `>= 0`. Con `includes` no pasa.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-099",
+    parcial: "Auditoría de código de IA",
+    tema: "Null sin comprobar",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué pasa si `usuario` es null?",
+    codigo: "function nombre(usuario: { nombre: string } | null): string {\n  return usuario.nombre;\n}",
+    options: [
+      "Error de compilación: usuario podría ser null y no se comprueba",
+      "Devuelve \"\"",
+      "Devuelve undefined",
+      "Funciona siempre"
+    ],
+    correct: 0,
+    exp: "TypeScript marca el error porque `usuario` puede ser null: hay que estrecharlo (`if (usuario)`) o usar optional chaining. Ignorar el tipo reintroduce el crash en runtime.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-100",
+    parcial: "Auditoría de código de IA",
+    tema: "Filter sin return",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "La IA quiso quedarse con los mayores de 18. ¿Qué devuelve el filtro?",
+    codigo: "const adultos = personas.filter(p => {\n  p.edad > 18;\n});",
+    options: [
+      "Un arreglo vacío: el callback devuelve undefined (falsy)",
+      "Todas las personas",
+      "Solo los mayores de 18",
+      "undefined"
+    ],
+    correct: 0,
+    exp: "La flecha con llaves no devuelve la comparación: el callback retorna undefined, que es falsy, y `filter` descarta todo. Falta `return` o quitar las llaves. Bug silencioso total.",
+    claseError: "silencioso"
   }
 ];
 
