@@ -37,6 +37,18 @@ describe("validarPregunta", () => {
     expect(errores).toContain("correctos con índices repetidos");
   });
 
+  it("valida los metadatos de lenguajes: claseError y focoLinea (spec 011)", () => {
+    // Opcionales: una pregunta sin ellos sigue siendo válida.
+    expect(validarPregunta(base, new Set())).toEqual([]);
+    // Valores correctos.
+    expect(validarPregunta({ ...base, claseError: "silencioso", focoLinea: 3 }, new Set())).toEqual([]);
+    // claseError fuera del vocabulario.
+    expect(validarPregunta({ ...base, claseError: "grave" }, new Set()).join(" ")).toContain("claseError inválida");
+    // focoLinea debe ser entero >= 1.
+    expect(validarPregunta({ ...base, focoLinea: 0 }, new Set()).join(" ")).toContain("focoLinea debe ser un entero");
+    expect(validarPregunta({ ...base, focoLinea: 2.5 }, new Set()).join(" ")).toContain("focoLinea debe ser un entero");
+  });
+
   it("valida dragdrop: piezas/respuestas y marcadores {n}", () => {
     const drag = {
       ...base, tipo: "dragdrop", options: undefined, correct: undefined,

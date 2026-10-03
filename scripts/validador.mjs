@@ -6,6 +6,9 @@ export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar"
 // Fuente única con el motor: evita que el contenido declare tipos de arista que el lienzo no ofrece.
 export const SUBTIPOS_DIAGRAMA = SUBTIPOS;
 export const DIFICULTADES = ["facil", "media", "dificil"];
+// Clase de error de los ejercicios de lenguajes (spec 011): alimenta estadísticas y
+// ordena los ejercicios del capstone "Auditoría de código de IA".
+export const CLASES_ERROR = ["sintaxis", "logica", "silencioso"];
 
 const esArreglo = v => Array.isArray(v);
 const textoNoVacio = v => typeof v === "string" && v.trim().length > 0;
@@ -31,6 +34,12 @@ export function validarPregunta(p, idsVistos) {
   if (!textoNoVacio(p.exp)) err("falta explicación (exp)");
   if (p.real !== undefined && typeof p.real !== "boolean") err("real debe ser booleano");
   if (p.caso !== undefined && !textoNoVacio(p.caso)) err("caso vacío");
+  if (p.claseError !== undefined && !CLASES_ERROR.includes(p.claseError)) {
+    err(`claseError inválida: ${p.claseError} (se espera ${CLASES_ERROR.join(" | ")})`);
+  }
+  if (p.focoLinea !== undefined && (!Number.isInteger(p.focoLinea) || p.focoLinea < 1)) {
+    err(`focoLinea debe ser un entero >= 1: ${p.focoLinea}`);
+  }
 
   switch (p.tipo) {
     case "multiple":
