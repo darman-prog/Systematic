@@ -50,7 +50,7 @@ test('el nombre se puede cambiar desde ajustes y viaja al saludo', async ({ page
   await expect(page.locator('#nombre-editor')).toBeHidden();
 
   // El saludo del home usa el nuevo nombre.
-  await page.locator('[data-action="irMaterias"]').click();
+  await page.locator('#screen-start [data-action="irMaterias"]').click();
   await expect(page.locator('#saludo-home')).toContainText('Ana');
   await expect(page.locator('#perfil-panel')).toContainText('Perfil de Ana');
 });

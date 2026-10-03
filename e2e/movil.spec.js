@@ -7,6 +7,9 @@ import { test, expect } from '@playwright/test';
 async function irAMateria(page, indice) {
   await page.goto('/');
   await page.locator('#materias-list .materia-card').nth(indice).click();
+  // El contenido se carga bajo demanda (spec 012): esperar la portada antes de evaluar
+  // visibilidad, o los asserts corren con la pantalla aún oculta.
+  await expect(page.locator('#screen-start')).toBeVisible();
 }
 
 test('las entradas al constructor de diagramas no aparecen en móvil', async ({ page }) => {
