@@ -45,9 +45,10 @@ formato `TS-NNN` que exige el validador (`scripts/validador.mjs:23`).
 
 > **Estado (2026-10-03)**: el **flujo completo está implementado** —dominio de competencia,
 > persistencia, validador de roadmap, track de TypeScript, pantalla de etapas con barra, gate y
-> export/import— con 5 etapas, 5 lecciones (1 por etapa) y 35 preguntas. La expansión a las 15
-> lecciones y ~165 preguntas es la tarea 7 (un lote por etapa). El umbral de 0.8 se sostiene porque
-> cada examen ya tiene 5 preguntas (con menos, `Math.ceil` lo volvería un 100%).
+> export/import— con 5 etapas y 48 preguntas. La expansión a las 15 lecciones y ~165 preguntas es
+> la tarea 7, en curso por lotes: **lote 1 (Fundamentos) hecho** (3 lecciones, examen de 8
+> preguntas). El umbral de 0.8 se sostiene porque cada examen tiene al menos 5 preguntas (con
+> menos, `Math.ceil` lo volvería un 100%).
 
 Los nombres de etapa, el orden, el umbral y la versión de cada examen viven en
 `src/datos/ts/roadmap.js` (datos, no `src/core/`), siguiendo el patrón de `presentacion.js`

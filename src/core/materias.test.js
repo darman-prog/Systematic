@@ -75,13 +75,17 @@ describe("Materias (metadata + carga lazy)", () => {
       expect(faltantes).toEqual([]);
     });
 
-    it("cada examen declara version, umbral 0.8 y 5 preguntas; el capstone va ultimo", async () => {
+    it("cada examen declara version, umbral 0.8 y al menos 5 preguntas; el capstone va ultimo", async () => {
       const ts = getLenguaje("lenguaje-ts");
       const c = await cargarContenido(ts);
       for (const etapa of c.roadmap.etapas) {
         expect(Number.isInteger(etapa.examen.version)).toBe(true);
         expect(etapa.examen.umbral).toBe(0.8);
-        expect(etapa.examen.preguntas).toHaveLength(5);
+        // El piso de 5 fija el minimo jugable; la ampliacion de contenido puede sumar mas.
+        expect(etapa.examen.preguntas.length).toBeGreaterThanOrEqual(5);
+        for (const leccion of etapa.lecciones) {
+          expect(leccion.preguntas.length).toBeGreaterThanOrEqual(2);
+        }
       }
       expect(c.roadmap.etapas[c.roadmap.etapas.length - 1].id).toBe("auditoria");
     });

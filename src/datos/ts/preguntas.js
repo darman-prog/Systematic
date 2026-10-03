@@ -509,6 +509,188 @@ const preguntas = [
     correctos: [1, 2],
     exp: "`push` y `filter` son reales. `remove` e `insertAt` no existen en `Array` (son de otros lenguajes o de librerías): la IA los inventa porque suenan plausibles. Verificar la API antes de confiar es la base de la auditoría.",
     claseError: "silencioso"
+  },
+  // --- Ampliación de Fundamentos (lote 1) ---
+  {
+    id: "TS-036",
+    parcial: "Fundamentos",
+    tema: "Template literals",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const n = 3;\nconsole.log(`total: ${n + 1}`);",
+    options: ["total: 4", "total: 31", "total: ${n + 1}", "Error"],
+    correct: 0,
+    exp: "El template literal evalúa la expresión `${n + 1}`: 3 + 1 = 4. Si estuviera entre comillas simples, se vería el texto literal `${n + 1}`.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-037",
+    parcial: "Fundamentos",
+    tema: "Igualdad",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué diferencia hay entre `==` y `===`?",
+    options: [
+      "`===` compara valor y tipo; `==` convierte tipos antes de comparar",
+      "`==` es más estricto que `===`",
+      "`===` solo sirve para números",
+      "Son equivalentes"
+    ],
+    correct: 0,
+    exp: "`===` no convierte: `1 === \"1\"` es false. `==` aplica coerción y da true. Mezclar ambos esconde comparaciones inesperadas.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-038",
+    parcial: "Fundamentos",
+    tema: "Condicionales",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime con `nota = 75`?",
+    codigo: "function nivel(nota: number): string {\n  if (nota >= 90) return \"alto\";\n  else if (nota >= 70) return \"medio\";\n  else return \"bajo\";\n}\nconsole.log(nivel(75));",
+    options: ["medio", "alto", "bajo", "undefined"],
+    correct: 0,
+    exp: "75 no llega a 90, pero sí a 70: entra al `else if` y devuelve \"medio\". Las cadenas de `else if` se evalúan en orden.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-039",
+    parcial: "Fundamentos",
+    tema: "Cortocircuito",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const usuario = null;\nconsole.log(usuario && usuario.nombre);",
+    options: ["null", "undefined", "Error", "false"],
+    correct: 0,
+    exp: "`&&` cortocircuita: si `usuario` es null (falsy), devuelve null sin evaluar `usuario.nombre`. Por eso no lanza error; creer que devuelve un booleano lleva a bugs.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-040",
+    parcial: "Fundamentos",
+    tema: "Bucles",
+    dificultad: "facil",
+    tipo: "dragdrop",
+    q: "Completá el bucle para que reste hasta llegar a 0.",
+    codigo: "let n = 3;\nwhile (n {1} 0) {\n  n{2};\n}",
+    piezas: [">", "--", "<", "++"],
+    respuestas: [">", "--"],
+    exp: "El `while` sigue mientras `n > 0` y `n--` resta 1 en cada vuelta, así termina en 0. Con `n++` el ciclo nunca terminaría.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-041",
+    parcial: "Fundamentos",
+    tema: "Bucles",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "let suma = 0;\nfor (let i = 1; i <= 4; i++) {\n  suma += i;\n}\nconsole.log(suma);",
+    options: ["10", "6", "4", "0"],
+    correct: 0,
+    exp: "Suma 1+2+3+4 = 10. El `<=` incluye el 4; con `<` daría 6.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-042",
+    parcial: "Fundamentos",
+    tema: "Switch",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const color = \"rojo\";\nswitch (color) {\n  case \"rojo\":\n    console.log(\"A\");\n  case \"azul\":\n    console.log(\"B\");\n    break;\n  default:\n    console.log(\"C\");\n}",
+    options: ["A y B", "Solo A", "Solo B", "A, B y C"],
+    correct: 0,
+    exp: "Falta el `break` en el caso \"rojo\": la ejecución cae al siguiente caso (fall-through) e imprime A y B. El `break` de \"azul\" corta antes del default.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-043",
+    parcial: "Fundamentos",
+    tema: "NaN",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué devuelve `NaN === NaN`?",
+    options: [
+      "false: NaN nunca es igual a sí mismo",
+      "true",
+      "undefined",
+      "Error"
+    ],
+    correct: 0,
+    exp: "NaN es el único valor distinto de sí mismo. Para comprobarlo se usa `Number.isNaN(x)`. Comparar con `=== NaN` siempre da false: bug silencioso típico.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-044",
+    parcial: "Fundamentos",
+    tema: "Precedencia",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "console.log(2 + 3 * 4);",
+    options: ["14", "20", "24", "9"],
+    correct: 0,
+    exp: "La multiplicación tiene mayor precedencia: 3*4 = 12, más 2 = 14. Para sumar primero harían falta paréntesis.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-045",
+    parcial: "Fundamentos",
+    tema: "Truthiness",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const valor = \"0\";\nif (valor) console.log(\"verdadero\");\nelse console.log(\"falso\");",
+    options: ["verdadero", "falso", "Error", "undefined"],
+    correct: 0,
+    exp: "El string \"0\" no está vacío, así que es truthy: imprime \"verdadero\". El número 0 sí sería falsy. Confundir ambos es un bug silencioso frecuente.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-046",
+    parcial: "Fundamentos",
+    tema: "typeof",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué devuelve `typeof null`?",
+    options: ["\"object\"", "\"null\"", "\"undefined\"", "\"boolean\""],
+    correct: 0,
+    exp: "`typeof null` devuelve \"object\" por un bug histórico de JavaScript. Para comprobar null se usa `x === null`; `typeof x === \"null\"` nunca es true.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-047",
+    parcial: "Fundamentos",
+    tema: "Bucles",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué pasa con este bucle?",
+    codigo: "let i = 0;\nwhile (i < 3) {\n  console.log(i);\n}",
+    options: [
+      "Se cuelga: `i` nunca cambia",
+      "Imprime 0, 1 y 2",
+      "Imprime 0 una vez",
+      "No imprime nada"
+    ],
+    correct: 0,
+    exp: "Falta incrementar `i` dentro del bucle: la condición siempre es true y se repite para siempre. El bucle infinito más común.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-048",
+    parcial: "Fundamentos",
+    tema: "Bucles",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "let x = 5;\nwhile (x > 0) {\n  x -= 2;\n}\nconsole.log(x);",
+    options: ["-1", "0", "1", "-2"],
+    correct: 0,
+    exp: "x va 5 → 3 → 1 → -1. Con x = 1 la condición 1 > 0 es true y resta 2, quedando -1; ahí corta. No se detiene en 0 porque 0 no es mayor que 0.",
+    claseError: "logica"
   }
 ];
 

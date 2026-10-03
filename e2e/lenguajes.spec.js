@@ -10,7 +10,7 @@ test.describe('Lenguajes — TypeScript', () => {
     await expect(seccion).toBeVisible();
     const card = page.locator('#lenguajes-list .materia-card').first();
     await expect(card).toContainText('TypeScript');
-    await expect(card).toContainText('35 preguntas');
+    await expect(card).toContainText('48 preguntas');
     await expect(card.locator('.competencia-texto')).toContainText('0 de 5');
   });
 
@@ -40,10 +40,11 @@ test.describe('Lenguajes — TypeScript', () => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
     await page.locator('#lenguajes-list .materia-card').first().click();
-    // La lección de "Fundamentos" tiene 2 preguntas de opción (TS-001 y TS-002).
     await page.locator('#lenguaje-etapas .etapa-leccion').first().click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
-    for (let i = 0; i < 2; i++) {
+    // Responder hasta que aparezca el resumen: la lección puede crecer con el contenido.
+    for (let i = 0; i < 12; i++) {
+      if (await page.locator('#screen-results').isVisible()) break;
       await page.locator('#options-container .option').first().click();
       await page.locator('#next-btn').click();
     }
@@ -61,9 +62,9 @@ test.describe('Lenguajes — TypeScript', () => {
     await page.addInitScript(() => {
       localStorage.clear();
       localStorage.setItem('sys.onboarding.v1', 'true');
-      // Aprobado vigente de la etapa 1 (version 1, la del roadmap).
+      // Aprobado vigente de la etapa 1 (version 2, la del roadmap).
       localStorage.setItem('sys.competencia.lenguaje-ts', JSON.stringify({
-        fundamentos: { aprobado: true, version: 1, ultimoPct: 1, intentos: 1 }
+        fundamentos: { aprobado: true, version: 2, ultimoPct: 1, intentos: 1 }
       }));
     });
     await page.goto('/');
@@ -106,7 +107,7 @@ test.describe('Lenguajes — TypeScript', () => {
     // Importar un archivo de competencia con la etapa 1 aprobada.
     const archivo = {
       app: 'systematic', version: 2, lenguaje: 'lenguaje-ts',
-      competencia: { fundamentos: { aprobado: true, version: 1, ultimoPct: 1, intentos: 1 } },
+      competencia: { fundamentos: { aprobado: true, version: 2, ultimoPct: 1, intentos: 1 } },
     };
     await page.locator('#import-file').setInputFiles({
       name: 'competencia.json',

@@ -8,9 +8,11 @@ const roadmap = {
       id: "fundamentos",
       nombre: "Fundamentos",
       lecciones: [
-        { id: "fund-tipos", nombre: "Tipos y variables", preguntas: ["TS-001", "TS-002"] }
+        { id: "fund-tipos", nombre: "Tipos y variables", preguntas: ["TS-001", "TS-002", "TS-026", "TS-036"] },
+        { id: "fund-control", nombre: "Control de flujo", preguntas: ["TS-004", "TS-038", "TS-039", "TS-044"] },
+        { id: "fund-traza", nombre: "Trazar ejecución", preguntas: ["TS-003", "TS-005", "TS-027", "TS-042"] }
       ],
-      examen: { version: 1, umbral: 0.8, preguntas: ["TS-003", "TS-004", "TS-005", "TS-026", "TS-027"] }
+      examen: { version: 2, umbral: 0.8, preguntas: ["TS-037", "TS-040", "TS-041", "TS-043", "TS-045", "TS-046", "TS-047", "TS-048"] }
     },
     {
       id: "funciones",
