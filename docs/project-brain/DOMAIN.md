@@ -73,7 +73,20 @@ Motor puro en `src/core/diagramas.js`; el lienzo y el modo de casos viven en `sr
   más no puede ser "éxito" (misma vara que el quiz). XP +60 éxito / +25 parcial y logro
   "Arquitecto". El mejor rating por caso se guarda en `sys.casos-diagrama`.
 
-## Materias
+## Materias y lenguajes
 
-`src/core/materias.js` registra las materias y expone `getMateria(id)`. El contenido vive en
-`src/datos/<materia>/`; el core no tiene ids de materia incrustados (ADR 003).
+`src/core/materias.js` registra los tracks y expone `getMateria(id)` / `getLenguaje(id)`. El
+contenido vive en `src/datos/<track>/`; el core no tiene ids incrustados (ADR 003).
+
+## Competencia (lenguajes)
+
+Vive en `src/core/competencia.js` (spec 011). Un track de lenguaje (`tipo: "lenguaje"`) avanza por
+**etapas** con un examen sumativo cada una:
+
+- **Competencia** = etapas de examen aprobadas / total. No es el `nivel` de XP ni la caja Leitner.
+- **Prueba** (formativa) da feedback y no mueve la barra; **examen** (sumativo) aprueba con el umbral
+  del roadmap (0.8) y desbloquea la etapa siguiente.
+- Un aprobado cuenta solo si su `version` coincide con la del examen en el roadmap; si el examen se
+  reescribe, la etapa vuelve a estar pendiente (reconciliación en la lectura, sin borrar el resto).
+- El bloqueo se deriva de la etapa anterior (la 1 siempre está abierta; el capstone queda último).
+- El roadmap (etapas, lecciones, umbral y versión) son datos en `src/datos/<lenguaje>/roadmap.js`.
