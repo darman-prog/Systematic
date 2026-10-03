@@ -84,7 +84,7 @@ export const LENGUAJES = [
     descripcion: "Leé y verificá código generado por IA: trazar, detectar y auditar.",
     color: "#6FA8DC",
     accentText: "#101418",
-    conteo: { preguntas: 48, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
+    conteo: { preguntas: 61, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
     sqlKeywords: tsKeywords,
     cargar: () => import("../datos/ts/index.js"),
     // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.

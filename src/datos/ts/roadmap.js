@@ -18,9 +18,11 @@ const roadmap = {
       id: "funciones",
       nombre: "Funciones y datos",
       lecciones: [
-        { id: "func-funciones", nombre: "Funciones y arreglos", preguntas: ["TS-006", "TS-007"] }
+        { id: "func-funciones", nombre: "Funciones y parámetros", preguntas: ["TS-006", "TS-007", "TS-049", "TS-050"] },
+        { id: "func-arreglos", nombre: "Arreglos y métodos", preguntas: ["TS-008", "TS-028", "TS-051", "TS-052"] },
+        { id: "func-objetos", nombre: "Objetos y destructuring", preguntas: ["TS-009", "TS-029", "TS-053", "TS-054"] }
       ],
-      examen: { version: 1, umbral: 0.8, preguntas: ["TS-008", "TS-009", "TS-010", "TS-028", "TS-029"] }
+      examen: { version: 2, umbral: 0.8, preguntas: ["TS-010", "TS-055", "TS-056", "TS-057", "TS-058", "TS-059", "TS-060", "TS-061"] }
     },
     {
       id: "tipos",

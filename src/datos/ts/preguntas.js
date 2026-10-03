@@ -691,6 +691,183 @@ const preguntas = [
     correct: 0,
     exp: "x va 5 → 3 → 1 → -1. Con x = 1 la condición 1 > 0 es true y resta 2, quedando -1; ahí corta. No se detiene en 0 porque 0 no es mayor que 0.",
     claseError: "logica"
+  },
+  // --- Ampliación de Funciones y datos (lote 2) ---
+  {
+    id: "TS-049",
+    parcial: "Funciones y datos",
+    tema: "Parámetros",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "function saludar(nombre = \"mundo\") {\n  return `hola ${nombre}`;\n}\nconsole.log(saludar());",
+    options: ["hola mundo", "hola undefined", "hola ", "Error"],
+    correct: 0,
+    exp: "Al llamar sin argumentos, `nombre` toma el valor por defecto \"mundo\". Sin el default sería undefined.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-050",
+    parcial: "Funciones y datos",
+    tema: "Arrow functions",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué devuelve `doble(3)`?",
+    codigo: "const doble = n => { n * 2 };\nconsole.log(doble(3));",
+    options: ["undefined", "6", "NaN", "Error"],
+    correct: 0,
+    exp: "La flecha con llaves no devuelve nada sin `return`: `{ n * 2 }` es un bloque, no un objeto. Para devolver 6 hacía falta `n => n * 2` o `return n * 2`.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-051",
+    parcial: "Funciones y datos",
+    tema: "Map",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "console.log([1, 2, 3].map(n => n * 2));",
+    options: ["[2, 4, 6]", "[1, 2, 3, 1, 2, 3]", "[2, 4, 6, 8]", "6"],
+    correct: 0,
+    exp: "`map` devuelve un arreglo nuevo con cada elemento transformado: [2, 4, 6]. No muta el original.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-052",
+    parcial: "Funciones y datos",
+    tema: "Reduce",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const total = [1, 2, 3].reduce((acc, n) => acc + n, 0);\nconsole.log(total);",
+    options: ["6", "3", "123", "0"],
+    correct: 0,
+    exp: "`reduce` acumula desde 0: 0+1=1, 1+2=3, 3+3=6. El segundo argumento (0) es el valor inicial; sin él, el primer elemento se usa como semilla.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-053",
+    parcial: "Funciones y datos",
+    tema: "Destructuring",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const persona = { nombre: \"Ana\", edad: 30 };\nconst { nombre } = persona;\nconsole.log(nombre);",
+    options: ["Ana", "{ nombre: \"Ana\", edad: 30 }", "undefined", "Error"],
+    correct: 0,
+    exp: "El destructuring `{ nombre }` extrae la propiedad `nombre` del objeto: imprime \"Ana\".",
+    claseError: "logica"
+  },
+  {
+    id: "TS-054",
+    parcial: "Funciones y datos",
+    tema: "Spread",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace `const copia = [...original];`?",
+    options: [
+      "Crea un arreglo nuevo con los mismos elementos (copia superficial)",
+      "Copia el arreglo por referencia",
+      "Vacía el original",
+      "Convierte el arreglo en objeto"
+    ],
+    correct: 0,
+    exp: "El spread copia los elementos a un arreglo nuevo, así que mutar `copia` no toca `original`. Es superficial: los objetos internos siguen compartidos.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-055",
+    parcial: "Funciones y datos",
+    tema: "Filter",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const pares = [1, 2, 3, 4].filter(n => n % 2 === 0);\nconsole.log(pares);",
+    options: ["[2, 4]", "[1, 3]", "[true, false, true, false]", "2"],
+    correct: 0,
+    exp: "`filter` conserva los elementos que cumplen la condición: los pares [2, 4]. Devuelve un arreglo nuevo.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-056",
+    parcial: "Funciones y datos",
+    tema: "Map + parseInt",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime? (bug clásico)",
+    codigo: "console.log([\"1\", \"2\", \"3\"].map(parseInt));",
+    options: ["[1, NaN, NaN]", "[1, 2, 3]", "[\"1\", \"2\", \"3\"]", "Error"],
+    correct: 0,
+    exp: "`map` pasa (valor, índice): `parseInt(\"2\", 1)` y `parseInt(\"3\", 2)` usan el índice como base y dan NaN. Hay que envolver: `.map(s => parseInt(s, 10))`.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-057",
+    parcial: "Funciones y datos",
+    tema: "Return faltante",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué devuelve `sumar(2, 3)`?",
+    codigo: "function sumar(a, b) {\n  a + b;\n}",
+    options: ["undefined", "5", "NaN", "Error"],
+    correct: 0,
+    exp: "Sin `return`, la función devuelve undefined aunque calcule a + b. El resultado se descarta: bug silencioso muy común en código generado.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-058",
+    parcial: "Funciones y datos",
+    tema: "Mutabilidad",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué método devuelve un arreglo nuevo sin mutar el original?",
+    options: ["map", "push", "sort", "splice"],
+    correct: 0,
+    exp: "`map` (y `filter`) devuelven un arreglo nuevo. `push`, `sort` y `splice` mutan el original: confundirlos altera datos compartidos.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-059",
+    parcial: "Funciones y datos",
+    tema: "Reduce",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué pasa con `[].reduce((a, b) => a + b)`?",
+    options: [
+      "Lanza TypeError: reduce de un arreglo vacío sin valor inicial",
+      "Devuelve 0",
+      "Devuelve undefined",
+      "Devuelve NaN"
+    ],
+    correct: 0,
+    exp: "`reduce` sobre un arreglo vacío sin valor inicial lanza TypeError. Con `reduce((a,b)=>a+b, 0)` devolvería 0. La IA a veces olvida el valor inicial.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-060",
+    parcial: "Funciones y datos",
+    tema: "Sort",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const a = [3, 1, 2];\nconst b = a.sort();\nconsole.log(a);",
+    options: ["[1, 2, 3]", "[3, 1, 2]", "undefined", "Error"],
+    correct: 0,
+    exp: "`sort` ordena en el lugar y devuelve el mismo arreglo: `a` también queda [1, 2, 3]. Para no mutar: `[...a].sort()`.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-061",
+    parcial: "Funciones y datos",
+    tema: "Destructuring",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "const { puerto = 3000 } = { host: \"localhost\" };\nconsole.log(puerto);",
+    options: ["3000", "undefined", "null", "Error"],
+    correct: 0,
+    exp: "El default `= 3000` se usa cuando la propiedad no existe o es undefined. Como no hay `puerto`, imprime 3000.",
+    claseError: "logica"
   }
 ];
 
