@@ -28,9 +28,11 @@ const roadmap = {
       id: "tipos",
       nombre: "Tipos y genéricos",
       lecciones: [
-        { id: "tipos-narrowing", nombre: "Interfaces y narrowing", preguntas: ["TS-011", "TS-012"] }
+        { id: "tipos-formas", nombre: "Interfaces y tipos", preguntas: ["TS-011", "TS-012", "TS-062", "TS-063"] },
+        { id: "tipos-narrowing", nombre: "Uniones y narrowing", preguntas: ["TS-013", "TS-030", "TS-064", "TS-065"] },
+        { id: "tipos-genericos", nombre: "Genéricos", preguntas: ["TS-014", "TS-031", "TS-066", "TS-067"] }
       ],
-      examen: { version: 1, umbral: 0.8, preguntas: ["TS-013", "TS-014", "TS-015", "TS-030", "TS-031"] }
+      examen: { version: 2, umbral: 0.8, preguntas: ["TS-015", "TS-068", "TS-069", "TS-070", "TS-071", "TS-072", "TS-073", "TS-074"] }
     },
     {
       id: "asincronia",

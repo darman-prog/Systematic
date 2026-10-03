@@ -868,6 +868,206 @@ const preguntas = [
     correct: 0,
     exp: "El default `= 3000` se usa cuando la propiedad no existe o es undefined. Como no hay `puerto`, imprime 3000.",
     claseError: "logica"
+  },
+  // --- Ampliación de Tipos y genéricos (lote 3) ---
+  {
+    id: "TS-062",
+    parcial: "Tipos y genéricos",
+    tema: "Interface vs type",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es cierto sobre `interface` y `type`?",
+    options: [
+      "Ambos describen la forma de un objeto; `interface` se puede extender con declaraciones repetidas",
+      "Solo `type` sirve para objetos",
+      "`interface` no admite métodos",
+      "Son sinónimos exactos en todos los casos"
+    ],
+    correct: 0,
+    exp: "`interface` y `type` describen formas; `interface` se puede reabrir/mergear con el mismo nombre, `type` no. `type` sí admite uniones y tuplas, que `interface` no.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-063",
+    parcial: "Tipos y genéricos",
+    tema: "Propiedades opcionales",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "type Usuario = { nombre: string; email?: string };\nconst u: Usuario = { nombre: \"Ana\" };\nconsole.log(u.email);",
+    options: ["undefined", "null", "Error de compilación", "\"\""],
+    correct: 0,
+    exp: "`email?` es opcional: si no se pasa, la propiedad no existe y leerla da undefined. TypeScript obliga a comprobarla antes de usarla como string.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-064",
+    parcial: "Tipos y genéricos",
+    tema: "Narrowing",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "function largo(x: string | number): number {\n  if (typeof x === \"string\") return x.length;\n  return x;\n}\nconsole.log(largo(\"hola\"));",
+    options: ["4", "\"hola\"", "undefined", "Error"],
+    correct: 0,
+    exp: "`typeof x === \"string\"` estrecha la unión y dentro del if `x` es string: `x.length` = 4. El narrowing permite operar sin castear.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-065",
+    parcial: "Tipos y genéricos",
+    tema: "Unión discriminada",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "type Forma =\n  | { tipo: \"circulo\"; radio: number }\n  | { tipo: \"cuadrado\"; lado: number };\nfunction area(f: Forma): number {\n  if (f.tipo === \"circulo\") return 3.14 * f.radio ** 2;\n  return f.lado ** 2;\n}\nconsole.log(area({ tipo: \"cuadrado\", lado: 3 }));",
+    options: ["9", "3.14 * 9", "3", "Error"],
+    correct: 0,
+    exp: "El campo `tipo` discrimina la unión: al no ser círculo, TypeScript sabe que es cuadrado y `f.lado` = 3, así que el área es 9. Este patrón evita `any`.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-066",
+    parcial: "Tipos y genéricos",
+    tema: "Genéricos",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué devuelve `identidad(5)`?",
+    codigo: "function identidad<T>(x: T): T {\n  return x;\n}\nconsole.log(identidad(5));",
+    options: ["5", "undefined", "T", "Error"],
+    correct: 0,
+    exp: "El genérico `<T>` se infiere como number al pasar 5, y devuelve el mismo valor. Los genéricos preservan el tipo sin usar `any`.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-067",
+    parcial: "Tipos y genéricos",
+    tema: "Restricciones",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Para qué sirve `T extends { id: number }` en un genérico?",
+    options: [
+      "Exige que T tenga al menos la propiedad id, sin fijar el resto",
+      "Hace que T sea siempre number",
+      "Impide pasar cualquier objeto",
+      "Convierte T en any"
+    ],
+    correct: 0,
+    exp: "`extends` restringe el genérico: T debe incluir `id: number`, pero puede tener más campos. Es la forma de pedir una forma mínima sin perder el tipo concreto.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-068",
+    parcial: "Tipos y genéricos",
+    tema: "Readonly",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué pasa con `lista.push(4)`?",
+    codigo: "const lista: readonly number[] = [1, 2, 3];\nlista.push(4);",
+    options: [
+      "Error de compilación: readonly number[] no tiene push",
+      "Agrega el 4 en runtime",
+      "Devuelve undefined",
+      "Nada, lo ignora"
+    ],
+    correct: 0,
+    exp: "`readonly number[]` quita los métodos que mutan, incluido `push`: TypeScript falla al compilar. Es una garantía de tipos, no una protección en runtime.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-069",
+    parcial: "Tipos y genéricos",
+    tema: "as const",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué tipo infiere `const direcciones = [\"norte\", \"sur\"] as const;`?",
+    options: [
+      "Una tupla readonly de literales: [\"norte\", \"sur\"]",
+      "string[]",
+      "readonly string[]",
+      "any[]"
+    ],
+    correct: 0,
+    exp: "`as const` congela los literales: el tipo es una tupla readonly con exactamente \"norte\" y \"sur\", no string[]. Sirve para mapas de valores válidos.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-070",
+    parcial: "Tipos y genéricos",
+    tema: "unknown vs any",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué diferencia hay entre `any` y `unknown`?",
+    options: [
+      "`unknown` obliga a comprobar el tipo antes de usarlo; `any` no comprueba nada",
+      "Son lo mismo",
+      "`any` es más seguro",
+      "`unknown` solo admite strings"
+    ],
+    correct: 0,
+    exp: "Con `unknown` no podés operar hasta estrecharlo (typeof, instanceof): es la opción segura para datos externos. `any` desactiva el chequeo y esconde bugs.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-071",
+    parcial: "Tipos y genéricos",
+    tema: "Enum",
+    dificultad: "facil",
+    tipo: "codigo",
+    q: "¿Qué imprime?",
+    codigo: "enum Estado { Activo, Inactivo }\nconsole.log(Estado.Activo);",
+    options: ["0", "\"Activo\"", "1", "undefined"],
+    correct: 0,
+    exp: "Por defecto los enums numéricos arrancan en 0: Estado.Activo vale 0. Es una de las razones por las que muchos equipos prefieren uniones de literales.",
+    claseError: "logica"
+  },
+  {
+    id: "TS-072",
+    parcial: "Tipos y genéricos",
+    tema: "Tipos literales",
+    dificultad: "media",
+    tipo: "codigo",
+    q: "¿Qué pasa al asignar `direccion = \"arriba\"`?",
+    codigo: "type Direccion = \"norte\" | \"sur\";\nlet direccion: Direccion = \"arriba\";",
+    options: [
+      "Error de compilación: \"arriba\" no pertenece a la unión",
+      "Se asigna sin problema",
+      "Queda undefined",
+      "Se convierte a string"
+    ],
+    correct: 0,
+    exp: "`Direccion` solo admite \"norte\" o \"sur\": \"arriba\" no compila. Los tipos literales atrapan valores inválidos en tiempo de compilación.",
+    claseError: "sintaxis"
+  },
+  {
+    id: "TS-073",
+    parcial: "Tipos y genéricos",
+    tema: "Non-null assertion",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué hace `valor!.toString()`?",
+    options: [
+      "Le dice a TypeScript que valor no es null/undefined, sin comprobarlo en runtime",
+      "Lanza un error si valor es null",
+      "Convierte null en string",
+      "Comprueba el tipo en runtime"
+    ],
+    correct: 0,
+    exp: "El `!` es una afirmación, no una comprobación: si valor es null en runtime, igual revienta. Es un atajo peligroso que suele esconder el bug.",
+    claseError: "silencioso"
+  },
+  {
+    id: "TS-074",
+    parcial: "Tipos y genéricos",
+    tema: "Genéricos",
+    dificultad: "dificil",
+    tipo: "codigo",
+    q: "¿Qué devuelve `primero([10, 20, 30])`?",
+    codigo: "function primero<T>(lista: T[]): T | undefined {\n  return lista[0];\n}\nconsole.log(primero([10, 20, 30]));",
+    options: ["10", "30", "undefined", "Error"],
+    correct: 0,
+    exp: "`lista[0]` es 10 y el tipo de retorno `T | undefined` recuerda que un arreglo puede estar vacío. Devolver undefined es correcto, no un bug.",
+    claseError: "logica"
   }
 ];
 
