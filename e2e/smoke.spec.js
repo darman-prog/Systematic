@@ -421,4 +421,25 @@ test.describe('Systematic — smoke', () => {
     expect(almacenado.meta).toBe('30');
     expect(almacenado.flag).toBeTruthy();
   });
+
+  test('el contenido de cada track se carga bajo demanda, no en el chunk inicial', async ({ page }) => {
+    // Gate del lazy loading (spec 012): abrir un track solo debe descargar el chunk
+    // de ese track, no los de los demás. Contamos requests a /assets/*.js.
+    await page.goto('/');
+    const assetsRequests = [];
+    page.on('request', r => {
+      const u = r.url();
+      if (u.includes('/assets/') && u.endsWith('.js')) assetsRequests.push(u);
+    });
+
+    await page.locator('#materias-list .materia-card').first().click(); // BD2
+    await expect(page.locator('#stat-total')).toHaveText('90');
+
+    // Tras abrir BD2, ningún chunk de otro track (isw/asw/infra) debió descargarse.
+    for (const u of assetsRequests) {
+      expect(/isw|asw|infra/i.test(u), `chunk de otro track cargado al abrir BD2: ${u}`).toBe(false);
+    }
+    // Y el de BD2 sí debe haberse pedido (confirmar que el mecanismo funciona).
+    expect(assetsRequests.length).toBeGreaterThan(0);
+  });
 });

@@ -1,27 +1,21 @@
-﻿// Registro de materias de la app. El contenido vive en src/datos/<materia>/.
-import bd2Preguntas from "../datos/bd2/preguntas.js";
-import bd2Glosario from "../datos/bd2/glosario.js";
-import bd2Escenarios from "../datos/bd2/escenarios.js";
-import bd2Casos from "../datos/bd2/casos.js";
+﻿// Registro de tracks de la app (materias hoy; lenguajes en el futuro, spec 011).
+// Solo guarda metadatos y conteos: el contenido pesado (preguntas, glosario, apuntes,
+// escenarios, casos) se carga bajo demanda desde src/datos/<id>/index.js (spec 012).
+// Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
-import iswPreguntas from "../datos/isw/preguntas.js";
-import iswGlosario from "../datos/isw/glosario.js";
-import iswApuntes from "../datos/isw/apuntes.js";
-import iswEscenarios from "../datos/isw/escenarios.js";
-import iswCasos from "../datos/isw/casos.js";
-import aswPreguntas from "../datos/asw/preguntas.js";
-import aswGlosario from "../datos/asw/glosario.js";
-import aswApuntes from "../datos/asw/apuntes.js";
-import aswEscenarios from "../datos/asw/escenarios.js";
-import aswCasos from "../datos/asw/casos.js";
-import infraPreguntas from "../datos/infra/preguntas.js";
-import infraGlosario from "../datos/infra/glosario.js";
-import infraApuntes from "../datos/infra/apuntes.js";
-import infraEscenarios from "../datos/infra/escenarios.js";
-import infraCasos from "../datos/infra/casos.js";
 
-// accentText: color de texto sobre superficies pintadas con `color` (botones primarios).
-// Los valores cumplen WCAG AA sobre su propio color de fondo.
+export async function cargarContenido(materia) {
+  const mod = await materia.cargar();
+  return {
+    preguntas: mod.preguntas ?? [],
+    glosario: mod.glosario ?? { categorias: [], terminos: [], tips: [] },
+    apuntes: mod.apuntes ?? [],
+    escenarios: mod.escenarios ?? [],
+    casos: mod.casos ?? [],
+  };
+}
+
+// tipo: clasifica el track para la UI y el mezclado (spec 011/012).
 export const MATERIAS = [
   {
     id: "bd2",
@@ -30,13 +24,11 @@ export const MATERIAS = [
     descripcion: "SQL, modelado, índices, integridad y consultas.",
     color: "#9FC5DA",
     accentText: "#F7F6F1",
-    preguntas: bd2Preguntas,
-    glosario: bd2Glosario,
-    apuntes: [],
-    escenarios: bd2Escenarios,
-    casos: bd2Casos,
+    tipo: "materia",
+    conteo: { preguntas: 90, terminos: 42, apuntes: 0, escenarios: 1, casos: 2 },
     topicColors: bd2TopicColors,
-    sqlKeywords: bd2SqlKeywords
+    sqlKeywords: bd2SqlKeywords,
+    cargar: () => import("../datos/bd2/index.js"),
   },
   {
     id: "isw",
@@ -45,11 +37,9 @@ export const MATERIAS = [
     descripcion: "Procesos, Scrum, requerimientos y diseño de software.",
     color: "#A094BA",
     accentText: "#E7E5DE",
-    preguntas: iswPreguntas,
-    glosario: iswGlosario,
-    apuntes: iswApuntes,
-    escenarios: iswEscenarios,
-    casos: iswCasos
+    tipo: "materia",
+    conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 },
+    cargar: () => import("../datos/isw/index.js"),
   },
   {
     id: "asw",
@@ -58,11 +48,9 @@ export const MATERIAS = [
     descripcion: "POO, principios de diseño, SOLID y patrones.",
     color: "#FA9B9B",
     accentText: "#101418",
-    preguntas: aswPreguntas,
-    glosario: aswGlosario,
-    apuntes: aswApuntes,
-    escenarios: aswEscenarios,
-    casos: aswCasos
+    tipo: "materia",
+    conteo: { preguntas: 48, terminos: 19, apuntes: 7, escenarios: 1, casos: 2 },
+    cargar: () => import("../datos/asw/index.js"),
   },
   {
     id: "infra",
@@ -71,11 +59,9 @@ export const MATERIAS = [
     descripcion: "Comandos de Linux, permisos, SSH y redes Cisco.",
     color: "#7FC8B0",
     accentText: "#101418",
-    preguntas: infraPreguntas,
-    glosario: infraGlosario,
-    apuntes: infraApuntes,
-    escenarios: infraEscenarios,
-    casos: infraCasos
+    tipo: "materia",
+    conteo: { preguntas: 124, terminos: 45, apuntes: 6, escenarios: 5, casos: 0 },
+    cargar: () => import("../datos/infra/index.js"),
   }
 ];
 
@@ -83,8 +69,6 @@ export function getMateria(id) {
   return MATERIAS.find(m => m.id === id) || null;
 }
 
-// Par de acento con fallbacks: nunca devuelve undefined aunque la materia
-// no declare accentText o se llame con materia nula (pantalla de materias).
 export const ACENTO_BASE = { color: "#9BB8C9", texto: "#101418" };
 
 export function acentoDe(materia) {
@@ -95,11 +79,16 @@ export function acentoDe(materia) {
   };
 }
 
-export function getRegistroParaMezclador() {
-  return MATERIAS.map(materia => ({
-    id: materia.id,
-    nombre: materia.nombre,
-    // Inyectamos materiaId en cada pregunta para trazabilidad en stats/logs
-    preguntas: materia.preguntas.map(p => ({ ...p, materiaId: materia.id }))
-  }));
+// Asíncrona: el contenido ya no vive en MATERIAS (spec 012).
+export async function getRegistroParaMezclador() {
+  const registros = [];
+  for (const materia of MATERIAS) {
+    const contenido = await cargarContenido(materia);
+    registros.push({
+      id: materia.id,
+      nombre: materia.nombre,
+      preguntas: contenido.preguntas.map(p => ({ ...p, materiaId: materia.id }))
+    });
+  }
+  return registros;
 }

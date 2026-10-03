@@ -7,7 +7,7 @@
 //
 //   node scripts/revision-contenido.mjs            → resumen de todas las materias
 //   node scripts/revision-contenido.mjs infra      → detalle de una materia
-import { MATERIAS } from "../src/core/materias.js";
+import { MATERIAS, cargarContenido } from "../src/core/materias.js";
 import { validarTodo } from "./validador.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -137,9 +137,13 @@ function imprimirMateria(m) {
   }
 }
 
-function main() {
+async function main() {
   const baseDir = process.cwd();
-  const { errores, resumen } = validarTodo(MATERIAS, {
+  // Cargar el contenido bajo demanda (spec 012): MATERIAS solo tiene metadatos.
+  const cargadas = [];
+  for (const m of MATERIAS) cargadas.push({ ...m, ...(await cargarContenido(m)) });
+
+  const { errores, resumen } = validarTodo(cargadas, {
     existeFuente: f => fs.existsSync(path.resolve(baseDir, f))
   });
   if (errores.length) {
@@ -149,19 +153,19 @@ function main() {
 
   const solo = process.argv[2];
   if (solo) {
-    const m = MATERIAS.find(x => x.id === solo);
+    const m = cargadas.find(x => x.id === solo);
     if (!m) {
-      console.error(`✖ no existe la materia "${solo}". Disponibles: ${MATERIAS.map(x => x.id).join(", ")}`);
+      console.error(`✖ no existe la materia "${solo}". Disponibles: ${cargadas.map(x => x.id).join(", ")}`);
       process.exit(1);
     }
     imprimirMateria(m);
   } else {
-    imprimirResumen(MATERIAS);
+    imprimirResumen(cargadas);
     console.log(`\nTotal: ${resumen.materias} materias · ${resumen.preguntas} preguntas · ${resumen.terminos} términos.`);
     console.log("Detalle de una materia: node scripts/revision-contenido.mjs <id>");
   }
 
-  const avisos = MATERIAS.flatMap(m => analizarMateria(m).avisos);
+  const avisos = cargadas.flatMap(m => analizarMateria(m).avisos);
   if (avisos.length) {
     console.log(`\n${avisos.length} aviso(s) de calidad en total.`);
   }

@@ -2,19 +2,26 @@
 // opciones duplicadas o explicaciones vacías, la suite falla. Los avisos (temas con
 // pocas preguntas, enunciados repetidos) se informan pero no bloquean: se revisan a mano.
 import { describe, it, expect } from "vitest";
-import { MATERIAS } from "../src/core/materias.js";
+import { MATERIAS, cargarContenido } from "../src/core/materias.js";
 import { analizarMateria, formatearPregunta, indicesCorrectos } from "./revision-contenido.mjs";
 
+// Carga el contenido de cada track bajo demanda (spec 012) y lo fusiona con los metadatos.
+async function cargadas() {
+  const out = [];
+  for (const m of MATERIAS) out.push({ ...m, ...(await cargarContenido(m)) });
+  return out;
+}
+
 describe("revisión de contenido", () => {
-  it("no deja errores de calidad en ninguna materia", () => {
-    const errores = MATERIAS.flatMap(m =>
+  it("no deja errores de calidad en ninguna materia", async () => {
+    const errores = (await cargadas()).flatMap(m =>
       analizarMateria(m).avisos.filter(a => a.nivel === "error").map(a => `[${m.id}] ${a.id}: ${a.msg}`)
     );
     expect(errores).toEqual([]);
   });
 
-  it("detecta avisos en el banco real (el chequeo no está ciego)", () => {
-    const avisos = MATERIAS.flatMap(m => analizarMateria(m).avisos);
+  it("detecta avisos en el banco real (el chequeo no está ciego)", async () => {
+    const avisos = (await cargadas()).flatMap(m => analizarMateria(m).avisos);
     expect(avisos.length).toBeGreaterThan(0);
   });
 

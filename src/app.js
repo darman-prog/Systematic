@@ -1,4 +1,4 @@
-﻿import { MATERIAS, getMateria } from "./core/materias.js";
+﻿import { MATERIAS, getMateria, cargarContenido, acentoDe } from "./core/materias.js";
 import { crearMezclador, storeLocalStorage } from "./core/mezclador.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
@@ -26,7 +26,7 @@ import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
-import { acentoDe } from "./core/materias.js";
+// import { acentoDe } from "./core/materias.js";
 
 
 const mezclador = crearMezclador({
@@ -778,8 +778,8 @@ function renderMaterias() {
   if (saludo) saludo.textContent = saludoSegunHora(persistencia.nombre());
 
   cont.innerHTML = MATERIAS.map(m => {
-    const n = m.preguntas.length;
-    const nGlosario = m.glosario.terminos ? m.glosario.terminos.length : 0;
+    const n = m.conteo?.preguntas ?? 0;
+    const nGlosario = m.conteo?.terminos ?? 0;
     const pendiente = n === 0;
 
     const detalles = pendiente
@@ -817,14 +817,23 @@ function irMaterias() {
   renderPerfil();
 }
 
-function seleccionarMateria(id) {
+async function seleccionarMateria(id) {
   const m = getMateria(id);
   if (!m) return;
-  materia = m;
-  banco = m.preguntas;
-  glosario = m.glosario;
-  aplicarAcento(m);
-  persistencia.migrarLegacy(m.id);
+
+  // Cargar el contenido del track bajo demanda (spec 012) antes de navegar: los
+  // chunks son pequeños y llevan hash inmutable, así que después del primer paint
+  // los sirve la caché HTTP. Cargar antes evita el parpadeo de stats en 0.
+  // Se adjunta al objeto materia para que la UI (escenarios, casos, apuntes, glosario)
+  // siga leyendo de materia.* sin cambios (app.js:507,546,873).
+  const contenido = await cargarContenido(m);
+  materia = { ...m, ...contenido };
+
+  aplicarAcento(materia);
+  persistencia.migrarLegacy(materia.id);
+
+  banco = contenido.preguntas;
+  glosario = contenido.glosario;
   progreso = cargarProgreso();
   inicializarFiltros();
   renderConfig();
