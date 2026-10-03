@@ -63,7 +63,8 @@ export function crearPersistencia(storage) {
     guardarMisiones: (materiaId, valor) => escribir(claveMisiones(materiaId), valor),
     // Competencia por lenguaje: estado por etapa { aprobado, version, ultimoPct, intentos }.
     competencia: lenguajeId => leer(claveCompetencia(lenguajeId), {}),
-    guardarCompetencia: (lenguajeId, valor) => escribir(claveCompetencia(lenguajeId), valor),    escenarios: () => leer(CLAVES_GLOBALES.escenarios, {}),
+    guardarCompetencia: (lenguajeId, valor) => escribir(claveCompetencia(lenguajeId), valor),
+    escenarios: () => leer(CLAVES_GLOBALES.escenarios, {}),
     guardarEscenarios: valor => escribir(CLAVES_GLOBALES.escenarios, valor),
     casos: () => leer(CLAVES_GLOBALES.casos, {}),
     guardarCasos: valor => escribir(CLAVES_GLOBALES.casos, valor),
