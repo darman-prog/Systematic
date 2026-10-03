@@ -1,33 +1,35 @@
 # AGENTS.md — Systematic
 
 App de estudio para materias de ingeniería (Base de Datos 2, Ingeniería de Software,
-Arquitectura de Software): práctica tipo quiz, simulacro, modo estudio, flashcards, glosario y
-apuntes. Sitio estático desplegado en Vercel.
+Arquitectura de Software, Infraestructura) y un track de **lenguajes de programación**
+(TypeScript) para leer y verificar código generado por IA. Práctica tipo quiz, simulacro, modo
+estudio, flashcards, glosario, apuntes, escenarios, casos y competencia por etapas. Sitio estático
+desplegado en Vercel.
 
 ## Stack
 
 - Frontend: JavaScript vanilla (sin framework) + HTML estático.
 - Build: Vite. Estilos: Tailwind CSS 3.4 local (sin CDN en runtime).
-- Datos: módulos JS en `src/datos/<materia>/` (`preguntas.js`, `glosario.js`, `apuntes.js`).
-- Persistencia: `localStorage` con namespace `sys.*.<materiaId>` (sin backend ni cuentas).
-- Tests: Vitest (unitario) y Playwright (smoke E2E). Validación de datos: `scripts/validar-datos.mjs`.
+- Datos: módulos JS en `src/datos/<track>/` (`preguntas.js`, `glosario.js`, `apuntes.js`,
+  `roadmap.js`); carga bajo demanda con `import()` dinámico (un chunk por track).
+- Dominio: `src/core/` (incluye `competencia.js`: barra y gate de etapas de un lenguaje).
+- Persistencia: `localStorage` con namespace `sys.*` (sin backend ni cuentas).
+- Tests: Vitest (unitario) y Playwright (E2E). Validación de datos: `scripts/validar-datos.mjs`.
 - Deploy: Vercel (preset Vite, salida `dist/`).
 
 ## Estructura
 
 - `index.html` — shell de la app (pantallas y contenedores; acciones vía `data-action`, sin `onclick` inline).
-- `src/app.js` — orquestación: estado, navegación, persistencia por materia y mapa de acciones delegadas
-  (antes todo el JS vivía inline en `app.html`).
-- `src/core/` — dominio testeable: materias (registro), progreso (localStorage inyectado), sesiones.
-  Sin DOM ni ids de materia incrustados.
-- `src/ui/` — render por pantalla (quiz, resultados, stats, estudio, glosario, flashcards, apuntes) con
-  helpers compartidos; recibe estado por parámetro, no toca `localStorage` ni `src/datos/`.
-- `src/estilos/entrada.css` — Tailwind + estilos de la app.
-- `src/datos/` — contenido por materia (incluye presentación: colores de tema, keywords).
-- `scripts/` — utilidades Node.js (validador de datos).
+- `src/app.js` — composición: estado, navegación, persistencia por track y mapa de acciones delegadas.
+- `src/core/` — dominio puro: `materias.js` (registro de tracks), `competencia.js`, `progreso.js`,
+  `sesiones.js`, `gamificacion.js`, `escenarios.js`, `diagramas.js`. Sin DOM ni localStorage.
+- `src/student/` — servicios de aplicación con dependencias inyectadas (persistencia, gamificación).
+- `src/ui/` — render por pantalla/componente; recibe estado por parámetro, no toca `localStorage`.
+- `src/estilos/` — Tailwind + parciales (`tokens`, `componentes`, `pantallas`, `lienzo`).
+- `src/datos/` — contenido por track (incluye presentación: colores de tema, keywords).
+- `scripts/` — utilidades Node.js (validador de datos, revisión de contenido).
 - `e2e/` — pruebas Playwright.
-- `docs/specs/` — specs (formato de la skill `ingenieria-software`).
-- `docs/adr/` — decisiones de arquitectura (formato Contexto/Decisión/Consecuencias/Alternativas).
+- `docs/specs/`, `docs/adr/`, `docs/project-brain/` — specs, decisiones y cerebro documental.
 - `BancoDeInformacion/` — material fuente (`*.md` convertidos; PDF/PPTX/DOCX no se versionan).
 
 ## Comandos
@@ -35,21 +37,80 @@ apuntes. Sitio estático desplegado en Vercel.
 - `npm run dev` — servidor de desarrollo.
 - `npm run build` — build de producción a `dist/`.
 - `npm run preview` — sirve el build local.
-- `npm run validar` — valida el schema de datos de todas las materias.
+- `npm run validar` — valida el schema de datos de todos los tracks.
+- `npm run revision` — revisión de calidad de contenido (avisos, no bloquea).
 - `npm run test` — Vitest (unitario).
-- `npm run e2e` — Playwright (smoke sobre el build).
+- `npm run e2e` — Playwright (E2E sobre el build).
+
+## Skill Gate (obligatorio antes de leer, buscar o editar)
+
+Antes de la primera accion: identifica skills con la tabla, carga cada una con la herramienta `skill` (este archivo NO sustituye a la skill) y declara en tu primer mensaje `Skills: <cargadas>`; si omites una candidata, `omitida <nombre>: <motivo>`. Si coinciden varias señales, combina sus skills; carga solo las obligatorias al inicio y las opcionales cuando apliquen. Toda escritura o modificación de código carga `code-clue`, sin que el usuario tenga que pedir comentarios.
+
+| Tipo de tarea | Obligatoria | Opcional (solo si aplica) |
+| --- | --- | --- |
+| Toda tarea (buscar, leer, planificar, responder) | `uso-eficiente`, `comunicacion-asertiva` | — |
+| Escribir o modificar código (cualquier lenguaje o proyecto) | `code-clue` | — |
+| Definir producto, alcance, MVP, roadmap o prioridades | `criterio-proyecto` | `ingenieria-software` |
+| Plan técnico, dependencias, spike/POC | `ingenieria-software` | `arquitectura` |
+| Feature backend, dominio o API | `arquitectura`, `convenciones-backend` | `contratos-api`, `base-datos`, `microservicios` |
+| Código frontend sin cambio visual | `convenciones-frontend` | `accesibilidad` |
+| Cambio UI visible o interactivo | `ui-ux`, `impeccable`, `impeccable-doctrina` | `convenciones-frontend`, `accesibilidad`, `frontend-design-review` |
+| Bug no trivial o intermitente | `debugging` | `testing`, `code-quality` |
+| Refactor o deuda técnica | `refactoring` | `code-quality`, `testing` |
+| Escribir o revisar tests | `testing` | `tdd` |
+| Esquema, migraciones o seeds | `base-datos` | `seguridad` |
+| Auth, inputs, secretos, validación o CORS | `seguridad` | `contratos-api` |
+| Investigación de hechos externos o actuales | `investigacion-web` | — |
+| Analizar datasets, CSV/JSON o métricas | `analisis-datos` | — |
+| Automatizar tareas repetitivas con scripts | `automatizacion` | — |
+| Usar Notion, Playwright u otra herramienta MCP | `activacion-mcp` | — |
+| README, ADR, guía, tutorial o taller | `documentacion` | `contexto-proyecto` |
+| Onboarding de proyecto o cambio en `docs/project-brain/` | `inicio-proyecto`, `contexto-proyecto` | — |
+| Deploy, pipeline o rollback | `despliegue` | `infraestructura` |
+| Docker, Compose o editar IaC/manifiestos | `infraestructura` | `despliegue` |
+| Medir u optimizar rendimiento | `performance` | `observabilidad`, `code-quality` |
+| Instrumentar logs, métricas o trazas | `observabilidad` | `debugging` |
+| Editar `.opencode/` (agentes, skills, config) | `customize-opencode` | — |
+| Auditar el harness (skills, agentes, scripts, permisos); pre-flight con `auditor` | `customize-opencode` | `testing` |
+| Cierre de implementación o cambio | `calidad-cierre` | `testing`, `seguridad` |
+| Commits, ramas o PRs | `workflow` | — |
+| Manuales, solo por petición explícita | `habilidades-ofimaticas`, `informe-docx` | — |
+
+Regla anti-omision: si la `description` de una skill menciona un verbo o dominio presente en la tarea, cargala aunque creas conocerla o este resumida aqui.
+
+## Estilo de respuesta (obligatorio para todos los agentes)
+Formato por defecto (perfil del usuario: directo, sin rodeos):
+1. **Primera linea = veredicto**: `Hecho:` / `Pendiente:` / `Bloqueado:` + resumen en una frase.
+2. **Maximo 5 bullets** con lo esencial: que se hizo, que falta, que decision tuya falta.
+3. Termina si hace falta con `¿Detallo algo?`; nunca expandas sin que te lo pidan.
+Excepciones (detalle COMPLETO aunque rompa el limite): preguntas de clarificacion, planes, ADRs y docs; hallazgos BLOCKER, riesgos de seguridad/perdida de datos o decisiones irreversibles. Prohibido: preambulos, repetir el plan, re-explicar lo ya dicho. Doctrina de redaccion, densidad y diagramas: skill `comunicacion-asertiva` (en preguntas puras responde sin etiquetas; respeta "modo detallado" como override del usuario).
+
+## Definition of Done
+Canonica en la skill `workflow` (lint/typecheck/tests, diff, secretos, cambios enfocados con tests, docs, contratos API, UI+impeccable). No la dupliques.
+
+## Tokens y contexto
+Reglas en la skill `uso-eficiente`; detalle en su `references/TOKEN-SAVING.md` (leerlo en exploracion amplia). `grep`/`glob` antes que `read`; no re-leas archivos ya vistos: este archivo es cache. **Ante la duda:** lee este archivo y `docs/project-brain/INDEX.md` antes de preguntar o asumir. **Fuera del repo:** no explores rutas externas salvo que la tarea nombre la ruta o el repo no responda.
+
+## Manejo de `.gitignore`
+Puedes crear `.gitignore` (raiz o subdirectorios) y agregar entradas. **Nunca elimines ni sobrescribas las existentes**: si hay conflicto, consulta al usuario.
+
+## Agentes
+- Primarios (Tab): `build`, `plan`.
+- Subagentes (Task/@): `ui-ux` (frontend, edita), `backend-expert` (solo analiza y planifica), `auditor`, `tester`, `quality`, `debugger`, `explore`. No invocan a nadie: reportan y quien los delego decide.
+- `calidad-cierre` es el gate de cierre (delegable); no sustituye `testing`, `seguridad`, `auditor` ni las skills de diseño.
+- Modelos se asignan manualmente por agente.
 
 ## Convenciones
 
 - Código e identificadores técnicos en inglés; contenido de estudio y UI en español.
 - Archivos en `kebab-case`. Ids de BD2 (`P1-*`) se conservan; materias nuevas usan prefijo
-  `ISW-*` / `ASW-*` / `INF-*`.
-- Contenido de materias nuevas: derivado únicamente de los `.md` de `BancoDeInformacion/`,
-  con revisión humana por lote antes de commitear.
-- Commits: Conventional Commits (`feat`, `fix`, `chore`, `build`, `test`, `docs`), uno por paso
-  de plan; skills `workflow` y `uso-eficiente` como referencia.
-- Editar archivos solo con herramientas que preserven UTF-8. Nunca hacer round-trips
-  `Get-Content`/`Set-Content` de PowerShell 5.1: corrompen acentos y símbolos ( UTF-8 → U+FFFD).
+  `ISW-*` / `ASW-*` / `INF-*`; el track de lenguajes usa `TS-*`.
+- Contenido de materias nuevas: derivado de los `.md` de `BancoDeInformacion/` con revisión humana
+  por lote. Excepción registrada (spec 011): el currículo de TypeScript es material propio revisado.
+- Commits: Conventional Commits (`feat`, `fix`, `refactor`, `style`, `chore`, `test`, `docs`), uno
+  por paso de plan; skills `workflow` y `uso-eficiente` como referencia.
+- Editar archivos solo con herramientas que preserven UTF-8. Nunca round-trips
+  `Get-Content`/`Set-Content` de PowerShell 5.1: corrompen acentos y símbolos (UTF-8 → U+FFFD).
 - Sin secretos ni `.env` versionados; sin dependencias CDN en runtime.
 
 ## Deploy
