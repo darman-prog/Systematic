@@ -579,11 +579,13 @@ function next() {
 
 function salir() {
   if (!confirm("¿Salir? Se perderá el avance de esta ronda.")) return;
+  // Una sesión lanzada desde el mapa de etapas vuelve ahí; la práctica libre, al dashboard.
+  const desdeEtapas = !!(sesiones.sesion && sesiones.sesion.lenguajeId);
   clearTimer();
   clearTimerPregunta();
   sesiones.limpiar();
   $("pause-overlay").classList.add("hidden");
-  goHome();
+  if (desdeEtapas) irLenguaje(); else goHome();
 }
 
 function iniciarTimer(segundos) {
@@ -792,6 +794,10 @@ function goHome() {
   // ella con "Salir") la portada y el tema deben ser del track vigente, no de la última
   // materia visitada.
   if (track.materia) renderMateriaUI();
+  // En un track de lenguaje el dashboard es la práctica libre: dejar a mano el acceso al
+  // mapa de etapas (en una materia no aplica y se oculta).
+  const btnEtapas = $("btn-etapas");
+  if (btnEtapas) btnEtapas.classList.toggle("hidden", !track.lenguaje);
   show("start");
   renderStats();
   renderHistory();

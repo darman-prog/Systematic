@@ -64,7 +64,10 @@
         <p class="text-xs text-slate-400" id="portada-sub"></p>
       </div>
     </div>
-    <button class="btn btn-ghost btn-sm mb-2" data-action="irMaterias">← Materias</button>
+    <div class="flex gap-2 flex-wrap mb-2">
+      <button class="btn btn-ghost btn-sm hidden" id="btn-etapas" data-action="irLenguaje">← Etapas</button>
+      <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+    </div>
     <p class="subtitle">
       Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
       Preguntas y opciones aleatorias, con explicación en cada respuesta.
@@ -254,7 +257,10 @@
   <section id="screen-lenguaje" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
       <h1 class="text-xl sm:text-2xl font-bold" id="lenguaje-nombre">Lenguaje</h1>
-      <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-ghost btn-sm" data-action="goHome">Práctica libre</button>
+        <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+      </div>
     </div>
     <div id="lenguaje-competencia" class="mb-4"></div>
     <p class="subtitle">Avanzá por etapas: cada prueba te prepara y el examen desbloquea la siguiente.</p>
