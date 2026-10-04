@@ -27,6 +27,7 @@ import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
+import { crearTrack } from "./student/track.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
 
 
@@ -52,19 +53,10 @@ pintarIconos();
 const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").matches;
 const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 
-// Materia activa y datos asociados (se definen al seleccionar materia en el home).
-let materia = null;
-let banco = [];
-let glosario = { categorias: [], terminos: [], tips: [] };
-
-// Track de lenguaje activo (spec 011): contenido, roadmap y competencia por etapa.
-let lenguaje = null;
-let lenguajeContenido = null;
-let competencia = {};
-
+// Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
+// (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
 let progreso = {};
 let session = null;
-let filtros = { parciales: new Set(), temas: new Set(), dificultades: new Set(), tipos: new Set(), soloDebiles: false, soloMarcadas: false, priorizar: true };
 let escenarioActual = null;
 let escenarioEstado = null;
 
@@ -92,23 +84,30 @@ const gamificacion = crearGamificacion({
 // Renderers del home (materias, lenguajes y perfil) extraídos a ui/dashboard (ADR 007).
 const home = crearHome({ persistencia, gamificacion });
 
+// Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
+const track = crearTrack({
+  persistencia, TIPOS, esDebil,
+  obtenerP, filtrarDiagramas, diagramasDisponibles
+});
+
 // Estado explícito que se inyecta a los módulos de src/ui/ (lectura vía getters,
 // porque estas variables se reasignan al cambiar de materia o de sesión).
 const ctx = {
   get session() { return session; },
-  get banco() { return banco; },
-  get glosario() { return glosario; },
-  get materia() { return materia; }
+  get banco() { return track.banco; },
+  get glosario() { return track.glosario; },
+  get materia() { return track.materia; }
 };
 
 // Config de práctica y pantalla de apuntes (extraídas de app.js, ADR 007).
 const config = crearConfig({
-  getFiltros: () => filtros,
-  valoresDe, contarPor, leerOpciones, preguntasFiltradas,
+  getFiltros: () => track.filtros,
+  valoresDe: track.valoresDe, contarPor: track.contarPor,
+  leerOpciones, preguntasFiltradas,
   diagramasDisponibles, TIPO_LABELS, DIF_LABELS,
   mostrarPantalla: show
 });
-const apuntesUI = crearApuntesUI({ getMateria: () => materia, mostrarPantalla: show });
+const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
 
 function show(screen) {
     ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje"].forEach(s =>
@@ -119,11 +118,11 @@ function show(screen) {
 }
 
 function cargarProgreso() {
-  return persistencia.progreso(materia.id);
+  return persistencia.progreso(track.materia.id);
 }
 
 function guardarProgreso() {
-  persistencia.guardarProgreso(materia.id, progreso);
+  persistencia.guardarProgreso(track.materia.id, progreso);
 }
 
 function obtenerP(id) {
@@ -134,22 +133,22 @@ function obtenerP(id) {
 const priorizar = lista => ordenarPrioridad(lista, obtenerP);
 
 function cargarActividad() {
-  return persistencia.actividad(materia.id);
+  return persistencia.actividad(track.materia.id);
 }
 
 function registrarActividad() {
   const a = cargarActividad();
   const h = hoyISO();
   a[h] = (a[h] || 0) + 1;
-  persistencia.guardarActividad(materia.id, a);
+  persistencia.guardarActividad(track.materia.id, a);
 }
 
 function cargarMeta() {
-  return persistencia.meta(materia.id);
+  return persistencia.meta(track.materia.id);
 }
 
 function cambiarMeta(valor) {
-  persistencia.guardarMeta(materia.id, valor);
+  persistencia.guardarMeta(track.materia.id, valor);
   renderStats();
 }
 
@@ -188,11 +187,11 @@ function toggleMarked(id) {
 }
 
 function cargarHistorial() {
-  return persistencia.historial(materia.id);
+  return persistencia.historial(track.materia.id);
 }
 
 function clearHistory() {
-  persistencia.borrarHistorial(materia.id);
+  persistencia.borrarHistorial(track.materia.id);
   renderHistory();
   renderStats();
 }
@@ -200,23 +199,23 @@ function clearHistory() {
 function resetProgreso() {
   if (!confirm("¿Borrar todo el progreso de esta materia? Se eliminan aciertos, fallos, marcas, racha, historial de intentos y misiones. Tu XP y logros globales se conservan.")) return;
   progreso = {};
-  persistencia.reiniciarMateria(materia.id);
+  persistencia.reiniciarMateria(track.materia.id);
   renderStats();
   renderHistory();
 }
 
 function exportarDatos() {
   // En un track de lenguaje se exporta la competencia; en una materia, su progreso.
-  const esLenguaje = !!lenguaje;
+  const esLenguaje = !!track.lenguaje;
   const datos = {
     app: "systematic",
     version: 2,
     exportado: new Date().toISOString(),
     nombre: persistencia.nombre(),
     ...(esLenguaje
-      ? { lenguaje: lenguaje.id, competencia: persistencia.competencia(lenguaje.id) }
+      ? { lenguaje: track.lenguaje.id, competencia: persistencia.competencia(track.lenguaje.id) }
       : {
-          materia: materia.id,
+          materia: track.materia.id,
           progreso: cargarProgreso(),
           historial: cargarHistorial(),
           actividad: cargarActividad(),
@@ -227,7 +226,7 @@ function exportarDatos() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "systematic-" + (esLenguaje ? lenguaje.id : materia.id) + "-" + hoyISO() + ".json";
+  a.download = "systematic-" + (esLenguaje ? track.lenguaje.id : track.materia.id) + "-" + hoyISO() + ".json";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -249,7 +248,7 @@ function importarDatos(input) {
 
       // Import de competencia de un lenguaje.
       if (esCompetencia) {
-        if (!lenguaje) {
+        if (!track.lenguaje) {
           alert("Este archivo es de un lenguaje. Entrá al lenguaje para importarlo.");
           return;
         }
@@ -257,29 +256,29 @@ function importarDatos(input) {
         const valida = Object.values(datos.competencia).every(r =>
           r && typeof r === "object" && typeof r.aprobado === "boolean" && Number.isInteger(r.version));
         if (!valida) throw new Error("formato");
-        if (datos.lenguaje && datos.lenguaje !== lenguaje.id &&
-            !confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + lenguaje.nombre + "»?")) return;
+        if (datos.lenguaje && datos.lenguaje !== track.lenguaje.id &&
+            !confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + track.lenguaje.nombre + "»?")) return;
         if (!confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
-        competencia = datos.competencia;
-        persistencia.guardarCompetencia(lenguaje.id, competencia);
+        track.setCompetencia(datos.competencia);
+        persistencia.guardarCompetencia(track.lenguaje.id, track.competencia);
         pintarLenguaje();
         alert("Competencia importada correctamente.");
         return;
       }
 
       // Import de materia: no se permite estando dentro de un lenguaje (claves distintas).
-      if (lenguaje) {
+      if (track.lenguaje) {
         alert("Este archivo es de una materia. Entrá a la materia para importarlo.");
         return;
       }
-      if (esMateria && datos.materia && datos.materia !== materia.id &&
-          !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + materia.nombre + "»?")) return;
+      if (esMateria && datos.materia && datos.materia !== track.materia.id &&
+          !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + track.materia.nombre + "»?")) return;
       if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
       progreso = datos.progreso || {};
-      persistencia.guardarProgreso(materia.id, progreso);
-      if (datos.historial) persistencia.guardarHistorial(materia.id, datos.historial);
-      if (datos.actividad) persistencia.guardarActividad(materia.id, datos.actividad);
-      if (datos.meta) persistencia.guardarMeta(materia.id, datos.meta);
+      persistencia.guardarProgreso(track.materia.id, progreso);
+      if (datos.historial) persistencia.guardarHistorial(track.materia.id, datos.historial);
+      if (datos.actividad) persistencia.guardarActividad(track.materia.id, datos.actividad);
+      if (datos.meta) persistencia.guardarMeta(track.materia.id, datos.meta);
       if (typeof datos.nombre === "string") persistencia.guardarNombre(datos.nombre);
       goHome();
       alert("Progreso importado correctamente.");
@@ -295,55 +294,30 @@ function importarDatos(input) {
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
 // Perfil y contador de XP: renderPerfil vive en ui/dashboard/home.js (ADR 007).
 
-function inicializarFiltros() {
-  filtros.parciales = new Set(banco.map(q => q.parcial));
-  filtros.temas = new Set(banco.map(q => q.tema));
-  filtros.dificultades = new Set(["facil", "media", "dificil"]);
-  filtros.tipos = new Set(TIPOS);
-}
-
-function valoresDe(clave) {
-  if (clave === "parciales") return [...new Set(banco.map(q => q.parcial))];
-  if (clave === "temas") return [...new Set(banco.map(q => q.tema))];
-  if (clave === "dificultades") return ["facil", "media", "dificil"];
-  return TIPOS;
-}
-
-function contarPor(clave, valor) {
-  if (clave === "parciales") return banco.filter(q => q.parcial === valor).length;
-  if (clave === "temas") return banco.filter(q => q.tema === valor).length;
-  if (clave === "dificultades") return banco.filter(q => q.dificultad === valor).length;
-  return banco.filter(q => q.tipo === valor).length;
-}
-
+// Filtros de práctica: el estado y la lógica viven en student/track.js; acá solo queda el
+// puente con el DOM (checkboxes de la config) y el re-render después de cada cambio.
 function leerOpciones() {
-  filtros.soloDebiles = $("cfg-solo-debiles").checked;
-  filtros.soloMarcadas = $("cfg-solo-marcadas").checked;
-  filtros.priorizar = $("cfg-priorizar").checked;
+  track.setOpciones({
+    soloDebiles: $("cfg-solo-debiles").checked,
+    soloMarcadas: $("cfg-solo-marcadas").checked,
+    priorizar: $("cfg-priorizar").checked
+  });
 }
 
 function preguntasFiltradas() {
   leerOpciones();
-  return sinDiagramasEnTactil(banco.filter(q =>
-    filtros.parciales.has(q.parcial) &&
-    filtros.temas.has(q.tema) &&
-    filtros.dificultades.has(q.dificultad) &&
-    filtros.tipos.has(q.tipo) &&
-    (!filtros.soloDebiles || esDebil(obtenerP(q.id))) &&
-    (!filtros.soloMarcadas || obtenerP(q.id).marked)
-  ));
+  return track.preguntasFiltradas();
 }
 
 // Render de la config de práctica: vive en ui/dashboard/config.js (ADR 007).
 
 function toggleFiltro(clave, valor) {
-  if (filtros[clave].has(valor)) filtros[clave].delete(valor);
-  else filtros[clave].add(valor);
+  track.toggleFiltro(clave, valor);
   config.renderConfig();
 }
 
 function toggleFiltroTodos(clave, activar) {
-  filtros[clave] = activar ? new Set(valoresDe(clave)) : new Set();
+  track.toggleFiltroTodos(clave, activar);
   config.renderConfig();
 }
 
@@ -413,7 +387,7 @@ function comenzarPractica() {
   const qs = preguntasFiltradas();
   if (!qs.length) return;
   const cant = Math.min(parseInt($("cfg-cantidad").value, 10) || qs.length, qs.length);
-  const lista = filtros.priorizar ? priorizar(qs) : shuffle(qs);
+  const lista = track.filtros.priorizar ? priorizar(qs) : shuffle(qs);
   startSession(lista.slice(0, cant), "practica", false);
 }
 
@@ -426,20 +400,20 @@ function comenzarSimulacro() {
 
 function startContrarreloj() {
   // El desarrollo se autoevalúa sin prisa: se excluye del modo contrarreloj.
-  const lista = shuffle(banco.filter(q => q.tipo !== "desarrollo")).slice(0, 10);
+  const lista = shuffle(track.banco.filter(q => q.tipo !== "desarrollo")).slice(0, 10);
   if (!lista.length) return;
   startSession(lista, "contrarreloj", false);
 }
 
 function startSupervivencia() {
-  if (!banco.length) return;
-  startSession(shuffle(banco), "supervivencia", false);
+  if (!track.banco.length) return;
+  startSession(shuffle(track.banco), "supervivencia", false);
 }
 
 // ===== Misiones por tema (spec 003): mapa secuencial con estrellas =====
 
 function misionesDeMateria() {
-  return materia ? persistencia.misiones(materia.id) : {};
+  return track.materia ? persistencia.misiones(track.materia.id) : {};
 }
 
 function irMisiones() {
@@ -451,12 +425,12 @@ function irMisiones() {
 }
 
 function renderMisiones() {
-  const temas = [...new Set(banco.map(q => q.tema))];
+  const temas = [...new Set(track.banco.map(q => q.tema))];
   pintarMisiones(estadoMisiones(temas, misionesDeMateria()));
 }
 
 function iniciarMision(tema) {
-  const lista = sinDiagramasEnTactil(banco.filter(q => q.tema === tema));
+  const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tema === tema));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
   session.misionTema = tema;
@@ -466,11 +440,11 @@ function iniciarMision(tema) {
 
 function startEscenarios() {
   show("escenarios");
-  pintarListaEscenarios((materia && materia.escenarios) || [], persistencia.escenarios());
+  pintarListaEscenarios((track.materia && track.materia.escenarios) || [], persistencia.escenarios());
 }
 
 function jugarEscenario(id) {
-  const e = ((materia && materia.escenarios) || []).find(x => x.id === id);
+  const e = ((track.materia && track.materia.escenarios) || []).find(x => x.id === id);
   if (!e) return;
   escenarioActual = e;
   escenarioEstado = iniciarEscenario(e);
@@ -505,12 +479,12 @@ let casoEstado = null;
 
 function startCasos() {
   show("casos");
-  const casos = (materia && materia.casos) || [];
+  const casos = (track.materia && track.materia.casos) || [];
   pintarListaCasos(casos, persistencia.casos());
 }
 
 function jugarCaso(id) {
-  const casos = (materia && materia.casos) || [];
+  const casos = (track.materia && track.materia.casos) || [];
   const c = casos.find(x => x.id === id);
   if (!c) return;
   casoActual = c;
@@ -544,31 +518,31 @@ function comprobarCaso() {
 }
 
 function practicarDebiles() {
-  const debiles = sinDiagramasEnTactil(banco.filter(q => esDebil(obtenerP(q.id))));
+  const debiles = sinDiagramasEnTactil(track.banco.filter(q => esDebil(obtenerP(q.id))));
   if (!debiles.length) return;
   startSession(shuffle(debiles).slice(0, 10), "practica", false);
 }
 
 function practicarTipo(tipo) {
-  const lista = sinDiagramasEnTactil(banco.filter(q => q.tipo === tipo));
+  const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tipo === tipo));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarArrastre() {
-  const lista = sinDiagramasEnTactil(banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar"));
+  const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar"));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarCasos() {
-  const lista = sinDiagramasEnTactil(banco.filter(q => q.caso));
+  const lista = sinDiagramasEnTactil(track.banco.filter(q => q.caso));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
 
 function practicarVencidas() {
-  const lista = sinDiagramasEnTactil(banco.filter(q => vencida(obtenerP(q.id))));
+  const lista = sinDiagramasEnTactil(track.banco.filter(q => vencida(obtenerP(q.id))));
   if (!lista.length) return;
   startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
 }
@@ -577,7 +551,7 @@ function renderTiposPanel() {
   const panel = $("tipos-panel");
   if (!panel) return;
   const conteos = {};
-  banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
+  track.banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
   panel.innerHTML = TIPOS.filter(t => conteos[t] && (diagramasDisponibles() || t !== "diagrama")).map(t =>
     '<button class="chip" data-action="practicarTipo" data-tipo="' + t + '">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
   ).join("");
@@ -680,10 +654,10 @@ function finalizar() {
   // Una sesión de lenguaje (prueba o examen) vuelve al mapa de etapas, no al inicio de materia.
   if (session.lenguajeId) session.resultado.lenguaje = true;
   // Examen de un track de lenguaje: registra el aprobado (con versión) y mueve la barra.
-  if (session.modo === "examen" && session.examenEtapa && lenguaje) {
-    const nuevo = registrarExamen({ etapa: session.examenEtapa, resultados: competencia, aciertos });
-    competencia = nuevo;
-    persistencia.guardarCompetencia(lenguaje.id, nuevo);
+  if (session.modo === "examen" && session.examenEtapa && track.lenguaje) {
+    const nuevo = registrarExamen({ etapa: session.examenEtapa, resultados: track.competencia, aciertos });
+    track.setCompetencia(nuevo);
+    persistencia.guardarCompetencia(track.lenguaje.id, nuevo);
     const aprobado = nuevo[session.examenEtapa.id].aprobado;
     session.resultado.examen = { aprobado, etapa: session.examenEtapa };
     toast(aprobado
@@ -699,7 +673,7 @@ function finalizar() {
     const merge = fusionarMision(mapa[session.misionTema], pct, nuevas);
     if (merge.cambio) {
       mapa[session.misionTema] = merge.registro;
-      persistencia.guardarMisiones(materia.id, mapa);
+      persistencia.guardarMisiones(track.materia.id, mapa);
       if (merge.mejoraEstrellas) gamificacion.sumarXp(merge.estrellasGanadas * XP_EVENTOS.estrella);
     }
     gamificacion.revisarLogros({ misionPerfecta: nuevas === 3, estrellasTotales: gamificacion.estrellasTotales() });
@@ -730,15 +704,15 @@ function repetirMisma() {
 function guardarIntento(score, total, modo) {
   const historial = cargarHistorial();
   historial.unshift({ date: Date.now(), score, total, modo: modo || "practica" });
-  persistencia.guardarHistorial(materia.id, historial);
+  persistencia.guardarHistorial(track.materia.id, historial);
 }
 
 // Wrappers que inyectan los datos persistidos al módulo de estadísticas.
 function renderStats() {
-  if (!materia) return;
+  if (!track.materia) return;
   renderStatsUI({
-    materia,
-    banco,
+    materia: track.materia,
+    banco: track.banco,
     obtenerP,
     historial: cargarHistorial(),
     actividad: cargarActividad(),
@@ -757,8 +731,7 @@ function irMaterias() {
   clearTimer();
   session = null;
   // Salir del track de lenguaje: que no quede activo para export/import ni para el quiz.
-  lenguaje = null;
-  lenguajeContenido = null;
+  track.limpiarLenguaje();
   aplicarAcento(null);
   const temaMeta = document.querySelector('meta[name="theme-color"]');
   if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
@@ -768,27 +741,10 @@ function irMaterias() {
 }
 
 async function seleccionarMateria(id) {
-  const m = getMateria(id);
-  if (!m) return;
-  // Al entrar a una materia, el track de lenguaje deja de estar activo (export/import).
-  lenguaje = null;
-  lenguajeContenido = null;
-
-  // Cargar el contenido del track bajo demanda (spec 012) antes de navegar: los
-  // chunks son pequeños y llevan hash inmutable, así que después del primer paint
-  // los sirve la caché HTTP. Cargar antes evita el parpadeo de stats en 0.
-  // Se adjunta al objeto materia para que la UI (escenarios, casos, apuntes, glosario)
-  // siga leyendo de materia.* sin cambios (app.js:507,546,873).
-  const contenido = await cargarContenido(m);
-  materia = { ...m, ...contenido };
-
-  aplicarAcento(materia);
-  persistencia.migrarLegacy(materia.id);
-
-  banco = contenido.preguntas;
-  glosario = contenido.glosario;
+  if (!await track.seleccionarMateria(id)) return;
+  aplicarAcento(track.materia);
+  persistencia.migrarLegacy(track.materia.id);
   progreso = cargarProgreso();
-  inicializarFiltros();
   config.renderConfig();
   renderMateriaUI();
   goHome();
@@ -796,37 +752,27 @@ async function seleccionarMateria(id) {
 
 // ─── Track de lenguaje (spec 011) ─────────────────────────────────────
 async function seleccionarLenguaje(id) {
-  const l = getLenguaje(id);
-  if (!l) return;
-  lenguaje = l;
-  lenguajeContenido = await cargarContenido(l);
-  competencia = persistencia.competencia(l.id);
-  // El track de lenguaje actúa como "materia" activa para el motor de quiz y resultados
-  // (resaltado por sqlKeywords, acento, historial). No toca sys.progreso.<materia>.
-  materia = { ...l, ...lenguajeContenido };
-  banco = lenguajeContenido.preguntas;
-  glosario = lenguajeContenido.glosario;
-  // Progreso y filtros propios del lenguaje: si no se recargan, se arrastra el de la
+  if (!await track.seleccionarLenguaje(id)) return;
+  // Progreso propio del lenguaje: si no se recarga, se arrastra el de la
   // materia anterior y se persiste bajo la clave equivocada.
-  progreso = persistencia.progreso(l.id);
+  progreso = persistencia.progreso(track.lenguaje.id);
   apuntesUI.resetTema();
-  inicializarFiltros();
-  aplicarAcento(l);
+  aplicarAcento(track.lenguaje);
   pintarLenguaje();
   show("lenguaje");
 }
 
 function pintarLenguaje() {
-  if (!lenguaje || !lenguajeContenido) return;
+  if (!track.lenguaje || !track.lenguajeContenido) return;
   const nombre = $("lenguaje-nombre");
-  if (nombre) nombre.textContent = lenguaje.nombre;
-  const barra = barraDeCompetencia(lenguajeContenido.roadmap?.etapas || [], competencia);
-  pintarCompetencia(barra, lenguaje.color);
-  pintarEtapas(estadoEtapas(lenguajeContenido.roadmap, competencia), lenguaje);
+  if (nombre) nombre.textContent = track.lenguaje.nombre;
+  const barra = barraDeCompetencia(track.lenguajeContenido.roadmap?.etapas || [], track.competencia);
+  pintarCompetencia(barra, track.lenguaje.color);
+  pintarEtapas(estadoEtapas(track.lenguajeContenido.roadmap, track.competencia), track.lenguaje);
 }
 
 function irLenguaje() {
-  if (lenguaje && lenguajeContenido) {
+  if (track.lenguaje && track.lenguajeContenido) {
     pintarLenguaje();
     show("lenguaje");
   } else {
@@ -834,44 +780,39 @@ function irLenguaje() {
   }
 }
 
-function itemsDeIds(ids) {
-  const porId = new Map((lenguajeContenido?.preguntas || []).map(p => [p.id, p]));
-  return ids.map(id => porId.get(id)).filter(Boolean);
-}
-
 // Prueba formativa: sesión sobre las preguntas de una lección. No mueve la competencia.
 function practicarLeccion(etapaId, leccionId) {
-  const etapa = lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
+  const etapa = track.lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
   const leccion = etapa?.lecciones.find(x => x.id === leccionId);
   if (!leccion) return;
-  const items = itemsDeIds(leccion.preguntas);
+  const items = track.itemsDeIds(leccion.preguntas);
   if (items.length) startSession(items, "practica", false);
-  if (session) session.lenguajeId = lenguaje.id;
+  if (session) session.lenguajeId = track.lenguaje.id;
 }
 
 // Examen sumativo: al terminar, finalizar() registra el resultado y mueve la barra.
 function rendirExamen(etapaId) {
-  const etapa = lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
+  const etapa = track.lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
   if (!etapa) return;
-  const items = itemsDeIds(etapa.examen.preguntas);
+  const items = track.itemsDeIds(etapa.examen.preguntas);
   if (!items.length) return;
   startSession(items, "examen", false);
   session.examenEtapa = etapa;
-  session.lenguajeId = lenguaje.id;
+  session.lenguajeId = track.lenguaje.id;
 }
 
 function renderMateriaUI() {
-  document.title = materia.nombre + " — Systematic";
+  document.title = track.materia.nombre + " — Systematic";
   const nombre = $("materia-nombre");
   const iconoSpan = $("materia-icono");
-  if (nombre) nombre.textContent = materia.nombre;
+  if (nombre) nombre.textContent = track.materia.nombre;
   if (iconoSpan) {
-    iconoSpan.innerHTML = icono(materia.icono);
+    iconoSpan.innerHTML = icono(track.materia.icono);
   }
   const sub = $("portada-sub");
-  if (sub) sub.textContent = materia.descripcion || "";
+  if (sub) sub.textContent = track.materia.descripcion || "";
   const temaMeta = document.querySelector('meta[name="theme-color"]');
-  if (temaMeta) temaMeta.setAttribute("content", materia.color);
+  if (temaMeta) temaMeta.setAttribute("content", track.materia.color);
   const gloTitulo = $("glosario-titulo");
   if (gloTitulo) gloTitulo.textContent = "Glosario";
 }
