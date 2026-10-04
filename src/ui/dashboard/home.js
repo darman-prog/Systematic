@@ -6,6 +6,9 @@ import { icono } from "../iconos.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
 
+// Pluraliza una etiqueta según la cantidad (1 día / 2 días).
+const plural = (n, uno, varios) => (n === 1 ? uno : varios);
+
 export function crearHome({ persistencia, gamificacion }) {
   const $ = id => document.getElementById(id);
   let xpMostrado = 0;
@@ -39,26 +42,39 @@ export function crearHome({ persistencia, gamificacion }) {
     const p = gamificacion.perfil();
     const desde = xpMostrado;
     xpMostrado = p.xp;
-    
+
+    const pct = Math.max(0, Math.min(100, Math.round(p.pct)));
     const nombrePerfil = persistencia.nombre() ? `Perfil de ${escapar(persistencia.nombre())}` : "Tu perfil";
-    const xpFaltante = p.faltante ? ` · faltan ${p.faltante} para el nivel ${p.nivel + 1}` : "";
-    const racha = `Racha: ${p.racha} día(s) · ${p.insignias} logro(s) desbloqueado(s)`;
-    
+    const faltan = p.faltante
+      ? `<p class="perfil-faltan">Faltan ${p.faltante} XP para el nivel ${p.nivel + 1}</p>`
+      : "";
+
     cont.innerHTML = `
       <div class="perfil-card">
-        <div class="perfil-nivel">
+        <div class="perfil-anillo" role="progressbar" aria-label="Progreso hacia el nivel ${p.nivel + 1}"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}">
+          <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+            <circle class="anillo-pista" cx="50" cy="50" r="44"/>
+            <circle class="anillo-valor" cx="50" cy="50" r="44" pathLength="100" style="--pct:${pct}"/>
+          </svg>
           <span class="perfil-num">${p.nivel}</span>
           <span class="perfil-etq">nivel</span>
         </div>
+
         <div class="perfil-datos">
           <p class="perfil-nombre">${nombrePerfil}</p>
-          <div class="perfil-xp-info">
-            <b id="perfil-xp">${desde}</b> XP${xpFaltante}
-          </div>
-          <div class="progress-track">
-            <div class="progress-fill" style="width: ${p.pct}%"></div>
-          </div>
-          <div class="perfil-mini">${racha}</div>
+          <p class="perfil-xp"><b id="perfil-xp">${desde}</b> XP</p>
+          ${faltan}
+          <ul class="perfil-chips">
+            <li class="perfil-chip perfil-chip--racha">
+              ${icono("llama", "icono-sm")}
+              <span><b>${p.racha}</b> ${plural(p.racha, "día", "días")} de racha</span>
+            </li>
+            <li class="perfil-chip perfil-chip--logros">
+              ${icono("medalla", "icono-sm")}
+              <span><b>${p.insignias}</b> ${plural(p.insignias, "logro", "logros")}</span>
+            </li>
+          </ul>
         </div>
       </div>
     `;
