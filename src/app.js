@@ -2,13 +2,14 @@
 import { barraDeCompetencia, registrarExamen } from "./core/index.js";
 import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/aprendizaje/lenguaje.js";
 import { crearHome } from "./ui/dashboard/home.js";
+import { crearConfig } from "./ui/dashboard/config.js";
 import { crearMezclador, storeLocalStorage } from "./core/index.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/index.js";
 import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/index.js";
-import { apunteAHTML, filtrarApuntes } from "./ui/aprendizaje/apuntes.js";
+import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
 import { crearResultadosUI } from "./ui/aprendizaje/resultados.js";
@@ -23,8 +24,6 @@ import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/index.js";
 import { crearDiagramasUI } from "./ui/componentes/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
-import { estadoVacio } from "./ui/componentes/estados.js";
-import { tarjeta } from "./ui/componentes/tarjetas.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
@@ -66,7 +65,6 @@ let competencia = {};
 let progreso = {};
 let session = null;
 let filtros = { parciales: new Set(), temas: new Set(), dificultades: new Set(), tipos: new Set(), soloDebiles: false, soloMarcadas: false, priorizar: true };
-let apunteTema = "todos";
 let escenarioActual = null;
 let escenarioEstado = null;
 
@@ -102,6 +100,15 @@ const ctx = {
   get glosario() { return glosario; },
   get materia() { return materia; }
 };
+
+// Config de práctica y pantalla de apuntes (extraídas de app.js, ADR 007).
+const config = crearConfig({
+  getFiltros: () => filtros,
+  valoresDe, contarPor, leerOpciones, preguntasFiltradas,
+  diagramasDisponibles, TIPO_LABELS, DIF_LABELS,
+  mostrarPantalla: show
+});
+const apuntesUI = crearApuntesUI({ getMateria: () => materia, mostrarPantalla: show });
 
 function show(screen) {
     ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje"].forEach(s =>
@@ -327,66 +334,20 @@ function preguntasFiltradas() {
   ));
 }
 
-function renderConfig() {
-  const grupos = [
-    { clave: "parciales", titulo: "Parcial", etiqueta: v => v },
-    { clave: "temas", titulo: "Tema", etiqueta: v => v },
-    { clave: "dificultades", titulo: "Dificultad", etiqueta: v => DIF_LABELS[v] || v },
-    { clave: "tipos", titulo: "Tipo de pregunta", etiqueta: v => TIPO_LABELS[v] || v }
-  ];
-  let html = "";
-  grupos.forEach(g => {
-    const valores = valoresDe(g.clave).filter(v => diagramasDisponibles() || !(g.clave === "tipos" && v === "diagrama"));
-    html += '<div class="mb-5"><div class="flex items-center gap-2 mb-2.5"><span class="font-semibold text-sm text-slate-300">' + g.titulo +
-      '</span><span class="ml-auto"></span><button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="true">Todos</button>' +
-      '<button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="false">Ninguno</button></div><div class="flex flex-wrap gap-2">';
-    valores.forEach(v => {
-      const activa = filtros[g.clave].has(v);
-      html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '"' + (g.clave === "tipos" ? ' data-tipo="' + v + '"' : "") + '>' +
-        g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
-    });
-    if (g.clave === "tipos" && !diagramasDisponibles()) {
-      html += '<p class="text-xs text-slate-400 mt-2 w-full" data-aviso-diagramas>El constructor de diagramas está disponible solo en escritorio.</p>';
-    }
-    html += '</div></div>';
-  });
-  $("config-groups").innerHTML = html;
-  actualizarResumen();
-}
+// Render de la config de práctica: vive en ui/dashboard/config.js (ADR 007).
 
 function toggleFiltro(clave, valor) {
   if (filtros[clave].has(valor)) filtros[clave].delete(valor);
   else filtros[clave].add(valor);
-  renderConfig();
+  config.renderConfig();
 }
 
 function toggleFiltroTodos(clave, activar) {
   filtros[clave] = activar ? new Set(valoresDe(clave)) : new Set();
-  renderConfig();
+  config.renderConfig();
 }
 
-function actualizarResumen() {
-  leerOpciones();
-  const qs = preguntasFiltradas();
-  $("cfg-max").textContent = qs.length;
-  const input = $("cfg-cantidad");
-  input.max = qs.length || 1;
-  const actual = parseInt(input.value, 10);
-  if (!actual || actual > qs.length) input.value = qs.length || 1;
-  $("cfg-resumen").textContent = qs.length + " preguntas coinciden con los filtros.";
-  $("btn-comenzar").disabled = qs.length === 0;
-}
-
-function usarTodas() {
-  const qs = preguntasFiltradas();
-  $("cfg-cantidad").value = qs.length || 1;
-  actualizarResumen();
-}
-
-function irConfig() {
-  renderConfig();
-  show("config");
-}
+// Resumen, "usar todas" e ir a config: viven en ui/dashboard/config.js (ADR 007).
 
 // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/estudio/sesiones.js (testeables).
 
@@ -828,7 +789,7 @@ async function seleccionarMateria(id) {
   glosario = contenido.glosario;
   progreso = cargarProgreso();
   inicializarFiltros();
-  renderConfig();
+  config.renderConfig();
   renderMateriaUI();
   goHome();
 }
@@ -848,7 +809,7 @@ async function seleccionarLenguaje(id) {
   // Progreso y filtros propios del lenguaje: si no se recargan, se arrastra el de la
   // materia anterior y se persiste bajo la clave equivocada.
   progreso = persistencia.progreso(l.id);
-  apunteTema = "todos";
+  apuntesUI.resetTema();
   inicializarFiltros();
   aplicarAcento(l);
   pintarLenguaje();
@@ -930,49 +891,7 @@ function aplicarAcento(materia) {
 
 
 
-function apuntesDeMateria() {
-  return materia && materia.apuntes ? materia.apuntes : [];
-}
-
-function startApuntes() {
-  apunteTema = "todos";
-  const s = $("apuntes-search");
-  if (s) s.value = "";
-  renderApuntes("");
-  renderApuntesFiltros();
-  show("apuntes");
-}
-
-function renderApuntesFiltros() {
-  const cont = $("apuntes-filtros");
-  if (!cont) return;
-  const todos = apuntesDeMateria();
-  const temas = ["todos"].concat([...new Set(todos.map(a => a.tema))]);
-  cont.innerHTML = temas.map(t => {
-    const cuenta = t === "todos" ? todos.length : todos.filter(a => a.tema === t).length;
-    return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" data-action="cambiarApunteTema" data-tema="' + t + '">' +
-      (t === "todos" ? "Todos" : escapar(t)) + " · " + cuenta + '</button>';
-  }).join("");
-}
-
-function cambiarApunteTema(t) {
-  apunteTema = t;
-  const s = $("apuntes-search");
-  renderApuntes(s ? s.value : "");
-  renderApuntesFiltros();
-}
-
-function renderApuntes(filtro) {
-  const lista = filtrarApuntes(apuntesDeMateria(), filtro, apunteTema);
-  $("apuntes-list").innerHTML = lista.map(a => tarjeta({
-    tema: a.tema,
-    titulo: a.titulo,
-    cuerpo: '<div class="apunte-contenido">' + apunteAHTML(a.contenido) + '</div>' +
-      '<div class="apunte-fuente">Fuente: ' + escapar(a.fuente) + '</div>'
-  })).join("") || estadoVacio("Aún no hay apuntes para esta materia.");
-  const cont = $("apuntes-count");
-  if (cont) cont.textContent = lista.length + " apunte(s)";
-}
+// Pantalla de apuntes: vive en ui/aprendizaje/apuntes.js (crearApuntesUI, ADR 007).
 
 function goHome() {
   show("start");
@@ -1085,11 +1004,11 @@ const ACCIONES = {
     home.renderPerfil();
     toast(icono("check", "icono-sm") + saludoSegunHora(persistencia.nombre()) + (persistencia.nombre() ? ", " + persistencia.nombre() : ""));
   },
-  actualizarResumen: () => actualizarResumen(),
+  actualizarResumen: () => config.actualizarResumen(),
   alternarPausa: () => alternarPausa(),
   autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),
   autoevaluarResultado: el => resultados.autoevaluarResultado(el.dataset.id, el.dataset.ok === "true"),
-  cambiarApunteTema: el => cambiarApunteTema(el.dataset.tema),
+  cambiarApunteTema: el => apuntesUI.cambiarApunteTema(el.dataset.tema),
   cambiarEstudioTipo: el => estudio.cambiarEstudioTipo(el.dataset.tipo),
   cambiarGlosarioCat: el => glosarioUI.cambiarGlosarioCat(el.dataset.id),
   clearHistory: () => clearHistory(),
@@ -1102,7 +1021,7 @@ const ACCIONES = {
   exportarDatos: () => exportarDatos(),
   goHome: () => goHome(),
   importarArchivo: () => $("import-file").click(),
-  irConfig: () => irConfig(),
+  irConfig: () => config.irConfig(),
   irMaterias: () => irMaterias(),
   iniciarMision: el => iniciarMision(el.dataset.tema),
   irMisiones: () => irMisiones(),
@@ -1129,7 +1048,7 @@ const ACCIONES = {
     practicarLeccion: el => practicarLeccion(el.dataset.etapa, el.dataset.leccion),
     rendirExamen: el => rendirExamen(el.dataset.etapa),
     irLenguaje: () => irLenguaje(),
-  startApuntes: () => startApuntes(),
+  startApuntes: () => apuntesUI.startApuntes(),
   startEscenarios: () => startEscenarios(),
   jugarEscenario: el => jugarEscenario(el.dataset.id),
   decidirEscenario: el => decidirEscenario(parseInt(el.dataset.idx, 10)),
@@ -1149,7 +1068,7 @@ const ACCIONES = {
   toggleMarcadaEstudio: el => estudio.toggleMarcadaEstudio(el.dataset.id),
   toggleMulti: el => quiz.toggleMulti(parseInt(el.dataset.idx, 10)),
   toggleStudy: el => estudio.toggleStudy(el),
-  usarTodas: () => usarTodas(),
+  usarTodas: () => config.usarTodas(),
   voltearFlash: () => flashcards.voltearFlash()
 };
 
@@ -1163,10 +1082,10 @@ document.addEventListener("click", event => {
 // Listeners puntuales sobre elementos estáticos (eventos change/input, fuera del alcance
 // de la delegación de click).
 ["cfg-priorizar", "cfg-solo-debiles", "cfg-solo-marcadas"].forEach(id =>
-  $(id).addEventListener("change", () => actualizarResumen())
+  $(id).addEventListener("change", () => config.actualizarResumen())
 );
 $("import-file").addEventListener("change", e => importarDatos(e.target));
 $("study-search").addEventListener("input", e => estudio.renderStudy(e.target.value));
-$("apuntes-search").addEventListener("input", e => renderApuntes(e.target.value));
+$("apuntes-search").addEventListener("input", e => apuntesUI.renderApuntes(e.target.value));
 $("glosario-search").addEventListener("input", e => glosarioUI.renderGlosario(e.target.value));
 
