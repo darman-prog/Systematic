@@ -5,7 +5,7 @@
 .star-btn { cursor: pointer; }
 .btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
 .star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible,
-.materia-card:focus-visible, .etapa-leccion:focus-visible, .etapa-examen:focus-visible {
+.materia-card:focus-visible {
   outline: 2px solid var(--study-accent); outline-offset: 3px;
 }
 .feedback { animation: fadeInUp var(--mov-base) var(--mov-ease); }
@@ -138,45 +138,7 @@ input, textarea { caret-color: var(--study-accent); }
    de lenguaje se distingue de una materia sin salirse del estilo de tarjeta. */
 .materia-card--lenguaje .materia-stats { flex-direction: column; align-items: stretch; gap: 8px; }
 
-.etapas-camino { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .etapa-item { margin: 0; }
-.etapa { border: 1px solid var(--study-border); border-radius: 12px; padding: 14px 16px; background: var(--study-surface); transition: border-color var(--mov-rapida) var(--mov-ease); }
-.etapa-cabecera { display: flex; align-items: center; gap: 10px; }
-.etapa-num { flex: 0 0 28px; height: 28px; border-radius: 9999px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: var(--study-surface-3); color: var(--study-text); }
-.etapa-nombre { flex: 1 1 auto; min-width: 0; font-weight: 600; color: var(--study-text); }
-.etapa-ico { flex: none; color: var(--study-muted); }
-.etapa-estado { font-size: .75rem; color: var(--study-muted); margin: 4px 0 10px; }
-
-/* Etapa en curso: acento en borde y número; la fila sigue mostrando "Disponible" o el
-   último porcentaje, así el estado no depende solo del color. */
-.etapa-actual { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
-.etapa-actual .etapa-num { border: 1px solid color-mix(in srgb, var(--competencia-color, var(--study-accent)) 65%, transparent); }
-.etapa-actual .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
-
-/* Etapa bloqueada: borde punteado + candado + texto. Sin opacidad global, para que el
-   mensaje "Bloqueada" y las etiquetas sigan siendo legibles. */
-.etapa-bloqueada { border-style: dashed; }
-.etapa-bloqueada .etapa-ico { color: var(--study-muted); }
-
-.etapa-aprobada { border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 55%, var(--study-border)); }
-.etapa-aprobada .etapa-num { background: var(--competencia-color, var(--study-accent)); color: var(--study-bg); border: 0; }
-.etapa-aprobada .etapa-ico { color: var(--competencia-color, var(--study-accent)); }
-
-.etapa-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
-.etapa-leccion, .etapa-examen {
-  flex: 1 1 150px; min-width: 0; min-height: 44px;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 14px; border-radius: 10px; cursor: pointer;
-  background: var(--study-surface-2); border: 1px solid var(--study-border); color: var(--study-text);
-  font-size: .85rem; text-align: left;
-  transition: border-color var(--mov-rapida) var(--mov-ease), background var(--mov-rapida) var(--mov-ease);
-}
-.etapa-leccion:hover:not(:disabled), .etapa-examen:hover:not(:disabled) { border-color: var(--competencia-color, var(--study-accent)); background: var(--study-surface-3); }
-.etapa-btn-titulo { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
-.etapa-leccion-meta { flex: none; white-space: nowrap; font-size: .7rem; color: var(--study-muted); }
-.etapa-examen { background: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 12%, var(--study-surface-2)); border-color: color-mix(in srgb, var(--competencia-color, var(--study-accent)) 45%, var(--study-border)); }
-.etapa-examen .etapa-btn-titulo { font-weight: 600; }
-.etapa-leccion:disabled, .etapa-examen:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Veredicto de un examen de lenguaje en resultados (spec 011): bloque con icono y texto,
    el color acompaña pero no es el único portador del estado. */
@@ -189,296 +151,362 @@ input, textarea { caret-color: var(--study-accent); }
 .veredicto-ok { color: #8FBF9F; border-color: color-mix(in srgb, #8FBF9F 45%, var(--study-border)); background: color-mix(in srgb, #8FBF9F 12%, var(--study-surface)); }
 .veredicto-no { color: var(--study-warning); border-color: color-mix(in srgb, var(--study-warning) 45%, var(--study-border)); background: color-mix(in srgb, var(--study-warning) 12%, var(--study-surface)); }
 
-/* estilos de lenguajes.js */
-/* ===== CONTENEDOR DEL CAMINO ===== */
+/* ==========================================================================
+   Mapa de etapas del track de lenguaje (spec 011)
+   Requiere: --color-tema definido en <ol class="etapas-camino"> (inline).
+   Los tokens --e-* tienen valor por defecto; mapéalos a tus variables globales.
+   ========================================================================== */
+
 .etapas-camino {
+  /* Tokens mapeados al sistema real (spec 006, tema oscuro único). */
+  --e-superficie: var(--study-surface);
+  --e-texto: var(--study-text);
+  --e-texto-suave: var(--study-muted);
+  --e-borde: var(--study-border);
+  --e-ok: #3ccf93;
+  --e-aviso: #e3a73f;
+  --e-sobre-tema: #ffffff;       /* texto sobre el color del tema */
+  --e-radio: 14px;
+  --e-nodo: 2.5rem;
+  --e-gap: 1.25rem;
+
   list-style: none;
-  padding: 0;
   margin: 0;
+  padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 1.25rem;
+  gap: var(--e-gap);
+  color: var(--e-texto);
 }
+
+/* ---------- Camino: nodo + línea ---------- */
 
 .etapa-item {
-  display: flex;
-}
-
-/* ===== TARJETA DE ETAPA ===== */
-.etapa-card {
-  width: 100%;
-  background: #1a1a2e;
-  border: 1px solid #2a2a3e;
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  transition: border-color 0.2s ease;
   position: relative;
+  padding-left: calc(var(--e-nodo) + 1rem);
 }
 
-.etapa-card:hover:not(.is-bloqueada) {
-  border-color: var(--color-tema, #667eea);
+/* línea que une un nodo con el siguiente */
+.etapa-item::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--e-nodo) / 2 - 1px);
+  top: calc(var(--e-nodo) + 0.5rem);
+  bottom: calc(var(--e-gap) * -1 + 0.5rem);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--e-borde);
+}
+.etapa-item:last-child::before { display: none; }
+
+/* tramo ya recorrido: la línea toma el color del tema */
+.etapa-item:has(.is-aprobada)::before {
+  background: color-mix(in srgb, var(--e-ok) 55%, var(--e-borde));
 }
 
-/* ===== ESTADOS DE LA TARJETA ===== */
-.etapa-card.is-aprobada {
-  background: #1a2e1f;
-  border-color: #2e4a35;
+.etapa-nodo {
+  position: absolute;
+  left: 0;
+  top: 0.75rem;
+  width: var(--e-nodo);
+  height: var(--e-nodo);
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px solid var(--e-borde);
+  background: var(--e-superficie);
+  color: var(--e-texto-suave);
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  z-index: 1;
+}
+
+.etapa-item:has(.is-actual) .etapa-nodo {
+  border-color: var(--color-tema);
+  background: var(--color-tema);
+  color: var(--e-sobre-tema);
+}
+
+.etapa-item:has(.is-aprobada) .etapa-nodo {
+  border-color: var(--e-ok);
+  background: var(--e-ok);
+  color: #fff;
+}
+
+.etapa-item:has(.is-bloqueada) .etapa-nodo {
+  background: color-mix(in srgb, var(--e-borde) 45%, var(--e-superficie));
+}
+
+/* pulso solo en la etapa actual */
+.etapa-item:has(.is-actual) .etapa-nodo::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  border: 2px solid var(--color-tema);
+  opacity: 0;
+  animation: etapa-pulso 2.4s ease-out infinite;
+}
+
+@keyframes etapa-pulso {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  80%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ---------- Tarjeta ---------- */
+
+.etapa-card {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  background: var(--e-superficie);
+  border: 1px solid var(--e-borde);
+  border-radius: var(--e-radio);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .etapa-card.is-actual {
-  border-color: var(--color-tema, #667eea);
-  border-width: 2px;
-  background: #1e1e35;
+  border-color: var(--color-tema);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-tema) 16%, transparent);
+}
+
+.etapa-card.is-aprobada {
+  border-color: color-mix(in srgb, var(--e-ok) 45%, var(--e-borde));
 }
 
 .etapa-card.is-bloqueada {
-  opacity: 0.5;
-  filter: grayscale(0.5);
+  opacity: 0.65;
+  filter: saturate(0.35);
 }
 
-.etapa-lock-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.3);
-  z-index: 10;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* ---------- Cabecera ---------- */
 
-.etapa-lock-overlay::after {
-  content: "🔒";
-  font-size: 2rem;
-  opacity: 0.4;
-}
-
-/* ===== HEADER DE LA ETAPA ===== */
 .etapa-header {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.etapa-identidad {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  flex: 1;
-}
-
-.etapa-num {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--color-tema, #667eea);
-  opacity: 0.5;
-  line-height: 1;
-  min-width: 2rem;
-}
-
-.etapa-card.is-actual .etapa-num,
-.etapa-card.is-aprobada .etapa-num {
-  opacity: 0.8;
+  gap: 0.75rem;
 }
 
 .etapa-titulos {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  min-width: 0;
 }
 
 .etapa-nombre {
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #f8fafc;
-  line-height: 1.4;
+  font-size: 1.1rem;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.etapa-ico {
-  color: var(--color-tema, #667eea);
-  display: flex;
-  align-items: center;
-  padding: 0.5rem;
-  background: rgba(102, 126, 234, 0.1);
-  border-radius: 8px;
-}
+/* ---------- Badges de estado ---------- */
 
-.etapa-card.is-aprobada .etapa-ico {
-  background: rgba(34, 197, 94, 0.15);
-  color: #4ade80;
-}
-
-/* ===== BADGES DE ESTADO ===== */
 .etapa-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.25rem 0.625rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  width: fit-content;
+  line-height: 1.4;
+  white-space: nowrap;
+  color: var(--b-color);
+  background: color-mix(in srgb, var(--b-color) 14%, transparent);
 }
 
-.badge-aprobada { 
-  background: rgba(34, 197, 94, 0.15); 
-  color: #4ade80; 
+.etapa-badge::before {
+  content: "";
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: currentColor;
 }
 
-.badge-bloqueada { 
-  background: rgba(148, 163, 184, 0.1); 
-  color: #94a3b8; 
+.badge-aprobada   { --b-color: var(--e-ok); }
+.badge-disponible { --b-color: var(--color-tema); }
+.badge-intento    { --b-color: var(--e-aviso); }
+.badge-bloqueada  { --b-color: var(--e-texto-suave); }
+
+/* ---------- Progreso del último intento ---------- */
+
+.etapa-progreso { display: grid; gap: 0.4rem; }
+
+.etapa-meter {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-tema) 15%, transparent);
 }
 
-.badge-intento { 
-  background: rgba(251, 191, 36, 0.15); 
-  color: #fbbf24; 
+.etapa-meter::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--pct, 0%);
+  border-radius: inherit;
+  background: var(--color-tema);
 }
 
-.badge-disponible { 
-  background: rgba(102, 126, 234, 0.1); 
-  color: #818cf8; 
+/* marca del umbral de aprobación */
+.etapa-meter::after {
+  content: "";
+  position: absolute;
+  left: var(--umbral, 100%);
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: var(--e-texto);
 }
 
-/* ===== BODY Y SCORE ===== */
-.etapa-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.etapa-progreso-texto {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--e-texto-suave);
 }
 
-.etapa-score {
-  background: #1e1e35;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  color: #cbd5e1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #2a2a3e;
-}
+.etapa-progreso-texto strong { color: var(--e-texto); }
 
-.etapa-score strong {
-  color: #fbbf24;
-  font-size: 1.125rem;
-  font-weight: 700;
-}
+/* ---------- Lecciones ---------- */
 
-/* ===== LISTA DE LECCIONES ===== */
 .etapa-lecciones-lista {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.75rem;
+  gap: 0.5rem;
+  grid-template-columns: 1fr;
 }
 
-/* ===== BOTONES ===== */
-.btn-leccion, .btn-examen {
+@media (min-width: 640px) {
+  .etapa-lecciones-lista {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+}
+
+.btn-leccion,
+.btn-examen {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  border-radius: 8px;
-  border: none;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border-radius: 10px;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  font-family: inherit;
-  text-align: center;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.1s;
 }
 
 .btn-leccion {
-  background: #252540;
-  color: #e2e8f0;
+  background: transparent;
+  color: var(--e-texto);
+  border: 1px solid var(--e-borde);
 }
 
 .btn-leccion:hover:not(:disabled) {
-  background: #2e2e4a;
+  border-color: var(--color-tema);
+  background: color-mix(in srgb, var(--color-tema) 7%, transparent);
 }
 
-.btn-examen {
-  background: var(--color-tema, #667eea);
-  color: white;
-  font-weight: 600;
-  grid-column: 1 / -1;
-}
-
-.btn-examen:hover:not(:disabled) {
-  filter: brightness(1.1);
-}
-
-.btn-leccion:disabled, .btn-examen:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
+.btn-leccion:active:not(:disabled),
+.btn-examen:active:not(:disabled) { transform: translateY(1px); }
 
 .btn-icono {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  flex-shrink: 0;
-}
-
-.btn-examen .btn-icono {
-  background: rgba(255, 255, 255, 0.15);
-  width: 48px;
-  height: 48px;
+  color: var(--color-tema);
+  background: color-mix(in srgb, var(--color-tema) 12%, transparent);
 }
 
 .btn-texto {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
 }
 
 .btn-titulo {
-  font-size: 0.875rem;
   font-weight: 600;
+  font-size: 0.95rem;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .btn-meta {
-  font-size: 0.75rem;
-  opacity: 0.7;
+  font-size: 0.78rem;
+  color: var(--e-texto-suave);
 }
 
-/* ===== FOOTER ===== */
+/* ---------- Examen (acción principal) ---------- */
+
 .etapa-footer {
-  margin-top: 0.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--e-borde);
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .etapas-camino {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .etapa-lecciones-lista {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
-  
-  .etapa-card {
-    padding: 1.25rem;
-  }
+.btn-examen {
+  justify-content: center;
+  border: 1px solid var(--color-tema);
+  background: var(--color-tema);
+  color: var(--e-sobre-tema);
 }
+
+.btn-examen .btn-texto { text-align: left; }
+.btn-examen .btn-meta  { color: inherit; opacity: 0.85; }
+
+.btn-examen .btn-icono {
+  color: inherit;
+  background: color-mix(in srgb, var(--e-sobre-tema) 20%, transparent);
+}
+
+.btn-examen:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-tema) 88%, #000);
+}
+
+/* ---------- Estados comunes ---------- */
+
+.etapa-card button:disabled {
+  cursor: not-allowed;
+  background: transparent;
+  border-color: var(--e-borde);
+  color: var(--e-texto-suave);
+}
+
+.etapa-card button:disabled .btn-icono {
+  color: var(--e-texto-suave);
+  background: color-mix(in srgb, var(--e-borde) 50%, transparent);
+}
+
+.btn-leccion:focus-visible,
+.btn-examen:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-tema) 70%, transparent);
+  outline-offset: 2px;
+}
+
+/* ---------- Móvil ---------- */
 
 @media (max-width: 480px) {
-  .etapa-lecciones-lista {
-    grid-template-columns: 1fr;
-  }
+  .etapas-camino { --e-nodo: 2.1rem; --e-gap: 1rem; }
+  .etapa-card { padding: 0.9rem; }
+  .etapa-header { align-items: flex-start; }
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .etapa-item:has(.is-actual) .etapa-nodo::after { animation: none; }
+  .etapa-card,
+  .btn-leccion,
+  .btn-examen { transition: none; }
 }
 /* home mejorado */
 /* ===== CONTENEDOR DE MATERIAS ===== */

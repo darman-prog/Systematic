@@ -43,17 +43,24 @@ export function pintarEtapas(nodos, lenguaje) {
     return;
   }
 
-  const color = lenguaje?.color || "var(--color-primario, #667eea)";
+  const color = lenguaje?.color || "var(--study-accent-strong)";
 
   const html = nodos.map((nodo, i) => {
     const etapa = nodo.etapa;
     const necesita = umbralDeExamen(etapa.examen.preguntas.length, etapa.examen.umbral);
     const total = etapa.examen.preguntas.length;
     const estado = obtenerEstadoEtapa(nodo);
-    
-    const estadoIco = nodo.aprobada ? "check" : (nodo.desbloqueada ? "punto" : "bloqueada");
+
+    // El nodo del camino muestra check si se aprobó, candado si sigue bloqueada y el número
+    // en los demás casos.
+    const nodoContenido = nodo.aprobada ? icono("check", "icono-sm")
+      : !nodo.desbloqueada ? icono("bloqueada", "icono-sm")
+      : String(i + 1);
+    const actual = nodo.desbloqueada && !nodo.aprobada;
+    // El medidor necesita el umbral en porcentaje para marcar dónde se aprueba.
+    const umbralPct = total ? Math.round((necesita / total) * 100) : 0;
+    const pct = nodo.ultimoPct !== null ? Math.round(nodo.ultimoPct * 100) : null;
     const disabledAttr = nodo.desbloqueada ? "" : "disabled aria-disabled=\"true\" tabindex=\"-1\"";
-    const lockedOverlay = !nodo.desbloqueada ? '<div class="etapa-lock-overlay"></div>' : "";
 
     // Generar botones de lecciones
     const leccionesHtml = etapa.lecciones.map(lec => `
@@ -79,40 +86,29 @@ export function pintarEtapas(nodos, lenguaje) {
 
     return `
       <li class="etapa-item">
-        <article class="etapa-card ${nodo.aprobada ? "is-aprobada" : ""} ${!nodo.desbloqueada ? "is-bloqueada" : ""} ${nodo.desbloqueada && !nodo.aprobada ? "is-actual" : ""}" style="--color-tema: ${color}">
-          ${lockedOverlay}
-          
+        <span class="etapa-nodo" aria-hidden="true">${nodoContenido}</span>
+        <article class="etapa-card ${nodo.aprobada ? "is-aprobada" : ""} ${!nodo.desbloqueada ? "is-bloqueada" : ""} ${actual ? "is-actual" : ""}" ${actual ? 'aria-current="step"' : ""}>
           <header class="etapa-header">
-            <div class="etapa-identidad">
-              <span class="etapa-num">${String(i + 1).padStart(2, '0')}</span>
-              <div class="etapa-titulos">
-                <h3 class="etapa-nombre">${escapar(etapa.nombre)}</h3>
-                <span class="etapa-badge ${estado.clase}">${estado.texto}</span>
-              </div>
+            <div class="etapa-titulos">
+              <h3 class="etapa-nombre">${escapar(etapa.nombre)}</h3>
+              <span class="etapa-badge ${estado.clase}">${estado.texto}</span>
             </div>
-            <span class="etapa-ico">${icono(estadoIco, "icono-md")}</span>
           </header>
 
           <div class="etapa-body">
-            ${nodo.ultimoPct !== null && !nodo.aprobada ? `
-              <div class="etapa-score">
-                <span>Mejor intento:</span>
-                <strong>${Math.round(nodo.ultimoPct * 100)}%</strong>
-              </div>
-            ` : ''}
-            
-            <div class="etapa-lecciones-lista">
-              ${leccionesHtml}
-            </div>
+            ${pct !== null && !nodo.aprobada ? `
+              <div class="etapa-progreso" role="img" aria-label="Último intento ${pct}%, se aprueba con ${umbralPct}%" style="--pct:${pct}%; --umbral:${umbralPct}%">
+                <div class="etapa-meter"></div>
+                <p class="etapa-progreso-texto">Último intento <strong>${pct}%</strong> · se aprueba con ${umbralPct}%</p>
+              </div>` : ""}
+            <div class="etapa-lecciones-lista">${leccionesHtml}</div>
           </div>
 
-          <footer class="etapa-footer">
-            ${examenHtml}
-          </footer>
+          <footer class="etapa-footer">${examenHtml}</footer>
         </article>
       </li>
     `;
   }).join("");
 
-  cont.innerHTML = `<ol class="etapas-camino" role="list" aria-label="Mapa de etapas del lenguaje">${html}</ol>`;
+  cont.innerHTML = `<ol class="etapas-camino" style="--color-tema: ${color}" role="list" aria-label="Mapa de etapas del lenguaje">${html}</ol>`;
 }
