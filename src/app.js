@@ -1,6 +1,6 @@
 ﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido, acentoDe } from "./core/index.js";
 import { barraDeCompetencia, registrarExamen } from "./core/index.js";
-import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/pantallas/lenguaje.js";
+import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/aprendizaje/lenguaje.js";
 import { barraCompetencia } from "./ui/componentes/competencia.js";
 import { crearMezclador, storeLocalStorage } from "./core/index.js";
 import {
@@ -8,20 +8,20 @@ import {
 } from "./core/index.js";
 import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/index.js";
-import { apunteAHTML, filtrarApuntes } from "./ui/pantallas/apuntes.js";
+import { apunteAHTML, filtrarApuntes } from "./ui/aprendizaje/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
-import { crearQuizUI } from "./ui/pantallas/quiz.js";
-import { crearResultadosUI } from "./ui/pantallas/resultados.js";
-import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/pantallas/stats.js";
-import { crearEstudioUI } from "./ui/pantallas/estudio.js";
-import { crearGlosarioUI } from "./ui/pantallas/glosario.js";
-import { crearFlashcardsUI } from "./ui/pantallas/flashcards.js";
-import { estadoMisiones, pintarMisiones } from "./ui/pantallas/misiones.js";
+import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
+import { crearResultadosUI } from "./ui/aprendizaje/resultados.js";
+import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/dashboard/stats.js";
+import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
+import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
+import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
+import { estadoMisiones, pintarMisiones } from "./ui/dashboard/misiones.js";
 import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/index.js";
-import { pintarListaEscenarios, pintarEscenario } from "./ui/pantallas/escenarios.js";
+import { pintarListaEscenarios, pintarEscenario } from "./ui/aprendizaje/escenarios.js";
 import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/index.js";
 import { crearDiagramasUI } from "./ui/componentes/diagramas.js";
-import { pintarListaCasos, pintarCaso } from "./ui/pantallas/casos.js";
+import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
 import { estadoVacio } from "./ui/componentes/estados.js";
 import { tarjeta } from "./ui/componentes/tarjetas.js";
