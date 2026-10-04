@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import infraPreguntas from '../src/datos/infra/preguntas.js';
-import infraGlosario from '../src/datos/infra/glosario.js';
-import infraApuntes from '../src/datos/infra/apuntes.js';
-import infraEscenarios from '../src/datos/infra/escenarios.js';
+import infraPreguntas from '../src/datos/materias/infra/preguntas.js';
+import infraGlosario from '../src/datos/materias/infra/glosario.js';
+import infraApuntes from '../src/datos/materias/infra/apuntes.js';
+import infraEscenarios from '../src/datos/materias/infra/escenarios.js';
 
 // La materia Infraestructura usa los motores existentes: práctica, misiones,
 // glosario, apuntes y escenarios. No tiene preguntas de diagrama, así que el

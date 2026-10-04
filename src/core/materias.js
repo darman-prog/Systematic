@@ -2,8 +2,8 @@
 // Solo guarda metadatos y conteos: el contenido pesado (preguntas, glosario, apuntes,
 // escenarios, casos) se carga bajo demanda desde src/datos/<id>/index.js (spec 012).
 // Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
-import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/bd2/presentacion.js";
-import { tsKeywords } from "../datos/ts/presentacion.js";
+import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../datos/materias/bd2/presentacion.js";
+import { tsKeywords } from "../datos/lenguajes/ts/presentacion.js";
 
 export async function cargarContenido(materia) {
   const mod = await materia.cargar();
@@ -31,7 +31,7 @@ export const MATERIAS = [
     conteo: { preguntas: 90, terminos: 42, apuntes: 0, escenarios: 1, casos: 2 },
     topicColors: bd2TopicColors,
     sqlKeywords: bd2SqlKeywords,
-    cargar: () => import("../datos/bd2/index.js"),
+    cargar: () => import("../datos/materias/bd2/index.js"),
   },
   {
     id: "isw",
@@ -42,7 +42,7 @@ export const MATERIAS = [
     accentText: "#E7E5DE",
     tipo: "materia",
     conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 },
-    cargar: () => import("../datos/isw/index.js"),
+    cargar: () => import("../datos/materias/isw/index.js"),
   },
   {
     id: "asw",
@@ -53,7 +53,7 @@ export const MATERIAS = [
     accentText: "#101418",
     tipo: "materia",
     conteo: { preguntas: 48, terminos: 19, apuntes: 7, escenarios: 1, casos: 2 },
-    cargar: () => import("../datos/asw/index.js"),
+    cargar: () => import("../datos/materias/asw/index.js"),
   },
   {
     id: "infra",
@@ -64,7 +64,7 @@ export const MATERIAS = [
     accentText: "#101418",
     tipo: "materia",
     conteo: { preguntas: 124, terminos: 45, apuntes: 6, escenarios: 5, casos: 0 },
-    cargar: () => import("../datos/infra/index.js"),
+    cargar: () => import("../datos/materias/infra/index.js"),
   }
 ];
 
@@ -86,9 +86,9 @@ export const LENGUAJES = [
     accentText: "#101418",
     conteo: { preguntas: 100, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
     sqlKeywords: tsKeywords,
-    cargar: () => import("../datos/ts/index.js"),
+    cargar: () => import("../datos/lenguajes/ts/index.js"),
     // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
-    cargarRoadmap: () => import("../datos/ts/roadmap.js").then(m => m.default),
+    cargarRoadmap: () => import("../datos/lenguajes/ts/roadmap.js").then(m => m.default),
   }
 ];
 

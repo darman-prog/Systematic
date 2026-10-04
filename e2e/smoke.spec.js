@@ -1,8 +1,8 @@
 ﻿import { test, expect } from '@playwright/test';
-import bd2Preguntas from '../src/datos/bd2/preguntas.js';
-import iswPreguntas from '../src/datos/isw/preguntas.js';
-import aswPreguntas from '../src/datos/asw/preguntas.js';
-import infraPreguntas from '../src/datos/infra/preguntas.js';
+import bd2Preguntas from '../src/datos/materias/bd2/preguntas.js';
+import iswPreguntas from '../src/datos/materias/isw/preguntas.js';
+import aswPreguntas from '../src/datos/materias/asw/preguntas.js';
+import infraPreguntas from '../src/datos/materias/infra/preguntas.js';
 
 test.describe('Systematic — smoke', () => {
   test('el home lista 4 materias con su estado de contenido', async ({ page }) => {
