@@ -20,18 +20,18 @@ test.describe('Lenguajes — TypeScript', () => {
 
     await expect(page.locator('#screen-lenguaje')).toBeVisible();
     await expect(page.locator('#lenguaje-nombre')).toHaveText('TypeScript');
-    await expect(page.locator('#lenguaje-etapas .etapa')).toHaveCount(5);
+    await expect(page.locator('#lenguaje-etapas .etapa-card')).toHaveCount(5);
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('0 de 5');
 
     // Etapa 1 habilitada; la 5 (capstone) bloqueada.
-    await expect(page.locator('#lenguaje-etapas .etapa').first().locator('.etapa-examen')).toBeEnabled();
-    await expect(page.locator('#lenguaje-etapas .etapa').nth(4).locator('.etapa-examen')).toBeDisabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').first().locator('.btn-examen')).toBeEnabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').nth(4).locator('.btn-examen')).toBeDisabled();
   });
 
   test('una prueba inicia una sesión de quiz', async ({ page }) => {
     await page.goto('/');
     await page.locator('#lenguajes-list .materia-card').first().click();
-    await page.locator('#lenguaje-etapas .etapa-leccion').first().click();
+    await page.locator('#lenguaje-etapas .btn-leccion').first().click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await expect(page.locator('#progress')).toContainText('Pregunta 1');
   });
@@ -40,7 +40,7 @@ test.describe('Lenguajes — TypeScript', () => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
     await page.locator('#lenguajes-list .materia-card').first().click();
-    await page.locator('#lenguaje-etapas .etapa-leccion').first().click();
+    await page.locator('#lenguaje-etapas .btn-leccion').first().click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     // Responder hasta que aparezca el resumen: la lección puede crecer con el contenido.
     for (let i = 0; i < 12; i++) {
@@ -72,11 +72,11 @@ test.describe('Lenguajes — TypeScript', () => {
 
     await page.locator('#lenguajes-list .materia-card').first().click();
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('1 de 5');
-    await expect(page.locator('#lenguaje-etapas .etapa').first()).toHaveClass(/etapa-aprobada/);
+    await expect(page.locator('#lenguaje-etapas .etapa-card').first()).toHaveClass(/is-aprobada/);
     // La etapa 2 queda habilitada por el aprobado de la 1.
-    await expect(page.locator('#lenguaje-etapas .etapa').nth(1).locator('.etapa-examen')).toBeEnabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').nth(1).locator('.btn-examen')).toBeEnabled();
     // La 5 sigue bloqueada hasta la 4.
-    await expect(page.locator('#lenguaje-etapas .etapa').nth(4).locator('.etapa-examen')).toBeDisabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').nth(4).locator('.btn-examen')).toBeDisabled();
   });
 
   test('un aprobado de versión vieja no desbloquea (reconciliación con el roadmap)', async ({ page }) => {
@@ -91,7 +91,7 @@ test.describe('Lenguajes — TypeScript', () => {
     await page.locator('#lenguajes-list .materia-card').first().click();
     // Dentro, la versión vieja no vale: la barra queda en 0 y la etapa 2 bloqueada.
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('0 de 5');
-    await expect(page.locator('#lenguaje-etapas .etapa').nth(1).locator('.etapa-examen')).toBeDisabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').nth(1).locator('.btn-examen')).toBeDisabled();
   });
 
   test('exporta e importa la competencia del lenguaje', async ({ page }) => {
@@ -115,7 +115,7 @@ test.describe('Lenguajes — TypeScript', () => {
       buffer: Buffer.from(JSON.stringify(archivo)),
     });
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('1 de 5');
-    await expect(page.locator('#lenguaje-etapas .etapa').nth(1).locator('.etapa-examen')).toBeEnabled();
+    await expect(page.locator('#lenguaje-etapas .etapa-card').nth(1).locator('.btn-examen')).toBeEnabled();
 
     // Exportar: el nombre del archivo identifica el lenguaje.
     const [download] = await Promise.all([
