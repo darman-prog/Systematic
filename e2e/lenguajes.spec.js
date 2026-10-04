@@ -68,7 +68,7 @@ test.describe('Lenguajes — TypeScript', () => {
       }));
     });
     await page.goto('/');
-    await expect(page.locator('#lenguajes-list .materia-card .competencia-texto')).toContainText('1 de 5');
+    await expect(page.locator('#lenguajes-list .materia-card[data-lenguaje="lenguaje-ts"] .competencia-texto')).toContainText('1 de 5');
 
     await page.locator('#lenguajes-list .materia-card').first().click();
     await expect(page.locator('#lenguaje-competencia .competencia-texto')).toContainText('1 de 5');
@@ -123,5 +123,20 @@ test.describe('Lenguajes — TypeScript', () => {
       page.getByRole('button', { name: 'Exportar competencia' }).click(),
     ]);
     expect(download.suggestedFilename()).toContain('lenguaje-ts');
+  });
+
+  test('el home lista también Java y Python, y Java abre su mapa de etapas', async ({ page }) => {
+    await page.goto('/');
+    const java = page.locator('#lenguajes-list .materia-card[data-lenguaje="lenguaje-java"]');
+    const python = page.locator('#lenguajes-list .materia-card[data-lenguaje="lenguaje-python"]');
+    await expect(java).toContainText('Java');
+    await expect(java).toContainText('100 preguntas');
+    await expect(python).toContainText('Python');
+    await expect(python).toContainText('100 preguntas');
+
+    await java.click();
+    await expect(page.locator('#screen-lenguaje')).toBeVisible();
+    await expect(page.locator('#lenguaje-nombre')).toHaveText('Java');
+    await expect(page.locator('#lenguaje-etapas .etapa-card')).toHaveCount(5);
   });
 });

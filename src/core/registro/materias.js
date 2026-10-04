@@ -4,6 +4,8 @@
 // Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../../datos/materias/bd2/presentacion.js";
 import { tsKeywords } from "../../datos/lenguajes/ts/presentacion.js";
+import { javaKeywords } from "../../datos/lenguajes/java/presentacion.js";
+import { pythonKeywords } from "../../datos/lenguajes/python/presentacion.js";
 
 export async function cargarContenido(materia) {
   const mod = await materia.cargar();
@@ -89,6 +91,34 @@ export const LENGUAJES = [
     cargar: () => import("../../datos/lenguajes/ts/index.js"),
     // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
     cargarRoadmap: () => import("../../datos/lenguajes/ts/roadmap.js").then(m => m.default),
+  },
+  {
+    id: "lenguaje-java",
+    tipo: "lenguaje",
+    nombre: "Java",
+    icono: "codigo",
+    descripcion: "Leé y auditá código Java generado por IA: POO, colecciones y concurrencia.",
+    color: "#744E3B",
+    accentText: "#101418",
+    conteo: { preguntas: 100, terminos: 20, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
+    sqlKeywords: javaKeywords,
+    cargar: () => import("../../datos/lenguajes/java/index.js"),
+    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
+    cargarRoadmap: () => import("../../datos/lenguajes/java/roadmap.js").then(m => m.default),
+  },
+  {
+    id: "lenguaje-python",
+    tipo: "lenguaje",
+    nombre: "Python",
+    icono: "codigo",
+    descripcion: "Leé y auditá código Python generado por IA: sintaxis, estructuras y asincronía.",
+    color: "#ffde57",
+    accentText: "#101418",
+    conteo: { preguntas: 100, terminos: 23, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
+    sqlKeywords: pythonKeywords,
+    cargar: () => import("../../datos/lenguajes/python/index.js"),
+    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
+    cargarRoadmap: () => import("../../datos/lenguajes/python/roadmap.js").then(m => m.default),
   }
 ];
 
