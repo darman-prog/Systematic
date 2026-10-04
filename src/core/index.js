@@ -4,6 +4,7 @@
 export * from "./registro/materias.js";
 export * from "./estudio/progreso.js";
 export * from "./estudio/sesiones.js";
+export * from "./estudio/sesion.js";
 export * from "./estudio/mezclador.js";
 export * from "./estudio/questionSelector.js";
 export * from "./juego/gamificacion.js";

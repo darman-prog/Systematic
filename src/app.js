@@ -7,8 +7,8 @@ import { crearMezclador, storeLocalStorage } from "./core/index.js";
 import {
   obtenerEntrada, aplicarRespuesta, esDebil, vencida, hoyISO
 } from "./core/index.js";
-import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
-import { XP_EVENTOS, xpDeRespuesta, multiplicadorSupervivencia, xpContrarreloj, estrellasDeMision } from "./core/index.js";
+import { shuffle, ordenarPrioridad, prepararItem, filtrarDiagramas, formatearTiempo } from "./core/index.js";
+import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
@@ -28,6 +28,7 @@ import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
+import { crearSesiones } from "./student/session.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
 
 
@@ -56,7 +57,6 @@ const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
 let progreso = {};
-let session = null;
 let escenarioActual = null;
 let escenarioEstado = null;
 
@@ -90,10 +90,22 @@ const track = crearTrack({
   obtenerP, filtrarDiagramas, diagramasDisponibles
 });
 
+// Servicio de la ronda de quiz (student/session.js): estado y orquestación. La parte que
+// toca el DOM (timers, badges, pantalla) queda acá; el resto entra por dependencias.
+const sesiones = crearSesiones({
+  persistencia, gamificacion, track, obtenerP, xpDeRespuesta, XP_EVENTOS,
+  estrellasDeMision, fusionarMision, registrarExamen, prepararItem,
+  guardarIntento, conNombre,
+  // El toast del examen no lleva icono: se pasa el texto tal cual.
+  notificar: texto => toast(texto),
+  alFinalizar: () => { resultados.pintarResultados(false); show("results"); },
+  leerTextoDesarrollo: () => { const ta = $("dev-texto"); return ta ? ta.value : ""; }
+});
+
 // Estado explícito que se inyecta a los módulos de src/ui/ (lectura vía getters,
 // porque estas variables se reasignan al cambiar de materia o de sesión).
 const ctx = {
-  get session() { return session; },
+  get session() { return sesiones.sesion; },
   get banco() { return track.banco; },
   get glosario() { return track.glosario; },
   get materia() { return track.materia; }
@@ -152,31 +164,18 @@ function cambiarMeta(valor) {
   renderStats();
 }
 
+// El progreso de la materia lo sigue escribiendo app.js; el XP de la ronda, la meta diaria y
+// los logros los resuelve el servicio (student/session.js).
 function registrarRespuesta(id, ok) {
   progreso[id] = aplicarRespuesta(obtenerP(id), ok);
   guardarProgreso();
   registrarActividad();
-  let ganado = xpDeRespuesta(ok, progreso[id]);
-  if (session && session.modo === "contrarreloj") {
-    clearTimerPregunta();
-    if (ok) ganado = xpContrarreloj(true, Date.now() - session.preguntaInicio, ganado);
-  }
-  if (session && session.modo === "supervivencia") {
-    if (ok) {
-      session.combo++;
-      session.mejorCombo = Math.max(session.mejorCombo, session.combo);
-      ganado = Math.round(ganado * multiplicadorSupervivencia(session.combo));
-    } else {
-      session.vidas--;
-      session.combo = 0;
-      if (session.vidas <= 0) session.gameOver = true;
-      quiz.pintarVidas();
-    }
-  }
-  if (ganado) gamificacion.sumarXp(ganado);
-  const metaCumplida = (cargarActividad()[hoyISO()] || 0) >= cargarMeta();
-  if (metaCumplida) gamificacion.xpEventoUnico("meta-" + hoyISO(), XP_EVENTOS.metaDiaria);
-  gamificacion.revisarLogros({ metaCumplida });
+  // El bonus de contrarreloj mide contra `sesion.preguntaInicio`; clearTimerPregunta solo
+  // apaga el intervalo, así que el dato sigue intacto para el servicio.
+  if (sesiones.sesion && sesiones.sesion.modo === "contrarreloj") clearTimerPregunta();
+  sesiones.responder(id, ok);
+  // La supervivencia pierde vidas dentro del servicio; el badge lo repinta la UI.
+  if (sesiones.sesion && sesiones.sesion.modo === "supervivencia") quiz.pintarVidas();
 }
 
 function toggleMarked(id) {
@@ -325,16 +324,18 @@ function toggleFiltroTodos(clave, activar) {
 
 // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/estudio/sesiones.js (testeables).
 
-// Timer por pregunta del modo Contrarreloj (spec 003): 30s o fallo.
+// Timer por pregunta del modo Contrarreloj (spec 003): 30s o fallo. La cuenta y el reloj
+// viven en el estado de la sesión (student/session.js); acá solo se pinta el badge.
 function iniciarTimerPregunta() {
-  if (!session || session.modo !== "contrarreloj") return;
-  session.tRestante = session.tPorPregunta;
-  session.preguntaInicio = Date.now();
+  const s = sesiones.sesion;
+  if (!s || s.modo !== "contrarreloj") return;
+  s.tRestante = s.tPorPregunta;
+  s.preguntaInicio = Date.now();
   actualizarTimerPregunta();
-  session.timerPreguntaId = setInterval(() => {
-    session.tRestante--;
+  s.timerPreguntaId = setInterval(() => {
+    s.tRestante--;
     actualizarTimerPregunta();
-    if (session.tRestante <= 0) {
+    if (s.tRestante <= 0) {
       clearTimerPregunta();
       quiz.expirarPregunta();
     }
@@ -343,26 +344,33 @@ function iniciarTimerPregunta() {
 
 function actualizarTimerPregunta() {
   const badge = $("timer-pregunta");
-  if (!badge) return;
-  badge.innerHTML = icono("rayo", "icono-sm") + "<span>" + Math.max(0, session.tRestante) + "s</span>";
-  badge.classList.toggle("timer-low", session.tRestante <= 10);
+  const s = sesiones.sesion;
+  if (!badge || !s) return;
+  badge.innerHTML = icono("rayo", "icono-sm") + "<span>" + Math.max(0, s.tRestante) + "s</span>";
+  badge.classList.toggle("timer-low", s.tRestante <= 10);
 }
 
 function clearTimerPregunta() {
-  if (session && session.timerPreguntaId) {
-    clearInterval(session.timerPreguntaId);
-    session.timerPreguntaId = null;
+  const s = sesiones.sesion;
+  if (s && s.timerPreguntaId) {
+    clearInterval(s.timerPreguntaId);
+    s.timerPreguntaId = null;
   }
 }
 
+// Arranca una ronda: el estado lo crea student/session.js y acá se monta la pantalla. Devuelve
+// la sesión (o null sin ítems) para que quien llama ajuste misionTema/lenguajeId/examenEtapa.
 function startSession(items, modo, conTimer) {
   clearTimer();
   clearTimerPregunta();
-  if (!items || !items.length) return;
-  const preparadas = items.map(it => prepararItem(it, true));
-  session = { items: preparadas, idx: 0, answers: {}, modo, inicio: Date.now(), finalizada: false, pausado: false };
-  if (modo === "contrarreloj") { session.tPorPregunta = 30; session.tRestante = 30; }
-  if (modo === "supervivencia") { session.vidas = 3; session.combo = 0; session.mejorCombo = 0; }
+  const s = sesiones.iniciar(items, modo);
+  if (!s) return null;
+  mostrarQuiz(modo, conTimer);
+  return s;
+}
+
+// Monta la pantalla de quiz y sus badges para la ronda ya creada (solo DOM).
+function mostrarQuiz(modo, conTimer) {
   show("quiz");
   $("timer-badge").classList.toggle("hidden", !conTimer);
   $("simulacro-badge").classList.toggle("hidden", modo !== "simulacro");
@@ -419,7 +427,7 @@ function misionesDeMateria() {
 function irMisiones() {
   clearTimer();
   clearTimerPregunta();
-  session = null;
+  sesiones.limpiar();
   show("misiones");
   renderMisiones();
 }
@@ -432,8 +440,8 @@ function renderMisiones() {
 function iniciarMision(tema) {
   const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tema === tema));
   if (!lista.length) return;
-  startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
-  session.misionTema = tema;
+  const s = startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
+  if (s) s.misionTema = tema;
 }
 
 // ===== Escenarios multi-paso (spec 003): decidir → consecuencias → final con rating =====
@@ -558,38 +566,34 @@ function renderTiposPanel() {
 }
 
 function next() {
-  if (!session) return;
-  const item = session.items[session.idx];
-  if (item.tipo === "desarrollo" && session.modo === "simulacro" && !session.answers[session.idx]) {
-    const ta = $("dev-texto");
-    const texto = ta ? ta.value : "";
-    session.answers[session.idx] = { ok: null, selected: texto || "(sin escribir)", expected: item.solucion, tipo: "desarrollo", texto };
-  }
-  if (session.gameOver || session.idx >= session.items.length - 1) {
-    finalizar();
+  if (!sesiones.sesion) return;
+  const r = sesiones.avanzar();
+  if (!r.continua) {
+    // La ronda cerró (game over o última): apagar el reloj antes de que siga corriendo.
+    clearTimer();
     return;
   }
-  session.idx++;
   quiz.renderQuestion();
-  if (session.modo === "contrarreloj") iniciarTimerPregunta();
+  if (sesiones.sesion.modo === "contrarreloj") iniciarTimerPregunta();
 }
 
 function salir() {
   if (!confirm("¿Salir? Se perderá el avance de esta ronda.")) return;
   clearTimer();
   clearTimerPregunta();
-  session = null;
+  sesiones.limpiar();
   $("pause-overlay").classList.add("hidden");
   goHome();
 }
 
 function iniciarTimer(segundos) {
-  session.restante = segundos;
+  const s = sesiones.sesion;
+  s.restante = segundos;
   actualizarTimer();
-  session.timerId = setInterval(() => {
-    session.restante--;
+  s.timerId = setInterval(() => {
+    s.restante--;
     actualizarTimer();
-    if (session.restante <= 0) {
+    if (s.restante <= 0) {
       clearTimer();
       finalizar();
     }
@@ -597,108 +601,51 @@ function iniciarTimer(segundos) {
 }
 
 function actualizarTimer() {
-  const m = Math.floor(session.restante / 60);
-  const s = session.restante % 60;
+  const s = sesiones.sesion;
   const badge = $("timer-badge");
-  badge.innerHTML = icono("reloj", "icono-sm") + "<span>" + m + ":" + String(s).padStart(2, "0") + "</span>";
-  badge.classList.toggle("timer-low", session.restante <= 60);
+  if (!s || !badge) return;
+  badge.innerHTML = icono("reloj", "icono-sm") + "<span>" + formatearTiempo(s.restante) + "</span>";
+  badge.classList.toggle("timer-low", s.restante <= 60);
 }
 
 function clearTimer() {
-  if (session && session.timerId) {
-    clearInterval(session.timerId);
-    session.timerId = null;
+  const s = sesiones.sesion;
+  if (s && s.timerId) {
+    clearInterval(s.timerId);
+    s.timerId = null;
   }
 }
 
 function alternarPausa() {
-  if (!session || session.modo !== "simulacro" || session.finalizada) return;
-  session.pausado = !session.pausado;
-  $("pause-overlay").classList.toggle("hidden", !session.pausado);
-  $("pause-btn").innerHTML = icono(session.pausado ? "seguir" : "pausa", "icono-sm");
-  if (session.pausado) {
+  const s = sesiones.sesion;
+  if (!s || s.modo !== "simulacro" || s.finalizada) return;
+  s.pausado = !s.pausado;
+  $("pause-overlay").classList.toggle("hidden", !s.pausado);
+  $("pause-btn").innerHTML = icono(s.pausado ? "seguir" : "pausa", "icono-sm");
+  if (s.pausado) {
     clearTimer();
-  } else if (session.restante > 0) {
-    iniciarTimer(session.restante);
+  } else if (s.restante > 0) {
+    iniciarTimer(s.restante);
   }
 }
 
+// Cierra la ronda: la orquestación (resultado, examen, misión, historial) vive en
+// student/session.js; acá solo se apaga el reloj y se delega. La pantalla la pinta el
+// callback `alFinalizar` que recibe el servicio.
 function finalizar() {
   clearTimer();
-  if (!session) return;
-  session.finalizada = true;
-  const items = session.items;
-  const calificables = items.filter(it => it.tipo !== "desarrollo");
-  let aciertos = 0;
-  const porTema = {};
-  calificables.forEach(item => {
-    const i = items.indexOf(item);
-    const a = session.answers[i];
-    porTema[item.tema] = porTema[item.tema] || { ok: 0, total: 0 };
-    porTema[item.tema].total++;
-    if (a && a.ok) {
-      aciertos++;
-      porTema[item.tema].ok++;
-    }
-  });
-  const totalCal = calificables.length || 1;
-  const pct = Math.round((aciertos / totalCal) * 100);
-  const falladas = calificables.filter(item => {
-    const a = session.answers[items.indexOf(item)];
-    return !(a && a.ok);
-  });
-  const desarrollos = items.filter(it => it.tipo === "desarrollo");
-  const segundos = Math.max(0, Math.round((Date.now() - session.inicio) / 1000));
-  const tiempo = Math.floor(segundos / 60) + ":" + String(segundos % 60).padStart(2, "0");
-  session.resultado = { items, calificables, aciertos, totalCal, pct, porTema, falladas, desarrollos, tiempo };
-  // Una sesión de lenguaje (prueba o examen) vuelve al mapa de etapas, no al inicio de materia.
-  if (session.lenguajeId) session.resultado.lenguaje = true;
-  // Examen de un track de lenguaje: registra el aprobado (con versión) y mueve la barra.
-  if (session.modo === "examen" && session.examenEtapa && track.lenguaje) {
-    const nuevo = registrarExamen({ etapa: session.examenEtapa, resultados: track.competencia, aciertos });
-    track.setCompetencia(nuevo);
-    persistencia.guardarCompetencia(track.lenguaje.id, nuevo);
-    const aprobado = nuevo[session.examenEtapa.id].aprobado;
-    session.resultado.examen = { aprobado, etapa: session.examenEtapa };
-    toast(aprobado
-      ? conNombre("¡Examen aprobado, @! ") + session.examenEtapa.nombre
-      : "Aún no: " + pct + "% en " + session.examenEtapa.nombre + ". Repasá y volvé a intentar.");
-  }
-  if (session.modo === "supervivencia") {
-    session.resultado.supervivencia = { jugadas: Object.keys(session.answers).length, mejorCombo: session.mejorCombo || 0 };
-  }
-  if (session.modo === "mision" && session.misionTema) {
-    const mapa = misionesDeMateria();
-    const nuevas = estrellasDeMision(pct);
-    const merge = fusionarMision(mapa[session.misionTema], pct, nuevas);
-    if (merge.cambio) {
-      mapa[session.misionTema] = merge.registro;
-      persistencia.guardarMisiones(track.materia.id, mapa);
-      if (merge.mejoraEstrellas) gamificacion.sumarXp(merge.estrellasGanadas * XP_EVENTOS.estrella);
-    }
-    gamificacion.revisarLogros({ misionPerfecta: nuevas === 3, estrellasTotales: gamificacion.estrellasTotales() });
-  }
-  guardarIntento(aciertos, totalCal, session.modo);
-  gamificacion.revisarLogros({
-    simulacroPerfecto: totalCal > 0 && pct === 100 && session.modo === "simulacro"
-  });
-  resultados.pintarResultados(false);
-  show("results");
+  sesiones.finalizar();
 }
 
 function repetirFalladas() {
-  if (session && session.resultado && session.resultado.falladas.length) {
-    startSession(session.resultado.falladas, "practica", false);
-  }
+  const s = sesiones.repetirFalladas();
+  if (s) mostrarQuiz(s.modo, false);
 }
 
 function repetirMisma() {
-  // Conserva el contexto de examen/lenguaje para que "Repetir ronda" siga registrando competencia.
-  const examenEtapa = session.examenEtapa;
-  const lenguajeId = session.lenguajeId;
-  startSession(session.items, session.modo, session.modo === "simulacro");
-  if (examenEtapa) session.examenEtapa = examenEtapa;
-  if (lenguajeId) session.lenguajeId = lenguajeId;
+  // student/session.js conserva el contexto de examen/lenguaje al repetir la ronda.
+  const s = sesiones.repetirMisma();
+  if (s) mostrarQuiz(s.modo, s.modo === "simulacro");
 }
 
 function guardarIntento(score, total, modo) {
@@ -729,7 +676,7 @@ function renderHistory() {
 
 function irMaterias() {
   clearTimer();
-  session = null;
+  sesiones.limpiar();
   // Salir del track de lenguaje: que no quede activo para export/import ni para el quiz.
   track.limpiarLenguaje();
   aplicarAcento(null);
@@ -790,19 +737,21 @@ function practicarLeccion(etapaId, leccionId) {
   const leccion = etapa?.lecciones.find(x => x.id === leccionId);
   if (!leccion) return;
   const items = track.itemsDeIds(leccion.preguntas);
-  if (items.length) startSession(items, "practica", false);
-  if (session) session.lenguajeId = track.lenguaje.id;
+  if (!items.length) return;
+  const s = startSession(items, "practica", false);
+  if (s) s.lenguajeId = track.lenguaje.id;
 }
 
-// Examen sumativo: al terminar, finalizar() registra el resultado y mueve la barra.
+// Examen sumativo: al terminar, el servicio registra el resultado y mueve la barra.
 function rendirExamen(etapaId) {
   const etapa = track.lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
   if (!etapa) return;
   const items = track.itemsDeIds(etapa.examen.preguntas);
   if (!items.length) return;
-  startSession(items, "examen", false);
-  session.examenEtapa = etapa;
-  session.lenguajeId = track.lenguaje.id;
+  const s = startSession(items, "examen", false);
+  if (!s) return;
+  s.examenEtapa = etapa;
+  s.lenguajeId = track.lenguaje.id;
 }
 
 function renderMateriaUI() {
@@ -867,11 +816,12 @@ const diagramasUI = crearDiagramasUI({
 });
 
 document.addEventListener("keydown", e => {
-  if ($("screen-quiz").classList.contains("hidden") || !session) return;
+  const s = sesiones.sesion;
+  if ($("screen-quiz").classList.contains("hidden") || !s) return;
   const t = e.target;
   if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
-  const item = session.items[session.idx];
-  const answered = !!session.answers[session.idx];
+  const item = s.items[s.idx];
+  const answered = !!s.answers[s.idx];
   if (answered) {
     if (e.key === "Enter") next();
     return;
@@ -895,7 +845,8 @@ document.addEventListener("keydown", e => {
 });
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden && session && session.modo === "simulacro" && !session.pausado && !session.finalizada) {
+  const s = sesiones.sesion;
+  if (document.hidden && s && s.modo === "simulacro" && !s.pausado && !s.finalizada) {
     alternarPausa();
   }
 });
@@ -988,7 +939,7 @@ const ACCIONES = {
   responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
   revelarSolucion: () => quiz.revelarSolucion(),
   saltarFlash: () => flashcards.saltarFlash(),
-  saltarPregunta: () => { quiz.saltarPregunta(); if (session && session.modo === "contrarreloj") clearTimerPregunta(); },
+  saltarPregunta: () => { quiz.saltarPregunta(); if (sesiones.sesion && sesiones.sesion.modo === "contrarreloj") clearTimerPregunta(); },
   startContrarreloj: () => startContrarreloj(),
   startSupervivencia: () => startSupervivencia(),
   salir: () => salir(),
