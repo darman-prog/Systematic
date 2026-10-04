@@ -1,12 +1,13 @@
 ﻿// Render e interacción de la pantalla de quiz (los 8 tipos de pregunta).
 // Recibe el estado de la app vía `ctx` (session/banco como getters) y callbacks para
 // persistencia y acciones; no lee localStorage ni importa datos de materias.
-import { respuestaCorrecta } from "../../core/sesiones.js";
+import {
+  respuestaCorrecta, evaluarDiagrama, normalizarClave, planCorreccion, resumenDiagrama
+} from "../../core/index.js";
 import {
   TIPO_LABELS, DIF_LABELS,
   animar, bloqueCaso, colorTema, diagramaER, escapar, resaltarSQL, seccionesCorreccion, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
-import { evaluarDiagrama, normalizarClave, planCorreccion, resumenDiagrama } from "../../core/diagramas.js";
 import { icono } from "../iconos.js";
 import { crearDiagramasUI } from "../componentes/diagramas.js";
 

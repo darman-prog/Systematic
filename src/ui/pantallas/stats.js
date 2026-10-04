@@ -10,7 +10,7 @@
 // Los colores viven en el CSS (tokens `--ok`, `--accent`, …). Este archivo no
 // duplica la paleta: el canvas los lee con getComputedStyle.
 
-import { calcularRacha, esDebil, hoyISO, vencida } from "../../core/progreso.js";
+import { calcularRacha, esDebil, hoyISO, vencida } from "../../core/index.js";
 import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
 import { aviso } from "../componentes/estados.js";
 

@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { icono, existeIcono, NOMBRES_ICONO } from "./iconos.js";
-import { LOGROS } from "../core/gamificacion.js";
-import { MATERIAS, LENGUAJES } from "../core/materias.js";
+import { LOGROS, MATERIAS, LENGUAJES } from "../core/index.js";
 
 describe("iconos", () => {
   it("expone un set base y resuelve alias", () => {

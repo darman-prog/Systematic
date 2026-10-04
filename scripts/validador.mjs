@@ -1,6 +1,6 @@
 // Validador de schema del contenido de las materias (preguntas, glosario y apuntes).
 // Sin dependencias del DOM: puede importarse desde los tests.
-import { SUBTIPOS, CONFIG_SUBTIPO, esDirigidoTipo, normalizarClave } from "../src/core/diagramas.js";
+import { SUBTIPOS, CONFIG_SUBTIPO, esDirigidoTipo, normalizarClave } from "../src/core/index.js";
 
 export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 // Fuente única con el motor: evita que el contenido declare tipos de arista que el lienzo no ofrece.

@@ -1,7 +1,7 @@
 ﻿// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
 import { escapar, seccionesCorreccion } from "../helpers.js";
-import { planCorreccion } from "../../core/diagramas.js";
+import { planCorreccion } from "../../core/index.js";
 import { estadoVacio } from "../componentes/estados.js";
 import { tarjeta } from "../componentes/tarjetas.js";
 import { tagRating } from "../componentes/etiquetas.js";

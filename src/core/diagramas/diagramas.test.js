@@ -5,12 +5,12 @@ import {
   validarConexion, ratingDiagrama, resumenDiagrama, resumenDiagramaAccesible, ratingDiagramaAccesible,
   planCorreccion, actualizarPosicion, nombreAccesible
 } from "./diagramas.js";
-import bd2Preguntas from "../datos/materias/bd2/preguntas.js";
-import iswPreguntas from "../datos/materias/isw/preguntas.js";
-import aswPreguntas from "../datos/materias/asw/preguntas.js";
-import bd2Casos from "../datos/materias/bd2/casos.js";
-import iswCasos from "../datos/materias/isw/casos.js";
-import aswCasos from "../datos/materias/asw/casos.js";
+import bd2Preguntas from "../../datos/materias/bd2/preguntas.js";
+import iswPreguntas from "../../datos/materias/isw/preguntas.js";
+import aswPreguntas from "../../datos/materias/asw/preguntas.js";
+import bd2Casos from "../../datos/materias/bd2/casos.js";
+import iswCasos from "../../datos/materias/isw/casos.js";
+import aswCasos from "../../datos/materias/asw/casos.js";
 
 const preguntaER = {
   id: "P1-078",

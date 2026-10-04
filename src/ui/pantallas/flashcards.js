@@ -1,7 +1,7 @@
 ﻿// Render e interacción del modo flashcards.
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
-import { shuffle } from "../../core/sesiones.js";
+import { shuffle } from "../../core/index.js";
 import { icono } from "../iconos.js";
 import {
   TIPO_LABELS,

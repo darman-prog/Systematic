@@ -1,5 +1,5 @@
 // Lienzo reutilizable del constructor de diagramas (spec 003, H6a ER + H6b subtipos).
-// Recibe la pregunta `tipo: "diagrama"`, el estado serializable de core/diagramas.js y
+// Recibe la pregunta `tipo: "diagrama"`, el estado serializable de core/diagramas/diagramas.js y
 // callbacks ({ guardarEstado }). Funciona con mouse y toque (Pointer Events +
 // tap-tap); no lee localStorage ni importa datos de materias.
 import { escapar, bloqueCaso } from "../helpers.js";
@@ -7,7 +7,7 @@ import { icono } from "../iconos.js";
 import {
   CONFIG_SUBTIPO, esDirigidoTipo, crearTablero, colocarNodo, quitarNodo,
   asignarMiembro, conectar, quitarConexion, actualizarPosicion
-} from "../../core/diagramas.js";
+} from "../../core/index.js";
 
 const $ = id => document.getElementById(id);
 // Área interna (papel) del lienzo: los nodos se posicionan y se dibujan respecto a ella;

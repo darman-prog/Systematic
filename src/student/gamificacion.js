@@ -1,8 +1,7 @@
 // Servicio de gamificación (spec 006): XP, eventos únicos, logros, racha y perfil.
-// La lógica pura vive en core/gamificacion.js; este servicio orquesta persistencia y
+// La lógica pura vive en core/juego/gamificacion.js; este servicio orquesta persistencia y
 // notificaciones. Presentación (toast/confeti/perfil) entra por callbacks inyectados.
-import { progresoDeNivel, evaluarLogros, XP_EVENTOS } from "../core/gamificacion.js";
-import { calcularRacha } from "../core/progreso.js";
+import { progresoDeNivel, evaluarLogros, XP_EVENTOS, calcularRacha } from "../core/index.js";
 import { sumarEstrellas } from "./registros.js";
 
 export function crearGamificacion({ persistencia, materias, alSubirNivel, alLogro, alCambiarPerfil }) {

@@ -29,7 +29,7 @@ function escaparRegex(texto) {
 }
 
 // Contenido por materia (colores de tema, palabras clave SQL) llega vía la entrada de la
-// materia activa (src/core/materias.js); fallback genérico solo cuando el campo falta.
+// materia activa (src/core/registro/materias.js); fallback genérico solo cuando el campo falta.
 const COLOR_TEMA_FALLBACK = "#3b82f6";
 
 export function colorTema(materia, tema) {
@@ -121,7 +121,7 @@ export function saludoSegunHora(nombre, fecha = new Date()) {
   return quien ? tramo + ", " + quien : tramo;
 }
 
-// Renderiza el plan de corrección (core/diagramas.js → planCorreccion) como secciones
+// Renderiza el plan de corrección (core/diagramas/diagramas.js → planCorreccion) como secciones
 // con pasos numerados: aciertos, qué crear, qué eliminar y qué reubicar. La línea de
 // aciertos solo aparece cuando el diagrama aún no está completo. Compartido por quiz y casos.
 export function seccionesCorreccion(plan) {

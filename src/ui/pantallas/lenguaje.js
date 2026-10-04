@@ -4,7 +4,7 @@
 import { escapar } from "../helpers.js";
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
-import { etapaDesbloqueada, aprobadoVigente, umbralDeExamen } from "../../core/competencia.js";
+import { etapaDesbloqueada, aprobadoVigente, umbralDeExamen } from "../../core/index.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 
 const $ = id => document.getElementById(id);

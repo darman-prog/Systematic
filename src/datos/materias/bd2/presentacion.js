@@ -1,6 +1,6 @@
 // Datos de presentación de BD2: colores por tema del banco y palabras clave SQL
 // (dialecto Oracle) para el resaltado de código. La UI los consume desde la entrada
-// de la materia en src/core/materias.js; una materia sin estos campos usa fallbacks.
+// de la materia en src/core/registro/materias.js; una materia sin estos campos usa fallbacks.
 const topicColors = {
   "DML": "#9BB8C9",
   "DDL": "#B5A9CF",

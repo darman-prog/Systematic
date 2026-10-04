@@ -8,7 +8,7 @@
 //
 //   node scripts/revision-contenido.mjs            → resumen de todas las materias
 //   node scripts/revision-contenido.mjs infra      → detalle de una materia
-import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/materias.js";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/index.js";
 import { validarTodo } from "./validador.mjs";
 import fs from "node:fs";
 import path from "node:path";

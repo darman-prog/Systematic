@@ -1,6 +1,6 @@
 // Acceso único a localStorage (spec 006): claves centralizadas y CRUD por materia/global.
-// Recibe `storage` por parámetro (igual que src/core/progreso.js) para poder testear sin DOM.
-import { claves, migrarClavesLegacy, leerJSON, escribirJSON, metaDiaria } from "../core/progreso.js";
+// Recibe `storage` por parámetro (igual que src/core/estudio/progreso.js) para poder testear sin DOM.
+import { claves, migrarClavesLegacy, leerJSON, escribirJSON, metaDiaria } from "../core/index.js";
 
 // Claves globales (no dependen de la materia activa).
 export const CLAVES_GLOBALES = {

@@ -2,7 +2,7 @@
 // contenido con la forma esperada. Es un gate de build: si un track nuevo se agrega
 // sin su index.js o con una pieza mal exportada, la suite falla.
 import { describe, it, expect } from "vitest";
-import { MATERIAS, LENGUAJES, cargarContenido } from "../../src/core/materias.js";
+import { MATERIAS, LENGUAJES, cargarContenido } from "../../src/core/index.js";
 
 const todos = [...MATERIAS, ...LENGUAJES];
 
