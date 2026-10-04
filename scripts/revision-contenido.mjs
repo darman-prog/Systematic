@@ -19,6 +19,9 @@ const MIN_EXP = 60;
 
 const esArreglo = v => Array.isArray(v);
 const normalizar = t => String(t == null ? "" : t).toLowerCase().replace(/\s+/g, " ").trim();
+// Las opciones se comparan tal cual (sin bajar a minúsculas): en las preguntas "¿qué imprime?"
+// el uso de mayúsculas es parte de la respuesta, no un duplicado.
+const normalizarOpcion = t => String(t == null ? "" : t).replace(/\s+/g, " ").trim();
 const sinHtml = t => String(t == null ? "" : t).replace(/<[^>]*>/g, "");
 
 // Lista de índices correctos según el tipo de pregunta.
@@ -72,7 +75,7 @@ export function analizarMateria(materia) {
 
   for (const p of preguntas) {
     if (esArreglo(p.options)) {
-      const textos = p.options.map(normalizar);
+      const textos = p.options.map(normalizarOpcion);
       if (new Set(textos).size !== textos.length) add("error", p.id, "tiene opciones con texto duplicado");
     }
     if (sinHtml(p.exp).trim().length < MIN_EXP) {
