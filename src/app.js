@@ -758,6 +758,10 @@ async function seleccionarLenguaje(id) {
   progreso = persistencia.progreso(track.lenguaje.id);
   apuntesUI.resetTema();
   aplicarAcento(track.lenguaje);
+  // La portada del dashboard lleva los datos del track activo, también para lenguajes:
+  // sin esto, el título por defecto de index.html ("Base de Datos 2") queda congelado
+  // y al salir de una sesión se ve el dashboard de otra materia.
+  renderMateriaUI();
   pintarLenguaje();
   show("lenguaje");
 }
@@ -835,6 +839,10 @@ function aplicarAcento(materia) {
 // Pantalla de apuntes: vive en ui/aprendizaje/apuntes.js (crearApuntesUI, ADR 007).
 
 function goHome() {
+  // El dashboard refleja siempre el track activo: al volver de una sesión (o al salir de
+  // ella con "Salir") la portada y el tema deben ser del track vigente, no de la última
+  // materia visitada.
+  if (track.materia) renderMateriaUI();
   show("start");
   renderStats();
   renderHistory();
