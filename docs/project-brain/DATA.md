@@ -2,7 +2,7 @@
 status: vigente
 last_reviewed: 2026-09-20
 confidence: confirmado
-source: código (core/progreso.js, app.js, scripts/validador.mjs)
+source: código (core/estudio/progreso.js, app.js, scripts/validador.mjs)
 ---
 
 # Datos y persistencia
@@ -12,7 +12,7 @@ tocar progreso, export/import, migraciones o el contenido de una materia.
 
 ## Persistencia local
 
-No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/progreso.js`
+No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/estudio/progreso.js`
 (`claves(materiaId)`) y en `src/app.js`.
 
 | Clave | Contenido |
@@ -40,7 +40,7 @@ Si `localStorage` está bloqueado o lleno, la app degrada sin persistir.
 
 ## Schema de contenido
 
-El contenido vive en `src/datos/<materia>/` y lo valida `npm run validar`
+El contenido vive en `src/datos/materias/<materia>/` (y `src/datos/lenguajes/<lenguaje>/`) y lo valida `npm run validar`
 (`scripts/validador.mjs`). Campos por tipo de pregunta:
 
 - Comunes: `id`, `parcial`, `tema`, `dificultad` (`facil` | `media` | `dificil`), `tipo`, `q`, `exp`, `ref`.
@@ -72,5 +72,5 @@ versión standalone sin `id`).
 
 ## Presentación por materia
 
-Colores de tema y palabras clave (resaltado SQL) son datos: `src/datos/bd2/presentacion.js`
+Colores de tema y palabras clave (resaltado SQL) son datos: `src/datos/materias/bd2/presentacion.js`
 (`topicColors`, `sqlKeywords`). La UI los consume de la materia activa (ADR 003).

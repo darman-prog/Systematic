@@ -10,9 +10,10 @@ desplegado en Vercel.
 
 - Frontend: JavaScript vanilla (sin framework) + HTML estático.
 - Build: Vite. Estilos: Tailwind CSS 3.4 local (sin CDN en runtime).
-- Datos: módulos JS en `src/datos/<track>/` (`preguntas.js`, `glosario.js`, `apuntes.js`,
-  `roadmap.js`); carga bajo demanda con `import()` dinámico (un chunk por track).
-- Dominio: `src/core/` (incluye `competencia.js`: barra y gate de etapas de un lenguaje).
+- Datos: módulos JS en `src/datos/{materias,lenguajes}/<track>/` (`preguntas.js`, `glosario.js`,
+  `apuntes.js`, `roadmap.js`); carga bajo demanda con `import()` dinámico (un chunk por track).
+- Dominio: `src/core/` agrupado por subdominio con barrel `index.js` (incluye
+  `lenguaje/competencia.js`: barra y gate de etapas de un lenguaje).
 - Persistencia: `localStorage` con namespace `sys.*` (sin backend ni cuentas).
 - Tests: Vitest (unitario) y Playwright (E2E). Validación de datos: `scripts/validar-datos.mjs`.
 - Deploy: Vercel (preset Vite, salida `dist/`).
@@ -21,12 +22,15 @@ desplegado en Vercel.
 
 - `index.html` — shell de la app (pantallas y contenedores; acciones vía `data-action`, sin `onclick` inline).
 - `src/app.js` — composición: estado, navegación, persistencia por track y mapa de acciones delegadas.
-- `src/core/` — dominio puro: `materias.js` (registro de tracks), `competencia.js`, `progreso.js`,
-  `sesiones.js`, `gamificacion.js`, `escenarios.js`, `diagramas.js`. Sin DOM ni localStorage.
+- `src/core/` — dominio puro agrupado por subdominio: `registro/` (materias), `estudio/` (progreso,
+  sesiones, mezclador, questionSelector), `juego/` (gamificacion, escenarios), `lenguaje/`
+  (competencia) y `diagramas/`. `index.js` re-exporta la API pública. Sin DOM ni localStorage.
 - `src/student/` — servicios de aplicación con dependencias inyectadas (persistencia, gamificación).
-- `src/ui/` — render por pantalla/componente; recibe estado por parámetro, no toca `localStorage`.
+- `src/ui/` — render separado en `aprendizaje/` (pantallas de práctica), `dashboard/` (datos del
+  estudiante) y `componentes/` (compartidos); recibe estado por parámetro, no toca `localStorage`.
 - `src/estilos/` — Tailwind + parciales (`tokens`, `componentes`, `pantallas`, `lienzo`).
-- `src/datos/` — contenido por track (incluye presentación: colores de tema, keywords).
+- `src/datos/` — contenido por track en dos ramas: `materias/` y `lenguajes/` (incluye presentación:
+  colores de tema, keywords).
 - `scripts/` — utilidades Node.js (validador de datos, revisión de contenido).
 - `e2e/` — pruebas Playwright.
 - `docs/specs/`, `docs/adr/`, `docs/project-brain/` — specs, decisiones y cerebro documental.

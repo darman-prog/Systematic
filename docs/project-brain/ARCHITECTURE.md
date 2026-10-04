@@ -16,15 +16,15 @@ La Dependency Rule apunta hacia adentro: el dominio no conoce UI ni persistencia
 
 | Capa | Carpeta | Responsabilidad |
 |---|---|---|
-| Dominio | `src/core/` | Reglas puras: `materias.js` (registro de tracks), `progreso.js` (Leitner con `storage` inyectado), `sesiones.js` (armado de sesiones con `rng` inyectable), `escenarios.js` (motor multi-paso), `gamificacion.js` (XP, niveles y logros), `diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating), `competencia.js` (barra y gate de etapas de un lenguaje, spec 011) |
+| Dominio | `src/core/` | Reglas puras, agrupadas por subdominio: `registro/materias.js` (registro de tracks), `estudio/` (progreso con `storage` inyectado, sesiones con `rng` inyectable, mezclador y questionSelector), `juego/` (gamificacion: XP/niveles/logros; escenarios: motor multi-paso), `lenguaje/competencia.js` (barra y gate de etapas, spec 011) y `diagramas/diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating). `index.js` re-exporta la API pública; los consumidores importan de ahí, no de las rutas internas (ADR 007) |
 | Aplicación | `src/student/` | Servicios del recorrido del estudiante con dependencias inyectadas: `persistencia.js` (claves `sys.*` centralizadas y CRUD con `storage`), `gamificacion.js` (XP, logros, racha y perfil; presentación por callbacks), `registros.js` (fusiones puras de mejor resultado) |
-| Render | `src/ui/` | `pantallas/` con un módulo por pantalla (`quiz.js`, `resultados.js`, `stats.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `misiones.js`, `escenarios.js`, `apuntes.js`, `casos.js`) y `componentes/` con piezas compartidas (`estados.js`, `tarjetas.js`, `etiquetas.js`, `anillo.js`, `avisos.js`, `diagramas.js` como lienzo); en la raíz quedan los compartidos `helpers.js`/`iconos.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
+| Render | `src/ui/` | `aprendizaje/` con un módulo por pantalla de práctica (`quiz.js`, `resultados.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `escenarios.js`, `apuntes.js`, `casos.js`, `lenguaje.js`) y `dashboard/` con los datos del estudiante (`stats.js`, `misiones.js`); `componentes/` con piezas compartidas (`estados.js`, `tarjetas.js`, `etiquetas.js`, `anillo.js`, `avisos.js`, `diagramas.js` como lienzo); en la raíz quedan los compartidos `helpers.js`/`iconos.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
 | Composición | `src/app.js` | Estado de la app, navegación, persistencia por materia y mapa de acciones `ACCIONES` con un único listener delegado |
-| Contenido | `src/datos/<materia>/` | Preguntas, glosario, apuntes, escenarios, casos y presentación (colores/keywords) por materia |
+| Contenido | `src/datos/{materias,lenguajes}/<track>/` | Preguntas, glosario, apuntes, escenarios, casos, roadmap y presentación (colores/keywords) por track |
 
 `src/main.js` importa estilos y arranca `app.js`. `index.html` es el shell con las pantallas.
 
-`src/ui/diagramas.js` es un componente compartido: el quiz lo usa para el tipo de pregunta
+`src/ui/componentes/diagramas.js` es un componente compartido: el quiz lo usa para el tipo de pregunta
 `diagrama` y el modo de casos lo instancia aparte con `obtenerItem`/`obtenerEstado`/`guardarEstado`,
 sin acoplarse a la sesión del quiz.
 
@@ -34,6 +34,7 @@ sin acoplarse a la sesión del quiz.
 - [ADR 002](../adr/002-eliminacion-window-globales.md): eventos por `data-action` y mapa de acciones; sin globales en `window` ni `onclick` inline.
 - [ADR 003](../adr/003-contenido-desacoplado-de-ui.md): el contenido específico por materia vive en `src/datos/`, no en core ni UI.
 - [ADR 004](../adr/004-capa-servicios-student.md): servicios de aplicación en `src/student/` con dependencias inyectadas (persistencia, gamificación y registros).
+- [ADR 007](../adr/007-estructura-por-subdominios.md): organización por subdominios en `core/` (con barrel `index.js`), `datos/` (materias/lenguajes) y `ui/` (dashboard/aprendizaje).
 
 ## Deuda conocida
 

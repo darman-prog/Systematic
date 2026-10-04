@@ -12,7 +12,7 @@ Leelo antes de tocar lógica de práctica o progreso, y al agregar un modo de ju
 
 ## Repaso espaciado (Leitner)
 
-Vive en `src/core/progreso.js`. Cada pregunta tiene una caja de 1 a 5.
+Vive en `src/core/estudio/progreso.js`. Cada pregunta tiene una caja de 1 a 5.
 
 - Acierto: sube la caja (máximo 5). Fallo: reinicia a 1.
 - Intervalos de repaso en días: `[0, 1, 3, 7, 16]` según la caja.
@@ -23,7 +23,7 @@ Vive en `src/core/progreso.js`. Cada pregunta tiene una caja de 1 a 5.
 
 ## Sesiones
 
-Vive en `src/core/sesiones.js`. Arma la lista de práctica:
+Vive en `src/core/estudio/sesiones.js`. Arma la lista de práctica:
 
 - Prioridad: débiles, luego vencidas, luego nuevas; cada grupo se baraja (`rng` inyectable).
 - `prepararItem` baraja opciones, piezas, bloques o pares según el tipo de pregunta.
@@ -33,7 +33,7 @@ Tipos de pregunta actuales (definidos en `scripts/validador.mjs`): `multiple`, `
 
 ## Gamificación
 
-Vive en `src/core/gamificacion.js`. La persistencia se orquesta en `app.js` (ver [DATA.md](DATA.md)).
+Vive en `src/core/juego/gamificacion.js`. La persistencia se orquesta en `app.js` (ver [DATA.md](DATA.md)).
 
 - XP base por acierto: 10; repetir una pregunta dominada (caja mayor o igual a 3) da 3.
 - Nivel: `1 + floor(raíz(xp / 100))`; el inicio de cada nivel crece como 100 por (n-1) al cuadrado.
@@ -44,7 +44,7 @@ Vive en `src/core/gamificacion.js`. La persistencia se orquesta en `app.js` (ver
 
 ## Escenarios
 
-Vive en `src/core/escenarios.js`. Multi-paso con decisiones y consecuencias.
+Vive en `src/core/juego/escenarios.js`. Multi-paso con decisiones y consecuencias.
 
 - Cada opción otorga 0, 1 o 2 puntos y muestra feedback antes de continuar.
 - Rating por porcentaje sobre el máximo: 70% o más es éxito, 40% o más es parcial, el resto fracaso.
@@ -52,7 +52,7 @@ Vive en `src/core/escenarios.js`. Multi-paso con decisiones y consecuencias.
 
 ## Diagramas y casos
 
-Motor puro en `src/core/diagramas.js`; el lienzo y el modo de casos viven en `src/ui/`.
+Motor puro en `src/core/diagramas/diagramas.js`; el lienzo y el modo de casos viven en `src/ui/`.
 
 - Subtipos: `er` (no dirigido, cardinalidad `1:1`/`1:N`/`N:M`), `uml-clases` (dirigido:
   herencia/asociación/composición/agregación y asignación de miembros a clases), `casos-uso`
@@ -75,12 +75,13 @@ Motor puro en `src/core/diagramas.js`; el lienzo y el modo de casos viven en `sr
 
 ## Materias y lenguajes
 
-`src/core/materias.js` registra los tracks y expone `getMateria(id)` / `getLenguaje(id)`. El
-contenido vive en `src/datos/<track>/`; el core no tiene ids incrustados (ADR 003).
+`src/core/registro/materias.js` registra los tracks y expone `getMateria(id)` / `getLenguaje(id)`. El
+contenido vive en `src/datos/materias/<materia>/` y `src/datos/lenguajes/<lenguaje>/`; el core no
+tiene ids incrustados (ADR 003).
 
 ## Competencia (lenguajes)
 
-Vive en `src/core/competencia.js` (spec 011). Un track de lenguaje (`tipo: "lenguaje"`) avanza por
+Vive en `src/core/lenguaje/competencia.js` (spec 011). Un track de lenguaje (`tipo: "lenguaje"`) avanza por
 **etapas** con un examen sumativo cada una:
 
 - **Competencia** = etapas de examen aprobadas / total. No es el `nivel` de XP ni la caja Leitner.
@@ -89,4 +90,4 @@ Vive en `src/core/competencia.js` (spec 011). Un track de lenguaje (`tipo: "leng
 - Un aprobado cuenta solo si su `version` coincide con la del examen en el roadmap; si el examen se
   reescribe, la etapa vuelve a estar pendiente (reconciliación en la lectura, sin borrar el resto).
 - El bloqueo se deriva de la etapa anterior (la 1 siempre está abierta; el capstone queda último).
-- El roadmap (etapas, lecciones, umbral y versión) son datos en `src/datos/<lenguaje>/roadmap.js`.
+- El roadmap (etapas, lecciones, umbral y versión) son datos en `src/datos/lenguajes/<lenguaje>/roadmap.js`.

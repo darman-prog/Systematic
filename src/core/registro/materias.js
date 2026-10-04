@@ -1,6 +1,6 @@
 ﻿// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
 // Solo guarda metadatos y conteos: el contenido pesado (preguntas, glosario, apuntes,
-// escenarios, casos) se carga bajo demanda desde src/datos/<id>/index.js (spec 012).
+// escenarios, casos) se carga bajo demanda desde src/datos/{materias,lenguajes}/<id>/index.js (spec 012).
 // Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
 import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../../datos/materias/bd2/presentacion.js";
 import { tsKeywords } from "../../datos/lenguajes/ts/presentacion.js";
