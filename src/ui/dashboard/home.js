@@ -39,16 +39,29 @@ export function crearHome({ persistencia, gamificacion }) {
     const p = gamificacion.perfil();
     const desde = xpMostrado;
     xpMostrado = p.xp;
-    cont.innerHTML =
-      '<div class="perfil-card">' +
-        '<div class="perfil-nivel"><span class="perfil-num">' + p.nivel + '</span><span class="perfil-etq">nivel</span></div>' +
-        '<div class="perfil-datos">' +
-          '<p class="text-xs font-semibold text-slate-300 mb-1">' + (persistencia.nombre() ? "Perfil de " + escapar(persistencia.nombre()) : "Tu perfil") + '</p>' +
-          '<div class="text-sm"><b id="perfil-xp">' + desde + '</b> XP' + (p.faltante ? " · faltan " + p.faltante + " para el nivel " + (p.nivel + 1) : "") + '</div>' +
-          '<div class="progress-track mt-2"><div class="progress-fill" style="width:' + p.pct + '%"></div></div>' +
-          '<div class="perfil-mini">Racha: ' + p.racha + ' día(s) · ' + p.insignias + ' logro(s) desbloqueado(s)</div>' +
-        '</div>' +
-      '</div>';
+    
+    const nombrePerfil = persistencia.nombre() ? `Perfil de ${escapar(persistencia.nombre())}` : "Tu perfil";
+    const xpFaltante = p.faltante ? ` · faltan ${p.faltante} para el nivel ${p.nivel + 1}` : "";
+    const racha = `Racha: ${p.racha} día(s) · ${p.insignias} logro(s) desbloqueado(s)`;
+    
+    cont.innerHTML = `
+      <div class="perfil-card">
+        <div class="perfil-nivel">
+          <span class="perfil-num">${p.nivel}</span>
+          <span class="perfil-etq">nivel</span>
+        </div>
+        <div class="perfil-datos">
+          <p class="perfil-nombre">${nombrePerfil}</p>
+          <div class="perfil-xp-info">
+            <b id="perfil-xp">${desde}</b> XP${xpFaltante}
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" style="width: ${p.pct}%"></div>
+          </div>
+          <div class="perfil-mini">${racha}</div>
+        </div>
+      </div>
+    `;
     contarHasta($("perfil-xp"), desde, p.xp);
   }
 
@@ -58,34 +71,44 @@ export function crearHome({ persistencia, gamificacion }) {
     const saludo = $("saludo-home");
     if (saludo) saludo.textContent = saludoSegunHora(persistencia.nombre());
 
-    cont.innerHTML = MATERIAS.map(m => {
+    const html = MATERIAS.map(m => {
       const n = m.conteo?.preguntas ?? 0;
       const nGlosario = m.conteo?.terminos ?? 0;
       const pendiente = n === 0;
 
       const detalles = pendiente
         ? "Contenido en preparación"
-        : n + " preguntas" + (nGlosario ? " · " + nGlosario + " términos" : "");
+        : `${n} preguntas${nGlosario ? ` · ${nGlosario} términos` : ""}`;
 
-      const ariaLabel = m.nombre + ". " + m.descripcion + ". " + detalles + ". " +
-        (pendiente ? "Materia no disponible aún." : "Presiona para entrar.");
+      const ariaLabel = `${m.nombre}. ${m.descripcion}. ${detalles}. ${
+        pendiente ? "Materia no disponible aún." : "Presiona para entrar."
+      }`;
 
-      return '<button class="materia-card" data-action="seleccionarMateria" data-materia="' + m.id + '" ' +
-        'aria-label="' + ariaLabel + '" ' +
-        (pendiente ? 'disabled aria-disabled="true" ' : '') +
-        'style="--materia-color:' + m.color + '">' +
-        '<span class="materia-icono">' + icono(m.icono) + '</span>' +
-        '<div class="materia-info">' +
-          '<span class="materia-nombre">' + m.nombre + '</span>' +
-          '<span class="materia-desc">' + m.descripcion + '</span>' +
-        '</div>' +
-        '<div class="materia-stats">' +
-          '<span class="materia-stats-texto' + (pendiente ? " materia-pendiente-texto" : "") + '">' + detalles + '</span>' +
-          (pendiente ? '' : '<span class="materia-arrow" aria-hidden="true">→</span>') +
-        '</div>' +
-      '</button>';
+      const disabledAttr = pendiente ? 'disabled aria-disabled="true"' : "";
+      const statsClass = `materia-stats-texto${pendiente ? " materia-pendiente-texto" : ""}`;
+      const arrow = pendiente ? "" : '<span class="materia-arrow" aria-hidden="true">→</span>';
+
+      return `
+        <button class="materia-card" 
+                data-action="seleccionarMateria" 
+                data-materia="${m.id}" 
+                aria-label="${ariaLabel}" 
+                ${disabledAttr}
+                style="--materia-color: ${m.color}">
+          <span class="materia-icono">${icono(m.icono)}</span>
+          <div class="materia-info">
+            <span class="materia-nombre">${m.nombre}</span>
+            <span class="materia-desc">${m.descripcion}</span>
+          </div>
+          <div class="materia-stats">
+            <span class="${statsClass}">${detalles}</span>
+            ${arrow}
+          </div>
+        </button>
+      `;
     }).join("");
 
+    cont.innerHTML = html;
     renderLenguajes();
   }
 
@@ -116,29 +139,38 @@ export function crearHome({ persistencia, gamificacion }) {
       const pendiente = (l.conteo?.preguntas ?? 0) === 0;
       const detalles = pendiente
         ? "Contenido en preparación"
-        : l.conteo.preguntas + " preguntas · " + total + " etapas";
+        : `${l.conteo.preguntas} preguntas · ${total} etapas`;
 
       // La barra es visual; el conteo entra en el nombre accesible del botón para que un
       // lector de pantalla lo anuncie al enfocar la tarjeta.
-      const competenciaTexto = barra.aprobadas + " de " + total + (total === 1 ? " etapa aprobada" : " etapas aprobadas");
+      const competenciaTexto = `${barra.aprobadas} de ${total} ${
+        total === 1 ? "etapa aprobada" : "etapas aprobadas"
+      }`;
 
-      const ariaLabel = l.nombre + ". " + l.descripcion + ". " + detalles + ". Competencia: " +
-        competenciaTexto + ". " + (pendiente ? "No disponible aún." : "Presiona para entrar.");
+      const ariaLabel = `${l.nombre}. ${l.descripcion}. ${detalles}. Competencia: ${competenciaTexto}. ${
+        pendiente ? "No disponible aún." : "Presiona para entrar."
+      }`;
 
-      return '<button class="materia-card materia-card--lenguaje" data-action="seleccionarLenguaje" data-lenguaje="' + l.id + '" ' +
-        'aria-label="' + ariaLabel + '" ' +
-        (pendiente ? 'disabled aria-disabled="true" ' : '') +
-        'style="--materia-color:' + l.color + '">' +
-        '<span class="materia-icono">' + icono(l.icono) + '</span>' +
-        '<div class="materia-info">' +
-          '<span class="materia-nombre">' + l.nombre + '</span>' +
-          '<span class="materia-desc">' + l.descripcion + '</span>' +
-        '</div>' +
-        '<div class="materia-stats">' +
-          '<span class="materia-stats-texto">' + detalles + '</span>' +
-          barraCompetencia({ ...barra, color: l.color }) +
-        '</div>' +
-      '</button>';
+      const disabledAttr = pendiente ? 'disabled aria-disabled="true"' : "";
+
+      return `
+        <button class="materia-card materia-card--lenguaje" 
+                data-action="seleccionarLenguaje" 
+                data-lenguaje="${l.id}" 
+                aria-label="${ariaLabel}" 
+                ${disabledAttr}
+                style="--materia-color: ${l.color}">
+          <span class="materia-icono">${icono(l.icono)}</span>
+          <div class="materia-info">
+            <span class="materia-nombre">${l.nombre}</span>
+            <span class="materia-desc">${l.descripcion}</span>
+          </div>
+          <div class="materia-stats">
+            <span class="materia-stats-texto">${detalles}</span>
+            ${barraCompetencia({ ...barra, color: l.color })}
+          </div>
+        </button>
+      `;
     }));
 
     cont.innerHTML = tarjetas.join("");

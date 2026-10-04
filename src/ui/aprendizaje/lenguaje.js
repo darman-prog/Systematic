@@ -1,6 +1,4 @@
-// Pantalla del track de lenguaje (spec 011): barra de competencia y mapa de etapas con
-// sus pruebas (lecciones) y el examen que hace de gate. Recibe estado por parámetro;
-// no lee localStorage. El motor de quiz se reusa tal cual para pruebas y exámenes.
+// Pantalla del track de lenguaje (spec 011): barra de competencia y mapa de etapas.
 import { escapar } from "../helpers.js";
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
@@ -9,7 +7,6 @@ import { barraCompetencia } from "../componentes/competencia.js";
 
 const $ = id => document.getElementById(id);
 
-// Estado de cada etapa: desbloqueada, aprobada e intentos/último porcentaje.
 export function estadoEtapas(roadmap, competencia) {
   const etapas = roadmap?.etapas || [];
   return etapas.map((etapa, i) => {
@@ -30,11 +27,11 @@ export function pintarCompetencia(barra, color) {
   cont.innerHTML = barraCompetencia({ ...barra, color });
 }
 
-function etiquetaEtapa(nodo) {
-  if (nodo.aprobada) return "Aprobada";
-  if (!nodo.desbloqueada) return "Bloqueada: aprobá la etapa anterior";
-  if (nodo.intentos) return "Último examen: " + Math.round((nodo.ultimoPct || 0) * 100) + "%";
-  return "Disponible";
+function obtenerEstadoEtapa(nodo) {
+  if (nodo.aprobada) return { texto: "Aprobada", clase: "badge-aprobada" };
+  if (!nodo.desbloqueada) return { texto: "Bloqueada", clase: "badge-bloqueada" };
+  if (nodo.intentos) return { texto: `Último: ${Math.round((nodo.ultimoPct || 0) * 100)}%`, clase: "badge-intento" };
+  return { texto: "Disponible", clase: "badge-disponible" };
 }
 
 export function pintarEtapas(nodos, lenguaje) {
@@ -46,52 +43,76 @@ export function pintarEtapas(nodos, lenguaje) {
     return;
   }
 
-  const color = lenguaje?.color || "";
+  const color = lenguaje?.color || "var(--color-primario, #667eea)";
 
   const html = nodos.map((nodo, i) => {
     const etapa = nodo.etapa;
     const necesita = umbralDeExamen(etapa.examen.preguntas.length, etapa.examen.umbral);
     const total = etapa.examen.preguntas.length;
-
-    // Una sola etapa queda "en curso" (desbloqueada sin aprobar); las aprobadas y bloqueadas
-    // se distinguen con icono, texto y borde además del color.
-    const clases = [
-      "etapa",
-      nodo.aprobada ? "etapa-aprobada" : "",
-      nodo.desbloqueada ? "" : "etapa-bloqueada",
-      nodo.desbloqueada && !nodo.aprobada ? "etapa-actual" : "",
-    ].filter(Boolean).join(" ");
-
-    const lecciones = etapa.lecciones.map(lec =>
-      '<button class="etapa-leccion" data-action="practicarLeccion" data-etapa="' + etapa.id +
-        '" data-leccion="' + lec.id + '"' + (nodo.desbloqueada ? "" : " disabled aria-disabled=\"true\"") +
-        ' aria-label="Prueba: ' + escapar(lec.nombre) + '. ' + lec.preguntas.length + ' preguntas.">' +
-        icono("practica", "icono-sm") + '<span class="etapa-btn-titulo">' + escapar(lec.nombre) + '</span>' +
-        '<span class="etapa-leccion-meta">' + lec.preguntas.length + ' preguntas</span>' +
-      '</button>'
-    ).join("");
-
-    const examen = '<button class="etapa-examen" data-action="rendirExamen" data-etapa="' + etapa.id + '"' +
-      (nodo.desbloqueada ? "" : " disabled aria-disabled=\"true\"") +
-      ' aria-label="Examen de ' + escapar(etapa.nombre) + '. ' + total + ' preguntas, se aprueba con ' + necesita + '.">' +
-      icono("medalla", "icono-sm") + '<span class="etapa-btn-titulo">Examen</span>' +
-      '<span class="etapa-leccion-meta">' + total + ' preguntas · aprueba con ' + necesita + '</span>' +
-    '</button>';
-
+    const estado = obtenerEstadoEtapa(nodo);
+    
     const estadoIco = nodo.aprobada ? "check" : (nodo.desbloqueada ? "punto" : "bloqueada");
+    const disabledAttr = nodo.desbloqueada ? "" : "disabled aria-disabled=\"true\" tabindex=\"-1\"";
+    const lockedOverlay = !nodo.desbloqueada ? '<div class="etapa-lock-overlay"></div>' : "";
 
-    return '<li class="etapa-item">' +
-      '<div class="' + clases + '" style="' + (color ? "--competencia-color:" + color : "") + '">' +
-        '<div class="etapa-cabecera">' +
-          '<span class="etapa-num" aria-hidden="true">' + (i + 1) + '</span>' +
-          '<span class="etapa-nombre">' + escapar(etapa.nombre) + '</span>' +
-          '<span class="etapa-ico">' + icono(estadoIco, "icono-sm") + '</span>' +
-        '</div>' +
-        '<p class="etapa-estado">' + escapar(etiquetaEtapa(nodo)) + '</p>' +
-        '<div class="etapa-acciones">' + lecciones + examen + '</div>' +
-      '</div>' +
-    '</li>';
+    // Generar botones de lecciones
+    const leccionesHtml = etapa.lecciones.map(lec => `
+      <button class="btn-leccion" data-action="practicarLeccion" data-etapa="${etapa.id}" data-leccion="${lec.id}" ${disabledAttr} aria-label="Practicar ${escapar(lec.nombre)}">
+        <span class="btn-icono">${icono("practica", "icono-sm")}</span>
+        <span class="btn-texto">
+          <span class="btn-titulo">${escapar(lec.nombre)}</span>
+          <span class="btn-meta">${lec.preguntas.length} preguntas</span>
+        </span>
+      </button>
+    `).join("");
+
+    // Generar botón de examen
+    const examenHtml = `
+      <button class="btn-examen" data-action="rendirExamen" data-etapa="${etapa.id}" ${disabledAttr} aria-label="Rendir examen de ${escapar(etapa.nombre)}">
+        <span class="btn-icono">${icono("medalla", "icono-sm")}</span>
+        <span class="btn-texto">
+          <span class="btn-titulo">Rendir Examen</span>
+          <span class="btn-meta">${total} preguntas · aprueba con ${necesita}</span>
+        </span>
+      </button>
+    `;
+
+    return `
+      <li class="etapa-item">
+        <article class="etapa-card ${nodo.aprobada ? "is-aprobada" : ""} ${!nodo.desbloqueada ? "is-bloqueada" : ""} ${nodo.desbloqueada && !nodo.aprobada ? "is-actual" : ""}" style="--color-tema: ${color}">
+          ${lockedOverlay}
+          
+          <header class="etapa-header">
+            <div class="etapa-identidad">
+              <span class="etapa-num">${String(i + 1).padStart(2, '0')}</span>
+              <div class="etapa-titulos">
+                <h3 class="etapa-nombre">${escapar(etapa.nombre)}</h3>
+                <span class="etapa-badge ${estado.clase}">${estado.texto}</span>
+              </div>
+            </div>
+            <span class="etapa-ico">${icono(estadoIco, "icono-md")}</span>
+          </header>
+
+          <div class="etapa-body">
+            ${nodo.ultimoPct !== null && !nodo.aprobada ? `
+              <div class="etapa-score">
+                <span>Mejor intento:</span>
+                <strong>${Math.round(nodo.ultimoPct * 100)}%</strong>
+              </div>
+            ` : ''}
+            
+            <div class="etapa-lecciones-lista">
+              ${leccionesHtml}
+            </div>
+          </div>
+
+          <footer class="etapa-footer">
+            ${examenHtml}
+          </footer>
+        </article>
+      </li>
+    `;
   }).join("");
 
-  cont.innerHTML = '<ol class="etapas-camino" role="list">' + html + '</ol>';
+  cont.innerHTML = `<ol class="etapas-camino" role="list" aria-label="Mapa de etapas del lenguaje">${html}</ol>`;
 }
