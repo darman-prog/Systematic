@@ -64,6 +64,11 @@ funcionar sin conexión y sin cuenta), free tier. El import/export JSON v2 ya ex
   acceso (login/registro) con la puerta "Continuar sin cuenta" hacia el onboarding local; al
   iniciar sesión con un respaldo disponible se ofrece restaurarlo. Sin claves, la app queda
   100% local como siempre.
+- Google exige configuración en la consola: proveedor habilitado en *Sign-in method* y el
+  dominio en *Authorized domains* (`systematicx.vercel.app` y `localhost` para desarrollo);
+  sin eso el SDK falla con `auth/unauthorized-domain`. Si el navegador bloquea el popup, el
+  adaptador reintenta con `signInWithRedirect` y la sesión se resuelve al volver por
+  `onAuthStateChanged`.
 - Limitaciones conocidas:
   - En un navegador compartido, el progreso local no está aislado por cuenta: una segunda cuenta
     ve el progreso anterior y podría subirlo. Mitigación futura: guardar el último `uid` y
