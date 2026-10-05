@@ -31,6 +31,7 @@
 
   /* Identidad tipográfica (spec 007): fuente display self-hosted solo para titulares. */
   --fuente-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --fuente-mono: "JetBrains Mono", Consolas, monospace;
 }
 
 html { background: var(--study-bg); }

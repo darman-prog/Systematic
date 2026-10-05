@@ -1,0 +1,330 @@
+/* Pantalla de cuenta: acceso embebido (login, registro, recuperar) y aviso de sesión.
+   Adaptado del prototipo del usuario: estilos scopeados a #auth-root para no pisar clases
+   del resto de la app; los tokens viven en tokens.css. */
+[hidden] { display: none !important; }
+
+/* ===== Caja y card ===== */
+#auth-root .auth-caja {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+  animation: entrar var(--mov-base) var(--mov-ease);
+}
+
+@keyframes entrar {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+#auth-root .auth-card {
+  background: linear-gradient(180deg, var(--study-surface), var(--study-surface-2));
+  border: 1px solid var(--study-border);
+  border-radius: 16px;
+  box-shadow: var(--study-shadow);
+  padding: 28px;
+}
+
+/* ===== Cabecera ===== */
+#auth-root .auth-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+#auth-root .head-tile {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 11px;
+  background: var(--study-surface-3);
+  border: 1px solid var(--study-border);
+  color: var(--study-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#auth-root .head-texto { display: flex; flex-direction: column; gap: 1px; }
+
+#auth-root .head-nombre {
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+}
+
+/* ===== Títulos ===== */
+#auth-root .auth-titulo {
+  font-family: var(--fuente-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 4px;
+}
+
+#auth-root .auth-titulo:focus { outline: none; }
+
+#auth-root .auth-titulo em {
+  color: var(--study-accent);
+  font-style: italic;
+}
+
+#auth-root .auth-sub {
+  color: var(--study-muted);
+  font-size: 0.87rem;
+  margin: 0 0 20px;
+}
+
+/* ===== Aviso general (errores sin campo) ===== */
+#auth-root .auth-alerta {
+  margin: 0 0 14px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--study-error) 45%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--study-error) 12%, transparent);
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--study-error);
+}
+
+#auth-root .auth-alerta:empty { display: none; }
+
+/* ===== Campos ===== */
+#auth-root .auth-form { display: flex; flex-direction: column; gap: 15px; }
+
+#auth-root .campo { display: flex; flex-direction: column; gap: 6px; }
+
+#auth-root .campo-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+#auth-root .campo-label {
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--study-muted);
+}
+
+#auth-root .campo-input-wrap { position: relative; }
+
+#auth-root .campo-ico {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--study-muted);
+  pointer-events: none;
+  transition: color var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .campo-input {
+  width: 100%;
+  background: var(--study-bg);
+  border: 1px solid var(--study-border);
+  border-radius: 10px;
+  color: var(--study-text);
+  font: inherit;
+  /* 16px: evita el zoom automático de iOS al enfocar */
+  font-size: 1rem;
+  padding: 11px 44px 11px 40px;
+  transition: border-color var(--mov-rapida) var(--mov-ease), box-shadow var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .campo-input::placeholder { color: var(--study-muted); opacity: 0.5; }
+
+#auth-root .campo-input:focus {
+  outline: none;
+  border-color: var(--study-accent);
+  box-shadow: 0 0 0 3px rgba(155, 184, 201, 0.13);
+}
+
+#auth-root .campo-input-wrap:focus-within .campo-ico { color: var(--study-accent); }
+
+#auth-root .campo-input[aria-invalid="true"] { border-color: var(--study-error); }
+#auth-root .campo-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(217, 154, 139, 0.13); }
+
+#auth-root .campo-ojo {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--study-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--mov-rapida) var(--mov-ease), color var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .campo-ojo:hover { background: var(--study-surface-3); color: var(--study-text); }
+
+#auth-root .campo-ojo:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: -2px;
+}
+
+#auth-root .campo-error {
+  font-size: 0.78rem;
+  color: var(--study-error);
+  border-left: 2px solid var(--study-error);
+  padding-left: 8px;
+  margin: 0;
+}
+
+#auth-root .campo-error:empty { display: none; }
+
+/* ===== Botones ===== */
+#auth-root .btn-primario {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: var(--study-accent-strong);
+  color: var(--study-bg);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 12px 16px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: filter var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .btn-primario:hover { filter: brightness(1.09); }
+#auth-root .btn-primario:active { filter: brightness(0.94); transform: translateY(1px); }
+
+#auth-root .btn-primario[aria-disabled="true"],
+#auth-root .btn-sec[aria-disabled="true"] {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+#auth-root .btn-sec {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 8px;
+  padding: 11px 16px;
+  background: var(--study-surface-3);
+  border: 1px solid var(--study-border);
+  border-radius: 10px;
+  color: var(--study-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--mov-rapida) var(--mov-ease), filter var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .btn-sec:hover { background: var(--study-surface-2); filter: brightness(1.05); }
+
+#auth-root .btn-sec:focus-visible,
+#auth-root .btn-primario:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: 2px;
+}
+
+#auth-root .link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--study-accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#auth-root .link:hover { text-decoration: underline; }
+
+#auth-root .link:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ===== Divider y chips de lenguajes ===== */
+#auth-root .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0 12px;
+  color: var(--study-muted);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+#auth-root .auth-divider::before,
+#auth-root .auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--study-border);
+}
+
+#auth-root .auth-tracks {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+#auth-root .track-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  color: var(--study-muted);
+  background: var(--study-bg);
+  border: 1px solid var(--study-border);
+  border-radius: 999px;
+  padding: 4px 11px;
+}
+
+#auth-root .track-punto { width: 7px; height: 7px; border-radius: 50%; }
+
+/* ===== Pies ===== */
+#auth-root .auth-pie {
+  font-size: 0.85rem;
+  color: var(--study-muted);
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 18px 0 0;
+}
+
+#auth-root .auth-foot {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-family: var(--fuente-mono);
+  color: var(--study-muted);
+  opacity: 0.65;
+}
+
+/* ===== Móvil ===== */
+@media (max-width: 480px) {
+  #auth-root .auth-card { padding: 24px 20px; }
+}
+
+/* ===== Aviso de la pantalla de cuenta (#cuenta-aviso) ===== */
+#cuenta-aviso {
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  border: 1px solid color-mix(in srgb, currentColor 45%, transparent);
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+#cuenta-aviso[data-estado="ok"] { color: var(--study-success, #3ccf93); }
+#cuenta-aviso[data-estado="error"] { color: var(--study-error, #f0707a); }
+#cuenta-aviso[data-estado="procesando"] { color: var(--study-muted, #9aa3b5); }
