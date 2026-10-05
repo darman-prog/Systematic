@@ -170,6 +170,25 @@
   outline-offset: -2px;
 }
 
+/* Cruce de los dos iconos del ojo: aria-pressed es el único estado (a11y) y también
+   conmuta la animación, así que el JS no toca iconos. */
+#auth-root .campo-ojo span {
+  display: inline-flex;
+  transition: opacity var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
+}
+
+#auth-root .campo-ojo .ojo-off {
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.75);
+}
+
+#auth-root .campo-ojo[aria-pressed="true"] .ojo-on { opacity: 0; transform: scale(0.75); }
+#auth-root .campo-ojo[aria-pressed="true"] .ojo-off { opacity: 1; transform: scale(1); }
+
 #auth-root .campo-error {
   font-size: 0.78rem;
   color: var(--study-error);
@@ -251,16 +270,14 @@
   border-radius: 4px;
 }
 
-/* ===== Divider y chips de lenguajes ===== */
+/* ===== Divisor "o" entre el botón principal y Google ===== */
 #auth-root .auth-divider {
   display: flex;
   align-items: center;
   gap: 10px;
   margin: 20px 0 12px;
   color: var(--study-muted);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  font-size: 0.75rem;
 }
 
 #auth-root .auth-divider::before,
@@ -270,27 +287,6 @@
   height: 1px;
   background: var(--study-border);
 }
-
-#auth-root .auth-tracks {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-#auth-root .track-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.72rem;
-  color: var(--study-muted);
-  background: var(--study-bg);
-  border: 1px solid var(--study-border);
-  border-radius: 999px;
-  padding: 4px 11px;
-}
-
-#auth-root .track-punto { width: 7px; height: 7px; border-radius: 50%; }
 
 /* ===== Pies ===== */
 #auth-root .auth-pie {
@@ -305,15 +301,6 @@
 #auth-root .auth-invitado { margin-top: 10px; }
 
 #auth-root .auth-invitado .link { font-weight: 500; }
-
-#auth-root .auth-foot {
-  margin-top: 16px;
-  text-align: center;
-  font-size: 0.7rem;
-  font-family: var(--fuente-mono);
-  color: var(--study-muted);
-  opacity: 0.65;
-}
 
 /* ===== Móvil ===== */
 @media (max-width: 480px) {

@@ -25,6 +25,15 @@ describe("ui/cuenta/autenticacion", () => {
     const conGoogle = montar({ alGoogle: vi.fn(async () => {}) });
     conGoogle.auth.renderLogin();
     expect(document.querySelector("[data-google]")).toBeTruthy();
+    expect(document.querySelector("[data-google] svg")).toBeTruthy();
+  });
+
+  it("no renderiza el lema ni chips decorativos", () => {
+    const { auth } = montar();
+    auth.renderLogin();
+    expect(document.querySelector(".auth-foot")).toBeNull();
+    expect(document.querySelector(".track-chip")).toBeNull();
+    expect(document.querySelector(".auth-tracks")).toBeNull();
   });
 
   it("valida el correo antes de llamar al callback", () => {
@@ -33,7 +42,7 @@ describe("ui/cuenta/autenticacion", () => {
     $("login-email").value = "mal";
     $("login-pass").value = "secreto1";
     enviar();
-    expect($("login-email-error").textContent).toBe("Revisá el formato del correo.");
+    expect($("login-email-error").textContent).toBe("Revisa el formato del correo.");
     expect(alIniciarSesion).not.toHaveBeenCalled();
   });
 
@@ -53,7 +62,7 @@ describe("ui/cuenta/autenticacion", () => {
 
   it("un error sin campo sale como aviso general", async () => {
     const alIniciarSesion = vi.fn(async () => {
-      throw { mensaje: "Demasiados intentos. Esperá unos minutos." };
+      throw { mensaje: "Demasiados intentos. Espera unos minutos." };
     });
     const { auth } = montar({ alIniciarSesion });
     auth.renderLogin();
@@ -106,16 +115,22 @@ describe("ui/cuenta/autenticacion", () => {
     enviar();
     await flush();
     expect(alRecuperar).toHaveBeenCalledWith(expect.objectContaining({ correo: "ana@x.com" }));
-    expect(document.getElementById("auth-root").textContent).toContain("Revisá tu correo");
+    expect(document.getElementById("auth-root").textContent).toContain("Revisa tu correo");
   });
 
-  it("el ojo alterna la visibilidad de la contraseña", () => {
+  it("el ojo alterna la visibilidad con dos iconos y aria-pressed", () => {
     const { auth } = montar();
     auth.renderLogin();
-    document.querySelector('[data-ojo="login-pass"]').click();
+    const boton = document.querySelector('[data-ojo="login-pass"]');
+    expect(boton.querySelector(".ojo-on")).toBeTruthy();
+    expect(boton.querySelector(".ojo-off")).toBeTruthy();
+    expect(boton.getAttribute("aria-pressed")).toBe("false");
+    boton.click();
     expect($("login-pass").type).toBe("text");
-    document.querySelector('[data-ojo="login-pass"]').click();
+    expect(boton.getAttribute("aria-pressed")).toBe("true");
+    boton.click();
     expect($("login-pass").type).toBe("password");
+    expect(boton.getAttribute("aria-pressed")).toBe("false");
   });
 
   it("la puerta de invitado aparece solo si se pasa alContinuarSinCuenta", () => {
