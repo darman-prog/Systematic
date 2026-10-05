@@ -136,21 +136,21 @@ const campoDeCodigo = codigo => codigo === "auth/invalid-email" ? "correo"
 const esCancelado = codigo => codigo === "auth/popup-closed-by-user" || codigo === "auth/cancelled-popup-request";
 
 // Adapta los resultados de los servicios al contrato de crearAuth: los errores se lanzan
-// como { mensaje, campo? } (o { cancelado: true }) y el éxito navega fuera del acceso.
+// como { mensaje, campo? } (o { cancelado: true }) y el éxito entra a la app (entrarConCuenta).
 async function pedirCuenta(ejecutar, alExito) {
   const r = await ejecutar();
   if (!r.ok) {
     if (esCancelado(r.codigo)) throw { cancelado: true };
     throw { mensaje: r.mensaje, campo: campoDeCodigo(r.codigo) };
   }
-  if (alExito) alExito(r);
+  if (alExito) await alExito(r);
   return r;
 }
 
 const auth = crearAuth({
   alIniciarSesion: datos => pedirCuenta(
     () => cuenta.ingresar(datos.correo, datos.contrasena),
-    r => cuentaUI.pintar(r.usuario)
+    r => entrarConCuenta(r.usuario)
   ),
   alRegistrarse: datos => pedirCuenta(
     async () => {
@@ -159,13 +159,18 @@ const auth = crearAuth({
       if (r.ok && datos.nombre) persistencia.guardarNombre(datos.nombre);
       return r;
     },
-    r => cuentaUI.pintar(r.usuario)
+    r => entrarConCuenta(r.usuario)
   ),
   alRecuperar: datos => pedirCuenta(() => cuenta.enviarReset(datos.correo)),
   alGoogle: () => pedirCuenta(
     () => cuenta.ingresarConGoogle(),
-    r => cuentaUI.pintar(r.usuario)
-  )
+    r => entrarConCuenta(r.usuario)
+  ),
+  // Puerta de invitado: quien no quiere cuenta sigue con el flujo local de siempre.
+  alContinuarSinCuenta: () => {
+    if (!persistencia.nombre() && !persistencia.onboardingHecho()) mostrarOnboardingLocal();
+    else mostrarMaterias();
+  }
 });
 
 // Config de práctica y pantalla de apuntes (extraídas de app.js, ADR 007).
@@ -917,28 +922,80 @@ document.addEventListener("visibilitychange", () => {
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
 // namespace al arrancar, antes de que el usuario seleccione materia.
 persistencia.migrarLegacy("bd2");
-// Onboarding (primera impresión): si nunca dijimos quién es, la pantalla de bienvenida
-// pide el nombre. Con flag o nombre guardado se entra directo al home con saludo.
-if (!persistencia.nombre() && !persistencia.onboardingHecho()) {
+
+// El constructor de diagramas (y los casos técnicos) solo se ofrece en escritorio: en táctil
+// se ocultan sus entradas del dashboard, que viven en el HTML estático.
+if (!diagramasDisponibles()) {
+  document.querySelectorAll('#screen-start [data-action="startCasos"], #screen-start [data-action="practicarCasos"]')
+    .forEach(el => el.classList.add("hidden"));
+}
+
+// Onboarding local (primera impresión sin cuenta): pide el nombre una sola vez.
+function mostrarOnboardingLocal() {
   show("onboarding");
   const entrada = $("onboarding-nombre");
   if (entrada) entrada.focus();
-} else {
+}
+
+function mostrarMaterias() {
   home.renderMaterias();
   home.renderPerfil();
   show("materias");
 }
 
-// Cuenta (ADR 008): sin claves de Firebase la pantalla queda deshabilitada y la app sigue
-// funcionando solo en local. Con claves, se restaura la sesión al recargar y se muestra el
-// botón "Cuenta" del dashboard.
+// Ofrece traer el respaldo cuando el navegador todavía no tiene estado local. Devuelve true
+// si restauró (la página se recarga y el arranque termina ahí).
+async function ofrecerRestauracion(usuario) {
+  if (!usuario || persistencia.nombre() || persistencia.onboardingHecho()) return false;
+  const r = await nube.bajar(usuario.uid);
+  if (!r.ok) return false; // sin respaldo (o sin conexión): se entra en modo local
+  const fecha = fechaSnapshot(r.datos);
+  const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
+  if (!confirm("Encontramos un respaldo del " + cuando + ". ¿Restaurar tu progreso en este dispositivo?")) return false;
+  aplicarSnapshot(r.datos, persistencia);
+  location.reload();
+  return true;
+}
+
+// Entrada común tras iniciar sesión o registrarse: pinta el panel, ofrece restaurar si hay
+// respaldo y entra al home. La cuenta ya da identidad: no se repite el onboarding por nombre.
+async function entrarConCuenta(usuario) {
+  cuentaUI.pintar(usuario);
+  if (await ofrecerRestauracion(usuario)) return;
+  if (!persistencia.onboardingHecho()) persistencia.guardarOnboardingHecho();
+  mostrarMaterias();
+}
+
+// Cuenta (ADR 008): decide la pantalla inicial. Sin claves de Firebase la app queda 100%
+// local (onboarding por nombre); con claves, el primer contacto es el acceso y la sesión se
+// restaura al recargar. El botón "Cuenta" del dashboard se muestra solo si hay configuración.
 (async () => {
   const disponible = await cuenta.disponible();
   const btnCuenta = $("btn-cuenta");
   if (btnCuenta) btnCuenta.classList.toggle("hidden", !disponible);
-  if (!disponible) return;
+
+  if (!disponible) {
+    if (!persistencia.nombre() && !persistencia.onboardingHecho()) mostrarOnboardingLocal();
+    else mostrarMaterias();
+    return;
+  }
+
   await cuenta.iniciar();
-  if (cuenta.estado()) cuentaUI.pintar(cuenta.estado());
+  const usuario = cuenta.estado();
+  if (usuario) {
+    await entrarConCuenta(usuario);
+    return;
+  }
+
+  // Navegador nuevo sin sesión: primero el acceso. Quien ya usó la app como invitado sigue
+  // entrando directo a sus materias.
+  if (persistencia.onboardingHecho() || persistencia.nombre()) {
+    mostrarMaterias();
+    return;
+  }
+  cuentaUI.pintar(null);
+  auth.renderLogin();
+  show("cuenta");
 })();
 
 // Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre

@@ -4,10 +4,10 @@
 import { describe, it, expect, vi } from "vitest";
 import { crearAuth } from "./autenticacion.js";
 
-function montar({ alIniciarSesion = vi.fn(async () => {}), alRegistrarse = vi.fn(async () => {}), alRecuperar = vi.fn(async () => {}), alGoogle } = {}) {
+function montar({ alIniciarSesion = vi.fn(async () => {}), alRegistrarse = vi.fn(async () => {}), alRecuperar = vi.fn(async () => {}), alGoogle, alContinuarSinCuenta } = {}) {
   document.body.innerHTML = '<div id="auth-root"></div>';
-  const auth = crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogle });
-  return { auth, alIniciarSesion, alRegistrarse, alRecuperar, alGoogle };
+  const auth = crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogle, alContinuarSinCuenta });
+  return { auth, alIniciarSesion, alRegistrarse, alRecuperar, alGoogle, alContinuarSinCuenta };
 }
 
 const $ = id => document.getElementById(id);
@@ -116,6 +116,17 @@ describe("ui/cuenta/autenticacion", () => {
     expect($("login-pass").type).toBe("text");
     document.querySelector('[data-ojo="login-pass"]').click();
     expect($("login-pass").type).toBe("password");
+  });
+
+  it("la puerta de invitado aparece solo si se pasa alContinuarSinCuenta", () => {
+    const sinInvitado = montar();
+    sinInvitado.auth.renderLogin();
+    expect(document.querySelector("[data-invitado]")).toBeNull();
+
+    const conInvitado = montar({ alContinuarSinCuenta: vi.fn() });
+    conInvitado.auth.renderLogin();
+    document.querySelector("[data-invitado]").click();
+    expect(conInvitado.alContinuarSinCuenta).toHaveBeenCalledTimes(1);
   });
 
   it("data-ir cambia entre login y registro conservando el correo", () => {

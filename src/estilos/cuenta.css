@@ -302,6 +302,10 @@
   margin: 18px 0 0;
 }
 
+#auth-root .auth-invitado { margin-top: 10px; }
+
+#auth-root .auth-invitado .link { font-weight: 500; }
+
 #auth-root .auth-foot {
   margin-top: 16px;
   text-align: center;

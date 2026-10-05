@@ -122,13 +122,21 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
   }
 
   // Empieza a observar la sesión (restaura al recargar y avisa a la UI en cada cambio).
-  // Devuelve la función para dejar de observar, o null si la cuenta no está disponible.
+  // Resuelve con la función para dejar de observar (o null sin cuenta) DESPUÉS del primer
+  // evento de sesión, para que el arranque decida la pantalla con el estado real.
   async function iniciar() {
     const api = await nube();
     if (!api) return null;
-    return api.auth.observar(u => {
-      usuario = u;
-      alCambiarSesion(u);
+    return new Promise(resolve => {
+      let primera = true;
+      const dejar = api.auth.observar(u => {
+        usuario = u;
+        alCambiarSesion(u);
+        if (primera) {
+          primera = false;
+          resolve(dejar);
+        }
+      });
     });
   }
 

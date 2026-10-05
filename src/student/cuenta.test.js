@@ -24,7 +24,8 @@ function adaptadorFake({ error = null } = {}) {
       enviarReset: vi.fn(lanzar),
       salir: vi.fn(lanzar),
       observar: vi.fn(cb => {
-        cb({ uid: "u1", email: "a@x.com", nombre: "" });
+        // El SDK real notifica la sesión de forma asíncrona; el fake imita ese borde.
+        setTimeout(() => cb({ uid: "u1", email: "a@x.com", nombre: "" }), 0);
         return () => {};
       })
     },

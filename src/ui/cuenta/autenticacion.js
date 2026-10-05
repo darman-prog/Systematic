@@ -7,6 +7,7 @@
 //     "contrasena" | "contrasena2") el error sale bajo ese campo; sin él, como aviso general.
 //   - { cancelado: true } no muestra nada (p. ej. el usuario cerró la ventana de Google).
 //   - alGoogle es opcional: si se pasa, login y registro muestran "Continuar con Google".
+//   - alContinuarSinCuenta es opcional: si se pasa, aparece la puerta "Continuar sin cuenta".
 // Los identificadores usan `contrasena` sin ñ (ASCII); la UI escribe "Contraseña".
 import { escapar } from "../helpers.js";
 import { LENGUAJES } from "../../core/index.js";
@@ -145,7 +146,7 @@ const PIES = {
   recuperar: '<button type="button" class="link" data-ir="login">Volver a ingresar</button>'
 };
 
-function plantilla(vista, conGoogle) {
+function plantilla(vista, conGoogle, conInvitado) {
   return `
     <div class="auth-caja">
       <div class="auth-card">
@@ -155,11 +156,12 @@ function plantilla(vista, conGoogle) {
         <div class="auth-tracks" aria-hidden="true">${chipsHtml()}</div>
       </div>
       <p class="auth-pie">${PIES[vista]}</p>
+      ${conInvitado ? '<p class="auth-pie auth-invitado"><button type="button" class="link" data-invitado>Continuar sin cuenta</button></p>' : ""}
       <p class="auth-foot">systematic · método sobre intuición</p>
     </div>`;
 }
 
-export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogle }) {
+export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogle, alContinuarSinCuenta }) {
   const $ = id => document.getElementById(id);
   const raiz = () => $("auth-root");
 
@@ -234,7 +236,7 @@ export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogl
     enviando = false;
 
     renderizando = true;
-    r.innerHTML = plantilla(vista, !!alGoogle);
+    r.innerHTML = plantilla(vista, !!alGoogle, !!alContinuarSinCuenta && vista !== "recuperar");
     renderizando = false;
 
     const correo = $(IDS[vista].correo);
@@ -377,6 +379,10 @@ export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogl
     if (ir) {
       recordarCorreo();
       render(ir.dataset.ir);
+      return;
+    }
+    if (e.target.closest("[data-invitado]")) {
+      if (alContinuarSinCuenta) alContinuarSinCuenta();
       return;
     }
     if (e.target.closest("[data-google]")) {
