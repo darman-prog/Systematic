@@ -315,9 +315,10 @@ test.describe('Systematic — smoke', () => {
     await page.getByRole('button', { name: /Comenzar práctica/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
 
-    // El banco va barajado: la primera puede ser casos-uso o actividades; llegar a actividades.
-    const fijos = await page.locator('#lienzo-diagrama .nodo-fijo').count();
-    if (fijos === 0) {
+    // El banco va barajado y hay 2 preguntas de casos de uso (sin nodos fijos) y 2 de
+    // actividades: avanzar hasta encontrar la de actividades. Con 2 de 4, alcanza con 3 intentos.
+    for (let intentos = 0; intentos < 3; intentos++) {
+      if (await page.locator('#lienzo-diagrama .nodo-fijo').count() > 0) break;
       await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
       await page.locator('#next-btn').click();
     }
