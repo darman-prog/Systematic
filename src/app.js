@@ -1,4 +1,4 @@
-﻿import { MATERIAS, getMateria, getLenguaje, cargarContenido, acentoDe } from "./core/index.js";
+﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido, acentoDe, fechaSnapshot } from "./core/index.js";
 import { barraDeCompetencia, registrarExamen } from "./core/index.js";
 import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/aprendizaje/lenguaje.js";
 import { crearHome } from "./ui/dashboard/home.js";
@@ -30,6 +30,13 @@ import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
 import { fusionarMejor, fusionarMision } from "./student/registros.js";
+// Cuenta y nube (ADR 008): servicios listos; falta cablearlos (docs/guias/aplicar-snapshots.md).
+import { cargarFirebase } from "./student/firebase.js";
+import { crearCuenta } from "./student/cuenta.js";
+import { crearNube } from "./student/nube.js";
+import { aplicarSnapshot } from "./student/aplicar.js";
+import { crearCuentaUI } from "./ui/cuenta.js";
+import { crearAuth } from "./ui/cuenta/autenticacion.js";
 
 
 const mezclador = crearMezclador({
@@ -111,6 +118,56 @@ const ctx = {
   get materia() { return track.materia; }
 };
 
+// Cuenta y nube (ADR 008): servicios con dependencias inyectadas; la UI de acceso vive en
+// ui/cuenta/autenticacion.js y el panel de sesión en ui/cuenta.js.
+const cuentaUI = crearCuentaUI({ ctx });
+const cuenta = crearCuenta({
+  cargarNube: cargarFirebase,
+  alCambiarSesion: usuario => cuentaUI.pintar(usuario)
+});
+const nube = crearNube({
+  cargarNube: cargarFirebase, persistencia, materias: MATERIAS, lenguajes: LENGUAJES
+});
+
+// Códigos de Firebase Auth que la UI de acceso sabe ubicar bajo un campo.
+const campoDeCodigo = codigo => codigo === "auth/invalid-email" ? "correo"
+  : codigo === "auth/weak-password" ? "contrasena" : undefined;
+// Cerrar la ventana de Google no es un error que deba mostrarse.
+const esCancelado = codigo => codigo === "auth/popup-closed-by-user" || codigo === "auth/cancelled-popup-request";
+
+// Adapta los resultados de los servicios al contrato de crearAuth: los errores se lanzan
+// como { mensaje, campo? } (o { cancelado: true }) y el éxito navega fuera del acceso.
+async function pedirCuenta(ejecutar, alExito) {
+  const r = await ejecutar();
+  if (!r.ok) {
+    if (esCancelado(r.codigo)) throw { cancelado: true };
+    throw { mensaje: r.mensaje, campo: campoDeCodigo(r.codigo) };
+  }
+  if (alExito) alExito(r);
+  return r;
+}
+
+const auth = crearAuth({
+  alIniciarSesion: datos => pedirCuenta(
+    () => cuenta.ingresar(datos.correo, datos.contrasena),
+    r => cuentaUI.pintar(r.usuario)
+  ),
+  alRegistrarse: datos => pedirCuenta(
+    async () => {
+      const r = await cuenta.registrar(datos.correo, datos.contrasena);
+      // El nombre es identidad local (saludo/perfil): se guarda al crear la cuenta.
+      if (r.ok && datos.nombre) persistencia.guardarNombre(datos.nombre);
+      return r;
+    },
+    r => cuentaUI.pintar(r.usuario)
+  ),
+  alRecuperar: datos => pedirCuenta(() => cuenta.enviarReset(datos.correo)),
+  alGoogle: () => pedirCuenta(
+    () => cuenta.ingresarConGoogle(),
+    r => cuentaUI.pintar(r.usuario)
+  )
+});
+
 // Config de práctica y pantalla de apuntes (extraídas de app.js, ADR 007).
 const config = crearConfig({
   getFiltros: () => track.filtros,
@@ -122,7 +179,7 @@ const config = crearConfig({
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
 
 function show(screen) {
-    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje"].forEach(s =>
+    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje", "cuenta"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -872,6 +929,18 @@ if (!persistencia.nombre() && !persistencia.onboardingHecho()) {
   show("materias");
 }
 
+// Cuenta (ADR 008): sin claves de Firebase la pantalla queda deshabilitada y la app sigue
+// funcionando solo en local. Con claves, se restaura la sesión al recargar y se muestra el
+// botón "Cuenta" del dashboard.
+(async () => {
+  const disponible = await cuenta.disponible();
+  const btnCuenta = $("btn-cuenta");
+  if (btnCuenta) btnCuenta.classList.toggle("hidden", !disponible);
+  if (!disponible) return;
+  await cuenta.iniciar();
+  if (cuenta.estado()) cuentaUI.pintar(cuenta.estado());
+})();
+
 // Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre
 // de la función que ejecutan y sus parámetros en data-*; un único listener delegado de
 // click los resuelve desde este mapa. No se publica nada en window.
@@ -975,7 +1044,44 @@ const ACCIONES = {
   toggleMulti: el => quiz.toggleMulti(parseInt(el.dataset.idx, 10)),
   toggleStudy: el => estudio.toggleStudy(el),
   usarTodas: () => config.usarTodas(),
-  voltearFlash: () => flashcards.voltearFlash()
+  voltearFlash: () => flashcards.voltearFlash(),
+  // ---- Cuenta y nube (ADR 008) ----
+  irCuenta: () => {
+    const usuario = cuenta.estado();
+    cuentaUI.pintar(usuario);
+    if (!usuario) auth.renderLogin();
+    show("cuenta");
+  },
+  salirCuenta: async () => {
+    cuentaUI.procesando(true);
+    const r = await cuenta.salir();
+    cuentaUI.procesando(false);
+    if (!r.ok) { cuentaUI.aviso(r.mensaje, false); return; }
+    cuentaUI.pintar(null);
+    auth.renderLogin();
+  },
+  subirNube: async () => {
+    const usuario = cuenta.estado();
+    if (!usuario) return;
+    cuentaUI.procesando(true);
+    const r = await nube.subir(usuario.uid);
+    cuentaUI.procesando(false);
+    cuentaUI.aviso(r.ok ? "Progreso subido a la nube." : r.mensaje, r.ok);
+  },
+  restaurarNube: async () => {
+    const usuario = cuenta.estado();
+    if (!usuario) return;
+    cuentaUI.procesando(true);
+    const r = await nube.bajar(usuario.uid);
+    cuentaUI.procesando(false);
+    if (!r.ok) { cuentaUI.aviso(r.mensaje, false); return; }
+    // ADR 008: restaurar pisa el progreso local y por eso se pregunta antes, con la fecha.
+    const fecha = fechaSnapshot(r.datos);
+    const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
+    if (!confirm("El respaldo es del " + cuando + ". Se reemplazará tu progreso en este dispositivo. ¿Continuar?")) return;
+    aplicarSnapshot(r.datos, persistencia);
+    location.reload();
+  }
 };
 
 document.addEventListener("click", event => {
