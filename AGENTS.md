@@ -14,7 +14,8 @@ desplegado en Vercel.
   `apuntes.js`, `roadmap.js`); carga bajo demanda con `import()` dinámico (un chunk por track).
 - Dominio: `src/core/` agrupado por subdominio con barrel `index.js` (incluye
   `lenguaje/competencia.js`: barra y gate de etapas de un lenguaje).
-- Persistencia: `localStorage` con namespace `sys.*` (sin backend ni cuentas).
+- Persistencia: `localStorage` con namespace `sys.*`; cuenta y respaldo en la nube opcionales con
+  Firebase (ADR 008), activados por `VITE_FIREBASE_*`. Sin claves, la app es 100% local.
 - Tests: Vitest (unitario) y Playwright (E2E). Validación de datos: `scripts/validar-datos.mjs`.
 - Deploy: Vercel (preset Vite, salida `dist/`).
 
@@ -24,10 +25,13 @@ desplegado en Vercel.
 - `src/app.js` — composición: estado, navegación, persistencia por track y mapa de acciones delegadas.
 - `src/core/` — dominio puro agrupado por subdominio: `registro/` (materias), `estudio/` (progreso,
   sesiones, mezclador, questionSelector), `juego/` (gamificacion, escenarios), `lenguaje/`
-  (competencia) y `diagramas/`. `index.js` re-exporta la API pública. Sin DOM ni localStorage.
-- `src/student/` — servicios de aplicación con dependencias inyectadas (persistencia, gamificación).
+  (competencia), `nube/` (snapshot del respaldo) y `diagramas/`. `index.js` re-exporta la API
+  pública. Sin DOM ni localStorage.
+- `src/student/` — servicios de aplicación con dependencias inyectadas (persistencia, gamificación,
+  cuenta y nube de ADR 008).
 - `src/ui/` — render separado en `aprendizaje/` (pantallas de práctica), `dashboard/` (datos del
-  estudiante) y `componentes/` (compartidos); recibe estado por parámetro, no toca `localStorage`.
+  estudiante), `cuenta/` (acceso: login/registro/recuperar) y `componentes/` (compartidos); recibe
+  estado por parámetro, no toca `localStorage`.
 - `src/estilos/` — Tailwind + parciales (`tokens`, `componentes`, `pantallas`, `lienzo`).
 - `src/datos/` — contenido por track en dos ramas: `materias/` y `lenguajes/` (incluye presentación:
   colores de tema, keywords).
@@ -121,4 +125,6 @@ Puedes crear `.gitignore` (raiz o subdirectorios) y agregar entradas. **Nunca el
 
 - Repo: https://github.com/darman-prog/Systematic.git
 - Vercel: importar el repo, preset Vite, build `npm run build`, output `dist/`.
+- Cuenta/nube (opcional): cargar `VITE_FIREBASE_*` en Vercel y pegar `firestore.rules` en la
+  consola de Firebase (no hay `firebase.json`).
 - Rollback: instant rollback en Vercel y `git revert` en el repo.

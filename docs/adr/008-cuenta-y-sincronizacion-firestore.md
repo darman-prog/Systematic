@@ -38,7 +38,7 @@ funcionar sin conexión y sin cuenta), free tier. El import/export JSON v2 ya ex
     `overrides` de `@grpc/grpc-js` parcheado para no arrastrar CVEs del árbol del SDK.
   - Vendor lock-in moderado en Google; migrar después implica cambiar el adaptador, no los
     servicios.
-  - Datos personales: solo email y datos de estudio; sin datos sensibles.
+  - Datos personales: solo email, nombre (opcional) y datos de estudio; sin datos sensibles.
   - La sincronización es manual en el MVP; el auto-sync queda como fase posterior.
 
 ## Alternativas descartadas
@@ -52,3 +52,20 @@ funcionar sin conexión y sin cuenta), free tier. El import/export JSON v2 ya ex
   aporta en esta fase.
 - **Auto-merge por última escritura**: podía pisar trabajo reciente sin avisar; se eligió
   preguntar al usuario.
+
+## Actualización de implementación (2026-10-05)
+
+- El documento en Firestore guarda el snapshot como **texto JSON** (campo `datos`) más `version`
+  y `actualizadoEn` (serverTimestamp). El cliente corta en 900 kB medidos en bytes UTF-8 y las
+  reglas además exigen `datos` string, `< 900000` caracteres y `version` entera.
+- La sesión usa la persistencia por defecto del SDK (IndexedDB) y se restaura con
+  `onAuthStateChanged` al arrancar; cerrar sesión solo repinta la UI (el progreso local queda).
+- Limitaciones conocidas:
+  - En un navegador compartido, el progreso local no está aislado por cuenta: una segunda cuenta
+    ve el progreso anterior y podría subirlo. Mitigación futura: guardar el último `uid` y
+    ofrecer limpiar/restaurar al detectar cambio de cuenta.
+  - La enumeración de correos en el registro (`auth/email-already-in-use`) depende de la
+    configuración de Firebase: conviene activar "Email Enumeration Protection" en la consola.
+  - El sitio todavía no define una CSP propia.
+- Despliegue de reglas manual: pegar `firestore.rules` en la consola de Firebase (no hay
+  `firebase.json`). La guía operativa está en [docs/guias/aplicar-snapshots.md](../guias/aplicar-snapshots.md).

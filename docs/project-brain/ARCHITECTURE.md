@@ -1,8 +1,8 @@
 ---
 status: vigente
-last_reviewed: 2026-09-20
+last_reviewed: 2026-10-05
 confidence: confirmado
-source: código + ADR 001-003
+source: código + ADR 001-008
 ---
 
 # Arquitectura
@@ -16,9 +16,9 @@ La Dependency Rule apunta hacia adentro: el dominio no conoce UI ni persistencia
 
 | Capa | Carpeta | Responsabilidad |
 |---|---|---|
-| Dominio | `src/core/` | Reglas puras, agrupadas por subdominio: `registro/materias.js` (registro de tracks), `estudio/` (progreso con `storage` inyectado, sesiones con `rng` inyectable, mezclador y questionSelector), `juego/` (gamificacion: XP/niveles/logros; escenarios: motor multi-paso), `lenguaje/competencia.js` (barra y gate de etapas, spec 011) y `diagramas/diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating). `index.js` re-exporta la API pública; los consumidores importan de ahí, no de las rutas internas (ADR 007) |
-| Aplicación | `src/student/` | Servicios del recorrido del estudiante con dependencias inyectadas: `persistencia.js` (claves `sys.*` centralizadas y CRUD con `storage`), `gamificacion.js` (XP, logros, racha y perfil; presentación por callbacks), `registros.js` (fusiones puras de mejor resultado) |
-| Render | `src/ui/` | `aprendizaje/` con un módulo por pantalla de práctica (`quiz.js`, `resultados.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `escenarios.js`, `apuntes.js`, `casos.js`, `lenguaje.js`) y `dashboard/` con los datos del estudiante (`stats.js`, `misiones.js`); `componentes/` con piezas compartidas (`estados.js`, `tarjetas.js`, `etiquetas.js`, `anillo.js`, `avisos.js`, `diagramas.js` como lienzo); en la raíz quedan los compartidos `helpers.js`/`iconos.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
+| Dominio | `src/core/` | Reglas puras, agrupadas por subdominio: `registro/materias.js` (registro de tracks), `estudio/` (progreso con `storage` inyectado, sesiones con `rng` inyectable, mezclador y questionSelector), `juego/` (gamificacion: XP/niveles/logros; escenarios: motor multi-paso), `lenguaje/competencia.js` (barra y gate de etapas, spec 011), `nube/snapshot.js` (snapshot serializable del estado para el respaldo, ADR 008) y `diagramas/diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating). `index.js` re-exporta la API pública; los consumidores importan de ahí, no de las rutas internas (ADR 007) |
+| Aplicación | `src/student/` | Servicios del recorrido del estudiante con dependencias inyectadas: `persistencia.js` (claves `sys.*` centralizadas y CRUD con `storage`), `gamificacion.js` (XP, logros, racha y perfil; presentación por callbacks), `registros.js` (fusiones puras de mejor resultado), `firebase.js` (adaptador lazy de Auth/Firestore), `cuenta.js` (sesión), `nube.js` (subir/bajar respaldo) y `aplicar.js` (pisa el estado local al restaurar), todos ADR 008 |
+| Render | `src/ui/` | `aprendizaje/` con un módulo por pantalla de práctica (`quiz.js`, `resultados.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `escenarios.js`, `apuntes.js`, `casos.js`, `lenguaje.js`), `dashboard/` con los datos del estudiante (`stats.js`, `misiones.js`) y `cuenta.js` + `cuenta/autenticacion.js` (acceso y sesión, ADR 008); `componentes/` con piezas compartidas (`estados.js`, `tarjetas.js`, `etiquetas.js`, `anillo.js`, `avisos.js`, `diagramas.js` como lienzo); en la raíz quedan los compartidos `helpers.js`/`iconos.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
 | Composición | `src/app.js` | Estado de la app, navegación, persistencia por materia y mapa de acciones `ACCIONES` con un único listener delegado |
 | Contenido | `src/datos/{materias,lenguajes}/<track>/` | Preguntas, glosario, apuntes, escenarios, casos, roadmap y presentación (colores/keywords) por track |
 
@@ -35,6 +35,7 @@ sin acoplarse a la sesión del quiz.
 - [ADR 003](../adr/003-contenido-desacoplado-de-ui.md): el contenido específico por materia vive en `src/datos/`, no en core ni UI.
 - [ADR 004](../adr/004-capa-servicios-student.md): servicios de aplicación en `src/student/` con dependencias inyectadas (persistencia, gamificación y registros).
 - [ADR 007](../adr/007-estructura-por-subdominios.md): organización por subdominios en `core/` (con barrel `index.js`), `datos/` (materias/lenguajes) y `ui/` (dashboard/aprendizaje).
+- [ADR 008](../adr/008-cuenta-y-sincronizacion-firestore.md): cuenta opcional (Firebase Auth) y respaldo del progreso en Firestore; `localStorage` sigue siendo la fuente de verdad y la app funciona sin claves configuradas.
 
 ## Deuda conocida
 

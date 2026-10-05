@@ -1,8 +1,8 @@
 ---
 status: vigente
-last_reviewed: 2026-09-20
+last_reviewed: 2026-10-05
 confidence: confirmado
-source: código (core/estudio/progreso.js, app.js, scripts/validador.mjs)
+source: código (core/estudio/progreso.js, core/nube/snapshot.js, app.js, scripts/validador.mjs)
 ---
 
 # Datos y persistencia
@@ -12,8 +12,8 @@ tocar progreso, export/import, migraciones o el contenido de una materia.
 
 ## Persistencia local
 
-No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/estudio/progreso.js`
-(`claves(materiaId)`) y en `src/app.js`.
+No hay backend propio: todo vive en `localStorage` (con un respaldo opcional en la nube, ADR 008).
+Las claves se definen en `src/core/estudio/progreso.js` (`claves(materiaId)`) y en `src/app.js`.
 
 | Clave | Contenido |
 |---|---|
@@ -30,6 +30,14 @@ No hay backend: todo vive en `localStorage`. Las claves se definen en `src/core/
 | `sys.competencia.<lenguajeId>` | Competencia por lenguaje (spec 011): `{ <etapaId>: { aprobado, version, ultimoPct, intentos } }` |
 
 Si `localStorage` está bloqueado o lleno, la app degrada sin persistir.
+
+## Respaldo en la nube (opcional, ADR 008)
+
+Con una cuenta de Firebase, el estado completo se respalda a mano en `estudiantes/{uid}` como
+texto JSON (campos `datos`, `version` y `actualizadoEn`), con tope de 900 kB. El snapshot
+(`nube-1`, `src/core/nube/snapshot.js`) agrupa globales, materias y lenguajes; se valida con
+`validarSnapshot` antes de aplicarlo. `localStorage` no se reemplaza: restaurar pisa el estado
+local con confirmación previa y recarga la app.
 
 ## Migración y export/import
 

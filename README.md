@@ -2,8 +2,9 @@
 
 App de estudio para materias de ingeniería: práctica tipo quiz y simulacro, modo estudio,
 Contrarreloj, Supervivencia, misiones por tema, escenarios, casos de diagramación (constructor
-ER/UML), apuntes, flashcards y glosario. Sitio estático (Vite + Tailwind, sin backend): el
-progreso se guarda en el navegador (localStorage) y puede exportarse/importarse como JSON.
+ER/UML), apuntes, flashcards y glosario. Sitio estático (Vite + Tailwind, sin servidor propio):
+el progreso se guarda en el navegador (localStorage) y puede exportarse/importarse como JSON;
+con una cuenta opcional (Firebase) se respalda en la nube y se lleva entre dispositivos (ADR 008).
 
 **Materias:** Base de Datos 2 · Ingeniería de Software · Arquitectura de Software.
 
@@ -12,6 +13,21 @@ progreso se guarda en el navegador (localStorage) y puede exportarse/importarse 
 - Abre la URL desplegada (ver Deploy) o corre en local: `npm install` y `npm run dev`.
 - Elige una materia y practica. El progreso queda en tu dispositivo; usa **Exportar progreso**
   para respaldarlo o pasarlo a otro equipo (también acepta los JSON de la app antigua Quiz BD2).
+- Con una cuenta (botón **Cuenta** en el dashboard) podés subir el progreso a la nube y
+  restaurarlo en otro dispositivo. Sin cuenta, la app funciona igual que siempre.
+
+## Cuenta y sincronización (opcional)
+
+Para habilitarla en un proyecto propio de Firebase:
+
+1. Crear un proyecto web, habilitar **Authentication** (Email/Password y Google) y **Firestore**.
+2. Pegar `firestore.rules` en las reglas de Firestore (consola de Firebase).
+3. Copiar `.env.example` a `.env` y completar las claves `VITE_FIREBASE_*`.
+4. En Vercel: cargar las mismas variables en *Settings → Environment Variables*.
+
+Sin claves configuradas, la pantalla de cuenta se oculta y la app queda 100% local. Detalle
+técnico: [ADR 008](docs/adr/008-cuenta-y-sincronizacion-firestore.md) y
+[guía de snapshots](docs/guias/aplicar-snapshots.md).
 
 ## Comandos
 
