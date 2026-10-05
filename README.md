@@ -13,6 +13,8 @@ con una cuenta opcional (Firebase) se respalda en la nube y se lleva entre dispo
 - Abre la URL desplegada (ver Deploy) o corre en local: `npm install` y `npm run dev`.
 - Elige una materia y practica. El progreso queda en tu dispositivo; usa **Exportar progreso**
   para respaldarlo o pasarlo a otro equipo (también acepta los JSON de la app antigua Quiz BD2).
+- La primera vez (con Firebase configurado) aparece el acceso: iniciá sesión o creá una cuenta
+  para traer tu progreso; **Continuar sin cuenta** mantiene el modo local de siempre.
 - Con una cuenta (botón **Cuenta** en el dashboard) podés subir el progreso a la nube y
   restaurarlo en otro dispositivo. Sin cuenta, la app funciona igual que siempre.
 

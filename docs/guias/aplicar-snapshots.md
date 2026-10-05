@@ -94,6 +94,9 @@ No hay que tocar `localStorage` a mano: usá estos métodos.
 - Los callbacks de `crearAuth` reciben `{ correo, contrasena, nombre }` y rechazan con
   `{ mensaje, campo?, cancelado? }`; `app.js` traduce los resultados de `cuenta.js` con
   `pedirCuenta`.
+- Arranque (ADR 008): sin claves → onboarding local o home; con claves y sin sesión → acceso
+  (`auth.renderLogin()`) con "Continuar sin cuenta"; con sesión → `entrarConCuenta`, que ofrece
+  restaurar si hay respaldo y entra al home.
 - `subirNube` / `restaurarNube` usan `cuenta.estado().uid`.
 
 ## Referencias

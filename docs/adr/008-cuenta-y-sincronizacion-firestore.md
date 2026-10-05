@@ -60,6 +60,10 @@ funcionar sin conexión y sin cuenta), free tier. El import/export JSON v2 ya ex
   reglas además exigen `datos` string, `< 900000` caracteres y `version` entera.
 - La sesión usa la persistencia por defecto del SDK (IndexedDB) y se restaura con
   `onAuthStateChanged` al arrancar; cerrar sesión solo repinta la UI (el progreso local queda).
+- Arranque: con claves configuradas, el primer contacto en un navegador nuevo es la pantalla de
+  acceso (login/registro) con la puerta "Continuar sin cuenta" hacia el onboarding local; al
+  iniciar sesión con un respaldo disponible se ofrece restaurarlo. Sin claves, la app queda
+  100% local como siempre.
 - Limitaciones conocidas:
   - En un navegador compartido, el progreso local no está aislado por cuenta: una segunda cuenta
     ve el progreso anterior y podría subirlo. Mitigación futura: guardar el último `uid` y
