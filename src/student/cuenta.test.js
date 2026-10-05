@@ -47,8 +47,8 @@ describe("student/cuenta", () => {
     const adaptador = adaptadorFake();
     const cuenta = cuentaCon(adaptador);
     expect(await cuenta.registrar("mal", "123456")).toEqual({ ok: false, mensaje: "El correo no tiene un formato válido." });
-    expect(await cuenta.registrar("a@x.com", "123")).toEqual({ ok: false, mensaje: "Usá al menos 8 caracteres." });
-    expect(await cuenta.ingresar("a@x.com", "")).toEqual({ ok: false, mensaje: "Escribí tu contraseña." });
+    expect(await cuenta.registrar("a@x.com", "123")).toEqual({ ok: false, mensaje: "Usa al menos 8 caracteres." });
+    expect(await cuenta.ingresar("a@x.com", "")).toEqual({ ok: false, mensaje: "Escribe tu contraseña." });
     expect(adaptador.auth.registrar).not.toHaveBeenCalled();
     expect(adaptador.auth.ingresar).not.toHaveBeenCalled();
   });

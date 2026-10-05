@@ -7,17 +7,17 @@
 const MENSAJES = {
   "auth/email-already-in-use": "Ya existe una cuenta con ese correo.",
   "auth/invalid-email": "El correo no tiene un formato válido.",
-  "auth/weak-password": "Usá al menos 8 caracteres.",
+  "auth/weak-password": "Usa al menos 8 caracteres.",
   "auth/user-not-found": "Correo o contraseña incorrectos.",
   "auth/wrong-password": "Correo o contraseña incorrectos.",
   "auth/invalid-credential": "Correo o contraseña incorrectos.",
   "auth/user-disabled": "Esta cuenta está deshabilitada.",
-  "auth/too-many-requests": "Demasiados intentos. Esperá unos minutos y probá de nuevo.",
-  "auth/network-request-failed": "Sin conexión. Revisá tu internet.",
+  "auth/too-many-requests": "Demasiados intentos. Espera unos minutos y prueba de nuevo.",
+  "auth/network-request-failed": "Sin conexión. Revisa tu internet.",
   "auth/popup-closed-by-user": "Se canceló el ingreso con Google.",
   "auth/cancelled-popup-request": "Se canceló el ingreso con Google.",
   "auth/operation-not-allowed": "Ese método de ingreso no está habilitado.",
-  "auth/missing-password": "Escribí tu contraseña."
+  "auth/missing-password": "Escribe tu contraseña."
 };
 
 // Misma política que la UI de acceso: 8 caracteres como mínimo.

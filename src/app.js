@@ -310,7 +310,7 @@ function importarDatos(input) {
       // Import de competencia de un lenguaje.
       if (esCompetencia) {
         if (!track.lenguaje) {
-          alert("Este archivo es de un lenguaje. Entrá al lenguaje para importarlo.");
+          alert("Este archivo es de un lenguaje. Entra al lenguaje para importarlo.");
           return;
         }
         // Validar la forma antes de persistir: no aceptar basura que rompa la UI.
@@ -329,7 +329,7 @@ function importarDatos(input) {
 
       // Import de materia: no se permite estando dentro de un lenguaje (claves distintas).
       if (track.lenguaje) {
-        alert("Este archivo es de una materia. Entrá a la materia para importarlo.");
+        alert("Este archivo es de una materia. Entra a la materia para importarlo.");
         return;
       }
       if (esMateria && datos.materia && datos.materia !== track.materia.id &&

@@ -8,10 +8,10 @@ const MENSAJES = {
   "respaldo-grande": "Tu progreso es demasiado grande para respaldarlo en la nube.",
   "invalid-argument": "Tu progreso es demasiado grande para respaldarlo en la nube.",
   "firestore/invalid-argument": "Tu progreso es demasiado grande para respaldarlo en la nube.",
-  "permission-denied": "No tenés permiso para esta acción. Cerrá sesión e iniciá de nuevo.",
-  unauthenticated: "Tu sesión expiró. Iniciá sesión de nuevo.",
-  unavailable: "Sin conexión. Revisá tu internet e intentá de nuevo.",
-  "deadline-exceeded": "La nube tardó demasiado en responder. Intentá de nuevo."
+  "permission-denied": "No tienes permiso para esta acción. Cierra sesión e inicia de nuevo.",
+  unauthenticated: "Tu sesión expiró. Inicia sesión de nuevo.",
+  unavailable: "Sin conexión. Revisa tu internet e inténtalo de nuevo.",
+  "deadline-exceeded": "La nube tardó demasiado en responder. Inténtalo de nuevo."
 };
 
 function mensajeDe(error, porDefecto) {
@@ -41,13 +41,13 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
   async function subir(uid) {
     const api = await nube();
     if (!api) return { ok: false, mensaje: "La cuenta no está configurada." };
-    if (!uid) return { ok: false, mensaje: "Iniciá sesión para subir tus datos." };
+    if (!uid) return { ok: false, mensaje: "Inicia sesión para subir tus datos." };
     try {
       const snapshot = construirSnapshot({ persistencia, materias, lenguajes, ahora: ahora() });
       await api.store.escribir(uid, snapshot);
       return { ok: true, exportado: snapshot.exportado };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDe(e, "No se pudo subir el progreso. Revisá tu conexión.") };
+      return { ok: false, mensaje: mensajeDe(e, "No se pudo subir el progreso. Revisa tu conexión.") };
     }
   }
 
@@ -56,7 +56,7 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
   async function bajar(uid) {
     const api = await nube();
     if (!api) return { ok: false, mensaje: "La cuenta no está configurada." };
-    if (!uid) return { ok: false, mensaje: "Iniciá sesión para restaurar tus datos." };
+    if (!uid) return { ok: false, mensaje: "Inicia sesión para restaurar tus datos." };
     try {
       const datos = await api.store.leer(uid);
       if (!datos) return { ok: false, vacio: true, mensaje: "Todavía no hay un respaldo en la nube." };
@@ -64,7 +64,7 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
       if (!valido.ok) return { ok: false, mensaje: "El respaldo tiene un formato que no reconocemos." };
       return { ok: true, datos: valido.datos };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDe(e, "No se pudo bajar el respaldo. Revisá tu conexión.") };
+      return { ok: false, mensaje: mensajeDe(e, "No se pudo bajar el respaldo. Revisa tu conexión.") };
     }
   }
 
