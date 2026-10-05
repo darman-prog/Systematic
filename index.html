@@ -165,6 +165,8 @@
       <button class="btn btn-ghost btn-sm" data-action="exportarDatos">Exportar progreso</button>
       <button class="btn btn-ghost btn-sm" data-action="importarArchivo">Importar</button>
       <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+      <!-- Cuenta (ADR 008): oculto hasta que app.js confirme que hay claves de Firebase. -->
+      <button class="btn btn-ghost btn-sm hidden" id="btn-cuenta" data-action="irCuenta">Cuenta</button>
       <button class="btn btn-ghost btn-sm" data-action="clearHistory">Borrar historial</button>
       <button class="btn btn-ghost btn-sm" data-action="resetProgreso">Reiniciar progreso</button>
     </div>
@@ -332,6 +334,31 @@
     <div id="glosario-filtros" class="flex flex-wrap gap-2 mb-3"></div>
     <p class="text-xs text-slate-500 mb-3" id="glosario-count"></p>
     <div id="glosario-list"></div>
+  </section>
+
+  <section id="screen-cuenta" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="text-xl sm:text-2xl font-bold">Cuenta</h1>
+      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+    </div>
+
+    <!-- Estado sin sesión: pantallas de acceso (las renderiza ui/cuenta/autenticacion.js). -->
+    <div id="cuenta-anon">
+      <div id="auth-root"></div>
+    </div>
+
+    <!-- Estado con sesión: subir/restaurar el respaldo y cerrar sesión. -->
+    <div id="cuenta-sesion" class="hidden">
+      <p class="subtitle">Sesión iniciada como <b id="cuenta-email-actual"></b>.</p>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-primary btn-sm" data-action="subirNube">Subir progreso a la nube</button>
+        <button class="btn btn-secondary btn-sm" data-action="restaurarNube">Restaurar de la nube</button>
+        <button class="btn btn-ghost btn-sm" data-action="salirCuenta">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- Aviso compartido por ambos estados (éxito, error o procesando). -->
+    <p id="cuenta-aviso" class="text-sm mt-3 hidden" role="status"></p>
   </section>
 
 </div>
