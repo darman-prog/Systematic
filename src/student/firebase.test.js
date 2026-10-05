@@ -1,7 +1,7 @@
 // Adaptador de Firebase: lectura de configuración por entorno y cableado del SDK con módulos
 // inyectados (no se carga el SDK real ni se toca la red).
 import { describe, it, expect, vi } from "vitest";
-import { leerConfig, crearAdaptador, COLECCION } from "./firebase.js";
+import { leerConfig, crearAdaptador, COLECCION, MAX_BYTES } from "./firebase.js";
 
 function envCompleto() {
   return {
@@ -28,7 +28,10 @@ function apiFake() {
       return () => {};
     }),
     doc: vi.fn((db, col, uid) => ({ col, uid })),
-    getDoc: vi.fn(async () => ({ exists: () => true, data: () => ({ formato: "nube-1" }) })),
+    getDoc: vi.fn(async () => ({
+      exists: () => true,
+      data: () => ({ datos: '{"formato":"nube-1"}', version: 1, actualizadoEn: "TS" })
+    })),
     setDoc: vi.fn(async () => {}),
     serverTimestamp: vi.fn(() => "TS")
   };
@@ -81,15 +84,26 @@ describe("student/firebase", () => {
     expect(visto).toHaveBeenCalledWith({ uid: "u1", email: "a@x.com", nombre: "" });
   });
 
-  it("el store lee el documento del usuario y escribe con sello del servidor", async () => {
+  it("el store lee y escribe el respaldo serializado como JSON", async () => {
     const api = apiFake();
     const adaptador = await crearAdaptador({ env: envCompleto(), cargarModulos: async () => api });
     expect(await adaptador.store.leer("u1")).toEqual({ formato: "nube-1" });
     expect(api.doc).toHaveBeenCalledWith(expect.anything(), COLECCION, "u1");
     await adaptador.store.escribir("u1", { formato: "nube-1" });
-    expect(api.setDoc).toHaveBeenCalledWith({ col: COLECCION, uid: "u1" }, { formato: "nube-1", actualizado: "TS" });
+    expect(api.setDoc).toHaveBeenCalledWith(
+      { col: COLECCION, uid: "u1" },
+      { datos: '{"formato":"nube-1"}', version: 1, actualizadoEn: "TS" }
+    );
     api.getDoc.mockResolvedValueOnce({ exists: () => false, data: () => null });
     expect(await adaptador.store.leer("u2")).toBeNull();
+  });
+
+  it("el store rechaza un respaldo más grande que el tope sin escribir", async () => {
+    const api = apiFake();
+    const adaptador = await crearAdaptador({ env: envCompleto(), cargarModulos: async () => api });
+    const enorme = { relleno: "x".repeat(MAX_BYTES + 1) };
+    await expect(adaptador.store.escribir("u1", enorme)).rejects.toEqual({ code: "respaldo-grande" });
+    expect(api.setDoc).not.toHaveBeenCalled();
   });
 
   it("salir y enviarReset pasan directo al SDK", async () => {

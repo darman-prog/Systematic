@@ -3,6 +3,21 @@
 // qué se manda y se valida lo que llega. Sin config de nube queda inactivo.
 import { construirSnapshot, validarSnapshot } from "../core/index.js";
 
+// Códigos de Firestore y del adaptador traducidos a mensajes de UI.
+const MENSAJES = {
+  "respaldo-grande": "Tu progreso es demasiado grande para respaldarlo en la nube.",
+  "invalid-argument": "Tu progreso es demasiado grande para respaldarlo en la nube.",
+  "firestore/invalid-argument": "Tu progreso es demasiado grande para respaldarlo en la nube.",
+  "permission-denied": "No tenés permiso para esta acción. Cerrá sesión e iniciá de nuevo.",
+  unauthenticated: "Tu sesión expiró. Iniciá sesión de nuevo.",
+  unavailable: "Sin conexión. Revisá tu internet e intentá de nuevo.",
+  "deadline-exceeded": "La nube tardó demasiado en responder. Intentá de nuevo."
+};
+
+function mensajeDe(error, porDefecto) {
+  return MENSAJES[error?.code] || porDefecto;
+}
+
 export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora = () => new Date() }) {
   let adaptador = null;
 
@@ -32,7 +47,7 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
       await api.store.escribir(uid, snapshot);
       return { ok: true, exportado: snapshot.exportado };
     } catch (e) {
-      return { ok: false, mensaje: "No se pudo subir el progreso. Revisá tu conexión." };
+      return { ok: false, mensaje: mensajeDe(e, "No se pudo subir el progreso. Revisá tu conexión.") };
     }
   }
 
@@ -49,7 +64,7 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
       if (!valido.ok) return { ok: false, mensaje: "El respaldo tiene un formato que no reconocemos." };
       return { ok: true, datos: valido.datos };
     } catch (e) {
-      return { ok: false, mensaje: "No se pudo bajar el respaldo. Revisá tu conexión." };
+      return { ok: false, mensaje: mensajeDe(e, "No se pudo bajar el respaldo. Revisá tu conexión.") };
     }
   }
 

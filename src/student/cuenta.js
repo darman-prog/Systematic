@@ -7,7 +7,7 @@
 const MENSAJES = {
   "auth/email-already-in-use": "Ya existe una cuenta con ese correo.",
   "auth/invalid-email": "El correo no tiene un formato válido.",
-  "auth/weak-password": "La contraseña necesita al menos 6 caracteres.",
+  "auth/weak-password": "Usá al menos 8 caracteres.",
   "auth/user-not-found": "Correo o contraseña incorrectos.",
   "auth/wrong-password": "Correo o contraseña incorrectos.",
   "auth/invalid-credential": "Correo o contraseña incorrectos.",
@@ -19,6 +19,9 @@ const MENSAJES = {
   "auth/operation-not-allowed": "Ese método de ingreso no está habilitado.",
   "auth/missing-password": "Escribí tu contraseña."
 };
+
+// Misma política que la UI de acceso: 8 caracteres como mínimo.
+const MIN_CONTRASENA = 8;
 
 export const ERROR_GENERICO = "No se pudo completar la operación. Probá de nuevo.";
 
@@ -56,14 +59,14 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
   async function registrar(email, pass) {
     const correo = String(email || "").trim();
     if (!emailValido(correo)) return { ok: false, mensaje: MENSAJES["auth/invalid-email"] };
-    if (String(pass || "").length < 6) return { ok: false, mensaje: MENSAJES["auth/weak-password"] };
+    if (String(pass || "").length < MIN_CONTRASENA) return { ok: false, mensaje: MENSAJES["auth/weak-password"] };
     const api = await nube();
     if (!api) return { ok: false, mensaje: ERROR_GENERICO };
     try {
       usuario = await api.auth.registrar(correo, pass);
       return { ok: true, usuario };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDeError(e) };
+      return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }
   }
 
@@ -77,7 +80,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
       usuario = await api.auth.ingresar(correo, pass);
       return { ok: true, usuario };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDeError(e) };
+      return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }
   }
 
@@ -88,7 +91,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
       usuario = await api.auth.ingresarConGoogle();
       return { ok: true, usuario };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDeError(e) };
+      return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }
   }
 
@@ -102,7 +105,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
       // Mismo mensaje exista o no la cuenta: no se confirma qué correos están registrados.
       return { ok: true, mensaje: "Si el correo existe, te enviamos un enlace para restablecerla." };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDeError(e) };
+      return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }
   }
 
@@ -114,7 +117,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
       usuario = null;
       return { ok: true };
     } catch (e) {
-      return { ok: false, mensaje: mensajeDeError(e) };
+      return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }
   }
 

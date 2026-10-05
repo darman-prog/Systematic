@@ -65,6 +65,13 @@ describe("student/nube", () => {
     expect(r.mensaje).toContain("No se pudo subir");
   });
 
+  it("traduce los códigos de Firestore y del tope de tamaño", async () => {
+    const grande = nubeCon({ store: { escribir: vi.fn(async () => { throw { code: "respaldo-grande" }; }) } });
+    expect((await grande.subir("u1")).mensaje).toContain("demasiado grande");
+    const sinRed = nubeCon({ store: { leer: vi.fn(async () => { throw { code: "unavailable" }; }) } });
+    expect((await sinRed.bajar("u1")).mensaje).toContain("Sin conexión");
+  });
+
   it("bajar avisa cuando no hay respaldo y rechaza formatos inválidos", async () => {
     const vacio = nubeCon({ store: { leer: vi.fn(async () => null) } });
     expect(await vacio.bajar("u1")).toEqual({ ok: false, vacio: true, mensaje: "Todavía no hay un respaldo en la nube." });

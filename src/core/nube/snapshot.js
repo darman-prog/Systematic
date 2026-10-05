@@ -45,10 +45,18 @@ function competenciaValida(competencia) {
     esObjeto(r) && typeof r.aprobado === "boolean" && Number.isInteger(r.version));
 }
 
+// Cada intento del historial es { date, score, total, modo } (lo escribe guardarIntento en
+// app.js); una entrada rota haría fallar el render de estadísticas tras restaurar.
+function historialValido(historial) {
+  return Array.isArray(historial) && historial.every(e =>
+    esObjeto(e) && typeof e.date === "number" && typeof e.score === "number" &&
+    typeof e.total === "number" && typeof e.modo === "string");
+}
+
 function materiaValida(datos) {
   return esObjeto(datos) &&
     esObjeto(datos.progreso) &&
-    Array.isArray(datos.historial) &&
+    historialValido(datos.historial) &&
     esObjeto(datos.actividad) &&
     Number.isInteger(datos.meta) && datos.meta > 0 &&
     esObjeto(datos.misiones);

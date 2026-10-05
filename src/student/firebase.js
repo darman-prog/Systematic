@@ -11,6 +11,13 @@ const CAMPOS = ["apiKey", "authDomain", "projectId", "appId"];
 // Colección de un documento por usuario (ADR 008): ahí vive el snapshot completo.
 export const COLECCION = "estudiantes";
 
+// El snapshot viaja como texto JSON dentro del documento. Así se evitan restricciones de
+// campos de Firestore y el esquema del progreso puede cambiar sin tocar el documento.
+// Tope medido en bytes UTF-8 (un documento admite 1 MiB): las reglas de firestore.rules
+// además acotan la longitud en caracteres.
+export const MAX_BYTES = 900000;
+export const VERSION_RESPALDO = 1;
+
 export function leerConfig(env) {
   if (!env) return null;
   const config = {
@@ -63,11 +70,20 @@ export async function crearAdaptador({ env = import.meta.env, cargarModulos = ca
     store: {
       leer: async uid => {
         const snap = await api.getDoc(api.doc(db, COLECCION, uid));
-        return snap.exists() ? snap.data() : null;
+        if (!snap.exists()) return null;
+        return JSON.parse(snap.data().datos);
       },
-      // `actualizado` es serverTimestamp: lo sella el servidor, no el reloj del dispositivo.
-      escribir: (uid, datos) =>
-        api.setDoc(api.doc(db, COLECCION, uid), { ...datos, actualizado: api.serverTimestamp() })
+      escribir: async (uid, datos) => {
+        const texto = JSON.stringify(datos);
+        // El límite real de Firestore es en bytes: 900 kB deja margen bajo el 1 MiB.
+        if (new TextEncoder().encode(texto).length > MAX_BYTES) throw { code: "respaldo-grande" };
+        // `actualizadoEn` es serverTimestamp: lo sella el servidor, no el reloj del dispositivo.
+        await api.setDoc(api.doc(db, COLECCION, uid), {
+          datos: texto,
+          version: VERSION_RESPALDO,
+          actualizadoEn: api.serverTimestamp()
+        });
+      }
     }
   };
 }

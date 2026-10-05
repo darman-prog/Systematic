@@ -46,7 +46,7 @@ describe("student/cuenta", () => {
     const adaptador = adaptadorFake();
     const cuenta = cuentaCon(adaptador);
     expect(await cuenta.registrar("mal", "123456")).toEqual({ ok: false, mensaje: "El correo no tiene un formato válido." });
-    expect(await cuenta.registrar("a@x.com", "123")).toEqual({ ok: false, mensaje: "La contraseña necesita al menos 6 caracteres." });
+    expect(await cuenta.registrar("a@x.com", "123")).toEqual({ ok: false, mensaje: "Usá al menos 8 caracteres." });
     expect(await cuenta.ingresar("a@x.com", "")).toEqual({ ok: false, mensaje: "Escribí tu contraseña." });
     expect(adaptador.auth.registrar).not.toHaveBeenCalled();
     expect(adaptador.auth.ingresar).not.toHaveBeenCalled();
@@ -64,7 +64,7 @@ describe("student/cuenta", () => {
 
   it("sin configuración devuelve error genérico", async () => {
     const cuenta = crearCuenta({ cargarNube: async () => null });
-    expect(await cuenta.registrar("a@x.com", "123456")).toEqual({ ok: false, mensaje: ERROR_GENERICO });
+    expect(await cuenta.registrar("a@x.com", "12345678")).toEqual({ ok: false, mensaje: ERROR_GENERICO });
     expect(await cuenta.ingresarConGoogle()).toEqual({ ok: false, mensaje: ERROR_GENERICO });
   });
 
@@ -75,6 +75,12 @@ describe("student/cuenta", () => {
     const b = await malaPass.ingresar("a@x.com", "secreto1");
     expect(a.mensaje).toBe("Correo o contraseña incorrectos.");
     expect(b.mensaje).toBe(a.mensaje);
+  });
+
+  it("expone el codigo del error para que la UI lo mapee a campo o cancelado", async () => {
+    const cuenta = cuentaCon(adaptadorFake({ error: { code: "auth/wrong-password" } }));
+    const r = await cuenta.ingresar("a@x.com", "secreto1");
+    expect(r.codigo).toBe("auth/wrong-password");
   });
 
   it("ingresarConGoogle y salir funcionan y limpian el estado", async () => {

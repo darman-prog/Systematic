@@ -16,7 +16,7 @@ function persistenciaFake() {
     casos: () => ({ c1: { ok: true } }),
     onboardingHecho: () => true,
     progreso: id => ({ [id + "-001"]: { ok: 1, fail: 0, box: 2, last: null, lastOk: true, marked: false } }),
-    historial: () => [{ fecha: "2026-01-01", pct: 80 }],
+    historial: () => [{ date: 1735776000000, score: 8, total: 10, modo: "practica" }],
     actividad: () => ({ "2026-01-01": 3 }),
     meta: () => 20,
     misiones: () => ({ m1: { pct: 50, estrellas: 1 } }),
@@ -78,6 +78,10 @@ describe("core/nube/snapshot", () => {
     const historialMalo = snapshotValido();
     historialMalo.materias.bd2.historial = "nada";
     expect(validarSnapshot(historialMalo).error).toBe("materias");
+    // Una entrada nula rompería el render de estadísticas tras restaurar.
+    const entradaRota = snapshotValido();
+    entradaRota.materias.bd2.historial = [null];
+    expect(validarSnapshot(entradaRota).error).toBe("materias");
     const competenciaMala = snapshotValido();
     competenciaMala.lenguajes["lenguaje-ts"].competencia = { e1: { aprobado: "si", version: 1 } };
     expect(validarSnapshot(competenciaMala).error).toBe("lenguajes");

@@ -1,10 +1,15 @@
 rules_version = '2';
 // Reglas de Firestore (ADR 008): un documento por usuario en estudiantes/{uid}.
-// Solo el dueño autenticado puede leerlo o escribirlo; el resto queda denegado por defecto.
+// Solo el dueño autenticado puede leerlo o escribirlo. El respaldo viaja como texto JSON
+// (campo `datos`) con tope de 900 kB: el mismo límite que valida el cliente en firebase.js.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /estudiantes/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.datos is string
+        && request.resource.data.datos.size() < 900000
+        && request.resource.data.version is int;
     }
   }
 }
