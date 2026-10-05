@@ -94,6 +94,14 @@ describe("student/cuenta", () => {
     expect(adaptador.auth.salir).toHaveBeenCalledTimes(1);
   });
 
+  it("Google por redirect devuelve navegando sin usuario", async () => {
+    const adaptador = adaptadorFake();
+    adaptador.auth.ingresarConGoogle = vi.fn(async () => null);
+    const cuenta = cuentaCon(adaptador);
+    expect(await cuenta.ingresarConGoogle()).toEqual({ ok: true, usuario: null, navegando: true });
+    expect(cuenta.estado()).toBeNull();
+  });
+
   it("enviarReset responde igual exista o no la cuenta", async () => {
     const cuenta = cuentaCon(adaptadorFake());
     const r = await cuenta.enviarReset("a@x.com");
@@ -110,9 +118,14 @@ describe("student/cuenta", () => {
     expect(cuenta.estado().uid).toBe("u1");
   });
 
-  it("mensajeDeError cae al genérico con códigos desconocidos", () => {
+  it("mensajeDeError traduce configuración y loguea los códigos desconocidos", () => {
+    expect(mensajeDeError({ code: "auth/unauthorized-domain" })).toContain("dominio");
+    expect(mensajeDeError({ code: "auth/popup-blocked" })).toContain("bloqueó");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(mensajeDeError({ code: "auth/lo-que-sea" })).toBe(ERROR_GENERICO);
     expect(mensajeDeError(null)).toBe(ERROR_GENERICO);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("sin traducir"), "auth/lo-que-sea");
+    warn.mockRestore();
   });
 
   it("emailValido acepta correos razonables y rechaza el resto", () => {

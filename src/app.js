@@ -164,7 +164,8 @@ const auth = crearAuth({
   alRecuperar: datos => pedirCuenta(() => cuenta.enviarReset(datos.correo)),
   alGoogle: () => pedirCuenta(
     () => cuenta.ingresarConGoogle(),
-    r => entrarConCuenta(r.usuario)
+    // Con redirect la página navega y no hay usuario todavía: la sesión llega al recargar.
+    r => { if (!r.navegando) entrarConCuenta(r.usuario); }
   ),
   // Puerta de invitado: quien no quiere cuenta sigue con el flujo local de siempre.
   alContinuarSinCuenta: () => {

@@ -54,14 +54,29 @@ export async function crearAdaptador({ env = import.meta.env, cargarModulos = ca
   const app = api.initializeApp(config);
   const auth = api.getAuth(app);
   const db = api.getFirestore(app);
+  // Un solo proveedor reutilizable: el mismo vale para el popup y para el redirect.
+  const proveedorGoogle = new api.GoogleAuthProvider();
+
+  // Si el navegador bloquea la ventana (móvil o ajustes estrictos) se cae a la navegación
+  // completa: devuelve null y la sesión la resuelve onAuthStateChanged al volver.
+  async function ingresarConGoogle() {
+    try {
+      const credencial = await api.signInWithPopup(auth, proveedorGoogle);
+      return normalizarUsuario(credencial.user);
+    } catch (error) {
+      if (error?.code !== "auth/popup-blocked") throw error;
+      await api.signInWithRedirect(auth, proveedorGoogle);
+      return null;
+    }
+  }
+
   return {
     auth: {
       registrar: async (email, pass) =>
         normalizarUsuario((await api.createUserWithEmailAndPassword(auth, email, pass)).user),
       ingresar: async (email, pass) =>
         normalizarUsuario((await api.signInWithEmailAndPassword(auth, email, pass)).user),
-      ingresarConGoogle: async () =>
-        normalizarUsuario((await api.signInWithPopup(auth, new api.GoogleAuthProvider())).user),
+      ingresarConGoogle,
       salir: () => api.signOut(auth),
       enviarReset: email => api.sendPasswordResetEmail(auth, email),
       observar: alCambiar => api.onAuthStateChanged(auth, user => alCambiar(normalizarUsuario(user))),

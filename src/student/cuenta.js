@@ -16,6 +16,11 @@ const MENSAJES = {
   "auth/network-request-failed": "Sin conexión. Revisa tu internet.",
   "auth/popup-closed-by-user": "Se canceló el ingreso con Google.",
   "auth/cancelled-popup-request": "Se canceló el ingreso con Google.",
+  "auth/popup-blocked": "El navegador bloqueó la ventana de Google. Permite las ventanas emergentes e inténtalo de nuevo.",
+  "auth/unauthorized-domain": "Este dominio no está autorizado para ingresar con Google.",
+  "auth/internal-error": "Google no respondió correctamente. Inténtalo de nuevo en un momento.",
+  "auth/api-key-not-valid.-please-pass-a-valid-api-key.": "La configuración de Firebase está incompleta.",
+  "auth/requires-recent-login": "Vuelve a iniciar sesión para confirmar tu identidad.",
   "auth/operation-not-allowed": "Ese método de ingreso no está habilitado.",
   "auth/missing-password": "Escribe tu contraseña."
 };
@@ -23,11 +28,15 @@ const MENSAJES = {
 // Misma política que la UI de acceso: 8 caracteres como mínimo.
 const MIN_CONTRASENA = 8;
 
-export const ERROR_GENERICO = "No se pudo completar la operación. Probá de nuevo.";
+export const ERROR_GENERICO = "No se pudo completar la operación. Inténtalo de nuevo.";
 
 export function mensajeDeError(error) {
   const codigo = error && (error.code || error.message);
-  return MENSAJES[codigo] || ERROR_GENERICO;
+  const conocido = MENSAJES[codigo];
+  // Un código sin traducir es configuración rota o un caso nuevo: se deja visible en la
+  // consola (solo el código, nunca correo ni token) para poder diagnosticarlo.
+  if (!conocido) console.warn("[cuenta] Código de Firebase Auth sin traducir:", codigo);
+  return conocido || ERROR_GENERICO;
 }
 
 // Validación de UX: Firebase vuelve a validar del lado servidor; esto solo evita el viaje obvio.
@@ -88,8 +97,12 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
     const api = await nube();
     if (!api) return { ok: false, mensaje: ERROR_GENERICO };
     try {
-      usuario = await api.auth.ingresarConGoogle();
-      return { ok: true, usuario };
+      const u = await api.auth.ingresarConGoogle();
+      // Con redirect el SDK no devuelve usuario: la página navega y la sesión llega por
+      // onAuthStateChanged. La UI se queda en "Abriendo Google…" hasta la recarga.
+      if (!u) return { ok: true, usuario: null, navegando: true };
+      usuario = u;
+      return { ok: true, usuario: u };
     } catch (e) {
       return { ok: false, mensaje: mensajeDeError(e), codigo: e && e.code };
     }

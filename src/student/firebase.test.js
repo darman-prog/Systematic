@@ -21,6 +21,7 @@ function apiFake() {
     signInWithEmailAndPassword: vi.fn(async () => ({ user: { uid: "u1", email: "a@x.com", displayName: "Ana" } })),
     GoogleAuthProvider: class Proveedor {},
     signInWithPopup: vi.fn(async () => ({ user: { uid: "u1", email: "g@x.com", displayName: null } })),
+    signInWithRedirect: vi.fn(async () => {}),
     signOut: vi.fn(async () => {}),
     sendPasswordResetEmail: vi.fn(async () => {}),
     onAuthStateChanged: vi.fn((auth, cb) => {
@@ -73,6 +74,24 @@ describe("student/firebase", () => {
     expect(await adaptador.auth.registrar("a@x.com", "secreto1")).toEqual({ uid: "u1", email: "a@x.com", nombre: "" });
     expect(await adaptador.auth.ingresar("a@x.com", "secreto1")).toEqual({ uid: "u1", email: "a@x.com", nombre: "Ana" });
     expect(await adaptador.auth.ingresarConGoogle()).toEqual({ uid: "u1", email: "g@x.com", nombre: "" });
+  });
+
+  it("cae a redirect cuando el navegador bloquea el popup de Google", async () => {
+    const api = apiFake();
+    api.signInWithPopup.mockRejectedValueOnce({ code: "auth/popup-blocked" });
+    const adaptador = await crearAdaptador({ env: envCompleto(), cargarModulos: async () => api });
+    expect(await adaptador.auth.ingresarConGoogle()).toBeNull();
+    expect(api.signInWithRedirect).toHaveBeenCalledTimes(1);
+    // El proveedor es el mismo que intentó el popup.
+    expect(api.signInWithRedirect.mock.calls[0][1]).toBe(api.signInWithPopup.mock.calls[0][1]);
+  });
+
+  it("propaga el error de Google si no es popup bloqueado", async () => {
+    const api = apiFake();
+    api.signInWithPopup.mockRejectedValueOnce({ code: "auth/unauthorized-domain" });
+    const adaptador = await crearAdaptador({ env: envCompleto(), cargarModulos: async () => api });
+    await expect(adaptador.auth.ingresarConGoogle()).rejects.toEqual({ code: "auth/unauthorized-domain" });
+    expect(api.signInWithRedirect).not.toHaveBeenCalled();
   });
 
   it("observar entrega el usuario normalizado", async () => {
