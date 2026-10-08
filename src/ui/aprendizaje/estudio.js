@@ -57,7 +57,8 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
             '<span class="badge" style="background:' + colorTema(ctx.materia, item.tema) + '; color:#0f172a">' + item.tema + '</span>' +
             '<span class="text-xs text-slate-400">' + item.parcial + ' · ' + (TIPO_LABELS[item.tipo] || item.tipo) + ' · ' + (DIF_LABELS[item.dificultad] || "") + '</span>' +
           '</div>' +
-          '<button class="star-btn' + (marcada ? " star-on" : "") + '" data-action="toggleMarcadaEstudio" data-id="' + item.id + '">' + (marcada ? "★" : "☆") + '</button>' +
+          // La estrella comunica su estado al lector con aria-pressed, no solo con el color.
+          '<button class="star-btn' + (marcada ? " star-on" : "") + '" data-action="toggleMarcadaEstudio" data-id="' + item.id + '" aria-pressed="' + (marcada ? "true" : "false") + '" aria-label="Marcar pregunta para repaso">' + (marcada ? "★" : "☆") + '</button>' +
         '</div>' +
         bloqueCaso(item) +
         '<div class="font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +

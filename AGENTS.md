@@ -60,14 +60,14 @@ Antes de la primera accion: identifica skills con la tabla, carga cada una con l
 | Escribir o modificar código (cualquier lenguaje o proyecto) | `code-clue` | — |
 | Definir producto, alcance, MVP, roadmap o prioridades | `criterio-proyecto` | `ingenieria-software` |
 | Plan técnico, dependencias, spike/POC | `ingenieria-software` | `arquitectura` |
-| Feature backend, dominio o API | `arquitectura`, `convenciones-backend` | `contratos-api`, `base-datos`, `microservicios` |
+| Feature backend, dominio o API | `arquitectura`, `api-backend` | `base-datos`, `microservicios` |
 | Código frontend sin cambio visual | `convenciones-frontend` | `accesibilidad` |
 | Cambio UI visible o interactivo | `ui-ux`, `impeccable`, `impeccable-doctrina` | `convenciones-frontend`, `accesibilidad`, `frontend-design-review` |
 | Bug no trivial o intermitente | `debugging` | `testing`, `code-quality` |
 | Refactor o deuda técnica | `refactoring` | `code-quality`, `testing` |
-| Escribir o revisar tests | `testing` | `tdd` |
+| Escribir, revisar o correr tests | `testing` | `tdd` |
 | Esquema, migraciones o seeds | `base-datos` | `seguridad` |
-| Auth, inputs, secretos, validación o CORS | `seguridad` | `contratos-api` |
+| Auth, inputs, secretos, validación o CORS | `seguridad` | `api-backend` |
 | Investigación de hechos externos o actuales | `investigacion-web` | — |
 | Analizar datasets, CSV/JSON o métricas | `analisis-datos` | — |
 | Automatizar tareas repetitivas con scripts | `automatizacion` | — |

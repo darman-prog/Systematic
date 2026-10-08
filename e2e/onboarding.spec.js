@@ -17,7 +17,9 @@ test('la primera visita muestra el acceso; sin cuenta deriva al onboarding', asy
 
   await expect(page.locator('#screen-materias')).toBeVisible();
   await expect(page.locator('#saludo-home')).toContainText('Diego');
-  await expect(page.locator('#perfil-panel')).toContainText('Perfil de Diego');
+  await page.getByRole('button', { name: 'Ver mi perfil' }).click();
+  await expect(page.locator('#screen-perfil')).toBeVisible();
+  await expect(page.locator('#perfil-identidad')).toContainText('Perfil de Diego');
 
   // Recarga: el invitado con identidad local entra directo (ni acceso ni onboarding).
   await page.reload();
@@ -35,29 +37,34 @@ test('se puede continuar sin nombre y el saludo queda neutro', async ({ page }) 
   await expect(page.locator('#screen-materias')).toBeVisible();
   await expect(page.locator('#saludo-home')).toBeVisible();
   await expect(page.locator('#saludo-home')).not.toContainText(',');
-  await expect(page.locator('#perfil-panel')).toContainText('Tu perfil');
+  await page.getByRole('button', { name: 'Ver mi perfil' }).click();
+  await expect(page.locator('#screen-perfil')).toBeVisible();
+  await expect(page.locator('#perfil-identidad')).toContainText('Tu perfil');
 
   // Recarga: el flag evita repetir el onboarding y el acceso.
   await page.reload();
   await expect(page.locator('#screen-materias')).toBeVisible();
 });
 
-test('el nombre se puede cambiar desde ajustes y viaja al saludo', async ({ page }) => {
+test('el nombre se puede cambiar desde el perfil y viaja al saludo', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#screen-cuenta')).toBeVisible();
   await page.getByRole('button', { name: 'Continuar sin cuenta' }).click();
   await page.getByRole('button', { name: 'Continuar sin nombre' }).click();
-  await page.locator('#materias-list .materia-card').first().click();
+  await page.getByRole('button', { name: 'Ver mi perfil' }).click();
+  await expect(page.locator('#screen-perfil')).toBeVisible();
 
-  // Editor de nombre en ajustes (pantalla de la materia).
-  await page.locator('[data-action="toggleNombreEditor"]').click();
+  // Editor de nombre en el Perfil.
+  await page.locator('#screen-perfil [data-action="toggleNombreEditor"]').click();
   await expect(page.locator('#nombre-editor')).toBeVisible();
   await page.locator('#nombre-input').fill('Ana');
-  await page.locator('[data-action="guardarNombreAjustes"]').click();
+  await page.locator('#screen-perfil [data-action="guardarNombreAjustes"]').click();
   await expect(page.locator('#nombre-editor')).toBeHidden();
 
   // El saludo del home usa el nuevo nombre.
-  await page.locator('#screen-start [data-action="irMaterias"]').click();
+  await page.locator('#screen-perfil [data-action="irMaterias"]').click();
   await expect(page.locator('#saludo-home')).toContainText('Ana');
-  await expect(page.locator('#perfil-panel')).toContainText('Perfil de Ana');
+  await page.getByRole('button', { name: 'Ver mi perfil' }).click();
+  await expect(page.locator('#screen-perfil')).toBeVisible();
+  await expect(page.locator('#perfil-identidad')).toContainText('Perfil de Ana');
 });

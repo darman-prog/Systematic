@@ -5,6 +5,10 @@ import aswPreguntas from '../src/datos/materias/asw/preguntas.js';
 import infraPreguntas from '../src/datos/materias/infra/preguntas.js';
 
 test.describe('Systematic — smoke', () => {
+  // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
+  async function abrirMasModos(page) {
+    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+  }
   test('el home lista 4 materias con su estado de contenido', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Systematic' })).toBeVisible();
@@ -46,6 +50,7 @@ test.describe('Systematic — smoke', () => {
   test('modo estudio, flashcards y glosario cargan', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Modo Estudio/ }).click();
     await expect(page.locator('#study-list .study-item').first()).toBeVisible();
     await page.locator('#screen-study').getByRole('button', { name: '← Inicio' }).click();
@@ -65,6 +70,7 @@ test.describe('Systematic — smoke', () => {
   test('apuntes: botón presente y estado vacío sin contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Apuntes/ }).click();
     await expect(page.locator('#screen-apuntes')).toBeVisible();
     await expect(page.locator('#apuntes-list')).toContainText('Aún no hay apuntes');
@@ -96,6 +102,7 @@ test.describe('Systematic — smoke', () => {
     await page.on('dialog', d => d.accept());
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Misiones/ }).click();
     await expect(page.locator('#screen-misiones')).toBeVisible();
     const nodos = page.locator('#misiones-lista .mision-nodo');
@@ -110,6 +117,7 @@ test.describe('Systematic — smoke', () => {
   test('escenarios: lista, decisiones y pantalla de juego', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();
+    await abrirMasModos(page);
     await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
     await expect(page.locator('#screen-escenarios')).toBeVisible();
     await expect(page.locator('#escenarios-lista .apunte-card').first()).toBeVisible();
@@ -254,6 +262,7 @@ test.describe('Systematic — smoke', () => {
   test('casos de diagramación: lista y juego', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click(); // BD2
+    await abrirMasModos(page);
     await page.locator('[data-action="startCasos"]').first().click();
     await expect(page.locator('#screen-casos')).toBeVisible();
     await expect(page.locator('#casos-lista .apunte-card').first()).toBeVisible();
@@ -398,6 +407,7 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#materia-nombre')).toHaveText('Ingeniería de Software');
     const total = await page.locator('#stat-total').textContent();
     expect(parseInt(total, 10)).toBeGreaterThan(0);
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Apuntes/ }).click();
     await expect(page.locator('#screen-apuntes')).toBeVisible();
     await expect(page.locator('#apuntes-list .apunte-card').first()).toBeVisible();

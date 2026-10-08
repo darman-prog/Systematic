@@ -1,4 +1,4 @@
-﻿// Render e interacción del modo flashcards.
+// Render e interacción del modo flashcards.
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
 import { shuffle } from "../../core/index.js";
@@ -49,17 +49,19 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
     if (item.codigo && item.tipo === "dragdrop") frente += '<pre class="code-block mt-4">' + resaltarSQL(item.codigo.replace(/\{\d\}/g, "____"), keywords()) + '</pre>';
     if (item.tipo === "ordenar") frente += '<div class="mt-4 flex flex-col gap-2">' + (item.frenteOrden || shuffle(item.bloques)).map(b => '<div class="bloque">' + escapar(b) + '</div>').join("") + '</div>';
 
-    let reves = "";
-    if (flash.volteada) {
-      reves = '<hr class="border-slate-700 my-4">' + respuestaEstudio(item, keywords()) + '<div class="study-exp">' + item.exp + '</div>';
-    }
+    const reversoContenido = frente + '<hr class="border-slate-700 my-4">' + respuestaEstudio(item, keywords()) + '<div class="study-exp">' + item.exp + '</div>';
 
     cont.innerHTML =
       '<div class="flex items-center justify-between mb-4 flex-wrap gap-2 text-sm text-slate-400">' +
         '<span>Tarjeta ' + (flash.idx + 1) + ' de ' + flash.items.length + '</span>' +
         '<span class="flex items-center gap-2">' + icono("check", "icono-sm") + ' ' + flash.aciertos + ' · ' + icono("cruz", "icono-sm") + ' ' + flash.fallos + '</span>' +
       '</div>' +
-      '<div class="flash-card">' + frente + reves + '</div>' +
+      '<div class="flash-card-container">' +
+        '<div class="flash-card-inner' + (flash.volteada ? ' flipped' : '') + '">' +
+          '<div class="flash-card flash-card-front">' + frente + '</div>' +
+          '<div class="flash-card flash-card-back">' + reversoContenido + '</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="mt-5 flex flex-col sm:flex-row gap-3">' +
         (flash.volteada
           ? '<button class="btn btn-primary flex-1" data-action="responderFlash" data-ok="true">Sabía</button>' +

@@ -1,11 +1,11 @@
-﻿/* Componentes visuales, foco, iconos y avisos (spec 006). Importado después de tokens.css. */
+/* Componentes visuales, foco, iconos y avisos (spec 006). Importado después de tokens.css. */
 .hidden { display: none !important; }
 .study-item:not(.revealed) .oculto { filter: blur(6px); pointer-events: none; user-select: none; }
 .btn { cursor: pointer; }
 .star-btn { cursor: pointer; }
 .btn:focus-visible, .option:focus-visible, .chip:focus-visible, .match-item:focus-visible,
 .star-btn:focus-visible, .btn-mini:focus-visible, .pieza:focus-visible, .mode-card:focus-visible,
-.materia-card:focus-visible {
+.materia-card:focus-visible, .mas-modos-summary:focus-visible {
   outline: 2px solid var(--study-accent); outline-offset: 3px;
 }
 .feedback { animation: fadeInUp var(--mov-base) var(--mov-ease); }
@@ -57,13 +57,22 @@ h1, h2 { font-family: var(--fuente-display); letter-spacing: -0.01em; }
 .brand-title { color: var(--study-accent); font-size: 1.75rem; line-height: 1.15; }@media (min-width: 640px) { .brand-title { font-size: 2.25rem; } }
 .card { background: var(--study-surface); border-color: var(--study-border); }
 .mode-card, .materia-card { background: var(--study-surface); border-color: var(--study-border); }
+/* "Más modos" plegable: el summary parece una card fantasma y marca abierto/cerrado. */
+.mas-modos-summary { cursor: pointer; list-style: none; border: 1px dashed var(--study-border); border-radius: 12px; padding: 0.65rem 1rem; color: var(--study-muted); font-weight: 600; font-size: 0.9rem; }
+.mas-modos-summary::-webkit-details-marker { display: none; }
+.mas-modos-summary::before { content: "▸ "; }
+#mas-modos[open] .mas-modos-summary::before { content: "▾ "; }
+.mas-modos-summary:hover { color: var(--study-text); border-color: var(--study-accent); }
 .btn-secondary, .btn-ghost { border-color: var(--study-border); }
 .search-input, .stat-input { background: var(--study-surface-2); border-color: var(--study-border); color: var(--study-text); }
 .option, .match-item, .study-item, .flash-card, .glosario-item, .apunte-card { background: var(--study-surface); border-color: var(--study-border); }
 
 /* Texto oscuro solo sobre acentos sólidos. Los estados de selección (chip-on, pieza-sel,
    match-sel, hueco-lleno, tag-practica) usan tinte al 18% con texto acento (Anexo A, entrada.css). */
-.er-head, .tag-simulacro { color: var(--study-bg); }
+/* La cabecera ER va sobre azul Tailwind sólido (#1d4ed8): solo el blanco pasa 4.5:1.
+   El tag de simulacro va sobre acento claro, así que conserva texto oscuro. */
+.er-head { color: #ffffff; }
+.tag-simulacro { color: var(--study-bg); }
 .tag-simulacro { background: var(--study-accent-strong); }
 
 /* Avisos globales (spec 003); el perfil vive en el bloque de abajo. */
@@ -269,7 +278,7 @@ input, textarea { caret-color: var(--study-accent); }
 }
 
 .etapa-card.is-bloqueada {
-  opacity: 0.65;
+  /* Sin opacity: al 65% el badge caía a 3.16:1; solo se desatura para marcar bloqueo. */
   filter: saturate(0.35);
 }
 
@@ -325,7 +334,8 @@ input, textarea { caret-color: var(--study-accent); }
 .badge-aprobada   { --b-color: var(--e-ok); }
 .badge-disponible { --b-color: var(--color-tema); }
 .badge-intento    { --b-color: var(--e-aviso); }
-.badge-bloqueada  { --b-color: var(--e-texto-suave); }
+/* Bloqueada más clara que el muted base: compensa el fondo tintado y pasa 4.5:1. */
+.badge-bloqueada  { --b-color: #c2c6ce; }
 
 /* ---------- Progreso del último intento ---------- */
 
@@ -450,12 +460,15 @@ input, textarea { caret-color: var(--study-accent); }
 .btn-examen {
   justify-content: center;
   border: 1px solid var(--color-tema);
-  background: var(--color-tema);
-  color: var(--e-sobre-tema);
+  /* Fondo oscurecido con el tinte del tema: el blanco pasa 4.5:1 en los tres lenguajes
+     (el tema puro #6FA8DC/#ffde57 es demasiado claro para texto blanco). */
+  background: color-mix(in srgb, var(--color-tema) 42%, #1a1c22);
+  color: #ffffff;
 }
 
 .btn-examen .btn-texto { text-align: left; }
-.btn-examen .btn-meta  { color: inherit; opacity: 0.85; }
+/* Meta a opacidad casi plena: al 85% caía a 2.23:1 sobre el tema claro. */
+.btn-examen .btn-meta  { color: inherit; opacity: 0.95; }
 
 .btn-examen .btn-icono {
   color: inherit;
@@ -463,7 +476,8 @@ input, textarea { caret-color: var(--study-accent); }
 }
 
 .btn-examen:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-tema) 88%, #000);
+  /* Aclara apenas sobre la base oscurecida sin volver al tema puro (rompería el 4.5:1). */
+  background: color-mix(in srgb, var(--color-tema) 52%, #1a1c22);
 }
 
 /* ---------- Estados comunes ---------- */
@@ -662,7 +676,7 @@ input, textarea { caret-color: var(--study-accent); }
   stroke: var(--study-accent-strong);
   stroke-linecap: round;
   stroke-dasharray: var(--pct, 0) 100;
-  animation: anillo-llenar 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: anillo-llenar var(--mov-enfasis) var(--mov-ease);
 }
 
 @keyframes anillo-llenar {
@@ -686,6 +700,7 @@ input, textarea { caret-color: var(--study-accent); }
   display: grid;
   gap: 0.35rem;
   min-width: 0;
+  text-align: left;
 }
 
 .perfil-nombre {
@@ -748,9 +763,25 @@ input, textarea { caret-color: var(--study-accent); }
 .perfil-chip--racha  { --chip-color: #f09a4a; }
 .perfil-chip--logros { --chip-color: var(--study-accent-strong); }
 
+/* Variante hero del Perfil: mismo anillo + chips, con más aire que en el home. */
+.perfil-card--hero {
+  gap: 1.75rem;
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(180deg, var(--study-surface), var(--study-surface-2));
+  box-shadow: var(--study-shadow);
+}
+.perfil-card--hero .perfil-anillo { width: 6.5rem; height: 6.5rem; }
+.perfil-card--hero .perfil-datos { gap: 0.45rem; }
+
 /* Móvil: anillo y tipografías más chicas. */
 @media (max-width: 480px) {
   .perfil-card { gap: 1rem; padding: 1rem; }
+  .perfil-card--hero { gap: 1.1rem; padding: 1.15rem 1rem; }
+  .perfil-card--hero .perfil-anillo { width: 5rem; height: 5rem; }
+  /* En móvil el hero se apila y centra: evita la mezcla de anillo lateral con texto centrado. */
+  .perfil-card--hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .perfil-card--hero .perfil-datos { text-align: center; justify-items: center; }
+  .perfil-card--hero .perfil-chips { justify-content: center; }
   .perfil-anillo { width: 4.75rem; height: 4.75rem; }
   .perfil-num { font-size: 1.6rem; }
   .perfil-xp b { font-size: 1.7rem; }
@@ -791,4 +822,231 @@ input, textarea { caret-color: var(--study-accent); }
     padding-top: 0.75rem;
     border-top: 1px solid var(--study-border);
   }
+}
+
+
+/* ===== FADE-IN ENTRE PANTALLAS (mejora 3) ===== */
+section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease); }
+
+/* ===== TARJETAS DE MATERIA CON GRADIENTE (mejora 1) ===== */
+.materia-card {
+  background: 
+    radial-gradient(
+      ellipse at 0% 0%,
+      color-mix(in srgb, var(--materia-color, var(--study-accent)) 10%, transparent) 0%,
+      transparent 70%
+    ),
+    var(--study-surface);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  transition: 
+    border-color var(--mov-rapida) var(--mov-ease),
+    background var(--mov-rapida) var(--mov-ease),
+    box-shadow var(--mov-rapida) var(--mov-ease);
+}
+
+.materia-card:hover:not(:disabled) {
+  background: 
+    radial-gradient(
+      ellipse at 0% 0%,
+      color-mix(in srgb, var(--materia-color, var(--study-accent)) 16%, transparent) 0%,
+      transparent 75%
+    ),
+    var(--study-surface-2);
+  border-color: var(--materia-color, var(--study-accent));
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--materia-color, var(--study-accent)) 12%, transparent);
+}
+
+/* ===== GRUPOS DE MODOS EN PORTADA (mejora 2) ===== */
+.mode-group-title {
+  font-family: var(--fuente-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--study-muted);
+  margin-bottom: 0.6rem;
+  padding-left: 0.15rem;
+}
+
+/* ===== QUIZ HEADER MEJORADO (mejora 4) ===== */
+.quiz-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.quiz-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.quiz-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.quiz-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--study-surface-2);
+  border-radius: 10px;
+  border: 1px solid var(--study-border);
+}
+
+.quiz-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--materia-accent) 12%, transparent);
+  color: var(--materia-accent);
+}
+
+.quiz-meta-badge--tipo {
+  background: color-mix(in srgb, var(--study-muted) 14%, transparent);
+  color: var(--study-muted);
+}
+
+.quiz-meta-badge--dif {
+  background: transparent;
+  padding: 0.15rem 0.3rem;
+}
+
+/* ===== RESULTADOS HERO (mejora 5) ===== */
+.results-hero {
+  text-align: center;
+  padding: 2rem 1.5rem 1.5rem;
+  margin: -1.25rem -1.25rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+  background:
+    radial-gradient(
+      circle at 50% 30%,
+      color-mix(in srgb, var(--ring-color, var(--study-accent)) 10%, transparent) 0%,
+      transparent 65%
+    ),
+    var(--study-surface);
+  border-bottom: 1px solid var(--study-border);
+}
+
+@media (min-width: 640px) {
+  .results-hero {
+    margin: -1.75rem -1.75rem 1.5rem;
+    padding: 2.5rem 2rem 1.5rem;
+  }
+}
+
+.results-stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.results-stat {
+  text-align: center;
+  padding: 0.75rem 0.5rem;
+  background: var(--study-surface-2);
+  border-radius: 10px;
+  border: 1px solid var(--study-border);
+}
+
+.results-stat-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--study-text);
+  line-height: 1.2;
+}
+
+.results-stat-label {
+  font-size: 0.72rem;
+  color: var(--study-muted);
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+/* ===== FLASHCARD FLIP 3D (mejora 6) ===== */
+.flash-card-container {
+  perspective: 1000px;
+  width: 100%;
+}
+
+.flash-card-inner {
+  position: relative;
+  width: 100%;
+  min-height: 16rem;
+  transition: transform var(--mov-enfasis) var(--mov-ease);
+  transform-style: preserve-3d;
+}
+
+.flash-card-inner.flipped {
+  transform: rotateY(180deg);
+}
+
+.flash-card-front,
+.flash-card-back {
+  width: 100%;
+  min-height: 16rem;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flash-card-front {
+  position: relative;
+}
+
+.flash-card-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  overflow-y: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-card-inner {
+    transition: none;
+  }
+}
+
+/* ===== ONBOARDING PASOS (mejora 7) ===== */
+.onboarding-step {
+  background: var(--study-surface);
+  border: 1px solid var(--study-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  transition: border-color var(--mov-rapida) var(--mov-ease), background var(--mov-rapida) var(--mov-ease);
+}
+
+.onboarding-step:hover {
+  border-color: var(--study-accent);
+  background: var(--study-surface-2);
+}
+
+.onboarding-step::before {
+  content: attr(data-step);
+  position: absolute;
+  top: -0.6rem;
+  right: -0.2rem;
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: color-mix(in srgb, var(--study-accent) 8%, transparent);
+  line-height: 1;
+  pointer-events: none;
 }

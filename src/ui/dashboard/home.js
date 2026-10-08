@@ -6,80 +6,8 @@ import { icono } from "../iconos.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
 
-// Pluraliza una etiqueta según la cantidad (1 día / 2 días).
-const plural = (n, uno, varios) => (n === 1 ? uno : varios);
-
-export function crearHome({ persistencia, gamificacion }) {
+export function crearHome({ persistencia }) {
   const $ = id => document.getElementById(id);
-  let xpMostrado = 0;
-
-  // Respeta la preferencia del sistema: sin animación de conteo si el usuario pide menos movimiento.
-  function prefiereMenosMovimiento() {
-    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }
-
-  // Contador de XP (spec 006): sube con easing; sin animación si el usuario pide menos movimiento.
-  function contarHasta(el, desde, hasta) {
-    if (!el) return;
-    if (desde === hasta || prefiereMenosMovimiento()) {
-      el.textContent = hasta;
-      return;
-    }
-    const inicio = performance.now();
-    const dur = 460;
-    function paso(t) {
-      const k = Math.min(1, (t - inicio) / dur);
-      const suave = 1 - Math.pow(1 - k, 3);
-      el.textContent = Math.round(desde + (hasta - desde) * suave);
-      if (k < 1) requestAnimationFrame(paso);
-    }
-    requestAnimationFrame(paso);
-  }
-
-  function renderPerfil() {
-    const cont = $("perfil-panel");
-    if (!cont) return;
-    const p = gamificacion.perfil();
-    const desde = xpMostrado;
-    xpMostrado = p.xp;
-
-    const pct = Math.max(0, Math.min(100, Math.round(p.pct)));
-    const nombrePerfil = persistencia.nombre() ? `Perfil de ${escapar(persistencia.nombre())}` : "Tu perfil";
-    const faltan = p.faltante
-      ? `<p class="perfil-faltan">Faltan ${p.faltante} XP para el nivel ${p.nivel + 1}</p>`
-      : "";
-
-    cont.innerHTML = `
-      <div class="perfil-card">
-        <div class="perfil-anillo" role="progressbar" aria-label="Progreso hacia el nivel ${p.nivel + 1}"
-             aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}">
-          <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-            <circle class="anillo-pista" cx="50" cy="50" r="44"/>
-            <circle class="anillo-valor" cx="50" cy="50" r="44" pathLength="100" style="--pct:${pct}"/>
-          </svg>
-          <span class="perfil-num">${p.nivel}</span>
-          <span class="perfil-etq">nivel</span>
-        </div>
-
-        <div class="perfil-datos">
-          <p class="perfil-nombre">${nombrePerfil}</p>
-          <p class="perfil-xp"><b id="perfil-xp">${desde}</b> XP</p>
-          ${faltan}
-          <ul class="perfil-chips">
-            <li class="perfil-chip perfil-chip--racha">
-              ${icono("llama", "icono-sm")}
-              <span><b>${p.racha}</b> ${plural(p.racha, "día", "días")} de racha</span>
-            </li>
-            <li class="perfil-chip perfil-chip--logros">
-              ${icono("medalla", "icono-sm")}
-              <span><b>${p.insignias}</b> ${plural(p.insignias, "logro", "logros")}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-    `;
-    contarHasta($("perfil-xp"), desde, p.xp);
-  }
 
   function renderMaterias() {
     const cont = $("materias-list");
@@ -192,5 +120,5 @@ export function crearHome({ persistencia, gamificacion }) {
     cont.innerHTML = tarjetas.join("");
   }
 
-  return { renderMaterias, renderLenguajes, renderPerfil };
+  return { renderMaterias, renderLenguajes };
 }

@@ -2,31 +2,52 @@
 // localStorage ni la nube: las acciones viven en el mapa ACCIONES de app.js, como el resto
 // de los módulos de ui/ (ADR 007).
 //
-// Markup servido en index.html#screen-cuenta; estos son los ids que maneja:
+// Markup servido en index.html#screen-cuenta y #screen-perfil; estos son los ids que maneja:
 //   #cuenta-anon         → panel sin sesión (adentro vive #auth-root, lo pinta autenticacion.js)
-//   #cuenta-sesion       → panel con sesión (subir, restaurar, cerrar sesión)
+//   #cuenta-sesion       → atajo con sesión hacia el Perfil (sin duplicar nube/salir)
+//   #perfil-cuenta       → bloque de cuenta dentro del Perfil (lo pinta ui/cuenta/perfil.js)
 //   #cuenta-email-actual → correo del usuario logueado
-//   #cuenta-aviso        → role="status" para éxito/error/procesando
+//   #cuenta-aviso/#perfil-aviso → role="status" para éxito/error/procesando
 export function crearCuentaUI({ ctx }) {
   const $ = id => document.getElementById(id);
-  const PANELES = ["cuenta-anon", "cuenta-sesion"];
+  const PANELES = ["cuenta-anon", "cuenta-sesion", "perfil-cuenta"];
+  const AVISOS = ["cuenta-aviso", "perfil-aviso"];
 
   // Panel que está bloqueado por una acción en curso (null si no hay ninguna).
   let panelOcupado = null;
 
+  // Un panel cuenta como visible solo si él y su sección están a la vista.
+  function esVisible(el) {
+    if (!el || el.classList.contains("hidden")) return false;
+    const seccion = el.closest("section");
+    return !seccion || !seccion.classList.contains("hidden");
+  }
+
   function panelVisible() {
-    return PANELES.map($).find(p => p && !p.classList.contains("hidden")) || null;
+    return PANELES.map($).find(p => esVisible(p)) || null;
   }
 
   // Escribe el aviso. El color sale de data-estado ("ok" | "error" | "procesando"),
   // así que el CSS decide los colores y este módulo no toca estilos.
+  // Solo pinta el panel visible: sin esto el aviso se duplicaba en cuenta y perfil.
   function escribirAviso(mensaje, estado) {
-    const el = $("cuenta-aviso");
-    if (!el) return;
-    el.textContent = mensaje || "";
-    el.classList.toggle("hidden", !mensaje);
-    if (mensaje) el.dataset.estado = estado;
-    else delete el.dataset.estado;
+    const todos = AVISOS.map($).filter(Boolean);
+    const visibles = todos.filter(esVisible);
+    // Sin panel visible (cambio de pantalla a mitad de acción) se escribe en todos
+    // para no perder el mensaje; al volver a la vista ya está el texto correcto.
+    const destinos = visibles.length ? visibles : todos;
+    const ocultos = todos.filter(el => !destinos.includes(el));
+    destinos.forEach(el => {
+      el.textContent = mensaje || "";
+      el.classList.toggle("hidden", !mensaje);
+      if (mensaje) el.dataset.estado = estado;
+      else delete el.dataset.estado;
+    });
+    ocultos.forEach(el => {
+      el.textContent = "";
+      el.classList.add("hidden");
+      delete el.dataset.estado;
+    });
   }
 
   // Alterna los paneles según haya sesión, muestra el correo y limpia el aviso.
@@ -79,7 +100,8 @@ export function crearCuentaUI({ ctx }) {
     panelOcupado = null;
 
     // Solo se limpia "Procesando…"; un éxito o error escrito antes se conserva.
-    if ($("cuenta-aviso")?.dataset.estado === "procesando") escribirAviso("");
+    const avisoActual = AVISOS.map($).find(el => el && el.dataset.estado === "procesando");
+    if (avisoActual) escribirAviso("");
   }
 
   return { pintar, aviso, procesando };

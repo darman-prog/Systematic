@@ -7,6 +7,8 @@ export function toast(mensaje) {
   if (!zona) {
     zona = document.createElement("div");
     zona.id = "toast-zone";
+    // Los avisos se anuncian solos al aparecer, sin robar el foco.
+    zona.setAttribute("aria-live", "polite");
     document.body.appendChild(zona);
   }
   const el = document.createElement("div");

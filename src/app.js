@@ -37,6 +37,7 @@ import { crearNube } from "./student/nube.js";
 import { aplicarSnapshot } from "./student/aplicar.js";
 import { crearCuentaUI } from "./ui/cuenta.js";
 import { crearAuth } from "./ui/cuenta/autenticacion.js";
+import { crearPerfil } from "./ui/cuenta/perfil.js";
 
 
 const mezclador = crearMezclador({
@@ -85,11 +86,12 @@ const gamificacion = crearGamificacion({
     confeti();
   },
   alLogro: l => toast(icono(l.icono, "icono-sm") + conNombre("Logro nuevo, @: " + l.nombre) + " (+" + XP_EVENTOS.logro + " XP)"),
-  alCambiarPerfil: () => home.renderPerfil()
+  // La tarjeta de perfil vive solo en screen-perfil: si está a la vista se repinta.
+  alCambiarPerfil: () => { if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil()); }
 });
 
-// Renderers del home (materias, lenguajes y perfil) extraídos a ui/dashboard (ADR 007).
-const home = crearHome({ persistencia, gamificacion });
+// Renderers del home (materias y lenguajes) extraídos a ui/dashboard (ADR 007).
+const home = crearHome({ persistencia });
 
 // Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
 const track = crearTrack({
@@ -121,9 +123,15 @@ const ctx = {
 // Cuenta y nube (ADR 008): servicios con dependencias inyectadas; la UI de acceso vive en
 // ui/cuenta/autenticacion.js y el panel de sesión en ui/cuenta.js.
 const cuentaUI = crearCuentaUI({ ctx });
+const perfilUI = crearPerfil();
 const cuenta = crearCuenta({
   cargarNube: cargarFirebase,
-  alCambiarSesion: usuario => cuentaUI.pintar(usuario)
+  alCambiarSesion: usuario => {
+    cuentaUI.pintar(usuario);
+    // Si el Perfil está a la vista, su bloque de cuenta sigue al mismo estado.
+    cachePerfilCuenta.email = usuario?.email ?? usuario?.correo ?? null;
+    if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil());
+  }
 });
 const nube = crearNube({
   cargarNube: cargarFirebase, persistencia, materias: MATERIAS, lenguajes: LENGUAJES
@@ -185,7 +193,7 @@ const config = crearConfig({
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
 
 function show(screen) {
-    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje", "cuenta"].forEach(s =>
+    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje", "cuenta", "perfil"].forEach(s =>
     $("screen-" + s).classList.toggle("hidden", s !== screen)
   );
   animar($("screen-" + screen));
@@ -253,6 +261,9 @@ function cargarHistorial() {
 }
 
 function clearHistory() {
+  // La Zona de peligro pide confirmación: borrar el historial no se puede deshacer.
+  if (!confirm("¿Borrar el historial de intentos de esta materia? No se puede deshacer.")) return;
+  if (!track.materia || !track.materia.id) return;
   persistencia.borrarHistorial(track.materia.id);
   renderHistory();
   renderStats();
@@ -260,6 +271,7 @@ function clearHistory() {
 
 function resetProgreso() {
   if (!confirm("¿Borrar todo el progreso de esta materia? Se eliminan aciertos, fallos, marcas, racha, historial de intentos y misiones. Tu XP y logros globales se conservan.")) return;
+  if (!track.materia || !track.materia.id) return;
   progreso = {};
   persistencia.reiniciarMateria(track.materia.id);
   renderStats();
@@ -267,6 +279,8 @@ function resetProgreso() {
 }
 
 function exportarDatos() {
+  // Desde el Perfil se exporta el track activo (materia o lenguaje); sin track no hay nada que exportar.
+  if (!track.lenguaje && (!track.materia || !track.materia.id)) return;
   // En un track de lenguaje se exporta la competencia; en una materia, su progreso.
   const esLenguaje = !!track.lenguaje;
   const datos = {
@@ -354,7 +368,7 @@ function importarDatos(input) {
 }
 
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
-// Perfil y contador de XP: renderPerfil vive en ui/dashboard/home.js (ADR 007).
+// La tarjeta de perfil vive solo en screen-perfil (ui/cuenta/perfil.js).
 
 // Filtros de práctica: el estado y la lógica viven en student/track.js; acá solo queda el
 // puente con el DOM (checkboxes de la config) y el re-render después de cada cambio.
@@ -689,10 +703,39 @@ function alternarPausa() {
   $("pause-btn").innerHTML = icono(s.pausado ? "seguir" : "pausa", "icono-sm");
   if (s.pausado) {
     clearTimer();
-  } else if (s.restante > 0) {
-    iniciarTimer(s.restante);
+    // El foco entra al diálogo para que el teclado no siga operando la ronda de atrás.
+    const primero = $("pause-overlay").querySelector("button");
+    if (primero) primero.focus();
+  } else {
+    if (s.restante > 0) iniciarTimer(s.restante);
+    // Al cerrar, el foco vuelve al trigger de pausa (cierra el ciclo del modal).
+    const trigger = $("pause-btn");
+    if (trigger) trigger.focus();
   }
 }
+
+// Trampa de foco del modal de pausa (M5): Tab cicla entre sus botones y Escape
+// reanuda. Mismo patrón que el diálogo de guardas de diagramas.
+$("pause-overlay").addEventListener("keydown", e => {
+  const s = sesiones.sesion;
+  if (!s || !s.pausado) return;
+  if (e.key === "Escape") {
+    e.preventDefault();
+    alternarPausa();
+    return;
+  }
+  if (e.key !== "Tab") return;
+  const botones = Array.from($("pause-overlay").querySelectorAll("button"));
+  if (!botones.length) return;
+  const idx = botones.indexOf(document.activeElement);
+  if (e.shiftKey && idx <= 0) {
+    e.preventDefault();
+    botones[botones.length - 1].focus();
+  } else if (!e.shiftKey && idx === botones.length - 1) {
+    e.preventDefault();
+    botones[0].focus();
+  }
+});
 
 // Cierra la ronda: la orquestación (resultado, examen, misión, historial) vive en
 // student/session.js; acá solo se apaga el reloj y se delega. La pantalla la pinta el
@@ -748,8 +791,30 @@ function irMaterias() {
   const temaMeta = document.querySelector('meta[name="theme-color"]');
   if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
   show("materias");
-  home.renderMaterias();
-  home.renderPerfil();
+    home.renderMaterias();
+}
+
+// Perfil (4 bloques): identidad local + cuenta + datos + peligro. Reúne nombre,
+// sesión y gamificación y los pasa como estado explícito a la UI (ADR 001).
+let cachePerfilCuenta = { disponible: false, email: null };
+function datosPerfil() {
+  const usuario = cuenta.estado();
+  const email = usuario?.email ?? usuario?.correo ?? null;
+  const cuentaEstado = !cachePerfilCuenta.disponible ? "no-disponible" : (email ? "sesion" : "invitado");
+  return { nombre: persistencia.nombre(), email, cuentaEstado, perfil: gamificacion.perfil() };
+}
+async function irPerfil() {
+  clearTimer();
+  sesiones.limpiar();
+  const disponible = await cuenta.disponible();
+  const usuario = cuenta.estado();
+  // Se cachea para repintar en sync tras cambiar el nombre sin re-preguntar a Firebase.
+  cachePerfilCuenta = { disponible, email: usuario?.email ?? usuario?.correo ?? null };
+  perfilUI.render(datosPerfil());
+  document.title = "Tu perfil — Systematic";
+  show("perfil");
+  // El foco va al título (igual que auth-titulo): orienta al lector sin abrir teclados.
+  $("perfil-titulo")?.focus({ preventScroll: true });
 }
 
 async function seleccionarMateria(id) {
@@ -939,8 +1004,7 @@ function mostrarOnboardingLocal() {
 }
 
 function mostrarMaterias() {
-  home.renderMaterias();
-  home.renderPerfil();
+    home.renderMaterias();
   show("materias");
 }
 
@@ -969,11 +1033,10 @@ async function entrarConCuenta(usuario) {
 
 // Cuenta (ADR 008): decide la pantalla inicial. Sin claves de Firebase la app queda 100%
 // local (onboarding por nombre); con claves, el primer contacto es el acceso y la sesión se
-// restaura al recargar. El botón "Cuenta" del dashboard se muestra solo si hay configuración.
+// restaura al recargar. El estado de cuenta vive en el Perfil (irPerfil).
 (async () => {
   const disponible = await cuenta.disponible();
-  const btnCuenta = $("btn-cuenta");
-  if (btnCuenta) btnCuenta.classList.toggle("hidden", !disponible);
+  cachePerfilCuenta.disponible = disponible;
 
   if (!disponible) {
     if (!persistencia.nombre() && !persistencia.onboardingHecho()) mostrarOnboardingLocal();
@@ -1010,14 +1073,12 @@ const ACCIONES = {
     persistencia.guardarNombre(valor);
     persistencia.guardarOnboardingHecho();
     home.renderMaterias();
-    home.renderPerfil();
     show("materias");
     toast(icono("nivel", "icono-sm") + saludoSegunHora(persistencia.nombre()) + ". ¡Vamos a estudiar!");
   },
   saltarOnboarding: () => {
     persistencia.guardarOnboardingHecho();
     home.renderMaterias();
-    home.renderPerfil();
     show("materias");
   },
   toggleNombreEditor: () => {
@@ -1034,7 +1095,8 @@ const ACCIONES = {
     persistencia.guardarNombre(entrada.value);
     persistencia.guardarOnboardingHecho();
     $("nombre-editor").classList.add("hidden");
-    home.renderPerfil();
+    // El Perfil muestra el mismo nombre: si está a la vista, se repinta en el acto.
+    if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil());
     toast(icono("check", "icono-sm") + saludoSegunHora(persistencia.nombre()) + (persistencia.nombre() ? ", " + persistencia.nombre() : ""));
   },
   actualizarResumen: () => config.actualizarResumen(),
@@ -1056,6 +1118,7 @@ const ACCIONES = {
   importarArchivo: () => $("import-file").click(),
   irConfig: () => config.irConfig(),
   irMaterias: () => irMaterias(),
+  irPerfil: () => irPerfil(),
   iniciarMision: el => iniciarMision(el.dataset.tema),
   irMisiones: () => irMisiones(),
   moverBloque: el => quiz.moverBloque(parseInt(el.dataset.i, 10), parseInt(el.dataset.dir, 10)),
@@ -1117,6 +1180,9 @@ const ACCIONES = {
     if (!r.ok) { cuentaUI.aviso(r.mensaje, false); return; }
     cuentaUI.pintar(null);
     auth.renderLogin();
+    // Salir solo se ofrece desde el Perfil: al cerrar sesión se vuelve a materias.
+    cachePerfilCuenta.email = null;
+    irMaterias();
   },
   subirNube: async () => {
     const usuario = cuenta.estado();

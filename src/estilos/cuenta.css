@@ -307,8 +307,9 @@
   #auth-root .auth-card { padding: 24px 20px; }
 }
 
-/* ===== Aviso de la pantalla de cuenta (#cuenta-aviso) ===== */
-#cuenta-aviso {
+/* ===== Aviso de la pantalla de cuenta (#cuenta-aviso) y del Perfil (#perfil-aviso) ===== */
+#cuenta-aviso,
+#perfil-aviso {
   padding: 0.7rem 0.85rem;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -316,6 +317,101 @@
   background: color-mix(in srgb, currentColor 12%, transparent);
 }
 
-#cuenta-aviso[data-estado="ok"] { color: var(--study-success, #3ccf93); }
-#cuenta-aviso[data-estado="error"] { color: var(--study-error, #f0707a); }
-#cuenta-aviso[data-estado="procesando"] { color: var(--study-muted, #9aa3b5); }
+#cuenta-aviso[data-estado="ok"],
+#perfil-aviso[data-estado="ok"] { color: var(--study-success, #3ccf93); }
+#cuenta-aviso[data-estado="error"],
+#perfil-aviso[data-estado="error"] { color: var(--study-error, #f0707a); }
+#cuenta-aviso[data-estado="procesando"],
+#perfil-aviso[data-estado="procesando"] { color: var(--study-muted, #9aa3b5); }
+
+/* ===== Perfil: cabecera, tarjetas y zona de peligro (scopeado a #screen-perfil) ===== */
+#screen-perfil .perfil-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+#screen-perfil .perfil-head-texto { min-width: 0; flex: 1 1 16rem; }
+
+/* Titular con la display serif del proyecto; el foco de app.js sigue en este h1. */
+#screen-perfil .perfil-titulo {
+  font-family: var(--fuente-display);
+  font-size: 1.75rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0 0 0.35rem;
+}
+
+#screen-perfil .perfil-titulo:focus { outline: none; }
+
+#screen-perfil .perfil-titulo:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+#screen-perfil .perfil-sub { margin-bottom: 0; }
+
+#screen-perfil .perfil-head-lado {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Tarjetas internas: separan Cuenta y Datos sin cards anidadas profundas. */
+#screen-perfil .perfil-tarjeta {
+  margin-top: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--study-surface-2);
+  border: 1px solid var(--study-border);
+  border-radius: 14px;
+}
+
+#screen-perfil .perfil-tarjeta-titulo {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Zona de peligro: borde y tinte de error en toda la tarjeta, sin franja lateral. */
+#screen-perfil .perfil-peligro {
+  border-color: color-mix(in srgb, var(--study-error) 55%, transparent);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--study-error) 9%, transparent), transparent 70%),
+    var(--study-surface-2);
+}
+
+#screen-perfil .perfil-peligro-titulo { color: var(--study-error); }
+
+/* Botón sólido de peligro: mismo peso que el primario, en tono error. */
+#screen-perfil .btn-peligro {
+  background: var(--study-error);
+  color: var(--study-bg);
+  border: 1px solid transparent;
+  transition: filter var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
+}
+
+#screen-perfil .btn-peligro:hover:not(:disabled) { filter: brightness(1.07); }
+#screen-perfil .btn-peligro:active:not(:disabled) { filter: brightness(0.95); transform: translateY(1px); }
+#screen-perfil .btn-peligro:focus-visible {
+  outline: 2px solid var(--study-error);
+  outline-offset: 3px;
+}
+
+/* Iconos dentro de botones del Perfil: heredan el color del botón. */
+#screen-perfil .btn .icono { width: 16px; height: 16px; flex: none; }
+#screen-perfil #nombre-input { min-height: 2.5rem; }
+
+/* Móvil: la cabecera se apila y el hero respira menos. */
+@media (max-width: 480px) {
+  #screen-perfil .perfil-head { flex-direction: column; align-items: stretch; }
+  #screen-perfil .perfil-head-lado { justify-content: space-between; }
+  #screen-perfil .perfil-titulo { font-size: 1.5rem; }
+  #screen-perfil .perfil-tarjeta { padding: 1rem; }
+}

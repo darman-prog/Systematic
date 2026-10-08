@@ -8,6 +8,11 @@ import infraEscenarios from '../src/datos/materias/infra/escenarios.js';
 // glosario, apuntes y escenarios. No tiene preguntas de diagrama, así que el
 // constructor de lienzo nunca debe aparecer.
 test.describe('Infraestructura', () => {
+  // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
+  async function abrirMasModos(page) {
+    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+  }
+
   test('aparece en el home como cuarta materia y carga su portada', async ({ page }) => {
     await page.goto('/');
     const card = page.locator('#materias-list .materia-card').nth(3);
@@ -39,6 +44,7 @@ test.describe('Infraestructura', () => {
   test('las misiones se generan a partir de los temas del banco', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').nth(3).click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Misiones/ }).click();
 
     await expect(page.locator('#screen-misiones')).toBeVisible();
@@ -50,6 +56,7 @@ test.describe('Infraestructura', () => {
   test('el glosario carga los términos y las categorías', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').nth(3).click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Glosario/ }).first().click();
 
     await expect(page.locator('#glosario-list')).toBeVisible();
@@ -61,6 +68,7 @@ test.describe('Infraestructura', () => {
   test('los apuntes cargan con su contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').nth(3).click();
+    await abrirMasModos(page);
     await page.locator('[data-action="startApuntes"]').click();
 
     await expect(page.locator('#screen-apuntes')).toBeVisible();
@@ -71,6 +79,7 @@ test.describe('Infraestructura', () => {
   test('los escenarios cargan y se puede jugar uno', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').nth(3).click();
+    await abrirMasModos(page);
     await page.getByRole('button', { name: /Escenarios/ }).click();
 
     await expect(page.locator('#screen-escenarios')).toBeVisible();
@@ -85,6 +94,7 @@ test.describe('Infraestructura', () => {
   test('los casos de diagramación muestran el estado vacío sin romperse', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').nth(3).click();
+    await abrirMasModos(page);
     await page.locator('[data-action="startCasos"]').first().click();
 
     await expect(page.locator('#screen-casos')).toBeVisible();

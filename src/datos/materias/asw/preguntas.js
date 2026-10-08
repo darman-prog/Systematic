@@ -695,6 +695,178 @@ const preguntas = [
     ],
     correctos: [0, 2, 3],
     exp: "LSP se rompe con <b>condiciones imposibles, pre/postcondiciones incompatibles o excepciones inesperadas</b>. Añadir métodos o campos nuevos es <b>extensión legítima</b> (lo que fomenta el Open/Closed), no una violación de sustituibilidad."
+  },
+  {
+    id: "ASW-049",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cuál es la diferencia fundamental entre capas (layers) y niveles (tiers)?",
+    options: [
+      "Son sinónimos: ambos describen la división del código fuente en módulos",
+      "Las capas son separación lógica del código dentro del mismo proceso; los niveles son despliegue físico en nodos independientes que se comunican por red",
+      "Las capas se comunican por red y los niveles comparten el mismo proceso en memoria"
+    ],
+    correct: 1,
+    exp: "Las <b>capas</b> organizan el código fuente por responsabilidad dentro del <b>mismo proceso</b>, mientras que los <b>niveles</b> son componentes desplegados en <b>nodos físicos separados</b> que se comunican por red (con latencia). Confundirlos es como confundir los planos de una casa con casas construidas en terrenos distintos."
+  },
+  {
+    id: "ASW-050",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En la arquitectura cliente-servidor de 2 niveles con cliente pesado, la interfaz y la lógica de negocio residen en la máquina del usuario con conexión directa a la base de datos, lo que dificulta actualizar la lógica distribuida.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero.</b> El cliente pesado mete presentación y negocio en la máquina del usuario y habla directo con la base de datos: cada cambio de lógica hay que <b>redistribuirlo a todas las máquinas</b>. Por eso la web de 3 niveles centralizó la lógica en el servidor."
+  },
+  {
+    id: "ASW-051",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué caracteriza a la arquitectura web de 3 niveles frente al cliente-servidor de 2 niveles?",
+    options: [
+      "El cliente concentra más lógica para responder más rápido sin depender del servidor",
+      "La base de datos se replica en cada máquina cliente para evitar usar la red",
+      "Cliente liviano con separación formal Presentación → Servidor de App → Base de Datos, y lógica centralizada en el servidor"
+    ],
+    correct: 2,
+    exp: "La web de 3 niveles adelgaza el cliente (<b>HTML/JS solo presenta</b>) y <b>centraliza la lógica en el servidor de aplicación</b>: actualizar el sistema es actualizar un solo lugar, no miles de máquinas de usuario."
+  },
+  {
+    id: "ASW-052",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es una ventaja operativa propia del despliegue multinivel (N-Tier)?",
+    options: [
+      "Escalabilidad independiente: cada nivel físico escala su hardware por separado según su demanda de carga",
+      "Latencia cero entre niveles gracias a que comparten el mismo proceso en memoria",
+      "Costo de infraestructura mínimo porque todo corre en un solo servidor"
+    ],
+    correct: 0,
+    exp: "Cada nivel físico puede <b>escalar por separado</b>: si la app se satura, agregas réplicas del Tier 2 sin tocar la base de datos. La latencia y el costo son justamente sus <b>desventajas</b>, no sus ventajas."
+  },
+  {
+    id: "ASW-053",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es el costo principal de rendimiento en una arquitectura N-Tier?",
+    options: [
+      "El compilador tarda más porque el código está dividido en capas lógicas",
+      "La latencia de los network hops: el tránsito de datos entre servidores distantes por red añade tiempo de respuesta",
+      "El navegador del cliente ejecuta demasiada lógica de negocio"
+    ],
+    correct: 1,
+    exp: "Cada salto de red (<b>network hop</b>) entre niveles suma tiempo de respuesta. Por eso las capas abiertas permiten a veces <b>saltarse intermedios para reducir latencia</b>, a cambio de más acoplamiento."
+  },
+  {
+    id: "ASW-054",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Selecciona TODAS las que son responsabilidades transversales (cross-cutting):",
+    options: ["Logging", "Procesar pagos", "Autenticación", "Gestión de caché"],
+    correctos: [0, 2, 3],
+    exp: "El <b>logging, la autenticación y la caché</b> atraviesan múltiples capas: son requisitos técnicos, no del dominio. <b>Procesar pagos</b> es una responsabilidad <b>central</b>: es la funcionalidad que justifica que el software exista."
+  },
+  {
+    id: "ASW-055",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "El código de negocio de una clase está mezclado con llamadas de logging, seguridad y acceso a disco. ¿Qué patología describe esto y qué principio viola?",
+    options: [
+      "Dispersión (scattering); viola DRY porque la lógica transversal se duplica",
+      "Domain smearing; viola el particionamiento por dominio",
+      "Enredo (tangling); viola SRP porque la infraestructura se mezcla con el negocio"
+    ],
+    correct: 2,
+    exp: "El <b>enredo (tangling)</b> mezcla infraestructura dentro del negocio y viola el <b>SRP</b>: la clase ya no tiene una sola razón para cambiar. La <b>dispersión</b> es el problema espejo: la misma lógica transversal <b>duplicada</b> en muchas clases, que viola DRY."
+  },
+  {
+    id: "ASW-056",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En un particionamiento técnico (multicapa), la lógica del Checkout queda repartida entre UI, servicios y DAOs. ¿Cómo se llama este riesgo?",
+    options: [
+      "Domain smearing: el concepto de negocio se dispersa a través de todas las capas técnicas",
+      "Ripple effect: un cambio en la base de datos obliga a tocar todas las capas",
+      "Over-fetching: el cliente recibe más datos de los que necesita"
+    ],
+    correct: 0,
+    exp: "El <b>domain smearing</b> es el costo de agrupar por tecnología: cada concepto de negocio queda <b>untado en todas las capas</b>. El particionamiento por dominio lo evita encapsulando cada módulo con su propia pila (UI + lógica + datos)."
+  },
+  {
+    id: "ASW-057",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "En el patrón MVC, ¿cuál es la responsabilidad del Controller?",
+    options: [
+      "Guardar el estado y los datos del dominio",
+      "Manejar los eventos del usuario y actualizar el modelo",
+      "Renderizar directamente el HTML sin pasar por la vista"
+    ],
+    correct: 1,
+    exp: "En MVC el <b>Model</b> guarda estado y datos, la <b>View</b> renderiza y el <b>Controller</b> recibe los eventos del usuario y <b>actualiza el modelo</b>. Si el controlador dibuja HTML, está invadiendo a la vista: cliente gordo."
+  },
+  {
+    id: "ASW-058",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Una empresa atiende Web, iOS, Android e IoT con un solo API y sufre over-fetching y under-fetching. ¿Qué patrón la ayuda y cómo?",
+    options: [
+      "Repository: centraliza el acceso a datos para que todos los clientes usen las mismas consultas",
+      "Cache-Aside: intercala Redis para absorber las lecturas repetitivas de cada cliente",
+      "Backend for Frontend (BFF): fachadas intermedias personalizadas por canal (BFF Móvil, BFF Web, BFF Dispositivos)"
+    ],
+    correct: 2,
+    exp: "El <b>BFF</b> pone una fachada a medida por cada tipo de cliente: elimina datos de más (<b>over-fetching</b>) y llamadas de más (<b>under-fetching</b>), y da <b>autonomía al frontend</b> sin tocar los servicios centrales del backend."
+  },
+  {
+    id: "ASW-059",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuándo conviene usar capas abiertas en lugar de capas cerradas?",
+    options: [
+      "Para reducir latencia saltándose intermedios o acceder a utilidades compartidas, aceptando más acoplamiento",
+      "Siempre: las capas cerradas están obsoletas porque aíslan demasiado",
+      "Nunca: saltarse capas viola el principio de separación de responsabilidades"
+    ],
+    correct: 0,
+    exp: "Las capas <b>cerradas</b> obligan a pasar por el inferior inmediato (aislamiento total); las <b>abiertas</b> permiten saltos para <b>bajar latencia</b>, pero cada atajo es <b>acoplamiento nuevo</b>. Es un trade-off consciente, no una regla absoluta."
+  },
+  {
+    id: "ASW-060",
+    parcial: "Parcial 1",
+    tema: "N-Tier",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Agregar un campo nuevo obliga a tocar columna SQL, ORM/DAO, servicio y vista. ¿Qué patología es y qué pierde el equipo?",
+    options: [
+      "Domain smearing: pierde la noción del dominio porque el campo vive en todas las capas",
+      "Ripple effect (change coupling): pierde agilidad por modificaciones en cascada y sobrecarga de conversión entre capas",
+      "Tangling: pierde el SRP porque el campo mezcla negocio con infraestructura"
+    ],
+    correct: 1,
+    exp: "El <b>ripple effect</b> convierte un cambio trivial en una <b>cascada DB → persistencia → negocio → presentación</b>. El equipo pierde <b>agilidad</b> y paga conversión de datos en cada frontera: síntoma típico de que toca evolucionar la arquitectura."
   }
 ];
 

@@ -1,4 +1,4 @@
-﻿// Render de la pantalla de resultados de una sesión.
+// Render de la pantalla de resultados de una sesión.
 // Recibe la sesión vía `ctx` y el callback de persistencia; no lee localStorage.
 import { respuestaCorrecta } from "../../core/index.js";
 import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "../helpers.js";
@@ -56,13 +56,16 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
     // Color del anillo usando TEMA
     const colorAnillo = r.pct >= 75 ? TEMA.exito : r.pct >= 50 ? TEMA.alerta : TEMA.error;
     
-    let html = '<div class="text-center mb-6">' +
+    let html = '<div class="results-hero">' +
       anilloPuntaje(r.pct, colorAnillo, r.aciertos + " de " + r.totalCal + " correctas (" + r.pct + "%)") +
-      '<p class="text-base sm:text-lg">Acertaste <b>' + r.aciertos + ' de ' + r.totalCal + '</b> preguntas' + (session.modo === "simulacro" ? " en el simulacro." : session.modo === "supervivencia" ? " en Supervivencia." : session.modo === "mision" ? " en la misión." : ".") + '</p>' +
-      (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
+      '<p class="text-base sm:text-lg font-medium text-slate-100 mt-1">' + mensaje + '</p>' +
+      (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
       (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +
-      '<p class="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">' + icono("reloj", "icono-sm") + '<span>Tiempo: ' + r.tiempo + '</span></p>' +
-      '<p class="text-slate-400 mt-2 text-sm">' + mensaje + '</p>' +
+      '<div class="results-stats-row">' +
+        '<div class="results-stat"><div class="results-stat-value" style="color:' + TEMA.exito + '">' + r.aciertos + '</div><div class="results-stat-label">Correctas</div></div>' +
+        '<div class="results-stat"><div class="results-stat-value" style="color:' + TEMA.error + '">' + (r.totalCal - r.aciertos) + '</div><div class="results-stat-label">Incorrectas</div></div>' +
+        '<div class="results-stat"><div class="results-stat-value">' + r.tiempo + '</div><div class="results-stat-label">Tiempo</div></div>' +
+      '</div>' +
     '</div>';
 
     html += '<h2 class="section-title">Desglose por tema</h2><div class="flex flex-col gap-2.5">' +

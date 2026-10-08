@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -16,7 +16,10 @@
 <div class="app w-full max-w-3xl">
 
   <section id="screen-onboarding" class="card hidden">
-    <h1 class="brand-title text-2xl sm:text-3xl font-bold mb-2">Systematic</h1>
+    <div class="flex items-center gap-3 mb-3">
+      <img src="/logo.svg" alt="Systematic logo" width="44" height="44" class="rounded-xl shadow-md shrink-0">
+      <h1 class="brand-title text-2xl sm:text-3xl font-bold">Systematic</h1>
+    </div>
     <p class="subtitle">Convierte el material de tus materias en sesiones cortas de estudio activo: preguntas con explicación en cada error, simulacros, flashcards y repaso espaciado. Tu progreso se guarda en este navegador.</p>
     <div class="max-w-md">
       <label for="onboarding-nombre" class="block text-sm font-semibold text-slate-300 mb-2">¿Cómo te llamas? Así el sistema te saluda y te habla por tu nombre.</label>
@@ -27,17 +30,17 @@
       <button type="button" class="link-btn mt-2" data-action="saltarOnboarding">Continuar sin nombre</button>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-7">
-      <div class="stat-card text-left">
-        <span class="text-xs font-bold text-slate-400">PASO 1</span>
-        <p class="text-sm mt-1">Elige tu materia: cada una guarda su progreso por separado.</p>
+      <div class="onboarding-step" data-step="1">
+        <span class="text-xs font-bold text-sky-400 tracking-wider">PASO 1</span>
+        <p class="text-sm mt-1 text-slate-200">Elige tu materia: cada una guarda su progreso por separado.</p>
       </div>
-      <div class="stat-card text-left">
-        <span class="text-xs font-bold text-slate-400">PASO 2</span>
-        <p class="text-sm mt-1">Practica: cada error te dice exactamente qué revisar y cómo mejorarlo.</p>
+      <div class="onboarding-step" data-step="2">
+        <span class="text-xs font-bold text-sky-400 tracking-wider">PASO 2</span>
+        <p class="text-sm mt-1 text-slate-200">Practica: cada error te dice exactamente qué revisar y cómo mejorarlo.</p>
       </div>
-      <div class="stat-card text-left">
-        <span class="text-xs font-bold text-slate-400">PASO 3</span>
-        <p class="text-sm mt-1">Vuelve cada día: repaso espaciado, misiones y tu racha te esperan.</p>
+      <div class="onboarding-step" data-step="3">
+        <span class="text-xs font-bold text-sky-400 tracking-wider">PASO 3</span>
+        <p class="text-sm mt-1 text-slate-200">Vuelve cada día: repaso espaciado, misiones y tu racha te esperan.</p>
       </div>
     </div>
   </section>
@@ -46,7 +49,9 @@
     <h1 class="brand-title text-2xl sm:text-3xl font-bold mb-2">Systematic</h1>
     <p class="text-sm text-slate-400 mb-2" id="saludo-home"></p>
     <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
-    <div id="perfil-panel" class="mb-4"></div>
+    <div class="flex justify-end mb-2">
+      <button class="btn btn-ghost btn-sm" data-action="irPerfil">Ver mi perfil</button>
+    </div>
     <div id="materias-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
     <div id="lenguajes-seccion" class="hidden">
       <br>
@@ -72,77 +77,88 @@
       Banco: <b id="stat-total">0</b> preguntas · <b id="stat-parciales">0</b> <span id="stat-parciales-txt">parciales</span> · <b id="stat-temas">0</b> temas.
       Preguntas y opciones aleatorias, con explicación en cada respuesta.
     </p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-      <button class="mode-card mode-primaria" data-action="irConfig">
-        <span class="icono icono-lg" data-icono="practica"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Configurar práctica</span>
-          <span class="mode-desc block">Elige tema, tipo, dificultad y cantidad</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startStudy">
-        <span class="icono icono-lg" data-icono="estudio"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Modo Estudio</span>
-          <span class="mode-desc block">Todas las preguntas con su solución</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startContrarreloj">
-        <span class="icono icono-lg" data-icono="contrarreloj"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Contrarreloj</span>
-          <span class="mode-desc block">10 preguntas · 30 segundos cada una</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startSupervivencia">
-        <span class="icono icono-lg" data-icono="supervivencia"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Supervivencia</span>
-          <span class="mode-desc block">3 vidas · encadena aciertos y multiplica tu XP</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startApuntes">
-        <span class="icono icono-lg" data-icono="apuntes"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Apuntes</span>
-          <span class="mode-desc block">Resúmenes curados por tema</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="irMisiones">
-        <span class="icono icono-lg" data-icono="misiones"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Misiones</span>
-          <span class="mode-desc block">Gana estrellas por tema, nodo a nodo</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startEscenarios">
-        <span class="icono icono-lg" data-icono="escenarios"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Escenarios</span>
-          <span class="mode-desc block">Toma decisiones y vive las consecuencias</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startCasos">
-        <span class="icono icono-lg" data-icono="casos"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Casos</span>
-          <span class="mode-desc block">Construye diagramas a partir de casos reales</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startFlashcards">
-        <span class="icono icono-lg" data-icono="flashcards"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Flashcards</span>
-          <span class="mode-desc block">Memoriza con tarjetas y autoevaluación</span>
-        </span>
-      </button>
-      <button class="mode-card" data-action="startGlosario">
-        <span class="icono icono-lg" data-icono="glosario"></span>
-        <span class="min-w-0">
-          <span class="mode-titulo block">Glosario</span>
-          <span class="mode-desc block">Términos y ejemplos por categoría</span>
-        </span>
-      </button>
+    <div class="modes-container mt-2">
+      <h3 class="mode-group-title">Practica</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button class="mode-card mode-primaria" data-action="irConfig">
+          <span class="icono icono-lg" data-icono="practica"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Configurar práctica</span>
+            <span class="mode-desc block">Elige tema, tipo, dificultad y cantidad</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startContrarreloj">
+          <span class="icono icono-lg" data-icono="contrarreloj"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Contrarreloj</span>
+            <span class="mode-desc block">10 preguntas · 30 segundos cada una</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startSupervivencia">
+          <span class="icono icono-lg" data-icono="supervivencia"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Supervivencia</span>
+            <span class="mode-desc block">3 vidas · encadena aciertos y multiplica tu XP</span>
+          </span>
+        </button>
+      </div>
+
+      <h3 class="mode-group-title mt-5">Aprende</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button class="mode-card" data-action="startStudy">
+          <span class="icono icono-lg" data-icono="estudio"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Modo Estudio</span>
+            <span class="mode-desc block">Todas las preguntas con su solución</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startApuntes">
+          <span class="icono icono-lg" data-icono="apuntes"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Apuntes</span>
+            <span class="mode-desc block">Resúmenes curados por tema</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startFlashcards">
+          <span class="icono icono-lg" data-icono="flashcards"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Flashcards</span>
+            <span class="mode-desc block">Memoriza con tarjetas y autoevaluación</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startGlosario">
+          <span class="icono icono-lg" data-icono="glosario"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Glosario</span>
+            <span class="mode-desc block">Términos y ejemplos por categoría</span>
+          </span>
+        </button>
+      </div>
+
+      <h3 class="mode-group-title mt-5">Aplica</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <button class="mode-card" data-action="irMisiones">
+          <span class="icono icono-lg" data-icono="misiones"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Misiones</span>
+            <span class="mode-desc block">Gana estrellas por tema, nodo a nodo</span>
+          </span>
+        </button>
+        <button class="mode-card" data-action="startEscenarios">
+          <span class="icono icono-lg" data-icono="escenarios"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Escenarios</span>
+            <span class="mode-desc block">Toma decisiones y vive las consecuencias</span>
+          </span>
+        </button>
+        <button class="mode-card sm:col-span-2" data-action="startCasos">
+          <span class="icono icono-lg" data-icono="casos"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Casos de Diagramación</span>
+            <span class="mode-desc block">Construye diagramas a partir de casos reales</span>
+          </span>
+        </button>
+      </div>
     </div>
     <div id="tip-dia" class="mt-3"></div>
     <br>
@@ -156,20 +172,6 @@
     <div id="stats-panel"></div>
     <h2 class="section-title">Historial de intentos</h2>
     <div id="history-section"></div>
-    <div class="flex gap-2 justify-end flex-wrap mt-2 items-center">
-      <button class="btn btn-ghost btn-sm" data-action="toggleNombreEditor">Cambiar nombre</button>
-      <div id="nombre-editor" class="hidden flex gap-2 items-center">
-        <input id="nombre-input" class="stat-input w-44" maxlength="24" placeholder="Tu nombre" aria-label="Tu nombre">
-        <button class="btn btn-primary btn-sm" data-action="guardarNombreAjustes">Guardar nombre</button>
-      </div>
-      <button class="btn btn-ghost btn-sm" data-action="exportarDatos">Exportar progreso</button>
-      <button class="btn btn-ghost btn-sm" data-action="importarArchivo">Importar</button>
-      <input type="file" id="import-file" accept=".json,application/json" class="hidden">
-      <!-- Cuenta (ADR 008): oculto hasta que app.js confirme que hay claves de Firebase. -->
-      <button class="btn btn-ghost btn-sm hidden" id="btn-cuenta" data-action="irCuenta">Cuenta</button>
-      <button class="btn btn-ghost btn-sm" data-action="clearHistory">Borrar historial</button>
-      <button class="btn btn-ghost btn-sm" data-action="resetProgreso">Reiniciar progreso</button>
-    </div>
   </section>
 
   <section id="screen-config" class="card hidden">
@@ -197,26 +199,26 @@
   </section>
 
   <section id="screen-quiz" class="card hidden">
-    <div class="flex flex-wrap items-center gap-2 mb-4">
-      <div class="text-sm text-slate-400 min-w-0 flex-1 truncate">
-        <b class="text-slate-200" id="progress">Pregunta 1</b>
-        <span class="mx-1.5 text-slate-600" aria-hidden="true">·</span>
-        <span class="inline-block w-2 h-2 rounded-full align-middle" id="topic-dot" aria-hidden="true"></span>
-        <span id="topic-badge">Tema</span>
-        <span class="mx-1.5 text-slate-600" aria-hidden="true">·</span>
-        <span id="type-badge">Tipo</span>
-        <span id="dif-badge" class="hidden"><span class="mx-1.5 text-slate-600" aria-hidden="true">·</span><span id="dif-texto"></span></span>
+    <div class="quiz-header mb-4">
+      <div class="quiz-header-top">
+        <b class="text-slate-200 text-sm font-semibold tracking-wide" id="progress">Pregunta 1</b>
+        <div class="quiz-header-actions">
+          <span class="badge hidden" id="timer-badge"><span data-icono="reloj"></span>20:00</span>
+          <span class="badge hidden" id="simulacro-badge">Simulacro</span>
+          <span class="badge hidden" id="modo-badge"></span>
+          <span class="badge hidden" id="vidas-badge"></span>
+          <span class="badge hidden" id="timer-pregunta"><span data-icono="rayo"></span>30s</span>
+          <button class="star-btn" id="star-btn" data-action="toggleMarcadaActual" title="Marcar pregunta" aria-label="Marcar pregunta" aria-pressed="false">☆</button>
+          <button class="btn btn-ghost btn-sm hidden" id="pause-btn" data-action="alternarPausa" title="Pausar" aria-label="Pausar simulacro"></button>
+          <button class="btn btn-ghost btn-sm" data-action="salir" title="Salir" aria-label="Salir de la ronda"><span class="icono icono-sm" data-icono="cerrar"></span></button>
+        </div>
       </div>
-      <span class="badge hidden" id="timer-badge"><span data-icono="reloj"></span>20:00</span>
-      <span class="badge hidden" id="simulacro-badge">Simulacro</span>
-      <span class="badge hidden" id="modo-badge"></span>
-      <span class="badge hidden" id="vidas-badge"></span>
-      <span class="badge hidden" id="timer-pregunta"><span data-icono="rayo"></span>30s</span>
-      <span class="ml-auto flex items-center gap-1">
-        <button class="star-btn" id="star-btn" data-action="toggleMarcadaActual" title="Marcar pregunta" aria-label="Marcar pregunta">☆</button>
-        <button class="btn btn-ghost btn-sm hidden" id="pause-btn" data-action="alternarPausa" title="Pausar" aria-label="Pausar simulacro"></button>
-        <button class="btn btn-ghost btn-sm" data-action="salir" title="Salir" aria-label="Salir de la ronda"><span class="icono icono-sm" data-icono="cerrar"></span></button>
-      </span>
+      <div class="quiz-meta">
+        <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" id="topic-dot" aria-hidden="true"></span>
+        <span class="quiz-meta-badge" id="topic-badge">Tema</span>
+        <span class="quiz-meta-badge quiz-meta-badge--tipo" id="type-badge">Tipo</span>
+        <span id="dif-badge" class="hidden"><span class="quiz-meta-badge quiz-meta-badge--dif" id="dif-texto"></span></span>
+      </div>
     </div>
     <div class="progress-track mb-5"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
 
@@ -336,20 +338,62 @@
     <div id="glosario-list"></div>
   </section>
 
-  <section id="screen-cuenta" class="card hidden">
+  <section id="screen-perfil" class="card hidden" aria-labelledby="perfil-titulo">
+    <div class="perfil-head">
+      <div class="perfil-head-texto">
+        <h1 id="perfil-titulo" class="perfil-titulo" tabindex="-1">Tu perfil</h1>
+        <p class="subtitle perfil-sub">Tu nombre, tu cuenta y tus datos en este navegador. El progreso sigue guardado por separado en cada materia.</p>
+      </div>
+      <div class="perfil-head-lado">
+        <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+      </div>
+    </div>
+    <h2 class="section-title">Identidad</h2>
+    <div id="perfil-identidad"></div>
+    <div class="perfil-tarjeta">
+      <h2 class="section-title perfil-tarjeta-titulo">Cuenta</h2>
+      <div id="perfil-cuenta"></div>
+    </div>
+    <p id="perfil-aviso" class="text-sm mt-3 hidden" role="status"></p>
+    <div class="perfil-tarjeta">
+      <h2 class="section-title perfil-tarjeta-titulo">Datos locales</h2>
+      <div class="flex gap-2 flex-wrap items-center">
+        <button class="btn btn-ghost btn-sm" data-action="toggleNombreEditor"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Cambiar nombre</button>
+        <div id="nombre-editor" class="hidden flex gap-2 items-center">
+          <input id="nombre-input" class="stat-input w-44" maxlength="24" placeholder="Tu nombre" aria-label="Tu nombre">
+          <button class="btn btn-primary btn-sm" data-action="guardarNombreAjustes">Guardar nombre</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-action="exportarDatos"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Exportar progreso</button>
+        <button class="btn btn-ghost btn-sm" data-action="importarArchivo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Importar</button>
+        <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+      </div>
+    </div>
+    <div class="perfil-tarjeta perfil-peligro">
+      <h2 class="section-title perfil-tarjeta-titulo perfil-peligro-titulo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>Zona de peligro</h2>
+      <p class="subtitle perfil-sub">Estas acciones no se pueden deshacer. Te pedimos confirmación antes de borrar nada.</p>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-peligro btn-sm" data-action="clearHistory"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Borrar historial</button>
+        <button class="btn btn-peligro btn-sm" data-action="resetProgreso"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>Reiniciar progreso</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-cuenta" class="card hidden" aria-labelledby="cuenta-titulo">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 id="cuenta-titulo" class="text-xl sm:text-2xl font-bold">Cuenta</h1>
+      <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
+    </div>
     <!-- Estado sin sesión: pantallas de acceso (las renderiza ui/cuenta/autenticacion.js).
          La salida es el enlace "Continuar sin cuenta" que vive dentro de la tarjeta. -->
     <div id="cuenta-anon">
       <div id="auth-root"></div>
     </div>
 
-    <!-- Estado con sesión: subir/restaurar el respaldo y cerrar sesión. -->
+    <!-- Estado con sesión: atajo al Perfil (la nube y salir viven ahí, sin duplicar). -->
     <div id="cuenta-sesion" class="hidden">
       <p class="subtitle">Sesión iniciada como <b id="cuenta-email-actual"></b>.</p>
       <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-primary btn-sm" data-action="subirNube">Subir progreso a la nube</button>
-        <button class="btn btn-secondary btn-sm" data-action="restaurarNube">Restaurar de la nube</button>
-        <button class="btn btn-ghost btn-sm" data-action="salirCuenta">Cerrar sesión</button>
+        <button class="btn btn-primary btn-sm" data-action="irPerfil">Abrir mi perfil</button>
       </div>
       <p class="mt-4"><button class="btn btn-ghost btn-sm" data-action="irMaterias">← Volver a materias</button></p>
     </div>
@@ -360,9 +404,9 @@
 
 </div>
 
-<div id="pause-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6">
+<div id="pause-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-labelledby="pause-titulo">
   <div class="card max-w-sm text-center">
-    <h2 class="text-2xl font-bold mb-2">Simulacro en pausa</h2>
+    <h2 class="text-2xl font-bold mb-2" id="pause-titulo">Simulacro en pausa</h2>
     <p class="text-slate-400 text-sm mb-6">El temporizador está detenido.</p>
     <button class="btn btn-primary w-full" data-action="alternarPausa">Reanudar</button>
     <button class="btn btn-ghost w-full mt-3" data-action="salir">Salir del simulacro</button>

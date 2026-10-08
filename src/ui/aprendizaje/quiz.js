@@ -250,6 +250,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const btn = $("star-btn");
     btn.textContent = marcada ? "★" : "☆";
     btn.classList.toggle("star-on", marcada);
+    // Estado sincronizado para el lector de pantalla (la estrella también cambia por teclado).
+    btn.setAttribute("aria-pressed", marcada ? "true" : "false");
   }
 
   function renderRelacionar(item, area) {

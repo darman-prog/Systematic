@@ -41,7 +41,7 @@ body.bg-slate-950 { background: var(--study-bg); color: var(--study-text); }
 .bg-slate-800 { background-color: var(--study-surface-2); }
 .bg-slate-700 { background-color: var(--study-surface-3); }
 .text-slate-100 { color: var(--study-text); }
-.text-slate-300, .text-slate-400 { color: var(--study-muted); }
+.text-slate-300, .text-slate-400, .text-slate-500 { color: var(--study-muted); }
 .text-sky-400, .text-blue-400, .text-sky-300 { color: var(--study-accent); }
 .border-slate-700, .border-slate-600 { border-color: var(--study-border); }
 .border-blue-500, .border-blue-600 { border-color: var(--study-accent); }
