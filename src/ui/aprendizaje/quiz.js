@@ -206,7 +206,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     $("skip-btn").style.display = "none";
     // La barra avanza al responder, no al llegar a la siguiente: lo completado se ve al instante.
     const n = session.items.length;
-    const hechas = session.answers.filter(Boolean).length;
+    const hechas = Object.values(session.answers).filter(Boolean).length;
     $("progress-fill").style.width = ((hechas / n) * 100) + "%";
   }
 
