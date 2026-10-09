@@ -22,10 +22,10 @@ firmas `crear*`.
 Se extrae en orden de menor a mayor dependencia, sin cambiar comportamiento:
 
 1. Confirmación → `src/ui/componentes/confirm.js` (misma firma Promise + retorno de foco).
-2. `show()` → `src/orquestacion/router.js` (ya se inyecta como `mostrarPantalla`).
+2. `show()` → `src/orquestacion/router.js` (conserva nombre y firma en `app.js`).
 3. `ACCIONES` → `src/orquestacion/acciones.js` por feature, conservando claves y listener delegado.
-4. Puentes config/quiz → controladores con `{ track, sesiones, ui }`.
-5. Timers → `quizUI`/sesión (mútan `sesiones.sesion`, no se duplican).
+4. Puentes config/quiz → `src/orquestacion/config-controller.js` y `src/orquestacion/ronda.js`.
+5. Timers → `ronda.js`/sesión (mútan `sesiones.sesion`, no se duplican).
 
 Se mantienen las fábricas con parámetros y **no** se crea contenedor DI: los tests
 mockean params sin magia y `ctx` ya resuelve la reasignación con getters.
