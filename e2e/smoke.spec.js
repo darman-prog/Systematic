@@ -59,7 +59,8 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#screen-study').getByRole('button', { name: '← Inicio' }).click();
 
     await page.getByRole('button', { name: /Flashcards/ }).click();
-    await expect(page.locator('.flash-card')).toBeVisible();
+    // El dorso vive en el DOM (backface oculto): se afirma solo el frente.
+    await expect(page.locator('.flash-card-front')).toBeVisible();
     await page.getByRole('button', { name: 'Voltear' }).click();
     await expect(page.getByRole('button', { name: 'Sabía', exact: true })).toBeVisible();
     await page.locator('#screen-flashcards').getByRole('button', { name: '← Inicio' }).click();
