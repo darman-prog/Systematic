@@ -261,21 +261,32 @@ function cargarHistorial() {
 }
 
 function clearHistory() {
-  // La Zona de peligro pide confirmación: borrar el historial no se puede deshacer.
-  if (!confirm("¿Borrar el historial de intentos de esta materia? No se puede deshacer.")) return;
-  if (!track.materia || !track.materia.id) return;
-  persistencia.borrarHistorial(track.materia.id);
-  renderHistory();
-  renderStats();
+  pedirConfirmacion({
+    titulo: "¿Borrar el historial?",
+    mensaje: "Se borran los intentos de esta materia. No se puede deshacer.",
+    textoConfirmar: "Borrar historial"
+  }).then(ok => {
+    if (!ok) return;
+    if (!track.materia || !track.materia.id) return;
+    persistencia.borrarHistorial(track.materia.id);
+    renderHistory();
+    renderStats();
+  });
 }
 
 function resetProgreso() {
-  if (!confirm("¿Borrar todo el progreso de esta materia? Se eliminan aciertos, fallos, marcas, racha, historial de intentos y misiones. Tu XP y logros globales se conservan.")) return;
-  if (!track.materia || !track.materia.id) return;
-  progreso = {};
-  persistencia.reiniciarMateria(track.materia.id);
-  renderStats();
-  renderHistory();
+  pedirConfirmacion({
+    titulo: "¿Reiniciar el progreso?",
+    mensaje: "Se eliminan aciertos, fallos, marcas, racha, historial y misiones. Tu XP y logros globales se conservan.",
+    textoConfirmar: "Reiniciar todo"
+  }).then(ok => {
+    if (!ok) return;
+    if (!track.materia || !track.materia.id) return;
+    progreso = {};
+    persistencia.reiniciarMateria(track.materia.id);
+    renderStats();
+    renderHistory();
+  });
 }
 
 function exportarDatos() {
@@ -470,7 +481,11 @@ function mostrarQuiz(modo, conTimer) {
 
 function comenzarPractica() {
   const qs = preguntasFiltradas();
-  if (!qs.length) return;
+  // Con filtros que dejan 0 no se arranca en silencio: se explica cómo reparar.
+  if (!qs.length) {
+    toast("Sin preguntas con esos filtros. Pulsa Todos o quita Solo débiles / Solo marcadas.");
+    return;
+  }
   const cant = Math.min(parseInt($("cfg-cantidad").value, 10) || qs.length, qs.length);
   const lista = track.filtros.priorizar ? priorizar(qs) : shuffle(qs);
   startSession(lista.slice(0, cant), "practica", false);
@@ -478,7 +493,11 @@ function comenzarPractica() {
 
 function comenzarSimulacro() {
   const qs = preguntasFiltradas();
-  if (!qs.length) return;
+  // Mismo aviso que en práctica: el simulacro tampoco sale sin preguntas.
+  if (!qs.length) {
+    toast("Sin preguntas con esos filtros. Pulsa Todos o quita Solo débiles / Solo marcadas.");
+    return;
+  }
   const lista = shuffle(qs).slice(0, Math.min(10, qs.length));
   startSession(lista, "simulacro", true);
 }
@@ -655,14 +674,52 @@ function next() {
 }
 
 function salir() {
-  if (!confirm("¿Salir? Se perderá el avance de esta ronda.")) return;
-  // Una sesión lanzada desde el mapa de etapas vuelve ahí; la práctica libre, al dashboard.
-  const desdeEtapas = !!(sesiones.sesion && sesiones.sesion.lenguajeId);
-  clearTimer();
-  clearTimerPregunta();
-  sesiones.limpiar();
-  $("pause-overlay").classList.add("hidden");
-  if (desdeEtapas) irLenguaje(); else goHome();
+  pedirConfirmacion({
+    titulo: "¿Salir de la ronda?",
+    mensaje: "Se pierde el avance de esta ronda. Puedes volver a empezar cuando quieras, sin prisa.",
+    textoConfirmar: "Salir de la ronda"
+  }).then(ok => {
+    if (!ok) return;
+    // Una sesión lanzada desde el mapa de etapas vuelve ahí; la práctica libre, al dashboard.
+    const desdeEtapas = !!(sesiones.sesion && sesiones.sesion.lenguajeId);
+    clearTimer();
+    clearTimerPregunta();
+    sesiones.limpiar();
+    $("pause-overlay").classList.add("hidden");
+    if (desdeEtapas) irLenguaje(); else goHome();
+  });
+}
+
+// Diálogo propio Noche calma: reemplaza al confirm() nativo para no romper
+// la calma con una ventana del navegador. Devuelve true si confirma.
+let confirmResolver = null;
+let confirmTrigger = null;
+function pedirConfirmacion({ titulo, mensaje, textoConfirmar }) {
+  const overlay = $("confirm-overlay");
+  if (!overlay) return Promise.resolve(window.confirm(titulo + " " + mensaje));
+  $("confirm-titulo").textContent = titulo || "¿Continuar?";
+  $("confirm-mensaje").textContent = mensaje || "Esta acción no se puede deshacer.";
+  const btnOk = overlay.querySelector('[data-action="confirmarConfirm"]');
+  if (btnOk) btnOk.textContent = textoConfirmar || "Confirmar";
+  // Se guarda quién abrió el diálogo para devolverle el foco al cerrar.
+  confirmTrigger = document.activeElement;
+  overlay.classList.remove("hidden");
+  const btnVolver = overlay.querySelector('[data-action="cancelarConfirm"]');
+  if (btnVolver) btnVolver.focus();
+  return new Promise(resolve => { confirmResolver = resolve; });
+}
+
+// Cierra el diálogo y resuelve la promesa pendiente (false al cancelar).
+function cerrarConfirm(valor) {
+  const overlay = $("confirm-overlay");
+  if (overlay) overlay.classList.add("hidden");
+  if (confirmResolver) {
+    confirmResolver(valor);
+    confirmResolver = null;
+  }
+  // El foco vuelve a quien abrió el diálogo para no perder el hilo con teclado.
+  if (confirmTrigger && confirmTrigger.focus) confirmTrigger.focus();
+  confirmTrigger = null;
 }
 
 function iniciarTimer(segundos) {
@@ -737,13 +794,35 @@ $("pause-overlay").addEventListener("keydown", e => {
   }
 });
 
+// El diálogo de confirmación cicla el Tab y se cancela con Escape, igual que la pausa.
+$("confirm-overlay").addEventListener("keydown", e => {
+  const overlay = $("confirm-overlay");
+  if (!overlay || overlay.classList.contains("hidden")) return;
+  if (e.key === "Escape") {
+    e.preventDefault();
+    cerrarConfirm(false);
+    return;
+  }
+  if (e.key !== "Tab") return;
+  const botones = Array.from(overlay.querySelectorAll("button"));
+  if (!botones.length) return;
+  const idx = botones.indexOf(document.activeElement);
+  if (e.shiftKey && idx <= 0) {
+    e.preventDefault();
+    botones[botones.length - 1].focus();
+  } else if (!e.shiftKey && idx === botones.length - 1) {
+    e.preventDefault();
+    botones[0].focus();
+  }
+});
+
 // Cierra la ronda: la orquestación (resultado, examen, misión, historial) vive en
 // student/session.js; acá solo se apaga el reloj y se delega. La pantalla la pinta el
 // callback `alFinalizar` que recibe el servicio.
 function finalizar() {
   clearTimer();
   sesiones.finalizar();
-}
+}   
 
 function repetirFalladas() {
   const s = sesiones.repetirFalladas();
@@ -1101,6 +1180,8 @@ const ACCIONES = {
   },
   actualizarResumen: () => config.actualizarResumen(),
   alternarPausa: () => alternarPausa(),
+  cancelarConfirm: () => cerrarConfirm(false),
+  confirmarConfirm: () => cerrarConfirm(true),
   autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),
   autoevaluarResultado: el => resultados.autoevaluarResultado(el.dataset.id, el.dataset.ok === "true"),
   cambiarApunteTema: el => apuntesUI.cambiarApunteTema(el.dataset.tema),

@@ -41,7 +41,11 @@ export function crearConfig({ getFiltros, valoresDe, contarPor, leerOpciones, pr
     const actual = parseInt(input.value, 10);
     if (!actual || actual > qs.length) input.value = qs.length || 1;
     $("cfg-resumen").textContent = qs.length + " preguntas coinciden con los filtros.";
-    $("btn-comenzar").disabled = qs.length === 0;
+    // Sin coincidencias no hay ronda que arrancar: se bloquean ambas salidas.
+    const sinItems = qs.length === 0;
+    $("btn-comenzar").disabled = sinItems;
+    const btnSimulacro = $("btn-simulacro");
+    if (btnSimulacro) btnSimulacro.disabled = sinItems;
   }
 
   function usarTodas() {

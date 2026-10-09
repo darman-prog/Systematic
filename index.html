@@ -194,7 +194,7 @@
     <p class="text-sm text-slate-400" id="cfg-resumen"></p>
     <div class="flex flex-wrap gap-3 justify-center mt-6">
       <button class="btn btn-primary w-full sm:w-auto" id="btn-comenzar" data-action="comenzarPractica">Comenzar práctica</button>
-      <button class="btn btn-secondary w-full sm:w-auto" data-action="comenzarSimulacro">Simulacro (10 preg · 20 min)</button>
+      <button class="btn btn-secondary w-full sm:w-auto" id="btn-simulacro" data-action="comenzarSimulacro">Simulacro (10 preg · 20 min)</button>
     </div>
   </section>
 
@@ -410,6 +410,15 @@
     <p class="text-slate-400 text-sm mb-6">El temporizador está detenido.</p>
     <button class="btn btn-primary w-full" data-action="alternarPausa">Reanudar</button>
     <button class="btn btn-ghost w-full mt-3" data-action="salir">Salir del simulacro</button>
+  </div>
+</div>
+
+<div id="confirm-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-labelledby="confirm-titulo">
+  <div class="card max-w-sm text-center">
+    <h2 class="text-xl font-bold mb-2" id="confirm-titulo">¿Continuar?</h2>
+    <p class="text-slate-400 text-sm mb-6" id="confirm-mensaje">Esta acción no se puede deshacer.</p>
+    <button class="btn btn-peligro w-full" data-action="confirmarConfirm">Confirmar</button>
+    <button class="btn btn-ghost w-full mt-3" data-action="cancelarConfirm">Volver</button>
   </div>
 </div>
 
