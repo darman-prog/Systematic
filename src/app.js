@@ -5,7 +5,7 @@ import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
 import { crearMezclador, storeLocalStorage } from "./core/index.js";
 import {
-  obtenerEntrada, aplicarRespuesta, hoyISO
+  obtenerEntrada, aplicarRespuesta, esDebil, hoyISO
 } from "./core/index.js";
 import { ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
@@ -26,10 +26,10 @@ import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
-import { crearRouter } from "./app/router.js";
-import { crearAcciones, instalarDelegacion } from "./app/acciones.js";
-import { crearConfigController } from "./app/config-controller.js";
-import { crearRonda } from "./app/ronda.js";
+import { crearRouter } from "./orquestacion/router.js";
+import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones.js";
+import { crearConfigController } from "./orquestacion/config-controller.js";
+import { crearRonda } from "./orquestacion/ronda.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
@@ -202,7 +202,9 @@ const configCtl = crearConfigController({
 const config = crearConfig({
   getFiltros: () => track.filtros,
   valoresDe: track.valoresDe, contarPor: track.contarPor,
-  leerOpciones, preguntasFiltradas,
+  // Los puentes llegan del controlador (las const alias viven más abajo, en zona muerta acá).
+  leerOpciones: (...args) => configCtl.leerOpciones(...args),
+  preguntasFiltradas: (...args) => configCtl.preguntasFiltradas(...args),
   diagramasDisponibles, TIPO_LABELS, DIF_LABELS,
   mostrarPantalla: show
 });
