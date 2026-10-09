@@ -26,6 +26,7 @@ import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
+import { crearRouter } from "./app/router.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
@@ -73,6 +74,8 @@ const $ = id => document.getElementById(id);
 
 // El diálogo de confirmación vive en su componente (ADR 009); acá solo se instancia.
 const confirm = crearConfirm({ $ });
+// La navegación vive en el router (ADR 009); show conserva su nombre y firma.
+const show = crearRouter({ $, animar }).show;
 
 // Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
 // dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
@@ -195,14 +198,6 @@ const config = crearConfig({
   mostrarPantalla: show
 });
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
-
-function show(screen) {
-    ["onboarding", "materias", "start", "config", "quiz", "results", "study", "apuntes", "misiones", "escenarios", "escenario", "casos", "caso", "flashcards", "glosario", "lenguaje", "cuenta", "perfil"].forEach(s =>
-    $("screen-" + s).classList.toggle("hidden", s !== screen)
-  );
-  animar($("screen-" + screen));
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
 
 function cargarProgreso() {
   return persistencia.progreso(track.materia.id);
