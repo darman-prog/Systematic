@@ -28,6 +28,7 @@ import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
 import { crearRouter } from "./app/router.js";
 import { crearAcciones, instalarDelegacion } from "./app/acciones.js";
+import { crearConfigController } from "./app/config-controller.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
@@ -190,6 +191,12 @@ const auth = crearAuth({
   }
 });
 
+// Filtros de práctica: el estado y la lógica viven en student/track.js; el puente
+// con el DOM vive en su controlador (ADR 009). Se instancia antes de la config
+// porque ella lo recibe inyectado (el re-render es perezoso, sin ciclo).
+const configCtl = crearConfigController({
+  $, track, alCambiarFiltro: () => config.renderConfig()
+});
 // Config de práctica y pantalla de apuntes (extraídas de app.js, ADR 007).
 const config = crearConfig({
   getFiltros: () => track.filtros,
@@ -381,32 +388,11 @@ function importarDatos(input) {
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
 // La tarjeta de perfil vive solo en screen-perfil (ui/cuenta/perfil.js).
 
-// Filtros de práctica: el estado y la lógica viven en student/track.js; acá solo queda el
-// puente con el DOM (checkboxes de la config) y el re-render después de cada cambio.
-function leerOpciones() {
-  track.setOpciones({
-    soloDebiles: $("cfg-solo-debiles").checked,
-    soloMarcadas: $("cfg-solo-marcadas").checked,
-    priorizar: $("cfg-priorizar").checked
-  });
-}
-
-function preguntasFiltradas() {
-  leerOpciones();
-  return track.preguntasFiltradas();
-}
-
 // Render de la config de práctica: vive en ui/dashboard/config.js (ADR 007).
-
-function toggleFiltro(clave, valor) {
-  track.toggleFiltro(clave, valor);
-  config.renderConfig();
-}
-
-function toggleFiltroTodos(clave, activar) {
-  track.toggleFiltroTodos(clave, activar);
-  config.renderConfig();
-}
+const leerOpciones = configCtl.leerOpciones;
+const preguntasFiltradas = configCtl.preguntasFiltradas;
+const toggleFiltro = configCtl.toggleFiltro;
+const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 
 // Resumen, "usar todas" e ir a config: viven en ui/dashboard/config.js (ADR 007).
 
