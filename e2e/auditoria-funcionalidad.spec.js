@@ -97,6 +97,8 @@ test.describe('Auditoría de funcionalidad — flujos faltantes', () => {
 
     // Reset.
     await page.getByRole('button', { name: /Reiniciar progreso/ }).click();
+    // La zona de peligro pide confirmación propia: se confirma en el diálogo.
+    await page.locator('#confirm-overlay').getByRole('button', { name: 'Reiniciar todo' }).click();
     await page.waitForTimeout(500);
 
     const progreso = await page.evaluate(() => JSON.parse(localStorage.getItem('sys.progreso.bd2') || '{}'));
@@ -126,6 +128,8 @@ test.describe('Auditoría de funcionalidad — flujos faltantes', () => {
 
     // Borrar historial.
     await page.getByRole('button', { name: /Borrar historial/ }).click();
+    // La zona de peligro pide confirmación propia: se confirma en el diálogo.
+    await page.locator('#confirm-overlay').getByRole('button', { name: 'Borrar historial' }).click();
     await page.waitForTimeout(500);
 
     const historial = await page.evaluate(() => JSON.parse(localStorage.getItem('sys.historial.bd2') || '[]'));
