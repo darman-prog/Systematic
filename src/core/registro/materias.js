@@ -50,11 +50,11 @@ export const MATERIAS = [
     id: "asw",
     nombre: "Arquitectura de Software",
     icono: "escenarios",
-    descripcion: "POO, principios de diseño, SOLID y patrones.",
+    descripcion: "POO, SOLID, patrones, estilos de arquitectura, REST y MVC.",
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 60, terminos: 19, apuntes: 8, escenarios: 1, casos: 2 },
+    conteo: { preguntas: 85, terminos: 27, apuntes: 8, escenarios: 1, casos: 2 },
     cargar: () => import("../../datos/materias/asw/index.js"),
   },
   {

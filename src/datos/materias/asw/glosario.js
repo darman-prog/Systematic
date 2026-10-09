@@ -6,7 +6,8 @@ const glosario = {
     { id: "solid", nombre: "Principios SOLID", corto: "SOLID", color: "#34d399" },
     { id: "creacionales", nombre: "Patrones Creacionales", corto: "Creacionales", color: "#f472b6" },
     { id: "estructurales", nombre: "Patrones Estructurales", corto: "Estructurales", color: "#fbbf24" },
-    { id: "comportamiento", nombre: "Patrones de Comportamiento", corto: "Comportamiento", color: "#a78bfa" }
+    { id: "comportamiento", nombre: "Patrones de Comportamiento", corto: "Comportamiento", color: "#a78bfa" },
+    { id: "fundamentos", nombre: "Fundamentos del desarrollo", corto: "Fundamentos", color: "#f472b6" }
   ],
   terminos: [
     {
@@ -122,6 +123,54 @@ const glosario = {
       categoria: "comportamiento",
       definicion: "Patrón de comportamiento que permite recorrer los elementos de una colección de forma secuencial sin exponer su estructura interna, encapsulando el recorrido en un objeto Iterador.",
       ejemplo: "Recorrer un árbol con el mismo for que recorre una lista, sin saber que por dentro usa DFS o índices."
+    },
+    {
+      termino: "Monolito",
+      categoria: "fundamentos",
+      definicion: "Sistema en una sola unidad desplegable, con un proceso y una base de datos. Rápido a escala pequeña; su riesgo es la contienda de releases cuando el equipo crece.",
+      ejemplo: "Una tienda en un solo despliegue que atiende catálogo, pagos y envíos desde el mismo proceso."
+    },
+    {
+      termino: "Microservicios",
+      categoria: "fundamentos",
+      definicion: "Estilo con servicios finos por dominio, cada uno con su base y su despliegue independiente. Gana autonomía y escalado horizontal; paga complejidad distribuida.",
+      ejemplo: "Pagos, catálogo e inventario como servicios separados que se comunican por red."
+    },
+    {
+      termino: "Event-driven",
+      categoria: "fundamentos",
+      definicion: "Estilo donde productores y consumidores se desacoplan mediante un broker de eventos. Absorbe picos de carga; su riesgo es el flujo de control invisible.",
+      ejemplo: "Al pagar, se publica PedidoPagado y facturación, envío y puntos lo consumen sin conocerse."
+    },
+    {
+      termino: "Arquitectura hexagonal",
+      categoria: "fundamentos",
+      definicion: "Estilo (puertos y adaptadores, Cockburn 2005) donde la lógica de negocio al centro define puertos y la infraestructura (BD, HTTP, colas) son adaptadores. Las dependencias apuntan hacia adentro.",
+      ejemplo: "Probar el cálculo de descuentos con un repositorio en memoria en vez de la base real."
+    },
+    {
+      termino: "API REST",
+      categoria: "fundamentos",
+      definicion: "Estilo sobre HTTP con recursos direccionables, verbos con semántica, códigos de estado y comunicación sin estado. Solo con hipermedia (nivel 3 de Richardson) es REST pleno.",
+      ejemplo: "GET /pedidos/42 devuelve el pedido; POST /pedidos crea uno y responde 201."
+    },
+    {
+      termino: "Modelo de madurez de Richardson",
+      categoria: "fundamentos",
+      definicion: "Escalera de Leonard Richardson hacia REST: Nivel 0 un solo endpoint, Nivel 1 recursos, Nivel 2 verbos HTTP, Nivel 3 controles hipermedia.",
+      ejemplo: "Pasar de un único /api con action=crear a GET /pedidos, POST /pedidos y enlaces next en la respuesta."
+    },
+    {
+      termino: "MVC",
+      categoria: "fundamentos",
+      definicion: "Modelo (datos y reglas), Vista (lo visible) y Controlador (coordina la entrada). En APIs el controlador devuelve el cuerpo directo; la regla vive en el modelo o servicio, nunca en el controlador gordo.",
+      ejemplo: "Un EmployeeController con @GetMapping que delega al servicio y devuelve JSON, sin lógica de negocio adentro."
+    },
+    {
+      termino: "Strangler fig",
+      categoria: "fundamentos",
+      definicion: "Migración por estrangulamiento: rodear el sistema legado con servicios nuevos, enrutarles tráfico y retirar lo viejo por partes, en vez de reescribir de golpe.",
+      ejemplo: "Sacar primero el login del monolito a un servicio de autenticación y apagar el módulo viejo."
     }
   ],
   tips: [

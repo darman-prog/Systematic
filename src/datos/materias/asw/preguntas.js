@@ -867,6 +867,367 @@ const preguntas = [
     ],
     correct: 1,
     exp: "El <b>ripple effect</b> convierte un cambio trivial en una <b>cascada DB → persistencia → negocio → presentación</b>. El equipo pierde <b>agilidad</b> y paga conversión de datos en cada frontera: síntoma típico de que toca evolucionar la arquitectura."
+  },
+  {
+    id: "ASW-061",
+    parcial: "Parcial 1",
+    tema: "Tipos de sistemas",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué caracteriza a un sistema monolítico?",
+    options: [
+      "Varios servicios con base propia que escalan horizontalmente",
+      "Una sola unidad desplegable con un proceso y una base de datos, que escala verticalmente",
+      "Funciones bajo demanda sin servidor que administrar"
+    ],
+    correct: 1,
+    exp: "El <b>monolito</b> es <b>un despliegue, un proceso, una base</b>. Gana <b>velocidad a escala pequeña</b> y escala en vertical; su talón de Aquiles es la <b>contienda de releases</b> cuando el equipo crece."
+  },
+  {
+    id: "ASW-062",
+    parcial: "Parcial 1",
+    tema: "Tipos de sistemas",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "En cliente-servidor, ¿dónde vive el estado autoritativo y cuál es su riesgo típico?",
+    options: [
+      "En el cliente; el riesgo es que el servidor se quede sin memoria",
+      "En el servidor; el riesgo es un cliente charlatán o con exceso de confianza",
+      "En la red; el riesgo es que los cables se saturen siempre"
+    ],
+    correct: 1,
+    exp: "El <b>servidor guarda la verdad</b> y el cliente la consume. Si el cliente hace <b>demasiadas idas</b> (charlatán) o <b>confía ciegamente</b> en lo que recibe, el sistema se vuelve lento o frágil."
+  },
+  {
+    id: "ASW-063",
+    parcial: "Parcial 1",
+    tema: "Tipos de sistemas",
+    dificultad: "media",
+    tipo: "vf",
+    q: "Los sistemas distribuidos exigen pensar comunicación, persistencia políglota, consistencia eventual y transacciones entre bases.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. Al repartirse en nodos con <b>fallos independientes</b> y <b>escalado horizontal</b>, ya no hay una sola base ni un solo reloj: la <b>consistencia eventual</b> y las transacciones distribuidas son parte del diseño."
+  },
+  {
+    id: "ASW-064",
+    parcial: "Parcial 1",
+    tema: "Tipos de sistemas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué distingue a un sistema de tiempo real?",
+    options: [
+      "Que responde rapidísimo en promedio",
+      "Que responde dentro de un plazo garantizado, aunque no sea el más veloz",
+      "Que solo funciona conectado a internet"
+    ],
+    correct: 1,
+    exp: "En tiempo real lo crítico es el <b>plazo garantizado</b>, no el promedio. Un freno ABS que responde <b>siempre antes de 10 ms</b> vale más que uno veloz pero impredecible."
+  },
+  {
+    id: "ASW-065",
+    parcial: "Parcial 1",
+    tema: "Tipos de sistemas",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Marca los rasgos de un sistema distribuido.",
+    options: [
+      "Dominios de fallo independientes",
+      "Escalado horizontal",
+      "Persistencia políglota",
+      "Un solo proceso y una sola base de datos"
+    ],
+    correctos: [0, 1, 2],
+    exp: "Distribuido = <b>varios nodos por red</b>: fallan por separado, <b>escalan en horizontal</b> y cada servicio puede usar <b>su propia base</b>. Un solo proceso con una base es el monolito, su opuesto."
+  },
+  {
+    id: "ASW-066",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es la arquitectura en capas (N-tier) y cuál es su fallo típico?",
+    options: [
+      "Servicios finos por dominio; falla por la red entre ellos",
+      "Presentación, negocio y datos en una unidad; falla al poner límites técnicos en vez de límites de dominio",
+      "Funciones sin servidor; falla por los arranques en frío"
+    ],
+    correct: 1,
+    exp: "Las <b>capas</b> son familiares y ordenadas, pero separan por <b>tecnología</b> (UI, lógica, BD) y no por <b>dominio</b>: cualquier cambio cruza todas las capas en cascada."
+  },
+  {
+    id: "ASW-067",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Por qué el monolito modular se considera un paso reversible?",
+    options: [
+      "Porque no tiene base de datos y migra solo",
+      "Porque un despliegue con límites internos por dominio puede volverse servicios después, sin reescribir",
+      "Porque usa serverless y escala a cero"
+    ],
+    correct: 1,
+    exp: "El monolito modular es <b>un despliegue con fronteras de dominio adentro</b>. Si algún módulo necesita escalar solo, se extrae; si no, sigue monolito. Su riesgo es que las reglas se <b>erosionen sin enforcement</b>."
+  },
+  {
+    id: "ASW-068",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué ganan y qué pagan los microservicios?",
+    options: [
+      "Ganan autonomía y agilidad; pagan complejidad distribuida",
+      "Ganan simplicidad; pagan licencias caras",
+      "Ganan velocidad de CPU; pagan más memoria RAM"
+    ],
+    correct: 0,
+    exp: "Microservicios = <b>servicios finos por dominio, cada uno con su base y su despliegue</b>. Ganan <b>autonomía de equipos y escala</b>; pagan <b>red, consistencia eventual y transacciones saga</b>."
+  },
+  {
+    id: "ASW-069",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "SOA integra servicios gruesos mediante orquestación central (ESB) y su riesgo típico es el cuello de botella en el bus.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. SOA es el patrón empresarial clásico: <b>pocos servicios gruesos orquestados</b> por un bus. Funciona integrando, pero el <b>ESB central</b> se vuelve punto único de congestión."
+  },
+  {
+    id: "ASW-070",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cuándo conviene event-driven y cuál es su riesgo?",
+    options: [
+      "Carga en ráfagas con productores y consumidores desacoplados por un broker; riesgo de flujo de control invisible",
+      "CRUD simple con una tabla; riesgo de SQL lento",
+      "Apps de consola; riesgo de teclado roto"
+    ],
+    correct: 0,
+    exp: "Event-driven <b>desacopla con un broker</b> y absorbe picos. El precio: nadie ve el <b>flujo completo</b> mirando un solo servicio; hay que rastrear eventos."
+  },
+  {
+    id: "ASW-071",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Para qué brilla serverless/FaaS y qué lo castiga?",
+    options: [
+      "Tráfico constante alto; lo castiga el precio fijo",
+      "Trabajo esporádico disparado por eventos; lo castigan los arranques en frío y el costo a escala",
+      "Videojuegos 3D; lo castiga la GPU"
+    ],
+    correct: 1,
+    exp: "Serverless = <b>funciones bajo demanda, cero servidores que administrar</b>. Ideal para picos esporádicos; con tráfico sostenido los <b>cold starts y la factura</b> duelen."
+  },
+  {
+    id: "ASW-072",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "En la arquitectura hexagonal, ¿hacia dónde apuntan las dependencias y qué se gana?",
+    options: [
+      "Hacia afuera, a la base de datos; se gana velocidad de consultas",
+      "Hacia adentro, al dominio: la lógica define puertos y la infraestructura son adaptadores; se gana testear sin base ni UI",
+      "En círculo; se gana que todo dependa de todo"
+    ],
+    correct: 1,
+    exp: "Hexagonal (Cockburn 2005): el <b>dominio al centro define puertos</b>; BD, HTTP y colas son <b>adaptadores</b> que se enchufan. Todo apunta <b>hacia adentro</b>: la lógica se prueba con adaptadores en memoria. Cuesta <b>indirección</b>."
+  },
+  {
+    id: "ASW-073",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Relaciona cada estilo con su rasgo.",
+    pares: [
+      ["Capas (N-tier)", "Límites técnicos, no de dominio"],
+      ["Microservicios", "Base propia por servicio"],
+      ["Event-driven", "Broker entre productor y consumidor"],
+      ["Hexagonal", "Dependencias hacia el dominio"]
+    ],
+    exp: "<b>Capas</b> separan por tecnología; <b>microservicios</b> por dominio con base propia; <b>event-driven</b> desacopla con broker; <b>hexagonal</b> invierte dependencias hacia adentro."
+  },
+  {
+    id: "ASW-074",
+    parcial: "Parcial 1",
+    tema: "Estilos de arquitectura",
+    dificultad: "dificil",
+    tipo: "ordenar",
+    q: "Ordena los pasos de una migración strangler fig.",
+    bloques: [
+      "Identificar una frontera del sistema legado",
+      "Enrutar ese tráfico hacia el servicio nuevo",
+      "Extraer la funcionalidad al servicio nuevo",
+      "Retirar el código legado reemplazado"
+    ],
+    exp: "Strangler fig = <b>estrangular, no reescribir</b>: se rodea el legado, se <b>enruta</b> tráfico al servicio nuevo, se <b>extrae</b> la función y al final se <b>retira</b> lo viejo."
+  },
+  {
+    id: "ASW-075",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es un recurso en REST?",
+    options: [
+      "Un servidor muy potente",
+      "Cada cosa direccionable con su propia URI, como el pedido #42",
+      "Un único endpoint para todas las operaciones"
+    ],
+    correct: 1,
+    exp: "En REST todo lo importante es un <b>recurso con dirección propia</b> (`/pedidos/42`). Un solo endpoint para todo es <b>Nivel 0</b>: RPC tunelizado, no REST."
+  },
+  {
+    id: "ASW-076",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Por qué GET es especial en REST?",
+    options: [
+      "Porque es el más rápido de todos",
+      "Porque es seguro: no cambia nada, así que es repetible y cacheable",
+      "Porque solo funciona con JSON"
+    ],
+    correct: 1,
+    exp: "<b>GET no modifica estado</b>: se puede invocar mil veces en cualquier orden con igual resultado. Esa seguridad permite <b>caché</b> en cada intermediario, clave del rendimiento web."
+  },
+  {
+    id: "ASW-077",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "media",
+    tipo: "vf",
+    q: "Usar POST para crear, consultar, borrar y actualizar es una API REST de Nivel 2.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "<b>Falso</b>: eso es <b>tunelización</b> (Nivel 0-1). El Nivel 2 exige los <b>verbos con su semántica</b>: GET crea nada, POST crea, PUT reemplaza, DELETE elimina."
+  },
+  {
+    id: "ASW-078",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "media",
+    tipo: "relacionar",
+    q: "Relaciona cada código HTTP con su significado.",
+    pares: [
+      ["200", "OK: todo salió bien"],
+      ["201", "Creado: nació un recurso"],
+      ["404", "No existe lo pedido"],
+      ["500", "Falló el servidor"]
+    ],
+    exp: "Los códigos <b>comunican sin leer el cuerpo</b>: 2xx éxito (201 = nació algo), 4xx culpa del cliente (404), 5xx culpa del servidor."
+  },
+  {
+    id: "ASW-079",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según el modelo de madurez de Richardson, ¿qué agrega cada nivel?",
+    options: [
+      "Nivel 1 verbos, Nivel 2 recursos, Nivel 3 caché",
+      "Nivel 1 recursos, Nivel 2 verbos HTTP, Nivel 3 hipermedia; solo el 3 es REST de verdad",
+      "Nivel 1 JSON, Nivel 2 XML, Nivel 3 YAML"
+    ],
+    correct: 1,
+    exp: "Richardson: <b>L0 un endpoint, L1 recursos, L2 verbos, L3 hipermedia</b> (la respuesta dice qué hacer después). Fielding exige el <b>nivel 3</b> para hablar de REST."
+  },
+  {
+    id: "ASW-080",
+    parcial: "Parcial 1",
+    tema: "API REST",
+    dificultad: "facil",
+    tipo: "ordenar",
+    q: "Ordena los niveles de Richardson de menor a mayor madurez.",
+    bloques: [
+      "Un solo endpoint para todo",
+      "Recursos con URI propia",
+      "Verbos HTTP con su semántica",
+      "Controles hipermedia en la respuesta"
+    ],
+    exp: "La escalera REST: <b>un endpoint → recursos → verbos → hipermedia</b>. Cada peldaño quita variación innecesaria y acerca al estilo web."
+  },
+  {
+    id: "ASW-081",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "En MVC, ¿qué hace cada pieza?",
+    options: [
+      "Modelo guarda datos y reglas, Vista muestra, Controlador coordina la entrada",
+      "Modelo muestra, Vista guarda, Controlador compila",
+      "Las tres hacen lo mismo por redundancia"
+    ],
+    correct: 0,
+    exp: "<b>Modelo</b> = datos y reglas; <b>Vista</b> = lo visible; <b>Controlador</b> = recibe la petición y coordina. Con `@RestController` el controlador devuelve el <b>cuerpo directo</b>, sin plantilla."
+  },
+  {
+    id: "ASW-082",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué indica `@RestController` en Spring?",
+    options: [
+      "Que la clase es la vista HTML",
+      "Que lo que devuelve cada método va directo al cuerpo de la respuesta, no a una plantilla",
+      "Que la clase se conecta sola a la base de datos"
+    ],
+    correct: 1,
+    exp: "`@RestController` = <b>datos, no vistas</b>. Cada `@GetMapping`/`@PostMapping` escribe su retorno en el <b>cuerpo HTTP</b>; la BD llega por el repositorio inyectado, no por magia de la anotación."
+  },
+  {
+    id: "ASW-083",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "vf",
+    q: "En MVP la vista es pasiva y el Presentador concentra la lógica, lo que facilita testear.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. MVP deja la <b>vista tonta</b> (solo pinta lo que le dicen) y el <b>Presentador decide todo</b>: al no depender de UI, se prueba con tests unitarios simples."
+  },
+  {
+    id: "ASW-084",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué aporta MVVM frente a MVC?",
+    options: [
+      "Elimina la necesidad de modelo",
+      "Enlace declarativo (binding) entre la Vista y un ViewModel con el estado presentable",
+      "Compila más rápido que cualquier otro patrón"
+    ],
+    correct: 1,
+    exp: "MVVM = <b>binding bidireccional Vista ↔ ViewModel</b>. La vista declara qué mostrar y el framework sincroniza; brilla donde hay <b>enlace declarativo</b> (WPF, SwiftUI, front reactivo)."
+  },
+  {
+    id: "ASW-085",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "dificil",
+    tipo: "multi",
+    q: "Marca las prácticas sanas contra el controlador gordo.",
+    options: [
+      "La regla de negocio vive en el modelo o servicio",
+      "El controlador solo traduce HTTP a dominio",
+      "La vista consulta SQL directo para ir más rápido",
+      "El controlador acumula validaciones, cálculos y accesos a datos"
+    ],
+    correctos: [0, 1],
+    exp: "Antídoto: <b>regla al modelo/servicio</b> y controlador <b>delgado que traduce</b>. Vista con SQL y controlador que hace todo son <b>deuda con intereses</b>."
   }
 ];
 
