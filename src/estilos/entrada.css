@@ -9,9 +9,13 @@
   .mode-card { @apply flex items-center gap-3 bg-slate-900 border border-slate-700 hover:border-slate-600 hover:bg-slate-800/70 rounded-xl p-4 text-left transition; }
   .mode-card .mode-titulo { @apply font-semibold; }
   .mode-card .mode-desc { @apply text-xs text-slate-400; }
-  .mode-primaria { @apply sm:col-span-2 border-blue-500/60 bg-slate-800/70; }
+  /* La primaria va a lo ancho en todos los anchos: es el camino diario y debe ganar el squint test. */
+  .mode-primaria { @apply col-span-full border-blue-500/60 bg-slate-800/70; }
   .mode-primaria .mode-titulo { @apply text-base; }
   .mode-primaria .icono { color: var(--study-accent); }
+  /* Las secundarias bajan un punto: misma fila compacta, menos aire e icono menor para que no compitan. */
+  .mode-card:not(.mode-primaria) { @apply py-3 px-3.5 gap-2.5; }
+  .mode-card:not(.mode-primaria) .icono { width: 20px; height: 20px; }
   .materia-card { @apply flex flex-col items-start gap-1 bg-slate-900 border border-slate-700 hover:border-slate-500 rounded-xl p-4 text-left transition; }
   .card { @apply bg-slate-800/90 border border-slate-700 rounded-xl p-5 sm:p-7 w-full; }
   .subtitle { @apply text-slate-400 leading-relaxed mb-5 text-sm sm:text-base; max-width: 70ch; }
