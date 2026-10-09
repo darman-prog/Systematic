@@ -27,6 +27,7 @@ import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
 import { crearRouter } from "./app/router.js";
+import { crearAcciones, instalarDelegacion } from "./app/acciones.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
@@ -343,8 +344,8 @@ function importarDatos(input) {
           r && typeof r === "object" && typeof r.aprobado === "boolean" && Number.isInteger(r.version));
         if (!valida) throw new Error("formato");
         if (datos.lenguaje && datos.lenguaje !== track.lenguaje.id &&
-            !confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + track.lenguaje.nombre + "»?")) return;
-        if (!confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
+            !window.confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + track.lenguaje.nombre + "»?")) return;
+        if (!window.confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
         track.setCompetencia(datos.competencia);
         persistencia.guardarCompetencia(track.lenguaje.id, track.competencia);
         pintarLenguaje();
@@ -358,8 +359,8 @@ function importarDatos(input) {
         return;
       }
       if (esMateria && datos.materia && datos.materia !== track.materia.id &&
-          !confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + track.materia.nombre + "»?")) return;
-      if (!confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
+          !window.confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + track.materia.nombre + "»?")) return;
+      if (!window.confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
       progreso = datos.progreso || {};
       persistencia.guardarProgreso(track.materia.id, progreso);
       if (datos.historial) persistencia.guardarHistorial(track.materia.id, datos.historial);
@@ -1043,7 +1044,7 @@ async function ofrecerRestauracion(usuario) {
   if (!r.ok) return false; // sin respaldo (o sin conexión): se entra en modo local
   const fecha = fechaSnapshot(r.datos);
   const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
-  if (!confirm("Encontramos un respaldo del " + cuando + ". ¿Restaurar tu progreso en este dispositivo?")) return false;
+  if (!window.confirm("Encontramos un respaldo del " + cuando + ". ¿Restaurar tu progreso en este dispositivo?")) return false;
   aplicarSnapshot(r.datos, persistencia);
   location.reload();
   return true;
@@ -1089,160 +1090,24 @@ async function entrarConCuenta(usuario) {
   show("cuenta");
 })();
 
-// Registro único de acciones (ADR 002): los elementos declaran data-action con el nombre
-// de la función que ejecutan y sus parámetros en data-*; un único listener delegado de
-// click los resuelve desde este mapa. No se publica nada en window.
-const ACCIONES = {
-  guardarNombreOnboarding: () => {
-    const entrada = $("onboarding-nombre");
-    const valor = entrada ? entrada.value : "";
-    if (!valor.trim()) { if (entrada) entrada.focus(); return; }
-    persistencia.guardarNombre(valor);
-    persistencia.guardarOnboardingHecho();
-    home.renderMaterias();
-    show("materias");
-    toast(icono("nivel", "icono-sm") + saludoSegunHora(persistencia.nombre()) + ". ¡Vamos a estudiar!");
-  },
-  saltarOnboarding: () => {
-    persistencia.guardarOnboardingHecho();
-    home.renderMaterias();
-    show("materias");
-  },
-  toggleNombreEditor: () => {
-    const editor = $("nombre-editor");
-    if (!editor) return;
-    const entrada = $("nombre-input");
-    entrada.value = persistencia.nombre();
-    editor.classList.toggle("hidden");
-    if (!editor.classList.contains("hidden")) entrada.focus();
-  },
-  guardarNombreAjustes: () => {
-    const entrada = $("nombre-input");
-    if (!entrada) return;
-    persistencia.guardarNombre(entrada.value);
-    persistencia.guardarOnboardingHecho();
-    $("nombre-editor").classList.add("hidden");
-    // El Perfil muestra el mismo nombre: si está a la vista, se repinta en el acto.
-    if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil());
-    toast(icono("check", "icono-sm") + saludoSegunHora(persistencia.nombre()) + (persistencia.nombre() ? ", " + persistencia.nombre() : ""));
-  },
-  actualizarResumen: () => config.actualizarResumen(),
-  alternarPausa: () => alternarPausa(),
-  cancelarConfirm: () => confirm.cerrarConfirm(false),
-  confirmarConfirm: () => confirm.cerrarConfirm(true),
-  autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),
-  autoevaluarResultado: el => resultados.autoevaluarResultado(el.dataset.id, el.dataset.ok === "true"),
-  cambiarApunteTema: el => apuntesUI.cambiarApunteTema(el.dataset.tema),
-  cambiarEstudioTipo: el => estudio.cambiarEstudioTipo(el.dataset.tipo),
-  cambiarGlosarioCat: el => glosarioUI.cambiarGlosarioCat(el.dataset.id),
-  clearHistory: () => clearHistory(),
-  clickMatchDer: el => quiz.clickMatchDer(parseInt(el.dataset.idx, 10)),
-  clickMatchIzq: el => quiz.clickMatchIzq(parseInt(el.dataset.i, 10)),
-  comenzarPractica: () => comenzarPractica(),
-  comenzarSimulacro: () => comenzarSimulacro(),
-  comprobarMulti: () => quiz.comprobarMulti(),
-  comprobarOrden: () => quiz.comprobarOrden(),
-  exportarDatos: () => exportarDatos(),
-  goHome: () => goHome(),
-  importarArchivo: () => $("import-file").click(),
-  irConfig: () => config.irConfig(),
-  irMaterias: () => irMaterias(),
-  irPerfil: () => irPerfil(),
-  iniciarMision: el => iniciarMision(el.dataset.tema),
-  irMisiones: () => irMisiones(),
-  moverBloque: el => quiz.moverBloque(parseInt(el.dataset.i, 10), parseInt(el.dataset.dir, 10)),
-  next: () => next(),
-  pintarResultados: el => resultados.pintarResultados(el.dataset.verTodas === "true"),
-  practicarArrastre: () => practicarArrastre(),
-  practicarCasos: () => practicarCasos(),
-  practicarDebiles: () => practicarDebiles(),
-  practicarTipo: el => practicarTipo(el.dataset.tipo),
-  practicarVencidas: () => practicarVencidas(),
-  repetirFalladas: () => repetirFalladas(),
-  repetirMisma: () => repetirMisma(),
-  resetProgreso: () => resetProgreso(),
-  responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
-  revelarSolucion: () => quiz.revelarSolucion(),
-  saltarFlash: () => flashcards.saltarFlash(),
-  saltarPregunta: () => { quiz.saltarPregunta(); if (sesiones.sesion && sesiones.sesion.modo === "contrarreloj") clearTimerPregunta(); },
-  startContrarreloj: () => startContrarreloj(),
-  startSupervivencia: () => startSupervivencia(),
-  salir: () => salir(),
-    seleccionarMateria: el => seleccionarMateria(el.dataset.materia),
-    seleccionarLenguaje: el => seleccionarLenguaje(el.dataset.lenguaje),
-    practicarLeccion: el => practicarLeccion(el.dataset.etapa, el.dataset.leccion),
-    rendirExamen: el => rendirExamen(el.dataset.etapa),
-    irLenguaje: () => irLenguaje(),
-  startApuntes: () => apuntesUI.startApuntes(),
-  startEscenarios: () => startEscenarios(),
-  jugarEscenario: el => jugarEscenario(el.dataset.id),
-  decidirEscenario: el => decidirEscenario(parseInt(el.dataset.idx, 10)),
-  continuarEscenario: () => continuarEscenario(),
-  startCasos: () => startCasos(),
-  jugarCaso: el => jugarCaso(el.dataset.id),
-  comprobarCaso: () => comprobarCaso(),
-  cancelarDiagramaTipoCaso: () => diagramasUI.cancelarSeleccion(),
-  comprobarDiagrama: () => quiz.comprobarDiagrama(),
-  cancelarDiagramaTipo: () => quiz.cancelarDiagramaTipo(),
-  startFlashcards: () => flashcards.startFlashcards(),
-  startGlosario: () => glosarioUI.startGlosario(),
-  startStudy: () => estudio.startStudy(),
-  toggleFiltro: el => toggleFiltro(el.dataset.clave, el.dataset.valor),
-  toggleFiltroTodos: el => toggleFiltroTodos(el.dataset.clave, el.dataset.activar === "true"),
-  toggleMarcadaActual: () => quiz.toggleMarcadaActual(),
-  toggleMarcadaEstudio: el => estudio.toggleMarcadaEstudio(el.dataset.id),
-  toggleMulti: el => quiz.toggleMulti(parseInt(el.dataset.idx, 10)),
-  toggleStudy: el => estudio.toggleStudy(el),
-  usarTodas: () => config.usarTodas(),
-  voltearFlash: () => flashcards.voltearFlash(),
-  // ---- Cuenta y nube (ADR 008) ----
-  irCuenta: () => {
-    const usuario = cuenta.estado();
-    cuentaUI.pintar(usuario);
-    if (!usuario) auth.renderLogin();
-    show("cuenta");
-  },
-  salirCuenta: async () => {
-    cuentaUI.procesando(true);
-    const r = await cuenta.salir();
-    cuentaUI.procesando(false);
-    if (!r.ok) { cuentaUI.aviso(r.mensaje, false); return; }
-    cuentaUI.pintar(null);
-    auth.renderLogin();
-    // Salir solo se ofrece desde el Perfil: al cerrar sesión se vuelve a materias.
-    cachePerfilCuenta.email = null;
-    irMaterias();
-  },
-  subirNube: async () => {
-    const usuario = cuenta.estado();
-    if (!usuario) return;
-    cuentaUI.procesando(true);
-    const r = await nube.subir(usuario.uid);
-    cuentaUI.procesando(false);
-    cuentaUI.aviso(r.ok ? "Progreso subido a la nube." : r.mensaje, r.ok);
-  },
-  restaurarNube: async () => {
-    const usuario = cuenta.estado();
-    if (!usuario) return;
-    cuentaUI.procesando(true);
-    const r = await nube.bajar(usuario.uid);
-    cuentaUI.procesando(false);
-    if (!r.ok) { cuentaUI.aviso(r.mensaje, false); return; }
-    // ADR 008: restaurar pisa el progreso local y por eso se pregunta antes, con la fecha.
-    const fecha = fechaSnapshot(r.datos);
-    const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
-    if (!confirm("El respaldo es del " + cuando + ". Se reemplazará tu progreso en este dispositivo. ¿Continuar?")) return;
-    aplicarSnapshot(r.datos, persistencia);
-    location.reload();
-  }
-};
-
-document.addEventListener("click", event => {
-  const el = event.target.closest("[data-action]");
-  if (!el) return;
-  const accion = ACCIONES[el.dataset.action];
-  if (accion) accion(el);
+// El mapa de acciones vive en su módulo (ADR 009), agrupado por feature; acá solo
+// se instancia con el alcance actual y se instala la delegación de click.
+const ACCIONES = crearAcciones({
+  $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil,
+  config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
+  clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome,
+  irMaterias, irPerfil, iniciarMision, irMisiones, next, practicarArrastre,
+  practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
+  repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
+  startContrarreloj, startSupervivencia, salir, seleccionarMateria, seleccionarLenguaje,
+  practicarLeccion, rendirExamen, irLenguaje, startEscenarios, jugarEscenario,
+  decidirEscenario, continuarEscenario, startCasos, jugarCaso, comprobarCaso,
+  diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth,
+  // El caché se reasigna al iniciar: se limpia por callback para no capturar el viejo.
+  limpiarCachePerfil: () => { cachePerfilCuenta.email = null; },
+  nube, fechaSnapshot, aplicarSnapshot
 });
+instalarDelegacion(ACCIONES);
 
 // Listeners puntuales sobre elementos estáticos (eventos change/input, fuera del alcance
 // de la delegación de click).
