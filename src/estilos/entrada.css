@@ -53,6 +53,8 @@
   .feedback-ok { @apply border-l border-emerald-500; }
   .feedback-bad { @apply border-l border-rose-500; }
   .feedback-neutro { @apply border-l border-slate-500; }
+  /* Fila de siguiente paso: separador sutil para no competir con la explicación. */
+  .feedback-next { @apply mt-3 pt-3 text-xs text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-700/60; }
   .code-block { @apply font-mono text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3.5 overflow-x-auto whitespace-pre leading-relaxed; }
   .kw { @apply text-blue-400 font-bold; }
   .str { @apply text-amber-400; }
