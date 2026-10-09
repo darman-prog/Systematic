@@ -25,6 +25,7 @@ import { crearDiagramasUI } from "./ui/componentes/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
+import { crearConfirm } from "./ui/componentes/confirm.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
@@ -69,6 +70,9 @@ let escenarioActual = null;
 let escenarioEstado = null;
 
 const $ = id => document.getElementById(id);
+
+// El diálogo de confirmación vive en su componente (ADR 009); acá solo se instancia.
+const confirm = crearConfirm({ $ });
 
 // Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
 // dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
@@ -261,7 +265,7 @@ function cargarHistorial() {
 }
 
 function clearHistory() {
-  pedirConfirmacion({
+  confirm.pedirConfirmacion({
     titulo: "¿Borrar el historial?",
     mensaje: "Se borran los intentos de esta materia. No se puede deshacer.",
     textoConfirmar: "Borrar historial"
@@ -275,7 +279,7 @@ function clearHistory() {
 }
 
 function resetProgreso() {
-  pedirConfirmacion({
+  confirm.pedirConfirmacion({
     titulo: "¿Reiniciar el progreso?",
     mensaje: "Se eliminan aciertos, fallos, marcas, racha, historial y misiones. Tu XP y logros globales se conservan.",
     textoConfirmar: "Reiniciar todo"
@@ -674,7 +678,7 @@ function next() {
 }
 
 function salir() {
-  pedirConfirmacion({
+  confirm.pedirConfirmacion({
     titulo: "¿Salir de la ronda?",
     mensaje: "Se pierde el avance de esta ronda. Puedes volver a empezar cuando quieras, sin prisa.",
     textoConfirmar: "Salir de la ronda"
@@ -690,37 +694,8 @@ function salir() {
   });
 }
 
-// Diálogo propio Noche calma: reemplaza al confirm() nativo para no romper
-// la calma con una ventana del navegador. Devuelve true si confirma.
-let confirmResolver = null;
-let confirmTrigger = null;
-function pedirConfirmacion({ titulo, mensaje, textoConfirmar }) {
-  const overlay = $("confirm-overlay");
-  if (!overlay) return Promise.resolve(window.confirm(titulo + " " + mensaje));
-  $("confirm-titulo").textContent = titulo || "¿Continuar?";
-  $("confirm-mensaje").textContent = mensaje || "Esta acción no se puede deshacer.";
-  const btnOk = overlay.querySelector('[data-action="confirmarConfirm"]');
-  if (btnOk) btnOk.textContent = textoConfirmar || "Confirmar";
-  // Se guarda quién abrió el diálogo para devolverle el foco al cerrar.
-  confirmTrigger = document.activeElement;
-  overlay.classList.remove("hidden");
-  const btnVolver = overlay.querySelector('[data-action="cancelarConfirm"]');
-  if (btnVolver) btnVolver.focus();
-  return new Promise(resolve => { confirmResolver = resolve; });
-}
-
-// Cierra el diálogo y resuelve la promesa pendiente (false al cancelar).
-function cerrarConfirm(valor) {
-  const overlay = $("confirm-overlay");
-  if (overlay) overlay.classList.add("hidden");
-  if (confirmResolver) {
-    confirmResolver(valor);
-    confirmResolver = null;
-  }
-  // El foco vuelve a quien abrió el diálogo para no perder el hilo con teclado.
-  if (confirmTrigger && confirmTrigger.focus) confirmTrigger.focus();
-  confirmTrigger = null;
-}
+// La trampa de foco del diálogo vive en su componente; acá solo se instala.
+confirm.instalarTrampa();
 
 function iniciarTimer(segundos) {
   const s = sesiones.sesion;
@@ -783,28 +758,6 @@ $("pause-overlay").addEventListener("keydown", e => {
   }
   if (e.key !== "Tab") return;
   const botones = Array.from($("pause-overlay").querySelectorAll("button"));
-  if (!botones.length) return;
-  const idx = botones.indexOf(document.activeElement);
-  if (e.shiftKey && idx <= 0) {
-    e.preventDefault();
-    botones[botones.length - 1].focus();
-  } else if (!e.shiftKey && idx === botones.length - 1) {
-    e.preventDefault();
-    botones[0].focus();
-  }
-});
-
-// El diálogo de confirmación cicla el Tab y se cancela con Escape, igual que la pausa.
-$("confirm-overlay").addEventListener("keydown", e => {
-  const overlay = $("confirm-overlay");
-  if (!overlay || overlay.classList.contains("hidden")) return;
-  if (e.key === "Escape") {
-    e.preventDefault();
-    cerrarConfirm(false);
-    return;
-  }
-  if (e.key !== "Tab") return;
-  const botones = Array.from(overlay.querySelectorAll("button"));
   if (!botones.length) return;
   const idx = botones.indexOf(document.activeElement);
   if (e.shiftKey && idx <= 0) {
@@ -1180,8 +1133,8 @@ const ACCIONES = {
   },
   actualizarResumen: () => config.actualizarResumen(),
   alternarPausa: () => alternarPausa(),
-  cancelarConfirm: () => cerrarConfirm(false),
-  confirmarConfirm: () => cerrarConfirm(true),
+  cancelarConfirm: () => confirm.cerrarConfirm(false),
+  confirmarConfirm: () => confirm.cerrarConfirm(true),
   autoevaluarDev: el => quiz.autoevaluarDev(el.dataset.ok === "true"),
   autoevaluarResultado: el => resultados.autoevaluarResultado(el.dataset.id, el.dataset.ok === "true"),
   cambiarApunteTema: el => apuntesUI.cambiarApunteTema(el.dataset.tema),
