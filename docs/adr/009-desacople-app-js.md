@@ -22,8 +22,8 @@ firmas `crear*`.
 Se extrae en orden de menor a mayor dependencia, sin cambiar comportamiento:
 
 1. Confirmación → `src/ui/componentes/confirm.js` (misma firma Promise + retorno de foco).
-2. `show()` → `src/app/router.js` (ya se inyecta como `mostrarPantalla`).
-3. `ACCIONES` → `src/app/acciones.js` por feature, conservando claves y listener delegado.
+2. `show()` → `src/orquestacion/router.js` (ya se inyecta como `mostrarPantalla`).
+3. `ACCIONES` → `src/orquestacion/acciones.js` por feature, conservando claves y listener delegado.
 4. Puentes config/quiz → controladores con `{ track, sesiones, ui }`.
 5. Timers → `quizUI`/sesión (mútan `sesiones.sesion`, no se duplican).
 
