@@ -19,18 +19,22 @@ Metodología: `detect --json` sobre `index.html` y los 5 parciales de `src/estil
 
 ## Backlog
 
-### P1 (legibilidad, rendimiento, a11y)
+### P1 (rendimiento, a11y, jerarquía)
 
-1. Gris sobre color ×3 (`entrada.css:49,71,98`): subir contraste del texto o del fondo.
-2. `transition: width` ×3 (`componentes.css:137,808`, `pantallas.css:186`): animar
-   `transform`/`opacity`, nunca `width`.
-3. Salto de heading (`index.html`: h1 BD2 → h3 Practica): nivel continuo para lectores.
-4. Jerarquía plana (h1/h2/h3 = 16px): un paso ≥1.25× en el título de pantalla.
+1. `transition: width` ×3 (`componentes.css:137,808`, `pantallas.css:186`): animar
+   `transform`/`opacity`, nunca `width`. → Corregido con `--pct` + `scaleX`.
+2. Salto de heading (`index.html`: h1 BD2 → h3 Practica): nivel continuo para lectores.
+   → Grupos a `h2`.
+3. Jerarquía plana (h1/h2/h3 = 16px): un paso ≥1.25× en el título de pantalla.
+   → Parcial: portada ya usa 24/30px; queda auditar el resto de pantallas.
 
 ### P2 (slop visual)
 
-5. Acento lateral grueso ×3 (`entrada.css:119`, `componentes.css:536`,
-   `pantallas.css:130`): acento sutil o quitar, sin perder identidad por materia.
+4. Acento lateral grueso ×3 (`entrada.css:119`, `componentes.css:536`,
+   `pantallas.css:130`): atenuado a 3px con `color-mix` al 65%.
+5. Gris sobre color ×3 (`entrada.css:49,71,98`): el remap de `tokens.css` falsea al
+   detector (evalúa Tailwind crudo, no los tokens reales); pasa a auditoría manual
+   de contraste por par real antes de tocar.
 
 ### P3 (deriva de sistema, verificar antes de tocar)
 

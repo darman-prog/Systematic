@@ -40,7 +40,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       dt.textContent = etiquetaDif;
       dt.style.color = tinteDif[item.dificultad] || "var(--study-muted)";
     }
-    $("progress-fill").style.width = ((session.idx / n) * 100) + "%";
+    $("progress-fill").style.setProperty("--pct", (session.idx / n) * 100);
     actualizarEstrella(item.id);
     const fb = $("feedback-box");
     fb.style.display = "none";
@@ -207,7 +207,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     // La barra avanza al responder, no al llegar a la siguiente: lo completado se ve al instante.
     const n = session.items.length;
     const hechas = Object.values(session.answers).filter(Boolean).length;
-    $("progress-fill").style.width = ((hechas / n) * 100) + "%";
+    $("progress-fill").style.setProperty("--pct", (hechas / n) * 100);
   }
 
   // Indicador de vidas y combo del modo Supervivencia.

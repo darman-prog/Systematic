@@ -116,7 +116,8 @@
   padding: 20px;
   background: color-mix(in srgb, var(--materia-color) 8%, var(--study-surface));
   border: 1px solid var(--study-border);
-  border-left: 4px solid var(--materia-color);
+  /* Acento por materia en versión tenue: identidad sin la barra gruesa. */
+  border-left: 3px solid color-mix(in srgb, var(--materia-color) 65%, transparent);
   border-radius: 12px;
   text-align: left;
   cursor: pointer;

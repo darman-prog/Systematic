@@ -12,7 +12,8 @@ export function barraCompetencia({ aprobadas, total, color }) {
 
   return '<div class="competencia" role="group" aria-label="Competencia: ' + texto + '">' +
     '<div class="competencia-track" aria-hidden="true">' +
-      '<div class="competencia-fill" style="width:' + pct + "%" +
+      // El avance viaja en --pct (0-100): el CSS lo escala sin tocar layout.
+      '<div class="competencia-fill" style="--pct:' + pct +
         (colorSeguro ? ";--competencia-color:" + colorSeguro : "") + '"></div>' +
     '</div>' +
     '<span class="competencia-texto">' + escapar(texto) + '</span>' +

@@ -5,7 +5,8 @@ describe("barraCompetencia", () => {
   it("escribe el avance en texto además de la barra (WCAG)", () => {
     const html = barraCompetencia({ aprobadas: 2, total: 5 });
     expect(html).toContain("2 de 5 etapas");
-    expect(html).toContain("width:40%");
+    // El avance viaja en --pct (el CSS lo escala sin tocar layout).
+    expect(html).toContain("--pct:40");
     expect(html).toContain('aria-label="Competencia: 2 de 5 etapas"');
   });
 

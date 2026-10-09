@@ -127,7 +127,8 @@
   display: grid; grid-template-columns: 20px 1fr; gap: 8px 14px; align-items: start;
   padding: 16px 18px;
   background: color-mix(in srgb, var(--accent) 6%, transparent);
-  border-left: 3px solid var(--accent);
+  /* Acento tenue: señala sin la barra gruesa. */
+  border-left: 3px solid color-mix(in srgb, var(--accent) 65%, transparent);
   border-radius: 6px;
 }
 .diagnostico-ico { color: var(--accent); margin-top: 1px; }
@@ -181,9 +182,12 @@
 .progress-track { height: 8px; margin-top: 14px; overflow: hidden; border-radius: 99px; background: var(--fill); }
 .progress-fill {
   height: 100%; border-radius: 99px;
-  width: calc(var(--pct, 0) * 1%);
+  width: 100%;
   background: linear-gradient(90deg, var(--accent-strong), var(--accent));
-  transition: width 600ms var(--ease-out);         /* al mover la meta, el cambio se anima */
+  /* El --pct lo escribe el render: acá solo se escala, sin tocar layout. */
+  transform: scaleX(calc(var(--pct, 0) / 100));
+  transform-origin: left center;
+  transition: transform 600ms var(--ease-out);         /* al mover la meta, el cambio se anima */
 }
 .meta-ok .progress-fill {
   background: linear-gradient(90deg, color-mix(in srgb, var(--ok) 80%, #000), var(--ok));

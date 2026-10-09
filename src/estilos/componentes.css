@@ -134,7 +134,7 @@ input, textarea { caret-color: var(--study-accent); }
 /* Barra de competencia y etapas del track de lenguaje (spec 011). */
 .competencia { display: flex; flex-direction: column; gap: 6px; width: 100%; min-width: 0; }
 .competencia-track { height: 8px; border-radius: 9999px; background: var(--study-surface-3); overflow: hidden; }
-.competencia-fill { height: 100%; border-radius: 9999px; background: var(--competencia-color, var(--study-accent)); transition: width var(--mov-base) var(--mov-ease); }
+.competencia-fill { height: 100%; width: 100%; border-radius: 9999px; background: var(--competencia-color, var(--study-accent)); transform: scaleX(calc(var(--pct, 0) / 100)); transform-origin: left center; transition: transform var(--mov-base) var(--mov-ease); }
 .competencia-texto { font-size: .75rem; color: var(--study-muted); }
 
 /* En la tarjeta del home la barra va debajo del conteo: track ancho y legible; así el track
@@ -533,7 +533,8 @@ input, textarea { caret-color: var(--study-accent); }
   padding: 1.25rem;
   background: var(--study-surface);
   border: 1px solid var(--study-border);
-  border-left: 4px solid var(--materia-color, var(--study-accent));
+  /* Acento por materia en versión tenue: identidad sin la barra gruesa. */
+  border-left: 3px solid color-mix(in srgb, var(--materia-color, var(--study-accent)) 65%, transparent);
   border-radius: 0.75rem;
   text-align: left;
   cursor: pointer;
@@ -803,9 +804,13 @@ input, textarea { caret-color: var(--study-accent); }
 
 .progress-fill {
   height: 100%;
+  width: 100%;
   background: var(--study-accent-strong);
   border-radius: 9999px;
-  transition: width var(--mov-base) var(--mov-ease);
+  /* El avance se escala en el compositor: anima transform, nunca width. */
+  transform: scaleX(calc(var(--pct, 0) / 100));
+  transform-origin: left center;
+  transition: transform var(--mov-base) var(--mov-ease);
 }
 
 /* ===== RESPONSIVE ===== */
