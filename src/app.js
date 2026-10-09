@@ -730,6 +730,8 @@ const {
   finalizar, repetirFalladas, repetirMisma
 } = ronda;
 ronda.instalarTrampaPausa();
+// La trampa del diálogo vive en su componente; acá solo se instala.
+confirm.instalarTrampa();
 
 document.addEventListener("keydown", e => {
   const s = sesiones.sesion;
