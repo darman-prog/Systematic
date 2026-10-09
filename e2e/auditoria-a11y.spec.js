@@ -13,7 +13,10 @@ const salida = join(__dirname, '../docs/auditoria/a11y-resultados.json');
 
 // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
 async function abrirMasModos(page) {
-  await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+  // Sin <details id="mas-modos"> los modos ya están visibles: solo se abre si existe.
+  if (await page.locator('#mas-modos').count()) {
+    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+  }
 }
 
 // Navega a una pantalla específica semillando onboarding para desbloquear el acceso.

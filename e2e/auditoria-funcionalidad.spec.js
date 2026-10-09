@@ -6,7 +6,10 @@ import { test, expect } from '@playwright/test';
 test.describe('Auditoría de funcionalidad — flujos faltantes', () => {
   // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
   async function abrirMasModos(page) {
-    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    // Sin <details id="mas-modos"> los modos ya están visibles: solo se abre si existe.
+    if (await page.locator('#mas-modos').count()) {
+      await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    }
   }
 
   test.beforeEach(async ({ page }) => {
@@ -366,6 +369,8 @@ test.describe('Auditoría de funcionalidad — flujos faltantes', () => {
 
     // Salir.
     await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
+    // Salir pide confirmación propia: se confirma en el diálogo.
+    await page.locator('#confirm-overlay').getByRole('button', { name: 'Salir de la ronda' }).click();
     await expect(page.locator('#screen-start')).toBeVisible();
     expect(errores).toEqual([]);
   });

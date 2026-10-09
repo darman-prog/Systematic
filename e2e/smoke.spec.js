@@ -7,7 +7,10 @@ import infraPreguntas from '../src/datos/materias/infra/preguntas.js';
 test.describe('Systematic — smoke', () => {
   // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
   async function abrirMasModos(page) {
-    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    // Sin <details id="mas-modos"> los modos ya están visibles: solo se abre si existe.
+    if (await page.locator('#mas-modos').count()) {
+      await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    }
   }
   test('el home lista 4 materias con su estado de contenido', async ({ page }) => {
     await page.goto('/');
@@ -90,6 +93,8 @@ test.describe('Systematic — smoke', () => {
       await expect(page.locator('#pool-diagrama .pieza').first()).toBeVisible();
     }
     await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
+    // Salir pide confirmación propia: se confirma en el diálogo.
+    await page.locator('#confirm-overlay').getByRole('button', { name: 'Salir de la ronda' }).click();
     await expect(page.locator('#screen-start')).toBeVisible();
     await page.locator('#screen-start').getByRole('button', { name: /Supervivencia/ }).click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
@@ -111,6 +116,8 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#misiones-lista .mision-disponible').first().click();
     await expect(page.locator('#screen-quiz')).toBeVisible();
     await page.locator('#screen-quiz').getByRole('button', { name: 'Salir de la ronda' }).click();
+    // Salir pide confirmación propia: se confirma en el diálogo.
+    await page.locator('#confirm-overlay').getByRole('button', { name: 'Salir de la ronda' }).click();
     await expect(page.locator('#screen-start')).toBeVisible();
   });
 

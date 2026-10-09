@@ -10,7 +10,10 @@ import infraEscenarios from '../src/datos/materias/infra/escenarios.js';
 test.describe('Infraestructura', () => {
   // "Más modos" vive plegado en un <details>: lo abre de forma idempotente.
   async function abrirMasModos(page) {
-    await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    // Sin <details id="mas-modos"> los modos ya están visibles: solo se abre si existe.
+    if (await page.locator('#mas-modos').count()) {
+      await page.locator('#mas-modos').evaluate(el => { el.open = true; });
+    }
   }
 
   test('aparece en el home como cuarta materia y carga su portada', async ({ page }) => {
