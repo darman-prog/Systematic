@@ -12,6 +12,10 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 - Portada con primaria a lo ancho y secundarias compactas.
 - Feedback de quiz unificado con siguiente paso (marcar para repaso + tema a revisar) y
   barra que avanza al responder.
+- Barras en compositor (`--pct` + `scaleX`), headings continuos, acentos tenues y shake
+  de fallo ([reporte anti-slop](docs/reporte-slop-2026-10-09.md)).
+- Continuidad en el dashboard ("Sigue donde lo dejaste") y "Practicar mis débiles" en
+  resultados.
 
 ## `main` (2026-10-08)
 
