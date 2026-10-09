@@ -19,6 +19,8 @@
 /* Momentos de la spec 006: acertar "late", marcar la estrella salta y el anillo se dibuja. */
 @keyframes popIn { from { transform: scale(0.94); opacity: 0.6; } to { transform: scale(1); opacity: 1; } }
 .feedback-ok { animation: popIn var(--mov-base) var(--mov-ease); }
+/* Fallar sacude en su sitio: entrada + shake compuestos, sin mover layout. */
+.feedback-bad { animation: fadeInUp var(--mov-base) var(--mov-ease), shakeX var(--mov-base) var(--mov-ease); }
 .option-correct .opt-key { animation: popIn var(--mov-base) var(--mov-ease); }
 @keyframes starPop { 0% { transform: scale(1); } 45% { transform: scale(1.28); } 100% { transform: scale(1); } }
 .star-btn.star-on { animation: starPop var(--mov-base) var(--mov-ease); }
