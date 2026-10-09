@@ -12,8 +12,10 @@ const TEMA = {
   exito: "#8FBF9F", alerta: "#D9BC8A", error: "#D99A8B",
 };
 
-export function crearResultadosUI({ ctx, registrarRespuesta }) {
+export function crearResultadosUI({ ctx, registrarRespuesta, contarDebiles }) {
   const keywords = () => sqlKeywordsDe(ctx.materia);
+  // Sin el contador no se ofrece el atajo (nunca un botón que no hace nada).
+  const hayDebiles = () => (typeof contarDebiles === "function" ? contarDebiles() : 0) > 0;
   
   function respuestaHTML(item, texto, esCorrecta) {
     if (item.tipo === "relacionar") {
@@ -135,6 +137,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta }) {
       veredictoExamen +
       (session.modo === "mision" ? '<button class="btn btn-primary w-full sm:w-auto" data-action="irMisiones">Volver al mapa</button>' : "") +
       (r.falladas.length ? '<button class="btn btn-primary w-full sm:w-auto" data-action="repetirFalladas">Repasar solo falladas (' + r.falladas.length + ')</button>' : "") +
+      (hayDebiles() ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="practicarDebiles">Practicar mis débiles</button>' : "") +
       (r.calificables.length && r.falladas.length ? '<button class="btn btn-secondary w-full sm:w-auto" data-action="pintarResultados" data-ver-todas="' + !verTodas + '">' + (verTodas ? "Ver solo falladas" : "Ver todas las preguntas") + '</button>' : "") +
       '<button class="btn btn-secondary w-full sm:w-auto" data-action="repetirMisma">Repetir ronda</button>' +
       volver +

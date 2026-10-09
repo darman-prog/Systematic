@@ -55,6 +55,10 @@
   .feedback-neutro { @apply border-l border-slate-500; }
   /* Fila de siguiente paso: separador sutil para no competir con la explicación. */
   .feedback-next { @apply mt-3 pt-3 text-xs text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-700/60; }
+  /* Franja de continuidad: superficie apenas teñida con el acento, sin brillos. */
+  .continuidad { @apply flex items-center justify-between gap-3 rounded-xl border border-slate-700 px-4 py-3 mb-4; background: color-mix(in srgb, var(--materia-accent, var(--study-accent)) 10%, var(--study-surface)); }
+  .continuidad-titulo { @apply font-semibold text-sm; }
+  .continuidad-sub { @apply text-xs text-slate-400 mt-0.5; }
   .code-block { @apply font-mono text-xs sm:text-sm bg-slate-950 border border-slate-700 rounded-xl p-3.5 overflow-x-auto whitespace-pre leading-relaxed; }
   .kw { @apply text-blue-400 font-bold; }
   .str { @apply text-amber-400; }

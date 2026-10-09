@@ -683,6 +683,27 @@ function aplicarAcento(materia) {
 
 // Pantalla de apuntes: vive en ui/aprendizaje/apuntes.js (crearApuntesUI, ADR 007).
 
+// Franja de continuidad del dashboard: última visita + débiles por repasar.
+// Solo aparece si ya hay actividad; el CTA reutiliza practicarDebiles.
+function renderContinuidad() {
+  const slot = $("continuidad");
+  if (!slot) return;
+  if (!track.materia) { slot.innerHTML = ""; return; }
+  const dias = Object.keys(cargarActividad());
+  if (!dias.length) { slot.innerHTML = ""; return; }
+  const ultima = dias.sort().pop();
+  // Ambas fechas son YYYY-MM-DD: la resta da días enteros.
+  const hace = Math.round((new Date(hoyISO()) - new Date(ultima)) / 86400000);
+  const cuando = hace <= 0 ? "hoy" : hace === 1 ? "ayer" : "hace " + hace + " días";
+  const debiles = track.banco.filter(q => esDebil(obtenerP(q.id))).length;
+  slot.innerHTML = '<div class="continuidad">' +
+    '<div class="min-w-0"><div class="continuidad-titulo">Sigue donde lo dejaste</div>' +
+    '<div class="continuidad-sub">Última vez ' + cuando + (debiles ? " · " + debiles + " débiles por repasar" : " · sin débiles pendientes") + '</div></div>' +
+    (debiles ? '<button class="btn btn-primary btn-sm shrink-0" data-action="practicarDebiles">Seguir con débiles</button>' : "") +
+  '</div>';
+  if (slot.firstChild) animar(slot.firstChild);
+}
+
 function goHome() {
   // El dashboard refleja siempre el track activo: al volver de una sesión (o al salir de
   // ella con "Salir") la portada y el tema deben ser del track vigente, no de la última
@@ -693,6 +714,7 @@ function goHome() {
   const btnEtapas = $("btn-etapas");
   if (btnEtapas) btnEtapas.classList.toggle("hidden", !track.lenguaje);
   show("start");
+  renderContinuidad();
   renderStats();
   renderHistory();
   renderTiposPanel();
@@ -701,7 +723,7 @@ function goHome() {
 
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
 const quiz = crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked });
-const resultados = crearResultadosUI({ ctx, registrarRespuesta });
+const resultados = crearResultadosUI({ ctx, registrarRespuesta, contarDebiles: () => track.banco.filter(q => esDebil(obtenerP(q.id))).length });
 const estudio = crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla: show });
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
 const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla: show });
