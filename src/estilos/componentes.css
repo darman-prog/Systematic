@@ -98,6 +98,8 @@ input, textarea { caret-color: var(--study-accent); }
 .misiones-camino { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0; }
 .mision-item { display: flex; flex-direction: column; align-items: stretch; }
 .mision-conector { display: block; width: 2px; height: 24px; margin: 0 auto; background: repeating-linear-gradient(to bottom, var(--study-border) 0 4px, transparent 4px 8px); }
+/* El tramo del camino ya recorrido se rellena de oro al completarse la misión (spec 012, fase C). */
+.mision-item:has(.mision-completada) > .mision-conector { background: #D9BC8A; transition: background var(--mov-base) var(--mov-ease); }
 
 .mision-nodo {
   display: flex; align-items: center; gap: 12px;

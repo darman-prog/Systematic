@@ -712,7 +712,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
       (item.diagrama ? diagramaER() : "") +
       (item.datos ? tablaDatos(item.datos) : "") +
-      '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-blue-500 mb-4"></textarea>' +
+      '<label for="dev-texto" class="sr-only">Tu respuesta</label>' +
+      '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs sm:text-sm text-slate-100 focus:border-blue-500 mb-4"></textarea>' +
       '<div id="dev-solucion" class="hidden"></div>' +
       '<div id="dev-eval" class="flex flex-wrap gap-3 mt-3"></div>' +
       (session.modo === "simulacro" ? "" : '<div class="mt-3" id="dev-ver"><button class="btn btn-secondary" data-action="revelarSolucion">Ver solución modelo</button></div>');

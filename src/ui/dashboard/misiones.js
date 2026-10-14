@@ -16,10 +16,6 @@ const TEMA = {
   acento: "#9BB8C9",
 };
 
-const reduceMotion = () =>
-  typeof window.matchMedia === "function" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 // Estado de cada nodo del camino: la primera misión siempre está disponible; las demás se
 // desbloquean con al menos 1 estrella en la anterior.
 export function estadoMisiones(temas, progresoMisiones) {
@@ -62,7 +58,6 @@ export function pintarMisiones(nodos, materia) {
   }
 
   const acento = colorTema(materia, nodos[0] ? nodos[0].tema : "") || TEMA.acento;
-  const sinMotion = reduceMotion();
 
   const html = nodos.map((n, i) => {
     const disponible = n.estado === "disponible";
@@ -122,10 +117,8 @@ export function pintarMisiones(nodos, materia) {
   cont.innerHTML = '<ul class="misiones-camino" role="list">' + html + '</ul>';
 
   // Acento dinámico por materia aplicado a la misión "siguiente"
-  if (!sinMotion) {
-    const siguiente = cont.querySelector(".mision-siguiente");
-    if (siguiente) {
-      siguiente.style.setProperty("--mision-accent", acento);
-    }
+  const siguiente = cont.querySelector(".mision-siguiente");
+  if (siguiente) {
+    siguiente.style.setProperty("--mision-accent", acento);
   }
 }
