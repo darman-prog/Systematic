@@ -998,7 +998,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   position: relative;
   width: 100%;
   min-height: 16rem;
-  transition: transform var(--mov-enfasis) var(--mov-ease);
+  transition: height var(--mov-base) var(--mov-ease), transform var(--mov-enfasis) var(--mov-ease);
   transform-style: preserve-3d;
 }
 
@@ -1023,6 +1023,35 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   inset: 0;
   transform: rotateY(180deg);
   overflow-y: auto;
+}
+
+/* El reverso es la cara más alta (pregunta + respuesta + explicación): JS le fija
+   --flash-alto al contenido real y el contenedor crece hasta ahí, para que el
+   texto largo se lea completo sin scroll interno. */
+.flash-card-container[data-altura] .flash-card-back {
+  height: auto;
+  overflow-y: visible;
+}
+.flash-card-container[data-altura="auto"] .flash-card-inner {
+  height: var(--flash-alto, 16rem);
+  min-height: 16rem;
+}
+
+@media (max-width: 767.5px) {
+  /* En pantallas chicas el apilado absoluto recortaba la tarjeta: cada cara
+     fluye en su propio bloque y la página hace scroll si hace falta. */
+  .flash-card-inner { min-height: 0; height: auto !important; }
+  .flash-card-inner.flipped { transform: none; }
+  .flash-card-back {
+    position: static;
+    height: auto;
+    transform: none;
+    overflow-y: visible;
+    margin-top: 0.75rem;
+  }
+  .flash-card-front { display: none; }
+  .flash-card-inner:not(.flipped) .flash-card-back { display: none; }
+  .flash-card-inner:not(.flipped) .flash-card-front { display: flex; }
 }
 
 @media (prefers-reduced-motion: reduce) {

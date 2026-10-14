@@ -111,6 +111,11 @@
   .flash-card { @apply bg-slate-900 border border-slate-700 rounded-2xl p-5 sm:p-7 min-h-[16rem] flex flex-col justify-center; }
   .glosario-item { @apply bg-slate-900 border border-slate-700 rounded-xl p-4; }
 }
+
+/* Flashcards: la pantalla usa un contenedor extendido (.app-ancha, ver router)
+   y las caras crecen con el contenido en lugar de quedar recortadas a 16rem. */
+.app-ancha { max-width: 56rem; }
+#screen-flashcards .flash-card { @apply min-h-0 sm:p-8; }
 /* Los estilos del constructor de diagramas viven en lienzo.css (importado desde main.js). */
 
 .materia-card {
