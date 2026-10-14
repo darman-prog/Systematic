@@ -13,10 +13,10 @@ El diagnóstico separa lo ya resuelto de lo pendiente:
 
 ### Fase A — Accesibilidad (spec 004)
 - [x] Etiqueta accesible en el textarea de preguntas de desarrollo (`quiz.js`, label `sr-only` "Tu respuesta").
-- [ ] Etiquetas y roles ARIA en buscadores e inputs de filtro por materia.
-- [ ] Chips/filtros como `role="group"` con `aria-pressed`.
+- [x] Etiquetas y roles ARIA en buscadores e inputs de filtro por materia (sr-only labels + `aria-controls` + `role="group"` en Estudio, Apuntes y Glosario).
+- [x] Chips/filtros como `role="group"` con `aria-pressed` (estudio.js, apuntes.js, glosario.js, config.js; también estrellas de favoritos).
 - [x] Foco visible consistente en todos los interactivos (verificado: no queda ningún `focus:outline-none`; hay reglas `:focus-visible` en componentes/pantallas).
-- [ ] Auditoría axe-core sobre las pantallas principales (home, quiz, estudio, misiones, cuenta).
+- [x] Auditoría axe-core sobre las pantallas principales (resultados en `docs/auditoria/a11y-*.json`; violaciones corregidas en lenguaje.js, home.js, misiones.js y flashcards.js — scrollable-region-focusable resuelto con altura auto).
 
 ### Fase B — Sistema tipográfico y tokens
 - [ ] Escala tipográfica explícita (h1→h3 con pasos definidos) en lugar de jerarquía plana.
@@ -42,4 +42,6 @@ El diagnóstico separa lo ya resuelto de lo pendiente:
 | 2026-10-14 | Fase A parcial: label accesible en textarea de desarrollo; verificado foco visible sin regresiones | ✅ |
 | 2026-10-14 | Fase C: urgencia contrarreloj confirmada existente; conectores dorados animados en Misiones + fix de acento con reduced-motion | ✅ |
 | 2026-10-14 | Gates: `npm run validar` ✔ · `npm test` 312/312 ✔ · `npm run build` ✔ (e2e pendiente de ejecución local) | ✅ |
-| — | Fase B completa y auditoría axe-core (quedan pendientes) | ⏳ |
+| 2026-10-14 | **Fase A COMPLETA**: buscadores con label/`role="group"`, chips con `aria-pressed`, auditoría axe-core con violaciones resueltas; fix flashcard scroll + rediseño sin scroll interno (commit `8b7b97a`) | ✅ |
+| — | Fase B completa (tipografía/tokens) | ⏳ |
+| — | Fase D restante: `npm run e2e` estable + re-auditoría anti-slop | ⏳ |
