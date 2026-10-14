@@ -42,7 +42,8 @@ export function crearApuntesUI({ getMateria, mostrarPantalla }) {
     const temas = ["todos"].concat([...new Set(todos.map(a => a.tema))]);
     cont.innerHTML = temas.map(t => {
       const cuenta = t === "todos" ? todos.length : todos.filter(a => a.tema === t).length;
-      return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" data-action="cambiarApunteTema" data-tema="' + t + '">' +
+      // aria-pressed comunica el filtro activo al lector de pantalla, no solo el color.
+      return '<button class="chip' + (apunteTema === t ? " chip-on" : "") + '" data-action="cambiarApunteTema" data-tema="' + t + '" aria-pressed="' + (apunteTema === t ? "true" : "false") + '">' +
         (t === "todos" ? "Todos" : escapar(t)) + " · " + cuenta + '</button>';
     }).join("");
   }

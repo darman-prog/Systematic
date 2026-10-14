@@ -25,7 +25,8 @@ export function crearGlosarioUI({ ctx, mostrarPantalla }) {
     const cats = [{ id: "todas", corto: "Todas", nombre: "Todas" }].concat(glosario.categorias);
     cont.innerHTML = cats.map(c => {
       const cuenta = c.id === "todas" ? glosario.terminos.length : glosario.terminos.filter(t => t.categoria === c.id).length;
-      return '<button class="chip' + (glosarioCat === c.id ? " chip-on" : "") + '" data-action="cambiarGlosarioCat" data-id="' + c.id + '">' + (c.corto || c.nombre) + ' · ' + cuenta + '</button>';
+      // aria-pressed comunica el filtro activo al lector de pantalla, no solo el color.
+      return '<button class="chip' + (glosarioCat === c.id ? " chip-on" : "") + '" data-action="cambiarGlosarioCat" data-id="' + c.id + '" aria-pressed="' + (glosarioCat === c.id ? "true" : "false") + '">' + (c.corto || c.nombre) + ' · ' + cuenta + '</button>';
     }).join("");
   }
 

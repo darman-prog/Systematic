@@ -2,7 +2,7 @@
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
-import { colorTema } from "../helpers.js";
+import { colorTema, escapar } from "../helpers.js";
 
 const $ = id => document.getElementById(id);
 
@@ -15,10 +15,6 @@ const TEMA = {
   sutil: "#6B707A",
   acento: "#9BB8C9",
 };
-
-const reduceMotion = () =>
-  typeof window.matchMedia === "function" &&
-  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Estado de cada nodo del camino: la primera misión siempre está disponible; las demás se
 // desbloquean con al menos 1 estrella en la anterior.
@@ -62,7 +58,6 @@ export function pintarMisiones(nodos, materia) {
   }
 
   const acento = colorTema(materia, nodos[0] ? nodos[0].tema : "") || TEMA.acento;
-  const sinMotion = reduceMotion();
 
   const html = nodos.map((n, i) => {
     const disponible = n.estado === "disponible";
@@ -77,8 +72,9 @@ export function pintarMisiones(nodos, materia) {
     ).join("");
 
     const iconoClave = iconoDeEstado(n);
-    const ariaLabel = "Misión " + (i + 1) + ": " + n.tema + ". " +
-      etiquetaEstado(n) + ". " +
+    // El nombre accesible surge del contenido visible (tema); el estado y la precisión
+    // se anuncian como texto oculto para evitar axe: label-content-name-mismatch.
+    const detalleEstado = etiquetaEstado(n) + ". " +
       (n.mejorPct ? "Mejor precisión: " + n.mejorPct + " por ciento." : "Sin intentos aún.");
 
     const clases = [
@@ -99,8 +95,8 @@ export function pintarMisiones(nodos, materia) {
         (disponible
           ? ' data-action="iniciarMision" data-tema="' + n.tema + '"'
           : ' disabled aria-disabled="true"') +
-        ' aria-label="' + ariaLabel + '"' +
-      '>' +
+        '>' +
+      '<span class="sr-only">' + escapar(detalleEstado) + '</span>' +
         '<span class="mision-num" aria-hidden="true">' + (i + 1) + '</span>' +
         '<span class="mision-info">' +
           '<span class="mision-tema">' + n.tema + '</span>' +
@@ -122,10 +118,8 @@ export function pintarMisiones(nodos, materia) {
   cont.innerHTML = '<ul class="misiones-camino" role="list">' + html + '</ul>';
 
   // Acento dinámico por materia aplicado a la misión "siguiente"
-  if (!sinMotion) {
-    const siguiente = cont.querySelector(".mision-siguiente");
-    if (siguiente) {
-      siguiente.style.setProperty("--mision-accent", acento);
-    }
+  const siguiente = cont.querySelector(".mision-siguiente");
+  if (siguiente) {
+    siguiente.style.setProperty("--mision-accent", acento);
   }
 }
