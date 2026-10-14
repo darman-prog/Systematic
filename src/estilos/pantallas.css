@@ -15,16 +15,19 @@
   color-scheme: dark;                 /* spinners e inputs nativos acordes al tema */
 
   --surface: var(--stats-bg, #22252D);
-  --surface-2: #2B2F38;
-  --surface-3: #343942;
-  --text: #E7E5DE;
-  --muted: #A9ADB6;
+  --surface-2: var(--study-surface-2, #2B2F38);
+  --surface-3: var(--study-surface-3, #343942);
+  --text: var(--study-text, #E7E5DE);
+  --muted: var(--study-muted, #A9ADB6);
   --subtle: #8A8F99;                  /* ≈4.7:1 sobre --surface (antes #6B707A ≈3:1) */
-  --accent: #9BB8C9;
-  --accent-strong: #7898B0;
-  --ok: #8FBF9F;
-  --warn: #D9BC8A;
-  --bad: #D99A8B;
+  --accent: var(--study-accent, #9BB8C9);
+  --accent-strong: var(--study-accent-strong, #7898B0);
+  --ok: var(--study-success, #8FBF9F);
+  /* Variante legible de --ok para TEXTO pequeño (spec 012, Fase B): --study-success es
+     color de relleno/decoración; como texto daba 3.14:1 en .hero-ok/.note-ok (axe). */
+  --ok-texto: var(--study-exito-texto, #6FB3AC);
+  --warn: var(--mision-oro, #D9BC8A);
+  --bad: var(--study-error, #D99A8B);
   --on-accent: #14161B;               /* texto sobre fondos claros del heatmap */
 
   --line: rgb(255 255 255 / .06);
@@ -106,10 +109,10 @@
 .hero-veredicto { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; color: var(--nivel, var(--muted)); }
 .hero-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: .8125rem; color: var(--muted); }
 .hero-sep  { color: var(--subtle); }
-.hero-ok   { color: var(--ok); }
+.hero-ok   { color: var(--ok-texto); }
 .hero-fail { color: var(--bad); }
 .hero-trend { margin-top: 6px; font-size: .75rem; font-weight: 500; color: var(--muted); }
-.hero-trend[data-dir="up"]   { color: var(--ok); }
+.hero-trend[data-dir="up"]   { color: var(--ok-texto); }
 .hero-trend[data-dir="down"] { color: var(--bad); }
 
 /* ══════ KPIs ══════ */
@@ -120,7 +123,7 @@
 .kpi-l  { margin-top: 2px; font-size: .75rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
 .kpi-note { margin-top: 6px; font-size: .75rem; color: var(--subtle); }
 .kpi-note.note-alert { color: var(--warn); }
-.kpi-note.note-ok    { color: var(--ok); }
+.kpi-note.note-ok    { color: var(--ok-texto); }
 
 /* ══════ DIAGNÓSTICO ══════ */
 .diagnostico {
@@ -161,7 +164,7 @@
 .meta-badge {
   padding: 2px 8px; border-radius: 10px;
   font-size: .625rem; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--ok); background: color-mix(in srgb, var(--ok) 15%, transparent);
+  color: var(--ok-texto); background: color-mix(in srgb, var(--ok) 15%, transparent);
 }
 .meta-badge[hidden] { display: none; }
 .meta-controles { display: flex; align-items: center; gap: 6px; }
@@ -198,11 +201,11 @@
 /* ══════ SECCIONES ══════ */
 .section-title {
   display: flex; align-items: center; gap: 8px; margin: 0 0 12px;
-  font-size: .8125rem; font-weight: 600; letter-spacing: .02em; color: var(--text);
+  font-size: var(--tipo-sm); font-weight: 600; letter-spacing: .02em; color: var(--text);
 }
 .section-count {
   padding: 2px 8px; border-radius: 10px;
-  font-size: .625rem; font-weight: 500; color: var(--muted); background: rgb(255 255 255 / .06);
+  font-size: var(--tipo-xs); font-weight: 500; color: var(--muted); background: rgb(255 255 255 / .06);
 }
 
 /* ══════ HEATMAP ══════ */
@@ -242,7 +245,7 @@
 .td-fuerte { background: color-mix(in srgb, var(--ok) 8%, transparent);  border-color: color-mix(in srgb, var(--ok) 20%, transparent); }
 .td-debil  { background: color-mix(in srgb, var(--bad) 8%, transparent); border-color: color-mix(in srgb, var(--bad) 20%, transparent); }
 .td-label  { font-size: .625rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.td-fuerte .td-label { color: var(--ok); }
+.td-fuerte .td-label { color: var(--ok-texto); }
 .td-debil  .td-label { color: var(--bad); }
 .td-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .875rem; font-weight: 500; }
 .td-pct    { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.02em; color: var(--nivel); }
@@ -313,9 +316,9 @@
 .history-meta { display: flex; gap: 8px; margin-top: 2px; font-size: .75rem; color: var(--subtle); }
 .history-bar  { height: 4px; overflow: hidden; border-radius: 2px; background: var(--fill); }
 .history-bar > div { height: 100%; border-radius: 2px; width: calc(var(--pct, 0) * 1%); background: var(--nivel); }
-.tag-best { font-size: .625rem; font-weight: 600; letter-spacing: .04em; color: var(--ok); }
+.tag-best { font-size: var(--tipo-xs); font-weight: 600; letter-spacing: .04em; color: var(--ok-texto); }
 .trend { padding: 1px 6px; border-radius: 4px; font-size: .75rem; font-weight: 600; }
-.trend-up   { color: var(--ok);    background: color-mix(in srgb, var(--ok) 12%, transparent); }
+.trend-up   { color: var(--ok-texto);    background: color-mix(in srgb, var(--ok) 12%, transparent); }
 .trend-down { color: var(--bad);   background: color-mix(in srgb, var(--bad) 12%, transparent); }
 .trend-flat { color: var(--muted); background: var(--fill); }
 .btn-mas {

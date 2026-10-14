@@ -33,7 +33,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     $("topic-badge").textContent = item.tema;
     $("type-badge").textContent = TIPO_LABELS[item.tipo] || item.tipo;
     const etiquetaDif = DIF_LABELS[item.dificultad] || "";
-    const tinteDif = { facil: "var(--study-success)", media: "var(--study-warning)", dificil: "var(--study-error)" };
+    const tinteDif = { facil: "var(--study-exito-texto)", media: "var(--study-warning)", dificil: "var(--study-error)" };
     $("dif-badge").classList.toggle("hidden", !etiquetaDif);
     if (etiquetaDif) {
       const dt = $("dif-texto");

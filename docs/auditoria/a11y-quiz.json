@@ -1,19 +1,5 @@
 {
-  "violaciones": [
-    {
-      "id": "color-contrast",
-      "impact": "serious",
-      "help": "Elements must meet minimum color contrast ratio thresholds",
-      "nodes": [
-        {
-          "target": [
-            "#dif-texto"
-          ],
-          "failureSummary": "Fix any of the following:\n  Element has insufficient color contrast of 2.75 (foreground color: #377c77, background color: #2b2f38, font size: 9.0pt (12px), font weight: normal). Expected contrast ratio of 4.5:1"
-        }
-      ]
-    }
-  ],
+  "violaciones": [],
   "incompletos": [
     {
       "id": "color-contrast",

@@ -30,7 +30,7 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
       cont.innerHTML =
         '<div class="flash-card text-center">' +
           '<div class="flex justify-center mb-3 text-amber-300">' + icono("medalla", "icono-lg") + '</div>' +
-          '<h2 class="text-xl font-bold mb-2">Ronda de flashcards terminada</h2>' +
+          '<h2 class="mb-2">Ronda de flashcards terminada</h2>' +
           '<p class="text-slate-300 mb-1 flex items-center justify-center gap-1.5">' + icono("check", "icono-sm") + 'Sabías: <b>' + flash.aciertos + '</b></p>' +
           '<p class="text-slate-300 mb-6 flex items-center justify-center gap-1.5">' + icono("cruz", "icono-sm") + 'No sabías: <b>' + flash.fallos + '</b></p>' +
           '<div class="flex flex-wrap gap-3 justify-center">' +
