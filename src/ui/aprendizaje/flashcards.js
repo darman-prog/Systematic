@@ -30,7 +30,7 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
       cont.innerHTML =
         '<div class="flash-card text-center">' +
           '<div class="flex justify-center mb-3 text-amber-300">' + icono("medalla", "icono-lg") + '</div>' +
-          '<h2 class="text-xl font-bold mb-2">Ronda de flashcards terminada</h2>' +
+          '<h2 class="mb-2">Ronda de flashcards terminada</h2>' +
           '<p class="text-slate-300 mb-1 flex items-center justify-center gap-1.5">' + icono("check", "icono-sm") + 'Sabías: <b>' + flash.aciertos + '</b></p>' +
           '<p class="text-slate-300 mb-6 flex items-center justify-center gap-1.5">' + icono("cruz", "icono-sm") + 'No sabías: <b>' + flash.fallos + '</b></p>' +
           '<div class="flex flex-wrap gap-3 justify-center">' +
@@ -56,10 +56,10 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
         '<span>Tarjeta ' + (flash.idx + 1) + ' de ' + flash.items.length + '</span>' +
         '<span class="flex items-center gap-2">' + icono("check", "icono-sm") + ' ' + flash.aciertos + ' · ' + icono("cruz", "icono-sm") + ' ' + flash.fallos + '</span>' +
       '</div>' +
-      '<div class="flash-card-container">' +
+      '<div class="flash-card-container" data-altura="auto">' +
         '<div class="flash-card-inner' + (flash.volteada ? ' flipped' : '') + '">' +
           '<div class="flash-card flash-card-front">' + frente + '</div>' +
-          // Region desplazable: debe recibir foco de teclado (axe: scrollable-region-focusable).
+          // Region desplazable: recibe foco de teclado si el alto supera la pantalla.
           '<div class="flash-card flash-card-back" tabindex="0" role="group" aria-label="Reverso de la tarjeta">' + reversoContenido + '</div>' +
         '</div>' +
       '</div>' +
@@ -70,6 +70,26 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
           : '<button class="btn btn-primary flex-1" data-action="voltearFlash">Voltear</button>') +
         '<button class="btn btn-ghost" data-action="saltarFlash">Saltar</button>' +
       '</div>';
+
+    ajustarAltoFlashcard(cont);
+  }
+
+  // El reverso (pregunta + respuesta + explicación) es la cara más alta: se lo
+  // mide en flujo normal y se fija como altura del contenedor, para que el
+  // contenido largo se lea completo sin scroll interno. Se limita al viewport
+  // restante; si el natural lo supera, el reverso recupera su scroll focal.
+  function ajustarAltoFlashcard(cont) {
+    const back = cont.querySelector(".flash-card-back");
+    if (!back || typeof window.matchMedia !== "function") return;
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    back.style.cssText = "position:static;height:auto;transform:none;backface-visibility:visible";
+    const natural = back.offsetHeight;
+    back.style.cssText = "";
+    const tope = Math.max(320, window.innerHeight - 240);
+    cont.style.setProperty("--flash-alto", Math.min(natural, tope) + "px");
+    // Con tope, la cara trasera vuelve a necesitar foco de teclado para desplazarse.
+    if (natural > tope) back.setAttribute("tabindex", "0");
+    else back.removeAttribute("tabindex");
   }
 
   function voltearFlash() {

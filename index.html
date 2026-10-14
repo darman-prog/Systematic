@@ -18,7 +18,7 @@
   <section id="screen-onboarding" class="card hidden">
     <div class="flex items-center gap-3 mb-3">
       <img src="/logo.svg" alt="Systematic logo" width="44" height="44" class="rounded-xl shadow-md shrink-0">
-      <h1 class="brand-title text-2xl sm:text-3xl font-bold">Systematic</h1>
+      <h1 class="brand-title">Systematic</h1>
     </div>
     <p class="subtitle">Convierte el material de tus materias en sesiones cortas de estudio activo: preguntas con explicación en cada error, simulacros, flashcards y repaso espaciado. Tu progreso se guarda en este navegador.</p>
     <div class="max-w-md">
@@ -46,7 +46,7 @@
   </section>
 
   <section id="screen-materias" class="card hidden">
-    <h1 class="brand-title text-2xl sm:text-3xl font-bold mb-2">Systematic</h1>
+    <h1 class="brand-title mb-2">Systematic</h1>
     <p class="text-sm text-slate-400 mb-2" id="saludo-home"></p>
     <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
     <div class="flex justify-end mb-2">
@@ -65,7 +65,7 @@
     <div class="flex items-center gap-4 mb-4">
       <span class="portada-tile"><span id="materia-icono"></span></span>
       <div class="min-w-0">
-        <h1 class="text-2xl sm:text-3xl font-bold" id="materia-nombre">Base de Datos 2</h1>
+        <h1 class="screen-titulo" id="materia-nombre">Base de Datos 2</h1>
         <p class="text-xs text-slate-400" id="portada-sub"></p>
       </div>
     </div>
@@ -177,7 +177,7 @@
 
   <section id="screen-config" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-5">
-      <h1 class="text-xl sm:text-2xl font-bold">Configurar práctica</h1>
+      <h1 class="screen-titulo">Configurar práctica</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <div id="config-groups" role="group" aria-label="Filtros de práctica"></div>
@@ -237,7 +237,7 @@
 
   <section id="screen-study" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Modo Estudio</h1>
+      <h1 class="screen-titulo">Modo Estudio</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa la estrella para marcar las que quieras priorizar.</p>
@@ -250,7 +250,7 @@
 
   <section id="screen-apuntes" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Apuntes</h1>
+      <h1 class="screen-titulo">Apuntes</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Resúmenes curados a partir del material de la materia. Busca o filtra por tema.</p>
@@ -263,7 +263,7 @@
 
   <section id="screen-lenguaje" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold" id="lenguaje-nombre">Lenguaje</h1>
+      <h1 class="screen-titulo" id="lenguaje-nombre">Lenguaje</h1>
       <div class="flex gap-2 flex-wrap">
         <button class="btn btn-ghost btn-sm" data-action="goHome">Práctica libre</button>
         <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
@@ -280,7 +280,7 @@
 
   <section id="screen-misiones" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Misiones</h1>
+      <h1 class="screen-titulo">Misiones</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Completa misiones por tema y gana hasta 3 estrellas según tu precisión. Cada nodo se desbloquea con al menos 1 estrella del anterior.</p>
@@ -289,7 +289,7 @@
 
   <section id="screen-escenarios" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Escenarios</h1>
+      <h1 class="screen-titulo">Escenarios</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Casos reales de la materia: decide, recibe consecuencias y llega a un final. Tu mejor resultado queda guardado.</p>
@@ -298,7 +298,7 @@
 
   <section id="screen-escenario" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold" id="escenario-titulo">Escenario</h1>
+      <h1 class="screen-titulo" id="escenario-titulo">Escenario</h1>
       <button class="btn btn-ghost btn-sm" data-action="startEscenarios">← Escenarios</button>
     </div>
     <div id="escenario-escena"></div>
@@ -306,7 +306,7 @@
 
   <section id="screen-casos" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Casos de Diagramación</h1>
+      <h1 class="screen-titulo">Casos de Diagramación</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="subtitle">Construye diagramas a partir de casos reales. Tu mejor resultado queda guardado.</p>
@@ -315,7 +315,7 @@
 
   <section id="screen-caso" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold" id="caso-titulo" tabindex="-1">Caso</h1>
+      <h1 class="screen-titulo" id="caso-titulo" tabindex="-1">Caso</h1>
       <button class="btn btn-ghost btn-sm" data-action="startCasos">← Casos</button>
     </div>
     <div id="caso-escena" aria-live="polite"></div>
@@ -323,7 +323,7 @@
 
   <section id="screen-flashcards" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold">Flashcards</h1>
+      <h1 class="screen-titulo">Flashcards</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <div id="flash-area"></div>
@@ -331,7 +331,7 @@
 
   <section id="screen-glosario" class="card hidden">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="text-xl sm:text-2xl font-bold" id="glosario-titulo">Glosario</h1>
+      <h1 class="screen-titulo" id="glosario-titulo">Glosario</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
     <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>
@@ -384,7 +384,7 @@
 
   <section id="screen-cuenta" class="card hidden" aria-labelledby="cuenta-titulo">
     <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 id="cuenta-titulo" class="text-xl sm:text-2xl font-bold">Cuenta</h1>
+      <h1 id="cuenta-titulo" class="screen-titulo">Cuenta</h1>
     </div>
     <!-- Estado sin sesión: pantallas de acceso (las renderiza ui/cuenta/autenticacion.js).
          La salida es el enlace "Continuar sin cuenta" que vive dentro de la tarjeta. -->
@@ -409,7 +409,7 @@
 
 <div id="pause-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-labelledby="pause-titulo">
   <div class="card max-w-sm text-center">
-    <h2 class="text-2xl font-bold mb-2" id="pause-titulo">Simulacro en pausa</h2>
+    <h2 class="mb-2" id="pause-titulo">Simulacro en pausa</h2>
     <p class="text-slate-400 text-sm mb-6">El temporizador está detenido.</p>
     <button class="btn btn-primary w-full" data-action="alternarPausa">Reanudar</button>
     <button class="btn btn-ghost w-full mt-3" data-action="salir">Salir del simulacro</button>
@@ -418,7 +418,7 @@
 
 <div id="confirm-overlay" class="hidden fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-6" role="dialog" aria-modal="true" aria-labelledby="confirm-titulo">
   <div class="card max-w-sm text-center">
-    <h2 class="text-xl font-bold mb-2" id="confirm-titulo">¿Continuar?</h2>
+    <h2 class="mb-2" id="confirm-titulo">¿Continuar?</h2>
     <p class="text-slate-400 text-sm mb-6" id="confirm-mensaje">Esta acción no se puede deshacer.</p>
     <button class="btn btn-peligro w-full" data-action="confirmarConfirm">Confirmar</button>
     <button class="btn btn-ghost w-full mt-3" data-action="cancelarConfirm">Volver</button>
