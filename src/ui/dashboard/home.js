@@ -91,7 +91,9 @@ export function crearHome({ persistencia }) {
         total === 1 ? "etapa aprobada" : "etapas aprobadas"
       }`;
 
-      const ariaLabel = `${l.nombre}. ${l.descripcion}. ${detalles}. Competencia: ${competenciaTexto}. ${
+      // El nombre visible de la tarjeta ya forma parte del nombre accesible (axe:
+      // label-content-name-mismatch); el detalle extra se expone como descripción.
+      const ariaDesc = `${l.descripcion}. ${detalles}. Competencia: ${competenciaTexto}. ${
         pendiente ? "No disponible aún." : "Presiona para entrar."
       }`;
 
@@ -101,7 +103,7 @@ export function crearHome({ persistencia }) {
         <button class="materia-card materia-card--lenguaje" 
                 data-action="seleccionarLenguaje" 
                 data-lenguaje="${l.id}" 
-                aria-label="${ariaLabel}" 
+                aria-describedby="lenguaje-desc-${l.id}" 
                 ${disabledAttr}
                 style="--materia-color: ${l.color}">
           <span class="materia-icono">${icono(l.icono)}</span>
@@ -109,6 +111,7 @@ export function crearHome({ persistencia }) {
             <span class="materia-nombre">${l.nombre}</span>
             <span class="materia-desc">${l.descripcion}</span>
           </div>
+          <span id="lenguaje-desc-${l.id}" class="sr-only">${escapar(ariaDesc)}</span>
           <div class="materia-stats">
             <span class="materia-stats-texto">${detalles}</span>
             ${barraCompetencia({ ...barra, color: l.color })}

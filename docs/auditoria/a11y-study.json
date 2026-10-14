@@ -1,0 +1,20 @@
+{
+  "violaciones": [],
+  "incompletos": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    },
+    {
+      "id": "label-content-name-mismatch",
+      "impact": "serious",
+      "help": "Elements must have their visible text as part of their accessible name"
+    },
+    {
+      "id": "th-has-data-cells",
+      "impact": "serious",
+      "help": "Table headers in a data table must refer to data cells"
+    }
+  ]
+}

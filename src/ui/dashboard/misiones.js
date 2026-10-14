@@ -2,7 +2,7 @@
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
-import { colorTema } from "../helpers.js";
+import { colorTema, escapar } from "../helpers.js";
 
 const $ = id => document.getElementById(id);
 
@@ -72,8 +72,9 @@ export function pintarMisiones(nodos, materia) {
     ).join("");
 
     const iconoClave = iconoDeEstado(n);
-    const ariaLabel = "Misión " + (i + 1) + ": " + n.tema + ". " +
-      etiquetaEstado(n) + ". " +
+    // El nombre accesible surge del contenido visible (tema); el estado y la precisión
+    // se anuncian como texto oculto para evitar axe: label-content-name-mismatch.
+    const detalleEstado = etiquetaEstado(n) + ". " +
       (n.mejorPct ? "Mejor precisión: " + n.mejorPct + " por ciento." : "Sin intentos aún.");
 
     const clases = [
@@ -94,8 +95,8 @@ export function pintarMisiones(nodos, materia) {
         (disponible
           ? ' data-action="iniciarMision" data-tema="' + n.tema + '"'
           : ' disabled aria-disabled="true"') +
-        ' aria-label="' + ariaLabel + '"' +
-      '>' +
+        '>' +
+      '<span class="sr-only">' + escapar(detalleEstado) + '</span>' +
         '<span class="mision-num" aria-hidden="true">' + (i + 1) + '</span>' +
         '<span class="mision-info">' +
           '<span class="mision-tema">' + n.tema + '</span>' +

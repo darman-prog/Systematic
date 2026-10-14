@@ -59,7 +59,8 @@ export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarP
       '<div class="flash-card-container">' +
         '<div class="flash-card-inner' + (flash.volteada ? ' flipped' : '') + '">' +
           '<div class="flash-card flash-card-front">' + frente + '</div>' +
-          '<div class="flash-card flash-card-back">' + reversoContenido + '</div>' +
+          // Region desplazable: debe recibir foco de teclado (axe: scrollable-region-focusable).
+          '<div class="flash-card flash-card-back" tabindex="0" role="group" aria-label="Reverso de la tarjeta">' + reversoContenido + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="mt-5 flex flex-col sm:flex-row gap-3">' +

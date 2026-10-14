@@ -20,7 +20,8 @@ export function crearConfig({ getFiltros, valoresDe, contarPor, leerOpciones, pr
         '<button class="link-btn" data-action="toggleFiltroTodos" data-clave="' + g.clave + '" data-activar="false">Ninguno</button></div><div class="flex flex-wrap gap-2">';
       valores.forEach(v => {
         const activa = filtros[g.clave].has(v);
-        html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '"' + (g.clave === "tipos" ? ' data-tipo="' + v + '"' : "") + '>' +
+        // aria-pressed comunica el filtro activo al lector de pantalla, no solo el color.
+        html += '<button type="button" class="chip' + (activa ? " chip-on" : "") + '" data-action="toggleFiltro" data-clave="' + g.clave + '" data-valor="' + v + '" aria-pressed="' + (activa ? "true" : "false") + '"' + (g.clave === "tipos" ? ' data-tipo="' + v + '"' : "") + '>' +
           g.etiqueta(v) + ' · ' + contarPor(g.clave, v) + '</button>';
       });
       if (g.clave === "tipos" && !diagramasDisponibles()) {

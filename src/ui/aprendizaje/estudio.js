@@ -28,7 +28,8 @@ export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla })
     const html = tipos.map(t => {
       const etiqueta = t === "todos" ? "Todos" : (TIPO_LABELS[t] || t);
       const cuenta = t === "todos" ? ctx.banco.length : ctx.banco.filter(q => q.tipo === t).length;
-      return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" data-action="cambiarEstudioTipo" data-tipo="' + t + '">' + etiqueta + ' · ' + cuenta + '</button>';
+      // aria-pressed comunica el filtro activo al lector de pantalla, no solo el color.
+      return '<button class="chip' + (estudioTipo === t ? " chip-on" : "") + '" data-action="cambiarEstudioTipo" data-tipo="' + t + '" aria-pressed="' + (estudioTipo === t ? "true" : "false") + '">' + etiqueta + ' · ' + cuenta + '</button>';
     }).join("");
     cont.innerHTML = html;
   }

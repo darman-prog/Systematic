@@ -64,7 +64,7 @@ export function pintarEtapas(nodos, lenguaje) {
 
     // Generar botones de lecciones
     const leccionesHtml = etapa.lecciones.map(lec => `
-      <button class="btn-leccion" data-action="practicarLeccion" data-etapa="${etapa.id}" data-leccion="${lec.id}" ${disabledAttr} aria-label="Practicar ${escapar(lec.nombre)}">
+      <button class="btn-leccion" data-action="practicarLeccion" data-etapa="${etapa.id}" data-leccion="${lec.id}" ${disabledAttr}>
         <span class="btn-icono">${icono("practica", "icono-sm")}</span>
         <span class="btn-texto">
           <span class="btn-titulo">${escapar(lec.nombre)}</span>
@@ -75,7 +75,7 @@ export function pintarEtapas(nodos, lenguaje) {
 
     // Generar botón de examen
     const examenHtml = `
-      <button class="btn-examen" data-action="rendirExamen" data-etapa="${etapa.id}" ${disabledAttr} aria-label="Rendir examen de ${escapar(etapa.nombre)}">
+      <button class="btn-examen" data-action="rendirExamen" data-etapa="${etapa.id}" ${disabledAttr}>
         <span class="btn-icono">${icono("medalla", "icono-sm")}</span>
         <span class="btn-texto">
           <span class="btn-titulo">Rendir Examen</span>

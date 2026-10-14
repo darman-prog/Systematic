@@ -1,0 +1,24 @@
+{
+  "violaciones": [
+    {
+      "id": "scrollable-region-focusable",
+      "impact": "serious",
+      "help": "Scrollable region must have keyboard access",
+      "nodes": [
+        {
+          "target": [
+            ".flash-card-back > pre"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element should have focusable content\n  Element should be focusable"
+        }
+      ]
+    }
+  ],
+  "incompletos": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "help": "Elements must meet minimum color contrast ratio thresholds"
+    }
+  ]
+}
