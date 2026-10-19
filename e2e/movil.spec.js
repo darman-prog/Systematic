@@ -83,3 +83,29 @@ test('accesibilidad táctil y prevención de zoom iOS en móvil', async ({ page 
   // Atajos de teclado físico ocultos en vista móvil
   await expect(page.locator('#screen-quiz p:has-text("Atajos:")')).toBeHidden();
 });
+
+test('pantalla de perfil compacta sin espacio vertical excesivo en móvil', async ({ page }) => {
+  await page.goto('/');
+  // Saltar onboarding inicial si aparece en navegador limpio
+  if (await page.locator('#screen-onboarding:visible').count() > 0) {
+    await page.locator('#onboarding-nombre').fill('Estudiante');
+    await page.getByRole('button', { name: /Comenzar/ }).click();
+  }
+  await expect(page.locator('#screen-materias')).toBeVisible();
+
+  // Abrir perfil desde materias
+  await page.locator('#screen-materias [data-action="irPerfil"]').click();
+  await expect(page.locator('#screen-perfil')).toBeVisible();
+
+  // Medir distancia vertical entre el subtítulo de la cabecera y el botón ← Materias
+  const subBox = await page.locator('#screen-perfil .perfil-head .perfil-sub').boundingBox();
+  const btnBox = await page.locator('#screen-perfil [data-action="irMaterias"]').boundingBox();
+
+  expect(subBox).not.toBeNull();
+  expect(btnBox).not.toBeNull();
+
+  // La distancia vertical (gap) debe ser compacta (menor a 30px), evitando el vacío de flex-basis
+  const distanciaVertical = btnBox.y - (subBox.y + subBox.height);
+  expect(distanciaVertical).toBeGreaterThanOrEqual(0);
+  expect(distanciaVertical).toBeLessThanOrEqual(30);
+});

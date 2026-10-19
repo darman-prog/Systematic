@@ -410,8 +410,10 @@
 
 /* Móvil unificado: la cabecera se apila y el hero respira acorde a pantallas <= 639px */
 @media (max-width: 639px) {
-  #screen-perfil .perfil-head { flex-direction: column; align-items: stretch; }
-  #screen-perfil .perfil-head-lado { justify-content: space-between; }
+  #screen-perfil .perfil-head { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+  /* En flex vertical, flex-basis: 16rem inflaba la altura a 256px creando un vacío gigante antes del botón */
+  #screen-perfil .perfil-head-texto { flex: none; width: 100%; }
+  #screen-perfil .perfil-head-lado { justify-content: flex-start; }
   #screen-perfil .perfil-titulo { font-size: 1.5rem; }
   #screen-perfil .perfil-tarjeta { padding: 1rem; }
 }
