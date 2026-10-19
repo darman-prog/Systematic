@@ -58,3 +58,28 @@ test('sin desbordamiento horizontal en pantallas clave', async ({ page }) => {
   await expect(page.locator('#feedback-box')).toBeVisible();
   expect(await overflow()).toBeLessThanOrEqual(0);
 });
+
+// Validación de ergonomía táctil y prevención de auto-zoom en móviles (Auditoría 2026-10)
+test('accesibilidad táctil y prevención de zoom iOS en móvil', async ({ page }) => {
+  await irAMateria(page, 0);
+
+  // Configuración: validar que el input de cantidad tenga al menos 16px para evitar auto-zoom iOS
+  await page.getByRole('button', { name: /Configurar práctica/ }).click();
+  await expect(page.locator('#screen-config')).toBeVisible();
+  const inputFont = await page.locator('#cfg-cantidad').evaluate(el => window.getComputedStyle(el).fontSize);
+  expect(inputFont).toBe('16px');
+
+  // Iniciar práctica
+  await page.locator('#screen-config [data-clave="tipos"][data-activar="false"]').click();
+  await page.locator('#screen-config [data-clave="tipos"][data-valor="multiple"]').click();
+  await page.getByRole('button', { name: /Comenzar práctica/ }).click();
+  await expect(page.locator('#screen-quiz')).toBeVisible();
+
+  // Estrella de marcar con área táctil accesible (mínimo 44px de alto y ancho, WCAG 2.5.8)
+  const starBox = await page.locator('#star-btn').boundingBox();
+  expect(starBox.width).toBeGreaterThanOrEqual(44);
+  expect(starBox.height).toBeGreaterThanOrEqual(44);
+
+  // Atajos de teclado físico ocultos en vista móvil
+  await expect(page.locator('#screen-quiz p:has-text("Atajos:")')).toBeHidden();
+});

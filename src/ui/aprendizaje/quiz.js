@@ -1,4 +1,4 @@
-﻿// Render e interacción de la pantalla de quiz (los 8 tipos de pregunta).
+// Render e interacción de la pantalla de quiz (los 8 tipos de pregunta).
 // Recibe el estado de la app vía `ctx` (session/banco como getters) y callbacks para
 // persistencia y acciones; no lee localStorage ni importa datos de materias.
 import {
@@ -297,7 +297,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       (item.diagrama ? diagramaER() : "") +
       (item.datos ? tablaDatos(item.datos) : "") +
       '<p class="text-xs text-slate-400 mb-3">Toca un elemento de la izquierda y luego su pareja de la derecha.</p>' +
-      '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+      // Vista de 2 columnas lado a lado en móvil para emparejar sin scroll vertical constante
+      '<div class="grid grid-cols-2 gap-2 sm:gap-3">' +
         '<div id="match-izq" class="flex flex-col gap-2"></div>' +
         '<div id="match-der" class="flex flex-col gap-2"></div>' +
       '</div>' +
@@ -619,7 +620,8 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
       (item.diagrama ? diagramaER() : "") +
       (item.datos ? tablaDatos(item.datos) : "") +
-      '<p class="text-xs text-slate-400 mb-3">Usa ▲▼ o arrastra los bloques hasta lograr el orden correcto.</p>' +
+      // Instrucción explícita con referencia clara a los botones de flecha y arrastre
+      '<p class="text-xs text-slate-400 mb-3">Usa los botones ▲/▼ o arrastra los bloques hasta lograr el orden correcto.</p>' +
       '<div id="bloques" class="flex flex-col gap-2"></div>' +
       '<div class="mt-4"><button class="btn btn-primary" id="btn-comprobar-orden" data-action="comprobarOrden">Comprobar</button></div>';
     const bloques = $("bloques");
@@ -711,9 +713,9 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
       bloqueCaso(item) +
       '<div class="text-base sm:text-lg font-semibold leading-relaxed mb-3">' + escapar(item.q) + '</div>' +
       (item.diagrama ? diagramaER() : "") +
-      (item.datos ? tablaDatos(item.datos) : "") +
       '<label for="dev-texto" class="sr-only">Tu respuesta</label>' +
-      '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs sm:text-sm text-slate-100 focus:border-blue-500 mb-4"></textarea>' +
+      // Tamaño de fuente 16px en móvil (text-base) para evitar el zoom automático forzado por iOS Safari
+      '<textarea id="dev-texto" rows="5" placeholder="Escribe tu consulta SQL aquí..." class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-base sm:text-sm text-slate-100 focus:border-blue-500 mb-4"></textarea>' +
       '<div id="dev-solucion" class="hidden"></div>' +
       '<div id="dev-eval" class="flex flex-wrap gap-3 mt-3"></div>' +
       (session.modo === "simulacro" ? "" : '<div class="mt-3" id="dev-ver"><button class="btn btn-secondary" data-action="revelarSolucion">Ver solución modelo</button></div>');

@@ -302,8 +302,8 @@
 
 #auth-root .auth-invitado .link { font-weight: 500; }
 
-/* ===== Móvil ===== */
-@media (max-width: 480px) {
+/* Móvil unificado: coincide con el breakpoint sm de Tailwind (640px) */
+@media (max-width: 639px) {
   #auth-root .auth-card { padding: 24px 20px; }
 }
 
@@ -408,8 +408,8 @@
 #screen-perfil .btn .icono { width: 16px; height: 16px; flex: none; }
 #screen-perfil #nombre-input { min-height: 2.5rem; }
 
-/* Móvil: la cabecera se apila y el hero respira menos. */
-@media (max-width: 480px) {
+/* Móvil unificado: la cabecera se apila y el hero respira acorde a pantallas <= 639px */
+@media (max-width: 639px) {
   #screen-perfil .perfil-head { flex-direction: column; align-items: stretch; }
   #screen-perfil .perfil-head-lado { justify-content: space-between; }
   #screen-perfil .perfil-titulo { font-size: 1.5rem; }
