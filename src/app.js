@@ -1,6 +1,5 @@
 ﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido, acentoDe, fechaSnapshot } from "./core/index.js";
-import { barraDeCompetencia, registrarExamen } from "./core/index.js";
-import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/aprendizaje/lenguaje.js";
+import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
 import { esDebil, hoyISO } from "./core/index.js";
@@ -26,6 +25,7 @@ import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearMisiones } from "./orquestacion/misiones.js";
 import { crearEscenarios } from "./orquestacion/escenarios.js";
 import { crearCasos } from "./orquestacion/casos.js";
+import { crearLenguaje } from "./orquestacion/lenguaje.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -58,6 +58,7 @@ const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").match
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
 let trackIdActual = null;
+let lenguaje = null;
 
 const $ = id => document.getElementById(id);
 
@@ -204,7 +205,7 @@ const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPanta
 // Export/import, borrar historial y reiniciar progreso (orquestacion/ajustes.js).
 const ajustes = crearAjustes({
   $, persistencia, track, avance, confirm,
-  renderStats, renderHistory, irHome: goHome, refrescarLenguaje: pintarLenguaje
+  renderStats, renderHistory, irHome: goHome, refrescarLenguaje: () => lenguaje.pintar()
 });
 const { clearHistory, resetProgreso, exportarDatos, importarDatos } = ajustes;
 
@@ -337,49 +338,8 @@ async function seleccionarLenguaje(id) {
   // sin esto, el título por defecto de index.html ("Base de Datos 2") queda congelado
   // y al salir de una sesión se ve el dashboard de otra materia.
   renderMateriaUI();
-  pintarLenguaje();
+  lenguaje.pintar();
   show("lenguaje");
-}
-
-function pintarLenguaje() {
-  if (!track.lenguaje || !track.lenguajeContenido) return;
-  const nombre = $("lenguaje-nombre");
-  if (nombre) nombre.textContent = track.lenguaje.nombre;
-  const barra = barraDeCompetencia(track.lenguajeContenido.roadmap?.etapas || [], track.competencia);
-  pintarCompetencia(barra, track.lenguaje.color);
-  pintarEtapas(estadoEtapas(track.lenguajeContenido.roadmap, track.competencia), track.lenguaje);
-}
-
-function irLenguaje() {
-  if (track.lenguaje && track.lenguajeContenido) {
-    pintarLenguaje();
-    show("lenguaje");
-  } else {
-    goHome();
-  }
-}
-
-// Prueba formativa: sesión sobre las preguntas de una lección. No mueve la competencia.
-function practicarLeccion(etapaId, leccionId) {
-  const etapa = track.lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
-  const leccion = etapa?.lecciones.find(x => x.id === leccionId);
-  if (!leccion) return;
-  const items = track.itemsDeIds(leccion.preguntas);
-  if (!items.length) return;
-  const s = startSession(items, "practica", false);
-  if (s) s.lenguajeId = track.lenguaje.id;
-}
-
-// Examen sumativo: al terminar, el servicio registra el resultado y mueve la barra.
-function rendirExamen(etapaId) {
-  const etapa = track.lenguajeContenido?.roadmap?.etapas.find(e => e.id === etapaId);
-  if (!etapa) return;
-  const items = track.itemsDeIds(etapa.examen.preguntas);
-  if (!items.length) return;
-  const s = startSession(items, "examen", false);
-  if (!s) return;
-  s.examenEtapa = etapa;
-  s.lenguajeId = track.lenguaje.id;
 }
 
 function renderMateriaUI() {
@@ -470,7 +430,7 @@ const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostr
 // La orquestación de la ronda vive en su controlador (ADR 009); acá quedan los
 // nombres que usan las acciones y los renders vecinos.
 const ronda = crearRonda({
-  $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje,
+  $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje: () => lenguaje.ir(),
   rondas, preguntasFiltradas
 });
 const {
@@ -484,6 +444,9 @@ const {
 ronda.instalarTrampaPausa();
 // La trampa del diálogo vive en su componente; acá solo se instala.
 confirm.instalarTrampa();
+
+// Controlador del track de lenguaje (orquestacion/lenguaje.js).
+lenguaje = crearLenguaje({ $, track, show, goHome, startSession });
 
 // Controlador del mapa de misiones (orquestacion/misiones.js).
 const misiones = crearMisiones({
@@ -624,7 +587,8 @@ const ACCIONES = crearAcciones({
   practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
   repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
   startContrarreloj, startSupervivencia, salir, seleccionarMateria, seleccionarLenguaje,
-  practicarLeccion, rendirExamen, irLenguaje,
+  practicarLeccion: lenguaje.practicarLeccion, rendirExamen: lenguaje.rendirExamen,
+  irLenguaje: lenguaje.ir,
   startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
   decidirEscenario: escenarios.decidir, continuarEscenario: escenarios.continuar,
   startCasos: casos.start, jugarCaso: casos.jugar, comprobarCaso: casos.comprobar,
