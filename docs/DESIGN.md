@@ -99,6 +99,33 @@ Cards y controles usan radios de 8-16px, foco visible y objetivos táctiles de a
 Cards de modo, chips, botones, feedback y tarjetas de pregunta comparten superficies y tokens.
 Los estados correcto/incorrecto siempre incluyen texto, icono o estructura además del color.
 
+## Acceso (Ribbon glass)
+
+Superficie de acceso anónimo (login, registro, recuperación y confirmación). Es una excepción
+acotada al resto de la app: se permite vidrio, glow ambiental y silueta ribbon solo en
+`#screen-cuenta.acceso-libre`. El resto de las pantallas sigue la dirección Noche calma.
+
+- **Layout:** full-bleed dentro del área de contenido; sin card ni título “Cuenta” cuando no hay
+  sesión. Glow radial azul niebla al 16% detrás de una card ribbon de máximo 440px, con doble capa
+  desplazada 22px y punta inferior en V. El header global de la app se conserva.
+- **Logo:** emblema del registro, 96px desktop / 80px móvil, con halo gradiente y SVG 64/56px.
+- **Tipografía:** Source Serif 4 para el H1; cuerpo del sistema; eyebrow 11px uppercase; labels
+  12px uppercase; H1 30px desktop / 26px móvil; subtítulo 14/13px.
+- **Campos:** outline de vidrio, 1px `rgba(155,184,201,0.55)`, alto 48px (46px en móvil), radio 10px, texto
+  alineado a la izquierda y 16px (evita zoom en iOS). Foco con ring de 2px, error terracota y
+  mensaje debajo. Sin iconos iniciales; el ojo de contraseña usa los SVG del proyecto.
+- **Botones:** primario outline (transparente, borde `#9BB8C9`, 48px, glow sutil, full width);
+  Google outline más tenue y full width; divisor “o”.
+- **Copy:** login “Bienvenido de vuelta”; registro “Comienza tu estudio” y subtítulo “Estudio
+  sereno para ingeniería y arquitectura de software.”; recuperación “Recupera tu contraseña”.
+  Hint de contraseña “Mín. 8 caracteres”. Sin textos legales, sin medidor de fuerza y sin chevron.
+- **Estados:** default, hover, focus, error por campo, alerta general, cargando y disabled; los
+  estados se comunican con texto además del color.
+- **Responsive:** card fluida hasta 440px; en móvil 100% del área con padding 20px, logo 80px,
+  targets ≥44px y scroll vertical si el registro no entra.
+- **Accesibilidad:** AA, foco visible, `aria-describedby` en errores/hint, `prefers-reduced-motion`
+  respetado y `aria-label="Acceso"` en la sección cuando el título “Cuenta” está oculto.
+
 ## Iconography
 
 La iconografía es un set propio de SVG de trazo (`src/ui/iconos.js`): stroke 1.5, viewBox 24,
