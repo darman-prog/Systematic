@@ -30,6 +30,7 @@ import { crearRonda } from "./orquestacion/ronda.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
+import { crearRondas } from "./student/rondas.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
@@ -55,7 +56,6 @@ pintarIconos();
 // El constructor de diagramas (lienzo) se ofrece solo en escritorio: en dispositivos
 // táctiles las preguntas de diagrama se excluyen de todas las rutas de sesión.
 const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").matches;
-const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
@@ -76,6 +76,8 @@ const persistencia = crearPersistencia(localStorage);
 // Avance del track activo (student/avance.js): progreso Leitner, actividad, meta e historial.
 // `trackIdActual` lo fija app.js al seleccionar materia o lenguaje.
 const avance = crearAvance({ persistencia, getTrackId: () => trackIdActual });
+// Selección de preguntas por modo (student/rondas.js); el DOM/timers viven en ronda.js.
+const rondas = crearRondas({ obtenerP: avance.obtenerP, diagramasDisponibles });
 // El sistema le habla al estudiante por su nombre en los hitos (onboarding).
 const conNombre = texto => {
   const n = persistencia.nombre();
@@ -267,9 +269,9 @@ function renderMisiones() {
 }
 
 function iniciarMision(tema) {
-  const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tema === tema));
-  if (!lista.length) return;
-  const s = startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "mision", false);
+  const r = rondas.mision({ banco: track.banco, tema });
+  if (!r) return;
+  const s = startSession(r.items, r.modo, r.conTimer);
   if (s) s.misionTema = tema;
 }
 
@@ -588,7 +590,7 @@ const diagramasUI = crearDiagramasUI({
 // nombres que usan las acciones y los renders vecinos.
 const ronda = crearRonda({
   $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje,
-  priorizar, obtenerP: avance.obtenerP, sinDiagramasEnTactil, preguntasFiltradas
+  rondas, preguntasFiltradas
 });
 const {
   iniciarTimerPregunta, actualizarTimerPregunta, clearTimerPregunta,

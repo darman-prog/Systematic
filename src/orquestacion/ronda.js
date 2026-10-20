@@ -1,12 +1,12 @@
 // Orquestación de la ronda de práctica (ADR 009): arranques por modo, timers,
 // pausa y salida. El estado vive en student/session.js y el track; acá solo se
 // monta la pantalla y se pinta. Recibe todo por parámetro, sin estado propio.
-import { shuffle, esDebil, vencida, formatearTiempo } from "../core/index.js";
+import { formatearTiempo } from "../core/index.js";
 import { icono } from "../ui/iconos.js";
 
 export function crearRonda({
   $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje,
-  priorizar, obtenerP, sinDiagramasEnTactil, preguntasFiltradas
+  rondas, preguntasFiltradas
 }) {
   // Timer por pregunta del modo Contrarreloj (spec 003): 30s o fallo. La cuenta y
   // el reloj viven en el estado de la sesión (student/session.js); acá solo se pinta.
@@ -82,9 +82,12 @@ export function crearRonda({
       toast("Sin preguntas con esos filtros. Pulsa Todos o quita Solo débiles / Solo marcadas.");
       return;
     }
-    const cant = Math.min(parseInt($("cfg-cantidad").value, 10) || qs.length, qs.length);
-    const lista = track.filtros.priorizar ? priorizar(qs) : shuffle(qs);
-    startSession(lista.slice(0, cant), "practica", false);
+    const r = rondas.practica({
+      items: qs,
+      cantidad: $("cfg-cantidad").value,
+      priorizando: track.filtros.priorizar
+    });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function comenzarSimulacro() {
@@ -94,50 +97,43 @@ export function crearRonda({
       toast("Sin preguntas con esos filtros. Pulsa Todos o quita Solo débiles / Solo marcadas.");
       return;
     }
-    const lista = shuffle(qs).slice(0, Math.min(10, qs.length));
-    startSession(lista, "simulacro", true);
+    const r = rondas.simulacro({ items: qs });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function startContrarreloj() {
-    // El desarrollo se autoevalúa sin prisa: se excluye del modo contrarreloj.
-    const lista = shuffle(track.banco.filter(q => q.tipo !== "desarrollo")).slice(0, 10);
-    if (!lista.length) return;
-    startSession(lista, "contrarreloj", false);
+    const r = rondas.contrarreloj({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function startSupervivencia() {
-    if (!track.banco.length) return;
-    startSession(shuffle(track.banco), "supervivencia", false);
+    const r = rondas.supervivencia({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function practicarDebiles() {
-    const debiles = sinDiagramasEnTactil(track.banco.filter(q => esDebil(obtenerP(q.id))));
-    if (!debiles.length) return;
-    startSession(shuffle(debiles).slice(0, 10), "practica", false);
+    const r = rondas.debiles({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function practicarTipo(tipo) {
-    const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tipo === tipo));
-    if (!lista.length) return;
-    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    const r = rondas.porTipo({ banco: track.banco, tipo });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function practicarArrastre() {
-    const lista = sinDiagramasEnTactil(track.banco.filter(q => q.tipo === "dragdrop" || q.tipo === "ordenar"));
-    if (!lista.length) return;
-    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    const r = rondas.arrastre({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function practicarCasos() {
-    const lista = sinDiagramasEnTactil(track.banco.filter(q => q.caso));
-    if (!lista.length) return;
-    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    const r = rondas.casos({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function practicarVencidas() {
-    const lista = sinDiagramasEnTactil(track.banco.filter(q => vencida(obtenerP(q.id))));
-    if (!lista.length) return;
-    startSession(priorizar(lista).slice(0, Math.min(10, lista.length)), "practica", false);
+    const r = rondas.vencidas({ banco: track.banco });
+    if (r) startSession(r.items, r.modo, r.conTimer);
   }
 
   function next() {
