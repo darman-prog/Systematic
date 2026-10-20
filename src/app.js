@@ -27,6 +27,7 @@ import { crearRouter } from "./orquestacion/router.js";
 import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones.js";
 import { crearConfigController } from "./orquestacion/config-controller.js";
 import { crearRonda } from "./orquestacion/ronda.js";
+import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearGamificacion } from "./student/gamificacion.js";
@@ -202,6 +203,13 @@ const config = crearConfig({
 });
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
 
+// Export/import, borrar historial y reiniciar progreso (orquestacion/ajustes.js).
+const ajustes = crearAjustes({
+  $, persistencia, track, avance, confirm,
+  renderStats, renderHistory, irHome: goHome, refrescarLenguaje: pintarLenguaje
+});
+const { clearHistory, resetProgreso, exportarDatos, importarDatos } = ajustes;
+
 // Prioriza según el progreso del track activo (débiles → vencidas → nuevas).
 const priorizar = lista => ordenarPrioridad(lista, avance.obtenerP);
 
@@ -222,121 +230,7 @@ function registrarRespuesta(id, ok) {
   if (sesiones.sesion && sesiones.sesion.modo === "supervivencia") quiz.pintarVidas();
 }
 
-function clearHistory() {
-  confirm.pedirConfirmacion({
-    titulo: "¿Borrar el historial?",
-    mensaje: "Se borran los intentos de esta materia. No se puede deshacer.",
-    textoConfirmar: "Borrar historial"
-  }).then(ok => {
-    if (!ok) return;
-    if (!track.materia || !track.materia.id) return;
-    avance.borrarHistorial();
-    renderHistory();
-    renderStats();
-  });
-}
 
-function resetProgreso() {
-  confirm.pedirConfirmacion({
-    titulo: "¿Reiniciar el progreso?",
-    mensaje: "Se eliminan aciertos, fallos, marcas, racha, historial y misiones. Tu XP y logros globales se conservan.",
-    textoConfirmar: "Reiniciar todo"
-  }).then(ok => {
-    if (!ok) return;
-    if (!track.materia || !track.materia.id) return;
-    avance.reiniciar();
-    renderStats();
-    renderHistory();
-  });
-}
-
-function exportarDatos() {
-  // Desde el Perfil se exporta el track activo (materia o lenguaje); sin track no hay nada que exportar.
-  if (!track.lenguaje && (!track.materia || !track.materia.id)) return;
-  // En un track de lenguaje se exporta la competencia; en una materia, su progreso.
-  const esLenguaje = !!track.lenguaje;
-  const datos = {
-    app: "systematic",
-    version: 2,
-    exportado: new Date().toISOString(),
-    nombre: persistencia.nombre(),
-    ...(esLenguaje
-      ? { lenguaje: track.lenguaje.id, competencia: persistencia.competencia(track.lenguaje.id) }
-      : {
-          materia: track.materia.id,
-          progreso: avance.progreso,
-          historial: avance.historial(),
-          actividad: avance.actividad(),
-          meta: avance.meta()
-        })
-  };
-  const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "systematic-" + (esLenguaje ? track.lenguaje.id : track.materia.id) + "-" + hoyISO() + ".json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function importarDatos(input) {
-  const archivo = input.files && input.files[0];
-  if (!archivo) return;
-  const lector = new FileReader();
-  lector.onload = () => {
-    try {
-      const datos = JSON.parse(lector.result);
-      const esLegacy = !!datos && datos.app === "quiz-bd2" && typeof datos.progreso === "object";
-      const esCompetencia = !!datos && datos.app === "systematic" &&
-        datos.competencia && typeof datos.competencia === "object" && !Array.isArray(datos.competencia);
-      const esMateria = !!datos && datos.app === "systematic" && typeof datos.progreso === "object";
-      if (!esLegacy && !esMateria && !esCompetencia) throw new Error("formato");
-
-      // Import de competencia de un lenguaje.
-      if (esCompetencia) {
-        if (!track.lenguaje) {
-          alert("Este archivo es de un lenguaje. Entra al lenguaje para importarlo.");
-          return;
-        }
-        // Validar la forma antes de persistir: no aceptar basura que rompa la UI.
-        const valida = Object.values(datos.competencia).every(r =>
-          r && typeof r === "object" && typeof r.aprobado === "boolean" && Number.isInteger(r.version));
-        if (!valida) throw new Error("formato");
-        if (datos.lenguaje && datos.lenguaje !== track.lenguaje.id &&
-            !window.confirm("El archivo es de otro lenguaje («" + datos.lenguaje + "»). ¿Importarlo igual en «" + track.lenguaje.nombre + "»?")) return;
-        if (!window.confirm("Se reemplazará tu competencia actual con la del archivo. ¿Continuar?")) return;
-        track.setCompetencia(datos.competencia);
-        persistencia.guardarCompetencia(track.lenguaje.id, track.competencia);
-        pintarLenguaje();
-        alert("Competencia importada correctamente.");
-        return;
-      }
-
-      // Import de materia: no se permite estando dentro de un lenguaje (claves distintas).
-      if (track.lenguaje) {
-        alert("Este archivo es de una materia. Entra a la materia para importarlo.");
-        return;
-      }
-      if (esMateria && datos.materia && datos.materia !== track.materia.id &&
-          !window.confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + track.materia.nombre + "»?")) return;
-      if (!window.confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
-      avance.reemplazar(datos.progreso || {});
-      if (datos.historial) persistencia.guardarHistorial(track.materia.id, datos.historial);
-      if (datos.actividad) persistencia.guardarActividad(track.materia.id, datos.actividad);
-      if (datos.meta) persistencia.guardarMeta(track.materia.id, datos.meta);
-      if (typeof datos.nombre === "string") persistencia.guardarNombre(datos.nombre);
-      goHome();
-      alert("Progreso importado correctamente.");
-    } catch (e) {
-      alert("El archivo no es válido. Debe ser un JSON exportado desde esta app.");
-    } finally {
-      input.value = "";
-    }
-  };
-  lector.readAsText(archivo);
-}
 
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
 // La tarjeta de perfil vive solo en screen-perfil (ui/cuenta/perfil.js).
