@@ -153,4 +153,40 @@ describe("ui/cuenta/autenticacion", () => {
     document.querySelector('[data-ir="login"]').click();
     expect($("login-email").value).toBe("ana@x.com");
   });
+
+  it("las tres vistas comparten el emblema del registro y el marco ribbon", () => {
+    for (const render of ["renderLogin", "renderRegistro", "renderRecuperar"]) {
+      const { auth } = montar();
+      auth[render]();
+      expect(document.querySelector(".auth-ribbon")).toBeTruthy();
+      expect(document.querySelector(".auth-ribbon-back")).toBeTruthy();
+      expect(document.querySelector(".auth-logo svg[aria-label='Systematic']")).toBeTruthy();
+    }
+  });
+
+  it("el registro usa el copy unificado y el hint, sin medidor ni legal", () => {
+    const { auth } = montar({ alContinuarSinCuenta: vi.fn() });
+    auth.renderRegistro();
+    expect($("auth-root").textContent).toContain("Comienza tu estudio");
+    expect($("auth-root").textContent).toContain("Nombre completo");
+    expect($("auth-root").textContent).toContain("Mín. 8 caracteres");
+    expect($("reg-pass").getAttribute("aria-describedby")).toContain("reg-pass-hint");
+    expect(document.querySelector("[id^='bar']")).toBeNull();
+    expect(document.querySelector("a[href]")).toBeNull();
+    expect($("auth-root").textContent).toContain("Continuar sin cuenta");
+  });
+
+  it("login y registro comparten las clases del shell", () => {
+    const { auth } = montar({ alGoogle: vi.fn(async () => {}) });
+    auth.renderLogin();
+    expect(document.querySelectorAll(".campo").length).toBe(2);
+    expect(document.querySelectorAll(".btn-sec").length).toBe(1);
+
+    auth.renderRegistro();
+    expect(document.querySelectorAll(".campo").length).toBe(4);
+    expect(document.querySelectorAll(".auth-ribbon").length).toBe(1);
+    expect(document.querySelectorAll(".auth-logo").length).toBe(1);
+    expect(document.querySelectorAll(".btn-primario").length).toBe(1);
+    expect(document.querySelectorAll(".btn-sec").length).toBe(1);
+  });
 });

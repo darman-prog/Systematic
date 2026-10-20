@@ -68,3 +68,19 @@ test('el nombre se puede cambiar desde el perfil y viaja al saludo', async ({ pa
   await expect(page.locator('#screen-perfil')).toBeVisible();
   await expect(page.locator('#perfil-identidad')).toContainText('Perfil de Ana');
 });
+
+test('login y registro comparten el shell y se puede cambiar de vista', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#screen-cuenta')).toHaveClass(/acceso-libre/);
+  await expect(page.locator('#auth-root')).toContainText('Bienvenido');
+
+  await page.getByRole('button', { name: 'Crea una' }).click();
+  await expect(page.locator('#auth-root')).toContainText('Comienza tu estudio');
+  await expect(page.locator('#reg-pass2')).toBeVisible();
+  await expect(page.locator('#reg-pass-hint')).toContainText('Mín. 8 caracteres');
+  await expect(page.locator('#auth-root')).not.toContainText('Términos de servicio');
+
+  await page.getByRole('button', { name: 'Inicia sesión' }).click();
+  await expect(page.locator('#auth-root')).toContainText('Bienvenido');
+  await expect(page.locator('#login-email')).toBeVisible();
+});
