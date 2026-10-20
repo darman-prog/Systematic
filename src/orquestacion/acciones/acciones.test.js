@@ -48,6 +48,19 @@ describe("acciones", () => {
     })).toThrow("Acción duplicada: x");
   });
 
+  it("detecta colisiones entre submódulos de navegación", () => {
+    expect(() => crearAcciones({
+      acceso: {},
+      practica: {},
+      juego: accionesStub,
+      navegacion: {
+        dashboard: { acciones: { repetida: () => {} } },
+        lenguaje: { acciones: { repetida: () => {} } },
+        ajustes: { acciones: {} }
+      }
+    })).toThrow("Acción duplicada: repetida");
+  });
+
   it("toda acción estática de index.html existe en el mapa", () => {
     const html = readFileSync(fileURLToPath(new URL("../../../index.html", import.meta.url)), "utf8");
     const acciones = mapaCompleto();

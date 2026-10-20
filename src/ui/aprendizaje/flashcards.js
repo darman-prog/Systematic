@@ -1,7 +1,7 @@
 // Render e interacción del modo flashcards.
 // Recibe el banco vía `ctx`, callbacks de priorización/persistencia/navegación;
 // el estado de la ronda (`flash`) vive en este módulo.
-import { shuffle } from "../../core/index.js";
+import { shuffle, ordenarPrioridad } from "../../core/index.js";
 import { icono } from "../iconos.js";
 import {
   TIPO_LABELS,
@@ -10,12 +10,12 @@ import {
 
 const $ = id => document.getElementById(id);
 
-export function crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla }) {
+export function crearFlashcardsUI({ ctx, obtenerP, registrarRespuesta, mostrarPantalla }) {
   let flash = null;
   const keywords = () => sqlKeywordsDe(ctx.materia);
 
   function startFlashcards() {
-    const items = priorizar(ctx.banco).map(it =>
+    const items = ordenarPrioridad(ctx.banco, obtenerP).map(it =>
       it.tipo === "ordenar" ? Object.assign({}, it, { frenteOrden: shuffle(it.bloques) }) : it
     );
     flash = { items, idx: 0, aciertos: 0, fallos: 0, volteada: false };

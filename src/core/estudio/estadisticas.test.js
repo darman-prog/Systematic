@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { hoyISO, fechaISO } from "../core/index.js";
+import { hoyISO, fechaISO } from "./progreso.js";
 import { calcularStats } from "./estadisticas.js";
 
 const q = (id, tema, dificultad, parcial = "P1") => ({ id, tema, dificultad, parcial });

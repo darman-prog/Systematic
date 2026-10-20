@@ -18,6 +18,11 @@ export const DIF_LABELS = { facil: "Fácil", media: "Media", dificil: "Difícil"
 
 export const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 
+// Reemplaza el marcador @ por el nombre del estudiante; sin nombre, limpia el marcador.
+export function conNombre(nombre, texto) {
+  return nombre ? texto.replace("@", nombre) : texto.replace(" @", "").replace("@", "");
+}
+
 export function escapar(texto) {
   // Escapa los caracteres que rompen el HTML y los atributos entre comillas dobles.
   // La comilla simple se deja cruda: resaltarSQL() la usa para marcar strings de SQL.

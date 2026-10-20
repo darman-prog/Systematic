@@ -3,8 +3,6 @@
 // delegado de click los resuelve desde este mapa. No se publica nada en window.
 import { accionesAcceso } from "./acceso.js";
 import { accionesPractica } from "./practica.js";
-import { accionesJuego } from "./juego.js";
-import { accionesNavegacion } from "./navegacion.js";
 
 // Compone mapas por feature y falla si dos grupos declaran la misma acción: una clave
 // duplicada pisaría silenciosamente a la otra.
@@ -21,12 +19,26 @@ export function componerAcciones(grupos) {
   return acciones;
 }
 
+// Aplana cada submódulo como un grupo propio: el guard detecta colisiones también entre
+// dashboard/lenguaje/ajustes y entre misiones/escenarios/casos.
+function gruposDe(prefijo, mapas) {
+  return Object.fromEntries(Object.entries(mapas).map(([nombre, mapa]) => [prefijo + ":" + nombre, mapa]));
+}
+
 export function crearAcciones({ acceso, practica, juego, navegacion }) {
   return componerAcciones({
     acceso: accionesAcceso(acceso),
     practica: accionesPractica(practica),
-    juego: accionesJuego(juego),
-    navegacion: accionesNavegacion(navegacion)
+    ...gruposDe("juego", {
+      misiones: juego.misiones.acciones,
+      escenarios: juego.escenarios.acciones,
+      casos: juego.casos.acciones
+    }),
+    ...gruposDe("navegacion", {
+      dashboard: navegacion.dashboard.acciones,
+      lenguaje: navegacion.lenguaje.acciones,
+      ajustes: navegacion.ajustes.acciones
+    })
   });
 }
 

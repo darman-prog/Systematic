@@ -10,8 +10,7 @@
 // Los colores viven en el CSS (tokens `--ok`, `--accent`, …). Este archivo no
 // duplica la paleta: el canvas los lee con getComputedStyle.
 
-import { vencida } from "../../core/index.js";
-import { calcularStats, ordenarHistorial, pct, CFG_ESTADISTICAS } from "../../student/estadisticas.js";
+import { calcularStats, ordenarHistorial, pct, CFG_ESTADISTICAS } from "../../core/index.js";
 import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
 import { aviso } from "../componentes/estados.js";
 
@@ -753,7 +752,7 @@ export function renderStats({ materia, banco = [], obtenerP, historial = [], act
   setTxt("stat-parciales-txt", s.parciales === 1 ? "parcial" : "parciales");
   setTxt("stat-temas", s.totalTemas);
 
-  const vencidasCount = banco.filter(q => vencida(obtenerP(q.id))).length;
+  const vencidasCount = s.vencidas;
   const btnV = $("btn-vencidas");
   if (btnV) { btnV.classList.toggle("hidden", !vencidasCount); btnV.textContent = "Repaso espaciado (" + vencidasCount + ")"; }
 

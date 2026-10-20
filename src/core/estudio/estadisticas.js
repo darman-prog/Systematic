@@ -1,7 +1,7 @@
 // Cálculo puro del panel de estadísticas: precisión, racha, heatmap, temas, dificultades,
 // tendencia y peores preguntas. Sin DOM: el color de tema entra por parámetro y la UI se
 // queda con las vistas, el canvas y el diagnóstico en prosa.
-import { esDebil, vencida, hoyISO, calcularRacha } from "../core/index.js";
+import { esDebil, vencida, hoyISO, calcularRacha } from "./progreso.js";
 
 export const CFG_ESTADISTICAS = Object.freeze({
   diasHeatmap: 7,

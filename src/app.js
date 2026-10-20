@@ -3,18 +3,17 @@ import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
 import { esDebil } from "./core/index.js";
-import { ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
+import { prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
-import { TIPOS, TIPO_LABELS, DIF_LABELS, animar, saludoSegunHora } from "./ui/helpers.js";
+import { TIPOS, TIPO_LABELS, DIF_LABELS, animar, saludoSegunHora, conNombre as conNombreUI } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
 import { crearResultadosUI } from "./ui/aprendizaje/resultados.js";
 import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
-
 import { icono, hidratarIconos } from "./ui/iconos.js";
-import { diagramasDisponibles } from "./ui/entorno.js";
+import { diagramasDisponibles, ocultarCasosEnTactil } from "./ui/entorno.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
 import { crearRouter } from "./orquestacion/router.js";
@@ -73,10 +72,7 @@ const avance = crearAvance({ persistencia, getTrackId: () => trackIdActual });
 // Selección de preguntas por modo (student/rondas.js); el DOM/timers viven en ronda.js.
 const rondas = crearRondas({ obtenerP: avance.obtenerP, diagramasDisponibles });
 // El sistema le habla al estudiante por su nombre en los hitos (onboarding).
-const conNombre = texto => {
-  const n = persistencia.nombre();
-  return n ? texto.replace("@", n) : texto.replace(" @", "").replace("@", "");
-};
+const conNombre = texto => conNombreUI(persistencia.nombre(), texto);
 const gamificacion = crearGamificacion({
   persistencia,
   materias: MATERIAS,
@@ -152,9 +148,6 @@ const ajustes = crearAjustes({
 });
 const { importarDatos } = ajustes;
 
-// Prioriza según el progreso del track activo (débiles → vencidas → nuevas).
-const priorizar = lista => ordenarPrioridad(lista, avance.obtenerP);
-
 // Coordinador de respuesta: avance + sesión + efectos de UI (timer/vidas).
 const respuesta = crearRespuesta({
   avance, sesiones,
@@ -188,7 +181,9 @@ const estudio = crearEstudioUI({
   ctx, obtenerP: avance.obtenerP, toggleMarked: avance.toggleMarked, mostrarPantalla: show
 });
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
-const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta: respuesta, mostrarPantalla: show });
+const flashcards = crearFlashcardsUI({
+  ctx, obtenerP: avance.obtenerP, registrarRespuesta: respuesta, mostrarPantalla: show
+});
 
 // La orquestación de la ronda vive en su controlador (ADR 009); acá quedan los
 // nombres que usan las acciones y los renders vecinos.
@@ -242,17 +237,8 @@ const casos = crearCasos({
 // namespace al arrancar, antes de que el usuario seleccione materia.
 persistencia.migrarLegacy("bd2");
 
-// El constructor de diagramas (y los casos técnicos) solo se ofrece en escritorio: en táctil
-// se ocultan sus entradas del dashboard, que viven en el HTML estático.
-if (!diagramasDisponibles()) {
-  document.querySelectorAll('#screen-start [data-action="startCasos"], #screen-start [data-action="practicarCasos"]')
-    .forEach(el => el.classList.add("hidden"));
-}
-
-// Cuenta (ADR 008): decide la pantalla inicial. Sin claves de Firebase la app queda 100%
-// local (onboarding por nombre); con claves, el primer contacto es el acceso y la sesión se
-// restaura al recargar. El estado de cuenta vive en el Perfil.
-acceso.iniciar();
+// El constructor de diagramas y los casos técnicos solo se ofrecen en escritorio.
+ocultarCasosEnTactil();
 
 // El mapa de acciones se compone por feature (ADR 009/010); acá solo se agrupan las
 // dependencias de cada controlador y se instala la delegación de click.
@@ -281,4 +267,7 @@ instalarDelegacion(ACCIONES);
 instalarAtajos({
   $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, importarDatos
 });
+
+// Cuenta (ADR 008): decide la pantalla inicial una vez instaladas acciones y atajos.
+acceso.iniciar();
 

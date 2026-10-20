@@ -1,6 +1,5 @@
 ﻿// Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
-import { estadoMisiones } from "../../core/index.js";
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
 import { colorTema, escapar } from "../helpers.js";
