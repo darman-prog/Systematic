@@ -26,6 +26,7 @@ import { crearEscenarios } from "./orquestacion/escenarios.js";
 import { crearCasos } from "./orquestacion/casos.js";
 import { crearLenguaje } from "./orquestacion/lenguaje.js";
 import { crearDashboard } from "./orquestacion/dashboard.js";
+import { crearAcceso } from "./orquestacion/acceso.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -40,7 +41,6 @@ import { crearCuenta } from "./student/cuenta.js";
 import { crearNube } from "./student/nube.js";
 import { aplicarSnapshot } from "./student/aplicar.js";
 import { crearCuentaUI } from "./ui/cuenta.js";
-import { crearAuth } from "./ui/cuenta/autenticacion.js";
 import { crearPerfil } from "./ui/cuenta/perfil.js";
 
 // Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
@@ -61,6 +61,7 @@ const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").match
 let trackIdActual = null;
 let lenguaje = null;
 let dashboard = null;
+let acceso = null;
 
 const $ = id => document.getElementById(id);
 
@@ -91,7 +92,7 @@ const gamificacion = crearGamificacion({
   },
   alLogro: l => toast(icono(l.icono, "icono-sm") + conNombre("Logro nuevo, @: " + l.nombre) + " (+" + XP_EVENTOS.logro + " XP)"),
   // La tarjeta de perfil vive solo en screen-perfil: si está a la vista se repinta.
-  alCambiarPerfil: () => { if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil()); }
+  alCambiarPerfil: () => acceso?.repintarPerfil()
 });
 
 // Renderers del home (materias y lenguajes) extraídos a ui/dashboard (ADR 007).
@@ -130,60 +131,10 @@ const cuentaUI = crearCuentaUI({ ctx });
 const perfilUI = crearPerfil();
 const cuenta = crearCuenta({
   cargarNube: cargarFirebase,
-  alCambiarSesion: usuario => {
-    cuentaUI.pintar(usuario);
-    // Si el Perfil está a la vista, su bloque de cuenta sigue al mismo estado.
-    cachePerfilCuenta.email = usuario?.email ?? usuario?.correo ?? null;
-    if (!$("screen-perfil")?.classList.contains("hidden")) perfilUI.render(datosPerfil());
-  }
+  alCambiarSesion: usuario => acceso?.alCambiarSesion(usuario)
 });
 const nube = crearNube({
   cargarNube: cargarFirebase, persistencia, materias: MATERIAS, lenguajes: LENGUAJES
-});
-
-// Códigos de Firebase Auth que la UI de acceso sabe ubicar bajo un campo.
-const campoDeCodigo = codigo => codigo === "auth/invalid-email" ? "correo"
-  : codigo === "auth/weak-password" ? "contrasena" : undefined;
-// Cerrar la ventana de Google no es un error que deba mostrarse.
-const esCancelado = codigo => codigo === "auth/popup-closed-by-user" || codigo === "auth/cancelled-popup-request";
-
-// Adapta los resultados de los servicios al contrato de crearAuth: los errores se lanzan
-// como { mensaje, campo? } (o { cancelado: true }) y el éxito entra a la app (entrarConCuenta).
-async function pedirCuenta(ejecutar, alExito) {
-  const r = await ejecutar();
-  if (!r.ok) {
-    if (esCancelado(r.codigo)) throw { cancelado: true };
-    throw { mensaje: r.mensaje, campo: campoDeCodigo(r.codigo) };
-  }
-  if (alExito) await alExito(r);
-  return r;
-}
-
-const auth = crearAuth({
-  alIniciarSesion: datos => pedirCuenta(
-    () => cuenta.ingresar(datos.correo, datos.contrasena),
-    r => entrarConCuenta(r.usuario)
-  ),
-  alRegistrarse: datos => pedirCuenta(
-    async () => {
-      const r = await cuenta.registrar(datos.correo, datos.contrasena);
-      // El nombre es identidad local (saludo/perfil): se guarda al crear la cuenta.
-      if (r.ok && datos.nombre) persistencia.guardarNombre(datos.nombre);
-      return r;
-    },
-    r => entrarConCuenta(r.usuario)
-  ),
-  alRecuperar: datos => pedirCuenta(() => cuenta.enviarReset(datos.correo)),
-  alGoogle: () => pedirCuenta(
-    () => cuenta.ingresarConGoogle(),
-    // Con redirect la página navega y no hay usuario todavía: la sesión llega al recargar.
-    r => { if (!r.navegando) entrarConCuenta(r.usuario); }
-  ),
-  // Puerta de invitado: quien no quiere cuenta sigue con el flujo local de siempre.
-  alContinuarSinCuenta: () => {
-    if (!persistencia.nombre() && !persistencia.onboardingHecho()) mostrarOnboardingLocal();
-    else mostrarMaterias();
-  }
 });
 
 // Filtros de práctica: el estado y la lógica viven en student/track.js; el puente
@@ -249,29 +200,6 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 
 // La salida, el avance y los relojes de la ronda viven en src/app/ronda.js (ADR 009).
 
-// Perfil (4 bloques): identidad local + cuenta + datos + peligro. Reúne nombre,
-// sesión y gamificación y los pasa como estado explícito a la UI (ADR 001).
-let cachePerfilCuenta = { disponible: false, email: null };
-function datosPerfil() {
-  const usuario = cuenta.estado();
-  const email = usuario?.email ?? usuario?.correo ?? null;
-  const cuentaEstado = !cachePerfilCuenta.disponible ? "no-disponible" : (email ? "sesion" : "invitado");
-  return { nombre: persistencia.nombre(), email, cuentaEstado, perfil: gamificacion.perfil() };
-}
-async function irPerfil() {
-  clearTimer();
-  sesiones.limpiar();
-  const disponible = await cuenta.disponible();
-  const usuario = cuenta.estado();
-  // Se cachea para repintar en sync tras cambiar el nombre sin re-preguntar a Firebase.
-  cachePerfilCuenta = { disponible, email: usuario?.email ?? usuario?.correo ?? null };
-  perfilUI.render(datosPerfil());
-  document.title = "Tu perfil — Systematic";
-  show("perfil");
-  // El foco va al título (igual que auth-titulo): orienta al lector sin abrir teclados.
-  $("perfil-titulo")?.focus({ preventScroll: true });
-}
-
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
 const quiz = crearQuizUI({
   ctx, obtenerP: avance.obtenerP, registrarRespuesta, toggleMarked: avance.toggleMarked
@@ -312,6 +240,12 @@ dashboard = crearDashboard({
   $, persistencia, track, avance, home, show, config, sesiones, apuntesUI,
   lenguaje, glosarioUI, clearTimer, diagramasDisponibles,
   alCambiarTrack: id => { trackIdActual = id; avance.cargar(); }
+});
+
+// Controlador de acceso y perfil (orquestacion/acceso.js): cuenta, onboarding y arranque.
+acceso = crearAcceso({
+  $, persistencia, home, show, cuenta, cuentaUI, perfilUI, nube, gamificacion,
+  fechaSnapshot, aplicarSnapshot, sesiones, clearTimer
 });
 
 // Controlador del mapa de misiones (orquestacion/misiones.js).
@@ -377,79 +311,18 @@ if (!diagramasDisponibles()) {
     .forEach(el => el.classList.add("hidden"));
 }
 
-// Onboarding local (primera impresión sin cuenta): pide el nombre una sola vez.
-function mostrarOnboardingLocal() {
-  show("onboarding");
-  const entrada = $("onboarding-nombre");
-  if (entrada) entrada.focus();
-}
-
-function mostrarMaterias() {
-    home.renderMaterias();
-  show("materias");
-}
-
-// Ofrece traer el respaldo cuando el navegador todavía no tiene estado local. Devuelve true
-// si restauró (la página se recarga y el arranque termina ahí).
-async function ofrecerRestauracion(usuario) {
-  if (!usuario || persistencia.nombre() || persistencia.onboardingHecho()) return false;
-  const r = await nube.bajar(usuario.uid);
-  if (!r.ok) return false; // sin respaldo (o sin conexión): se entra en modo local
-  const fecha = fechaSnapshot(r.datos);
-  const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
-  if (!window.confirm("Encontramos un respaldo del " + cuando + ". ¿Restaurar tu progreso en este dispositivo?")) return false;
-  aplicarSnapshot(r.datos, persistencia);
-  location.reload();
-  return true;
-}
-
-// Entrada común tras iniciar sesión o registrarse: pinta el panel, ofrece restaurar si hay
-// respaldo y entra al home. La cuenta ya da identidad: no se repite el onboarding por nombre.
-async function entrarConCuenta(usuario) {
-  cuentaUI.pintar(usuario);
-  if (await ofrecerRestauracion(usuario)) return;
-  if (!persistencia.onboardingHecho()) persistencia.guardarOnboardingHecho();
-  mostrarMaterias();
-}
-
 // Cuenta (ADR 008): decide la pantalla inicial. Sin claves de Firebase la app queda 100%
 // local (onboarding por nombre); con claves, el primer contacto es el acceso y la sesión se
-// restaura al recargar. El estado de cuenta vive en el Perfil (irPerfil).
-(async () => {
-  const disponible = await cuenta.disponible();
-  cachePerfilCuenta.disponible = disponible;
-
-  if (!disponible) {
-    if (!persistencia.nombre() && !persistencia.onboardingHecho()) mostrarOnboardingLocal();
-    else mostrarMaterias();
-    return;
-  }
-
-  await cuenta.iniciar();
-  const usuario = cuenta.estado();
-  if (usuario) {
-    await entrarConCuenta(usuario);
-    return;
-  }
-
-  // Navegador nuevo sin sesión: primero el acceso. Quien ya usó la app como invitado sigue
-  // entrando directo a sus materias.
-  if (persistencia.onboardingHecho() || persistencia.nombre()) {
-    mostrarMaterias();
-    return;
-  }
-  cuentaUI.pintar(null);
-  auth.renderLogin();
-  show("cuenta");
-})();
+// restaura al recargar. El estado de cuenta vive en el Perfil.
+acceso.iniciar();
 
 // El mapa de acciones vive en su módulo (ADR 009), agrupado por feature; acá solo
 // se instancia con el alcance actual y se instala la delegación de click.
 const ACCIONES = crearAcciones({
-  $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil,
+  $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil: acceso.datosPerfil,
   config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
   clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome: dashboard.goHome,
-  irMaterias: dashboard.irMaterias, irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
+  irMaterias: dashboard.irMaterias, irPerfil: acceso.irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
   practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
   repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
   startContrarreloj, startSupervivencia, salir,
@@ -460,9 +333,9 @@ const ACCIONES = crearAcciones({
   startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
   decidirEscenario: escenarios.decidir, continuarEscenario: escenarios.continuar,
   startCasos: casos.start, jugarCaso: casos.jugar, comprobarCaso: casos.comprobar,
-  diagramasUI: casos.diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth,
+  diagramasUI: casos.diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth: acceso.auth,
   // El caché se reasigna al iniciar: se limpia por callback para no capturar el viejo.
-  limpiarCachePerfil: () => { cachePerfilCuenta.email = null; },
+  limpiarCachePerfil: () => acceso.limpiarCachePerfil(),
   nube, fechaSnapshot, aplicarSnapshot
 });
 instalarDelegacion(ACCIONES);
