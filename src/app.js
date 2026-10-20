@@ -3,10 +3,7 @@ import { barraDeCompetencia, registrarExamen } from "./core/index.js";
 import { estadoEtapas, pintarCompetencia, pintarEtapas } from "./ui/aprendizaje/lenguaje.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
-import { crearMezclador, storeLocalStorage } from "./core/index.js";
-import {
-  obtenerEntrada, aplicarRespuesta, esDebil, hoyISO
-} from "./core/index.js";
+import { esDebil, hoyISO } from "./core/index.js";
 import { ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
@@ -31,6 +28,7 @@ import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones.js";
 import { crearConfigController } from "./orquestacion/config-controller.js";
 import { crearRonda } from "./orquestacion/ronda.js";
 import { crearPersistencia } from "./student/persistencia.js";
+import { crearAvance } from "./student/avance.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
@@ -43,15 +41,6 @@ import { aplicarSnapshot } from "./student/aplicar.js";
 import { crearCuentaUI } from "./ui/cuenta.js";
 import { crearAuth } from "./ui/cuenta/autenticacion.js";
 import { crearPerfil } from "./ui/cuenta/perfil.js";
-
-
-const mezclador = crearMezclador({
-  registro: MATERIAS,
-  obtenerP: obtenerEntrada, 
-  store: storeLocalStorage("nexora-mezclador")
-});
-
-export default mezclador;
 
 // Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
 function pintarIconos(raiz) {
@@ -69,7 +58,7 @@ const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
-let progreso = {};
+let trackIdActual = null;
 let escenarioActual = null;
 let escenarioEstado = null;
 
@@ -83,6 +72,9 @@ const show = crearRouter({ $, animar }).show;
 // Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
 // dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
 const persistencia = crearPersistencia(localStorage);
+// Avance del track activo (student/avance.js): progreso Leitner, actividad, meta e historial.
+// `trackIdActual` lo fija app.js al seleccionar materia o lenguaje.
+const avance = crearAvance({ persistencia, getTrackId: () => trackIdActual });
 // El sistema le habla al estudiante por su nombre en los hitos (onboarding).
 const conNombre = texto => {
   const n = persistencia.nombre();
@@ -106,15 +98,15 @@ const home = crearHome({ persistencia });
 // Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
 const track = crearTrack({
   persistencia, TIPOS, esDebil,
-  obtenerP, filtrarDiagramas, diagramasDisponibles
+  obtenerP: avance.obtenerP, filtrarDiagramas, diagramasDisponibles
 });
 
 // Servicio de la ronda de quiz (student/session.js): estado y orquestación. La parte que
 // toca el DOM (timers, badges, pantalla) queda acá; el resto entra por dependencias.
 const sesiones = crearSesiones({
-  persistencia, gamificacion, track, obtenerP, xpDeRespuesta, XP_EVENTOS,
+  persistencia, gamificacion, track, obtenerP: avance.obtenerP, xpDeRespuesta, XP_EVENTOS,
   estrellasDeMision, fusionarMision, registrarExamen, prepararItem,
-  guardarIntento, conNombre,
+  guardarIntento: avance.guardarIntento, conNombre,
   // El toast del examen no lleva icono: se pasa el texto tal cual.
   notificar: texto => toast(texto),
   alFinalizar: () => { resultados.pintarResultados(false); show("results"); },
@@ -210,64 +202,24 @@ const config = crearConfig({
 });
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
 
-function cargarProgreso() {
-  return persistencia.progreso(track.materia.id);
-}
-
-function guardarProgreso() {
-  persistencia.guardarProgreso(track.materia.id, progreso);
-}
-
-function obtenerP(id) {
-  return obtenerEntrada(progreso, id);
-}
-
-// Prioriza según el progreso de la materia activa (débiles → vencidas → nuevas).
-const priorizar = lista => ordenarPrioridad(lista, obtenerP);
-
-function cargarActividad() {
-  return persistencia.actividad(track.materia.id);
-}
-
-function registrarActividad() {
-  const a = cargarActividad();
-  const h = hoyISO();
-  a[h] = (a[h] || 0) + 1;
-  persistencia.guardarActividad(track.materia.id, a);
-}
-
-function cargarMeta() {
-  return persistencia.meta(track.materia.id);
-}
+// Prioriza según el progreso del track activo (débiles → vencidas → nuevas).
+const priorizar = lista => ordenarPrioridad(lista, avance.obtenerP);
 
 function cambiarMeta(valor) {
-  persistencia.guardarMeta(track.materia.id, valor);
+  avance.cambiarMeta(valor);
   renderStats();
 }
 
-// El progreso de la materia lo sigue escribiendo app.js; el XP de la ronda, la meta diaria y
-// los logros los resuelve el servicio (student/session.js).
+// El avance (progreso, actividad, historial) vive en student/avance.js; el XP de la ronda,
+// la meta diaria y los logros los resuelve student/session.js.
 function registrarRespuesta(id, ok) {
-  progreso[id] = aplicarRespuesta(obtenerP(id), ok);
-  guardarProgreso();
-  registrarActividad();
+  avance.registrar(id, ok);
   // El bonus de contrarreloj mide contra `sesion.preguntaInicio`; clearTimerPregunta solo
   // apaga el intervalo, así que el dato sigue intacto para el servicio.
   if (sesiones.sesion && sesiones.sesion.modo === "contrarreloj") clearTimerPregunta();
   sesiones.responder(id, ok);
   // La supervivencia pierde vidas dentro del servicio; el badge lo repinta la UI.
   if (sesiones.sesion && sesiones.sesion.modo === "supervivencia") quiz.pintarVidas();
-}
-
-function toggleMarked(id) {
-  const marcada = !obtenerP(id).marked;
-  progreso[id] = Object.assign({}, obtenerP(id), { marked: marcada });
-  guardarProgreso();
-  return marcada;
-}
-
-function cargarHistorial() {
-  return persistencia.historial(track.materia.id);
 }
 
 function clearHistory() {
@@ -278,7 +230,7 @@ function clearHistory() {
   }).then(ok => {
     if (!ok) return;
     if (!track.materia || !track.materia.id) return;
-    persistencia.borrarHistorial(track.materia.id);
+    avance.borrarHistorial();
     renderHistory();
     renderStats();
   });
@@ -292,8 +244,7 @@ function resetProgreso() {
   }).then(ok => {
     if (!ok) return;
     if (!track.materia || !track.materia.id) return;
-    progreso = {};
-    persistencia.reiniciarMateria(track.materia.id);
+    avance.reiniciar();
     renderStats();
     renderHistory();
   });
@@ -313,10 +264,10 @@ function exportarDatos() {
       ? { lenguaje: track.lenguaje.id, competencia: persistencia.competencia(track.lenguaje.id) }
       : {
           materia: track.materia.id,
-          progreso: cargarProgreso(),
-          historial: cargarHistorial(),
-          actividad: cargarActividad(),
-          meta: cargarMeta()
+          progreso: avance.progreso,
+          historial: avance.historial(),
+          actividad: avance.actividad(),
+          meta: avance.meta()
         })
   };
   const blob = new Blob([JSON.stringify(datos, null, 2)], { type: "application/json" });
@@ -371,8 +322,7 @@ function importarDatos(input) {
       if (esMateria && datos.materia && datos.materia !== track.materia.id &&
           !window.confirm("El archivo es de otra materia («" + datos.materia + "»). ¿Importarlo igual en «" + track.materia.nombre + "»?")) return;
       if (!window.confirm("Se reemplazará tu progreso actual con el del archivo. ¿Continuar?")) return;
-      progreso = datos.progreso || {};
-      persistencia.guardarProgreso(track.materia.id, progreso);
+      avance.reemplazar(datos.progreso || {});
       if (datos.historial) persistencia.guardarHistorial(track.materia.id, datos.historial);
       if (datos.actividad) persistencia.guardarActividad(track.materia.id, datos.actividad);
       if (datos.meta) persistencia.guardarMeta(track.materia.id, datos.meta);
@@ -522,28 +472,22 @@ function renderTiposPanel() {
 
 // La salida, el avance y los relojes de la ronda viven en src/app/ronda.js (ADR 009).
 
-function guardarIntento(score, total, modo) {
-  const historial = cargarHistorial();
-  historial.unshift({ date: Date.now(), score, total, modo: modo || "practica" });
-  persistencia.guardarHistorial(track.materia.id, historial);
-}
-
 // Wrappers que inyectan los datos persistidos al módulo de estadísticas.
 function renderStats() {
   if (!track.materia) return;
   renderStatsUI({
     materia: track.materia,
     banco: track.banco,
-    obtenerP,
-    historial: cargarHistorial(),
-    actividad: cargarActividad(),
-    meta: cargarMeta(),
+    obtenerP: avance.obtenerP,
+    historial: avance.historial(),
+    actividad: avance.actividad(),
+    meta: avance.meta(),
     onCambiarMeta: cambiarMeta
   });
 }
 
 function renderHistory() {
-  renderHistoryUI(cargarHistorial(), null, persistencia.nombre());
+  renderHistoryUI(avance.historial(), null, persistencia.nombre());
 }
 
 // Home (materias y lenguajes): renderMaterias/renderLenguajes viven en ui/dashboard/home.js (ADR 007).
@@ -587,7 +531,8 @@ async function seleccionarMateria(id) {
   if (!await track.seleccionarMateria(id)) return;
   aplicarAcento(track.materia);
   persistencia.migrarLegacy(track.materia.id);
-  progreso = cargarProgreso();
+  trackIdActual = track.materia.id;
+  avance.cargar();
   config.renderConfig();
   renderMateriaUI();
   goHome();
@@ -598,7 +543,8 @@ async function seleccionarLenguaje(id) {
   if (!await track.seleccionarLenguaje(id)) return;
   // Progreso propio del lenguaje: si no se recarga, se arrastra el de la
   // materia anterior y se persiste bajo la clave equivocada.
-  progreso = persistencia.progreso(track.lenguaje.id);
+  trackIdActual = track.lenguaje.id;
+  avance.cargar();
   apuntesUI.resetTema();
   aplicarAcento(track.lenguaje);
   // La portada del dashboard lleva los datos del track activo, también para lenguajes:
@@ -689,13 +635,13 @@ function renderContinuidad() {
   const slot = $("continuidad");
   if (!slot) return;
   if (!track.materia) { slot.innerHTML = ""; return; }
-  const dias = Object.keys(cargarActividad());
+  const dias = Object.keys(avance.actividad());
   if (!dias.length) { slot.innerHTML = ""; return; }
   const ultima = dias.sort().pop();
   // Ambas fechas son YYYY-MM-DD: la resta da días enteros.
   const hace = Math.round((new Date(hoyISO()) - new Date(ultima)) / 86400000);
   const cuando = hace <= 0 ? "hoy" : hace === 1 ? "ayer" : "hace " + hace + " días";
-  const debiles = track.banco.filter(q => esDebil(obtenerP(q.id))).length;
+  const debiles = track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length;
   slot.innerHTML = '<div class="continuidad">' +
     '<div class="min-w-0"><div class="continuidad-titulo">Sigue donde lo dejaste</div>' +
     '<div class="continuidad-sub">Última vez ' + cuando + (debiles ? " · " + debiles + " débiles por repasar" : " · sin débiles pendientes") + '</div></div>' +
@@ -722,9 +668,16 @@ function goHome() {
 }
 
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
-const quiz = crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked });
-const resultados = crearResultadosUI({ ctx, registrarRespuesta, contarDebiles: () => track.banco.filter(q => esDebil(obtenerP(q.id))).length });
-const estudio = crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla: show });
+const quiz = crearQuizUI({
+  ctx, obtenerP: avance.obtenerP, registrarRespuesta, toggleMarked: avance.toggleMarked
+});
+const resultados = crearResultadosUI({
+  ctx, registrarRespuesta,
+  contarDebiles: () => track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length
+});
+const estudio = crearEstudioUI({
+  ctx, obtenerP: avance.obtenerP, toggleMarked: avance.toggleMarked, mostrarPantalla: show
+});
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
 const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla: show });
 const diagramasUI = crearDiagramasUI({
@@ -741,7 +694,7 @@ const diagramasUI = crearDiagramasUI({
 // nombres que usan las acciones y los renders vecinos.
 const ronda = crearRonda({
   $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje,
-  priorizar, obtenerP, sinDiagramasEnTactil, preguntasFiltradas
+  priorizar, obtenerP: avance.obtenerP, sinDiagramasEnTactil, preguntasFiltradas
 });
 const {
   iniciarTimerPregunta, actualizarTimerPregunta, clearTimerPregunta,
