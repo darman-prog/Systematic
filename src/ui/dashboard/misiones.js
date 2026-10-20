@@ -1,5 +1,6 @@
 ﻿// Render del mapa de misiones por tema (spec 003): nodos secuenciales con estrellas.
 // Funciones puras de render: reciben datos y callbacks; no leen localStorage.
+import { estadoMisiones } from "../../core/index.js";
 import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
 import { colorTema, escapar } from "../helpers.js";
@@ -15,24 +16,6 @@ const TEMA = {
   sutil: "#6B707A",
   acento: "#9BB8C9",
 };
-
-// Estado de cada nodo del camino: la primera misión siempre está disponible; las demás se
-// desbloquean con al menos 1 estrella en la anterior.
-export function estadoMisiones(temas, progresoMisiones) {
-  let bloqueado = false;
-  return temas.map(tema => {
-    const mision = progresoMisiones[tema] || { estrellas: 0, mejorPct: 0 };
-    const estado = bloqueado ? "bloqueada" : "disponible";
-    if (!mision.estrellas) bloqueado = true;
-    return {
-      tema,
-      estrellas: mision.estrellas || 0,
-      mejorPct: mision.mejorPct || 0,
-      estado,
-      completada: (mision.estrellas || 0) === 3
-    };
-  });
-}
 
 function etiquetaEstado(n) {
   if (n.estado === "bloqueada") return "Bloqueada";

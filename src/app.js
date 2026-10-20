@@ -14,7 +14,7 @@ import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "
 import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
-import { estadoMisiones, pintarMisiones } from "./ui/dashboard/misiones.js";
+
 import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/index.js";
 import { pintarListaEscenarios, pintarEscenario } from "./ui/aprendizaje/escenarios.js";
 import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/index.js";
@@ -28,6 +28,7 @@ import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones.js";
 import { crearConfigController } from "./orquestacion/config-controller.js";
 import { crearRonda } from "./orquestacion/ronda.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
+import { crearMisiones } from "./orquestacion/misiones.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -248,32 +249,6 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/estudio/sesiones.js (testeables).
 
 // Arranca una ronda: ver src/app/ronda.js (ADR 009).
-
-// ===== Misiones por tema (spec 003): mapa secuencial con estrellas =====
-
-function misionesDeMateria() {
-  return track.materia ? persistencia.misiones(track.materia.id) : {};
-}
-
-function irMisiones() {
-  clearTimer();
-  clearTimerPregunta();
-  sesiones.limpiar();
-  show("misiones");
-  renderMisiones();
-}
-
-function renderMisiones() {
-  const temas = [...new Set(track.banco.map(q => q.tema))];
-  pintarMisiones(estadoMisiones(temas, misionesDeMateria()));
-}
-
-function iniciarMision(tema) {
-  const r = rondas.mision({ banco: track.banco, tema });
-  if (!r) return;
-  const s = startSession(r.items, r.modo, r.conTimer);
-  if (s) s.misionTema = tema;
-}
 
 // ===== Escenarios multi-paso (spec 003): decidir → consecuencias → final con rating =====
 
@@ -604,6 +579,12 @@ ronda.instalarTrampaPausa();
 // La trampa del diálogo vive en su componente; acá solo se instala.
 confirm.instalarTrampa();
 
+// Controlador del mapa de misiones (orquestacion/misiones.js).
+const misiones = crearMisiones({
+  persistencia, track, sesiones, show, clearTimer, clearTimerPregunta,
+  rondas, startSession
+});
+
 document.addEventListener("keydown", e => {
   const s = sesiones.sesion;
   if ($("screen-quiz").classList.contains("hidden") || !s) return;
@@ -723,7 +704,7 @@ const ACCIONES = crearAcciones({
   $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil,
   config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
   clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome,
-  irMaterias, irPerfil, iniciarMision, irMisiones, next, practicarArrastre,
+  irMaterias, irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
   practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
   repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
   startContrarreloj, startSupervivencia, salir, seleccionarMateria, seleccionarLenguaje,

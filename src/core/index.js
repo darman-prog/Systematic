@@ -9,6 +9,7 @@ export * from "./estudio/mezclador.js";
 export * from "./estudio/questionSelector.js";
 export * from "./juego/gamificacion.js";
 export * from "./juego/escenarios.js";
+export * from "./juego/misiones.js";
 export * from "./lenguaje/competencia.js";
 export * from "./nube/snapshot.js";
 export * from "./diagramas/diagramas.js";
