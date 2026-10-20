@@ -8,7 +8,7 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 - Refuerzo de límites y desacople de `app.js` ([ADR 010](docs/adr/010-app-js-composition-root.md),
   [ADR 011](docs/adr/011-limites-capas-y-contenido.md)): evaluación, misiones, estadísticas,
   selección de rondas y carga de contenido en `core`/`student`; controladores por feature;
-  acciones por feature con guard de duplicados; `app.js` de 899 a 284 líneas.
+  acciones por feature con guard de duplicados; `app.js` de 899 a 273 líneas.
 
 ## Sin publicar (rama `feat/modernizacion-y-contenido`)
 

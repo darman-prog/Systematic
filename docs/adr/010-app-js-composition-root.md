@@ -24,7 +24,7 @@ controladores por feature, composición de acciones, instalación de atajos y ar
 contiene reglas de negocio ni estado mutable de una feature.
 
 1. Los controladores viven en `src/orquestacion/` (`misiones`, `escenarios`, `casos`,
-   `lenguaje`, `dashboard`, `acceso`, `arranque`, `atajos`).
+   `lenguaje`, `dashboard`, `acceso` —cuenta, onboarding y arranque— y `atajos`).
 2. Los servicios de aplicación viven en `src/student/` (`avance`, `exportacion`, `rondas`,
    `estadisticas`, `contenido`).
 3. Las acciones se dividen por feature en `src/orquestacion/acciones/` y se componen con un
@@ -36,8 +36,8 @@ contiene reglas de negocio ni estado mutable de una feature.
    `crear*(deps)` y los getters de `ctx`.
 
 **Objetivo de cierre:** `app.js` ≤300 líneas, sin `let progreso`/`escenarioActual`/`casoActual`
-y sin funciones de negocio; `grep -c "^function " src/app.js` = 0. El resultado es 284 líneas y
-0 funciones, una reducción del 68% desde las 899 iniciales.
+y sin funciones de negocio; `grep -c "^function " src/app.js` = 0. El resultado es 273 líneas y
+0 funciones, una reducción del 70% desde las 899 iniciales.
 
 ## Consecuencias
 

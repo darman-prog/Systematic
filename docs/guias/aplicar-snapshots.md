@@ -1,8 +1,8 @@
 # Guía: respaldo y restauración de snapshots
 
 Referencia del flujo de cuenta y nube (ADR 008) ya implementado. Leela antes de tocar
-`src/student/{firebase,cuenta,nube,aplicar}.js`, `src/core/nube/snapshot.js` o las acciones de
-cuenta de `src/app.js`.
+`src/student/{firebase,cuenta,nube,aplicar}.js`, `src/core/nube/snapshot.js`,
+`src/orquestacion/acceso.js` o `src/orquestacion/acciones/acceso.js`.
 
 ## 1. Qué es un snapshot
 
@@ -90,10 +90,11 @@ No hay que tocar `localStorage` a mano: usá estos métodos.
 
 - Pantalla: `index.html#screen-cuenta` con `#cuenta-anon` (adentro `#auth-root`, que renderiza
   `src/ui/cuenta/autenticacion.js`) y `#cuenta-sesion` + `#cuenta-aviso`.
-- Acciones de `app.js`: `irCuenta`, `salirCuenta`, `subirNube`, `restaurarNube`.
+- Acciones de `orquestacion/acciones/acceso.js`: `irCuenta`, `salirCuenta`, `subirNube`,
+  `restaurarNube`.
 - Los callbacks de `crearAuth` reciben `{ correo, contrasena, nombre }` y rechazan con
-  `{ mensaje, campo?, cancelado? }`; `app.js` traduce los resultados de `cuenta.js` con
-  `pedirCuenta`.
+  `{ mensaje, campo?, cancelado? }`; `orquestacion/acceso.js` traduce los resultados de
+  `cuenta.js` con `pedirCuenta`.
 - Arranque (ADR 008): sin claves → onboarding local o home; con claves y sin sesión → acceso
   (`auth.renderLogin()`) con "Continuar sin cuenta"; con sesión → `entrarConCuenta`, que ofrece
   restaurar si hay respaldo y entra al home.

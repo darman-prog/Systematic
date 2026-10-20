@@ -33,7 +33,8 @@ Tipos de pregunta actuales (definidos en `scripts/validador.mjs`): `multiple`, `
 
 ## Gamificación
 
-Vive en `src/core/juego/gamificacion.js`. La persistencia se orquesta en `app.js` (ver [DATA.md](DATA.md)).
+Vive en `src/core/juego/gamificacion.js`. La persistencia se orquesta en
+`src/student/{avance,session,persistencia}.js` (ver [DATA.md](DATA.md)).
 
 - XP base por acierto: 10; repetir una pregunta dominada (caja mayor o igual a 3) da 3.
 - Nivel: `1 + floor(raíz(xp / 100))`; el inicio de cada nivel crece como 100 por (n-1) al cuadrado.

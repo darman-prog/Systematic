@@ -13,7 +13,8 @@ tocar progreso, export/import, migraciones o el contenido de una materia.
 ## Persistencia local
 
 No hay backend propio: todo vive en `localStorage` (con un respaldo opcional en la nube, ADR 008).
-Las claves se definen en `src/core/estudio/progreso.js` (`claves(materiaId)`) y en `src/app.js`.
+Las claves se definen en `src/core/estudio/progreso.js` (`claves(materiaId)`) y en
+`src/student/persistencia.js` (globales, misiones y competencia).
 
 | Clave | Contenido |
 |---|---|

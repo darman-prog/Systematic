@@ -26,8 +26,8 @@ pregunta nuevo obligue a tocar UI, dominio y validador.
 1. La evaluación de respuestas pasa a `src/core/estudio/evaluacion.js`; la UI solo recolecta
    la entrada y muestra el resultado.
 2. El desbloqueo de misiones pasa a `src/core/juego/misiones.js`.
-3. El cálculo de estadísticas pasa a `src/student/estadisticas.js`; la UI conserva vistas,
-   canvas y formato.
+3. El cálculo de estadísticas pasa a `src/core/estudio/estadisticas.js` (cálculo puro, sin
+   DOM); la UI conserva vistas, canvas y formato.
 4. La selección de preguntas por modo pasa a `src/student/rondas.js`; `orquestacion/ronda.js`
    conserva timers, pausa, foco y DOM.
 5. La carga de contenido y la presentación (`topicColors`, `sqlKeywords`) pasan a
