@@ -62,6 +62,20 @@ export function crearCuentaUI({ ctx }) {
     $("cuenta-anon")?.classList.toggle("hidden", conSesion);
     $("cuenta-sesion")?.classList.toggle("hidden", !conSesion);
 
+    // Sin sesión, la pantalla entera es el acceso: se quita la card del shell y el título
+    // "Cuenta" deja de nombrar la sección (pasa a llamarse "Acceso").
+    const seccion = $("screen-cuenta");
+    if (seccion) {
+      seccion.classList.toggle("acceso-libre", !conSesion);
+      if (conSesion) {
+        seccion.setAttribute("aria-labelledby", "cuenta-titulo");
+        seccion.removeAttribute("aria-label");
+      } else {
+        seccion.removeAttribute("aria-labelledby");
+        seccion.setAttribute("aria-label", "Acceso");
+      }
+    }
+
     const correo = $("cuenta-email-actual");
     if (correo) correo.textContent = usuario?.email ?? usuario?.correo ?? "";
 

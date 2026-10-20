@@ -13,7 +13,6 @@
 // Textos en tuteo ("tú"), igual que el resto de la app.
 import { escapar } from "../helpers.js";
 
-const NOMBRE_APP = "Systematic";
 const MIN_CONTRASENA = 8;
 
 const CAMPOS = {
@@ -35,25 +34,21 @@ const TEXTOS = {
   recuperar: { enviar: "Enviar enlace", cargando: "Enviando…" }
 };
 
-const ICONO_MAIL = '<svg class="campo-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>';
-const ICONO_LOCK = '<svg class="campo-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
-const ICONO_USER = '<svg class="campo-ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
 // Dos iconos apilados: el CSS cruza uno u otro según aria-pressed (estado del botón).
 const ICONO_OJO = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6Z"/><circle cx="12" cy="12" r="3"/></svg>';
 const ICONO_OJO_OFF = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
-const ICONO_LOGO = `<span class="head-tile" aria-hidden="true">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-    <path d="M12 3 20 7.5 12 12 4 7.5 12 3Z" fill="currentColor" fill-opacity="0.18" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-    <path d="m4 12 8 4.5 8-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.72"/>
-    <path d="m4 16.5 8 4.5 8-4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.42"/>
-  </svg>
-</span>`;
+// Logo oficial de la app (el mismo del registro aprobado); el SVG ya trae su fondo.
+const LOGO_SYSTEMATIC = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Systematic">
+  <rect width="64" height="64" rx="14" fill="#1A1C22"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#2B2F38"/>
+  <rect x="10" y="10" width="44" height="44" rx="9" fill="#22252D" stroke="#2B2F38" stroke-width="1.5"/>
+  <path d="M19 7v6M32 7v6M45 7v6" stroke="#9BB8C9" stroke-width="2.5" stroke-linecap="round"/>
+  <path class="logo-s" d="M37.5 25 A5.5 5.5 0 1 0 32 30.5 A5.5 5.5 0 1 1 26.5 36" fill="none" stroke="#E7E5DE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18 47h28M18 51h15" stroke="#2B2F38" stroke-width="2.5" stroke-linecap="round"/>
+</svg>`;
 
-const CABECERA = `
-  <div class="auth-head">
-    ${ICONO_LOGO}
-    <div class="head-texto"><span class="head-nombre">${NOMBRE_APP}</span></div>
-  </div>`;
+// Emblema circular del registro: halo + SVG. El CSS lo reduce en móvil.
+const LOGO_BLOQUE = `<div class="auth-logo">${LOGO_SYSTEMATIC}</div>`;
 
 // Logo oficial de Google (4 colores), solo decorativo.
 const ICONO_GOOGLE = `<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
@@ -90,18 +85,18 @@ function validar(campo, valor, vista, datos) {
   return valor ? "" : "Escribe tu contraseña.";
 }
 
-function campoHtml({ id, campo, etiqueta, tipo, autocompletar, icono, ojo = false, extra = "", cabeceraExtra = "" }) {
+function campoHtml({ id, campo, etiqueta, tipo, autocompletar, ojo = false, extra = "", labelExtra = "", hintId = "" }) {
   // El nombre accesible del botón de ojo es fijo ("Mostrar contraseña"); el estado lo
   // comunica aria-pressed. Cambiar el nombre Y el estado a la vez se leería al revés.
+  const describedBy = hintId ? `${hintId} ${id}-error` : `${id}-error`;
   return `
     <div class="campo">
       <div class="campo-label-row">
         <label class="campo-label" for="${id}">${etiqueta}</label>
-        ${cabeceraExtra}
+        ${labelExtra}
       </div>
       <div class="campo-input-wrap">
-        <input class="campo-input" id="${id}" data-campo="${campo}" type="${tipo}" autocomplete="${autocompletar}" ${extra} aria-describedby="${id}-error">
-        ${icono}
+        <input class="campo-input${ojo ? " campo-input--ojo" : ""}" id="${id}" data-campo="${campo}" type="${tipo}" autocomplete="${autocompletar}" ${extra} aria-describedby="${describedBy}">
         ${ojo ? `<button type="button" class="campo-ojo" data-ojo="${id}" aria-pressed="false" aria-label="Mostrar contraseña"><span class="ojo-on">${ICONO_OJO}</span><span class="ojo-off">${ICONO_OJO_OFF}</span></button>` : ""}
       </div>
       <p class="campo-error" id="${id}-error"></p>
@@ -110,43 +105,72 @@ function campoHtml({ id, campo, etiqueta, tipo, autocompletar, icono, ojo = fals
 
 const ATRIBUTOS_CORREO = 'placeholder="tucorreo@ejemplo.com" inputmode="email" autocapitalize="none" spellcheck="false"';
 
+// Copy editorial por vista. "Enviado" arma su subtítulo con el correo en renderEnviado.
+const CABECERAS = {
+  login: {
+    eyebrow: "Acceso al entorno",
+    titulo: 'Bienvenido <em>de vuelta</em>',
+    sub: "Sigue donde lo dejaste."
+  },
+  register: {
+    eyebrow: "Acceso al entorno",
+    titulo: 'Comienza tu <em>estudio</em>',
+    sub: "Estudio sereno para ingeniería y arquitectura de software."
+  },
+  recuperar: {
+    eyebrow: "Recuperar acceso",
+    titulo: 'Recupera tu <em>contraseña</em>',
+    sub: "Te enviaremos un enlace para crear una nueva."
+  },
+  enviado: {
+    eyebrow: "Recuperar acceso",
+    titulo: 'Revisa tu <em>correo</em>',
+    sub: ""
+  }
+};
+
+function cabeceraHtml(vista, sub = "") {
+  const c = CABECERAS[vista];
+  return `
+    <header class="auth-head">
+      <span class="auth-eyebrow">${c.eyebrow}</span>
+      <h1 class="auth-titulo" id="auth-titulo" tabindex="-1">${c.titulo}</h1>
+      <p class="auth-sub">${sub || c.sub}</p>
+    </header>`;
+}
+
 function vistaHtml(vista, conGoogle) {
   const google = conGoogle && vista !== "recuperar" ? GOOGLE_BLOQUE : "";
   const alerta = '<p class="auth-alerta" id="auth-alerta" role="alert"></p>';
 
   if (vista === "recuperar") {
     return `
-      <h1 class="auth-titulo" id="auth-titulo" tabindex="-1">Recupera tu <em>contraseña</em></h1>
-      <p class="auth-sub">Te enviaremos un enlace para crear una nueva.</p>
       ${alerta}
       <form class="auth-form" id="auth-form" novalidate>
-        ${campoHtml({ id: "rec-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", icono: ICONO_MAIL, extra: ATRIBUTOS_CORREO })}
+        ${campoHtml({ id: "rec-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", extra: ATRIBUTOS_CORREO })}
         <button class="btn-primario" type="submit"><span id="auth-enviar-texto">${TEXTOS.recuperar.enviar}</span></button>
       </form>`;
   }
 
   if (vista === "register") {
+    const hint = `<span class="campo-extra" id="reg-pass-hint">Mín. ${MIN_CONTRASENA} caracteres</span>`;
     return `
-      <h1 class="auth-titulo" id="auth-titulo" tabindex="-1">Crea tu <em>cuenta</em></h1>
-      <p class="auth-sub">Un perfil para todos tus tracks.</p>
       ${alerta}
       <form class="auth-form" id="auth-form" novalidate>
-        ${campoHtml({ id: "reg-nombre", campo: "nombre", etiqueta: "Nombre", tipo: "text", autocompletar: "name", icono: ICONO_USER, extra: 'placeholder="Cómo quieres que te salude" autocapitalize="words"' })}
-        ${campoHtml({ id: "reg-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", icono: ICONO_MAIL, extra: ATRIBUTOS_CORREO })}
-        ${campoHtml({ id: "reg-pass", campo: "contrasena", etiqueta: "Contraseña", tipo: "password", autocompletar: "new-password", icono: ICONO_LOCK, ojo: true })}
-        ${campoHtml({ id: "reg-pass2", campo: "contrasena2", etiqueta: "Confirmar contraseña", tipo: "password", autocompletar: "new-password", icono: ICONO_LOCK, ojo: true })}
+        ${campoHtml({ id: "reg-nombre", campo: "nombre", etiqueta: "Nombre completo", tipo: "text", autocompletar: "name", extra: 'placeholder="ej. Ada Lovelace" autocapitalize="words"' })}
+        ${campoHtml({ id: "reg-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", extra: ATRIBUTOS_CORREO })}
+        ${campoHtml({ id: "reg-pass", campo: "contrasena", etiqueta: "Contraseña", tipo: "password", autocompletar: "new-password", ojo: true, labelExtra: hint, hintId: "reg-pass-hint" })}
+        ${campoHtml({ id: "reg-pass2", campo: "contrasena2", etiqueta: "Confirmar contraseña", tipo: "password", autocompletar: "new-password", ojo: true })}
         <button class="btn-primario" type="submit"><span id="auth-enviar-texto">${TEXTOS.register.enviar}</span></button>
         ${google}
       </form>`;
   }
 
   return `
-    <h1 class="auth-titulo" id="auth-titulo" tabindex="-1">Bienvenido <em>de vuelta</em></h1>
-    <p class="auth-sub">Sigue donde lo dejaste.</p>
     ${alerta}
     <form class="auth-form" id="auth-form" novalidate>
-      ${campoHtml({ id: "login-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", icono: ICONO_MAIL, extra: ATRIBUTOS_CORREO })}
-      ${campoHtml({ id: "login-pass", campo: "contrasena", etiqueta: "Contraseña", tipo: "password", autocompletar: "current-password", icono: ICONO_LOCK, ojo: true, cabeceraExtra: '<button type="button" class="link" data-ir="recuperar">¿Olvidaste tu contraseña?</button>' })}
+      ${campoHtml({ id: "login-email", campo: "correo", etiqueta: "Correo", tipo: "email", autocompletar: "email", extra: ATRIBUTOS_CORREO })}
+      ${campoHtml({ id: "login-pass", campo: "contrasena", etiqueta: "Contraseña", tipo: "password", autocompletar: "current-password", ojo: true, labelExtra: '<button type="button" class="link campo-extra" data-ir="recuperar">¿Olvidaste tu contraseña?</button>' })}
       <button class="btn-primario" type="submit"><span id="auth-enviar-texto">${TEXTOS.login.enviar}</span></button>
       ${google}
     </form>`;
@@ -158,15 +182,21 @@ const PIES = {
   recuperar: '<button type="button" class="link" data-ir="login">Volver a iniciar sesión</button>'
 };
 
-// Una sola tarjeta: cabecera, formulario y los enlaces de cambio de pantalla, todo adentro.
+// Un solo marco: emblema, cabecera, formulario y enlaces; cambia solo el contenido de la vista.
 function plantilla(vista, conGoogle, conInvitado) {
   return `
     <div class="auth-caja">
-      <div class="auth-card">
-        ${CABECERA}
-        ${vistaHtml(vista, conGoogle)}
-        <p class="auth-pie">${PIES[vista]}</p>
-        ${conInvitado ? '<p class="auth-pie auth-invitado"><button type="button" class="link" data-invitado>Continuar sin cuenta</button></p>' : ""}
+      <div class="auth-ribbon-wrap">
+        <div class="auth-ribbon-back" aria-hidden="true"></div>
+        <div class="auth-ribbon">
+          <div class="auth-ribbon-body">
+            ${LOGO_BLOQUE}
+            ${cabeceraHtml(vista)}
+            ${vistaHtml(vista, conGoogle)}
+            <p class="auth-pie">${PIES[vista]}</p>
+            ${conInvitado ? '<p class="auth-pie auth-invitado"><button type="button" class="link" data-invitado>Continuar sin cuenta</button></p>' : ""}
+          </div>
+        </div>
       </div>
     </div>`;
 }
@@ -263,11 +293,17 @@ export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogl
     renderizando = true;
     raiz().innerHTML = `
       <div class="auth-caja">
-        <div class="auth-card">
-          ${CABECERA}
-          <h1 class="auth-titulo" id="auth-titulo" tabindex="-1">Revisa tu <em>correo</em></h1>
-          <p class="auth-sub">Si existe una cuenta con <strong>${escapar(correo)}</strong>, te enviamos un enlace para restablecer tu contraseña. Puede tardar un par de minutos.</p>
-          <button type="button" class="btn-primario" data-ir="login">Volver a iniciar sesión</button>
+        <div class="auth-ribbon-wrap">
+          <div class="auth-ribbon-back" aria-hidden="true"></div>
+          <div class="auth-ribbon">
+            <div class="auth-ribbon-body">
+              ${LOGO_BLOQUE}
+              ${cabeceraHtml("enviado", `Si existe una cuenta con <strong>${escapar(correo)}</strong>, te enviamos un enlace para restablecer tu contraseña. Puede tardar un par de minutos.`)}
+              <div class="auth-accion">
+                <button type="button" class="btn-primario" data-ir="login">Volver a iniciar sesión</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>`;
     renderizando = false;

@@ -1,13 +1,49 @@
-/* Pantalla de cuenta: acceso embebido (login, registro, recuperar) y aviso de sesión.
-   Adaptado del prototipo del usuario: estilos scopeados a #auth-root para no pisar clases
-   del resto de la app; los tokens viven en tokens.css. */
+/* Pantalla de cuenta: acceso full-bleed (login, registro y recuperar) y aviso de sesión.
+   El acceso anónimo vive en #screen-cuenta.acceso-libre; los estilos quedan scopeados a
+   #auth-root para no pisar el resto de la app. */
 [hidden] { display: none !important; }
 
-/* ===== Caja y card ===== */
+/* ===== Pantalla de acceso full-bleed ===== */
+#screen-cuenta.acceso-libre {
+  position: relative;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* El título "Cuenta" solo tiene sentido cuando hay sesión. */
+#screen-cuenta.acceso-libre .cuenta-head { display: none; }
+
+/* Glow ambiental detrás del ribbon, como en el prototipo. */
+#screen-cuenta.acceso-libre::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, rgba(155, 184, 201, 0.16) 0%, rgba(26, 28, 34, 0) 65%);
+}
+
+#screen-cuenta.acceso-libre #cuenta-anon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(78vh, 48rem);
+  padding: 1.5rem 1rem;
+}
+
+/* ===== Caja, ribbon y contenido ===== */
 #auth-root .auth-caja {
+  --auth-ribbon-r: 32px;
+  --auth-ribbon-v: 52px;
+  --auth-ribbon-offset: 22px;
   position: relative;
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   margin-inline: auto;
   animation: entrar var(--mov-base) var(--mov-ease);
 }
@@ -16,51 +52,144 @@
   from { opacity: 0; transform: translateY(10px); }
 }
 
-#auth-root .auth-card {
-  background: linear-gradient(180deg, var(--study-surface), var(--study-surface-2));
-  border: 1px solid var(--study-border);
+#auth-root .auth-ribbon-wrap {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+}
+
+/* Segunda capa del ribbon: mismo contorno, desplazada hacia abajo. */
+#auth-root .auth-ribbon-back {
+  position: absolute;
+  top: var(--auth-ribbon-offset);
+  right: 0;
+  bottom: calc(-1 * var(--auth-ribbon-offset));
+  left: 0;
+  z-index: 0;
+  background: rgba(43, 47, 56, 0.45);
+  clip-path: polygon(
+    0 var(--auth-ribbon-r),
+    8px 12px,
+    20px 4px,
+    var(--auth-ribbon-r) 0,
+    calc(100% - var(--auth-ribbon-r)) 0,
+    calc(100% - 20px) 4px,
+    calc(100% - 8px) 12px,
+    100% var(--auth-ribbon-r),
+    100% calc(100% - var(--auth-ribbon-v)),
+    50% 100%,
+    0 calc(100% - var(--auth-ribbon-v))
+  );
+  filter: drop-shadow(0 0 1px rgba(155, 184, 201, 0.22));
+}
+
+/* Vidrio ahumado: el borde se dibuja con drop-shadow porque clip-path recorta el border. */
+#auth-root .auth-ribbon {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(43, 47, 56, 0.86) 0%, rgba(34, 37, 45, 0.62) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  clip-path: polygon(
+    0 var(--auth-ribbon-r),
+    8px 12px,
+    20px 4px,
+    var(--auth-ribbon-r) 0,
+    calc(100% - var(--auth-ribbon-r)) 0,
+    calc(100% - 20px) 4px,
+    calc(100% - 8px) 12px,
+    100% var(--auth-ribbon-r),
+    100% calc(100% - var(--auth-ribbon-v)),
+    50% 100%,
+    0 calc(100% - var(--auth-ribbon-v))
+  );
+  filter: drop-shadow(0 0 1px rgba(155, 184, 201, 0.45)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.45)) drop-shadow(0 0 35px rgba(155, 184, 201, 0.14));
+}
+
+#auth-root .auth-ribbon::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 32px;
+  right: 32px;
+  height: 1px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(231, 229, 222, 0.15), transparent);
+}
+
+#auth-root .auth-ribbon-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 32px 64px;
+}
+
+/* Fallback para navegadores sin blur: superficie sólida, misma silueta. */
+@supports not (backdrop-filter: blur(1px)) {
+  #auth-root .auth-ribbon { background: var(--study-surface-2); }
+}
+
+/* ===== Emblema (el del registro) ===== */
+#auth-root .auth-logo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  flex: none;
+  margin-bottom: 24px;
+  padding: 12px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--study-surface-3) 60%, transparent);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+#auth-root .auth-logo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(155, 184, 201, 0.20), transparent);
+}
+
+#auth-root .auth-logo svg {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 64px;
+  height: 64px;
   border-radius: 16px;
-  box-shadow: var(--study-shadow);
-  padding: 28px;
 }
 
 /* ===== Cabecera ===== */
 #auth-root .auth-head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  width: 100%;
+  margin-bottom: 28px;
 }
 
-#auth-root .head-tile {
-  width: 42px;
-  height: 42px;
-  flex: none;
-  border-radius: 11px;
-  background: var(--study-surface-3);
-  border: 1px solid var(--study-border);
+#auth-root .auth-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--study-accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-#auth-root .head-texto { display: flex; flex-direction: column; gap: 1px; }
-
-#auth-root .head-nombre {
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  text-transform: lowercase;
-}
-
-/* ===== Títulos ===== */
 #auth-root .auth-titulo {
+  margin: 0;
   font-family: var(--fuente-display);
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 1.875rem;
+  font-weight: 600;
   line-height: 1.2;
-  margin: 0 0 4px;
+  letter-spacing: -0.01em;
+  color: var(--study-text);
 }
 
 #auth-root .auth-titulo:focus { outline: none; }
@@ -68,110 +197,147 @@
 #auth-root .auth-titulo em {
   color: var(--study-accent);
   font-style: italic;
+  font-weight: 400;
 }
 
 #auth-root .auth-sub {
+  max-width: 320px;
+  margin: 8px auto 0;
   color: var(--study-muted);
-  font-size: 0.87rem;
-  margin: 0 0 20px;
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
 /* ===== Aviso general (errores sin campo) ===== */
 #auth-root .auth-alerta {
-  margin: 0 0 14px;
-  padding: 0.6rem 0.75rem;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 0 16px;
+  padding: 0.65rem 0.75rem;
   border: 1px solid color-mix(in srgb, var(--study-error) 45%, transparent);
   border-radius: 10px;
   background: color-mix(in srgb, var(--study-error) 12%, transparent);
+  color: var(--study-error);
   font-size: 0.85rem;
   line-height: 1.45;
-  color: var(--study-error);
+  text-align: left;
 }
 
 #auth-root .auth-alerta:empty { display: none; }
 
-/* ===== Campos ===== */
-#auth-root .auth-form { display: flex; flex-direction: column; gap: 15px; }
+/* ===== Formulario y campos ===== */
+#auth-root .auth-form {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
 
-#auth-root .campo { display: flex; flex-direction: column; gap: 6px; }
+#auth-root .campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
 #auth-root .campo-label-row {
   display: flex;
-  justify-content: space-between;
   align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 #auth-root .campo-label {
-  font-size: 0.813rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--study-muted);
+}
+
+#auth-root .campo-extra {
+  color: var(--study-muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+#auth-root .campo-extra.link {
+  font-size: 0.72rem;
+  font-weight: 500;
 }
 
 #auth-root .campo-input-wrap { position: relative; }
 
-#auth-root .campo-ico {
-  position: absolute;
-  left: 13px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--study-muted);
-  pointer-events: none;
-  transition: color var(--mov-rapida) var(--mov-ease);
-}
-
 #auth-root .campo-input {
   width: 100%;
-  background: var(--study-bg);
-  border: 1px solid var(--study-border);
+  min-height: 48px;
+  padding: 12px 16px;
+  background: rgba(26, 28, 34, 0.4);
+  border: 1px solid rgba(155, 184, 201, 0.55);
   border-radius: 10px;
   color: var(--study-text);
   font: inherit;
-  /* 16px: evita el zoom automático de iOS al enfocar */
+  /* 16px: evita el zoom automático de iOS al enfocar. */
   font-size: 1rem;
-  padding: 11px 44px 11px 40px;
-  transition: border-color var(--mov-rapida) var(--mov-ease), box-shadow var(--mov-rapida) var(--mov-ease);
+  transition: border-color var(--mov-rapida) var(--mov-ease), box-shadow var(--mov-rapida) var(--mov-ease), background var(--mov-rapida) var(--mov-ease);
 }
 
-#auth-root .campo-input::placeholder { color: var(--study-muted); opacity: 0.5; }
+#auth-root .campo-input--ojo { padding-right: 48px; }
+
+#auth-root .campo-input::placeholder {
+  color: var(--study-muted);
+  opacity: 0.65;
+}
+
+#auth-root .campo-input:hover { border-color: rgba(155, 184, 201, 0.75); }
 
 #auth-root .campo-input:focus {
   outline: none;
   border-color: var(--study-accent);
-  box-shadow: 0 0 0 3px rgba(155, 184, 201, 0.13);
+  box-shadow: 0 0 0 3px rgba(155, 184, 201, 0.16);
 }
 
-#auth-root .campo-input-wrap:focus-within .campo-ico { color: var(--study-accent); }
-
 #auth-root .campo-input[aria-invalid="true"] { border-color: var(--study-error); }
-#auth-root .campo-input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(217, 154, 139, 0.13); }
+
+#auth-root .campo-input[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgba(217, 154, 139, 0.14);
+}
 
 #auth-root .campo-ojo {
   position: absolute;
-  right: 7px;
   top: 50%;
+  right: 4px;
+  width: 44px;
+  height: 44px;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 8px;
   background: transparent;
   color: var(--study-muted);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background var(--mov-rapida) var(--mov-ease), color var(--mov-rapida) var(--mov-ease);
 }
 
-#auth-root .campo-ojo:hover { background: var(--study-surface-3); color: var(--study-text); }
+#auth-root .campo-ojo:hover {
+  background: var(--study-surface-3);
+  color: var(--study-text);
+}
 
 #auth-root .campo-ojo:focus-visible {
   outline: 2px solid var(--study-accent);
   outline-offset: -2px;
 }
 
-/* Cruce de los dos iconos del ojo: aria-pressed es el único estado (a11y) y también
-   conmuta la animación, así que el JS no toca iconos. */
+#auth-root .campo-ojo svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Cruce de los dos iconos del ojo: aria-pressed es el único estado y también anima. */
 #auth-root .campo-ojo span {
   display: inline-flex;
   transition: opacity var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
@@ -190,11 +356,13 @@
 #auth-root .campo-ojo[aria-pressed="true"] .ojo-off { opacity: 1; transform: scale(1); }
 
 #auth-root .campo-error {
-  font-size: 0.78rem;
-  color: var(--study-error);
-  border-left: 2px solid var(--study-error);
-  padding-left: 8px;
   margin: 0;
+  padding-left: 8px;
+  border-left: 2px solid var(--study-error);
+  color: var(--study-error);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  text-align: left;
 }
 
 #auth-root .campo-error:empty { display: none; }
@@ -202,21 +370,27 @@
 /* ===== Botones ===== */
 #auth-root .btn-primario {
   width: 100%;
-  border: 0;
+  min-height: 48px;
+  margin-top: 4px;
+  padding: 12px 16px;
+  border: 1px solid var(--study-accent);
   border-radius: 10px;
-  background: var(--study-accent-strong);
-  color: var(--study-bg);
+  background: transparent;
+  color: var(--study-text);
   font: inherit;
   font-size: 0.95rem;
   font-weight: 700;
-  padding: 12px 16px;
   cursor: pointer;
-  margin-top: 4px;
-  transition: filter var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
+  box-shadow: 0 0 16px rgba(155, 184, 201, 0.22);
+  transition: background var(--mov-rapida) var(--mov-ease), box-shadow var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
 }
 
-#auth-root .btn-primario:hover { filter: brightness(1.09); }
-#auth-root .btn-primario:active { filter: brightness(0.94); transform: translateY(1px); }
+#auth-root .btn-primario:hover {
+  background: rgba(155, 184, 201, 0.10);
+  box-shadow: 0 0 22px rgba(155, 184, 201, 0.32);
+}
+
+#auth-root .btn-primario:active { transform: translateY(1px) scale(0.99); }
 
 #auth-root .btn-primario[aria-disabled="true"],
 #auth-root .btn-sec[aria-disabled="true"] {
@@ -226,24 +400,27 @@
 
 #auth-root .btn-sec {
   width: 100%;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  margin-top: 8px;
-  padding: 11px 16px;
-  background: var(--study-surface-3);
-  border: 1px solid var(--study-border);
+  gap: 0.6rem;
+  padding: 12px 16px;
+  border: 1px solid rgba(155, 184, 201, 0.28);
   border-radius: 10px;
+  background: transparent;
   color: var(--study-text);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background var(--mov-rapida) var(--mov-ease), filter var(--mov-rapida) var(--mov-ease);
+  transition: background var(--mov-rapida) var(--mov-ease), border-color var(--mov-rapida) var(--mov-ease);
 }
 
-#auth-root .btn-sec:hover { background: var(--study-surface-2); filter: brightness(1.05); }
+#auth-root .btn-sec:hover {
+  background: rgba(155, 184, 201, 0.06);
+  border-color: rgba(155, 184, 201, 0.45);
+}
 
 #auth-root .btn-sec:focus-visible,
 #auth-root .btn-primario:focus-visible {
@@ -251,10 +428,52 @@
   outline-offset: 2px;
 }
 
+/* ===== Divisor y pie ===== */
+#auth-root .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 2px 0 0;
+  color: var(--study-muted);
+  font-size: 0.75rem;
+}
+
+#auth-root .auth-divider::before,
+#auth-root .auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--study-border);
+}
+
+#auth-root .auth-accion {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+#auth-root .auth-pie {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 18px 0 0;
+  color: var(--study-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+#auth-root .auth-invitado { margin-top: 10px; }
+
 #auth-root .link {
-  background: none;
-  border: 0;
   padding: 0;
+  border: 0;
+  background: none;
   color: var(--study-accent);
   font: inherit;
   font-size: 0.85rem;
@@ -270,41 +489,45 @@
   border-radius: 4px;
 }
 
-/* ===== Divisor "o" entre el botón principal y Google ===== */
-#auth-root .auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 20px 0 12px;
-  color: var(--study-muted);
-  font-size: 0.75rem;
-}
-
-#auth-root .auth-divider::before,
-#auth-root .auth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--study-border);
-}
-
-/* ===== Pies ===== */
-#auth-root .auth-pie {
-  font-size: 0.85rem;
-  color: var(--study-muted);
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin: 18px 0 0;
-}
-
-#auth-root .auth-invitado { margin-top: 10px; }
-
 #auth-root .auth-invitado .link { font-weight: 500; }
 
-/* Móvil unificado: coincide con el breakpoint sm de Tailwind (640px) */
+/* ===== Móvil ===== */
 @media (max-width: 639px) {
-  #auth-root .auth-card { padding: 24px 20px; }
+  #screen-cuenta.acceso-libre #cuenta-anon {
+    min-height: calc(100vh - 6rem);
+    padding: 1.25rem 0.75rem;
+  }
+
+  #auth-root .auth-caja {
+    --auth-ribbon-r: 28px;
+    --auth-ribbon-v: 46px;
+    --auth-ribbon-offset: 16px;
+    max-width: 380px;
+  }
+
+  #auth-root .auth-ribbon-body { padding: 32px 20px 56px; }
+
+  #auth-root .auth-logo {
+    width: 80px;
+    height: 80px;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+
+  #auth-root .auth-logo svg {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+
+  #auth-root .auth-titulo { font-size: 1.625rem; }
+  #auth-root .auth-sub { font-size: 0.8125rem; }
+
+  #auth-root .campo-input { min-height: 46px; }
+  #auth-root .btn-primario,
+  #auth-root .btn-sec { min-height: 46px; }
+
+  #auth-root .campo-extra { font-size: 0.6875rem; }
 }
 
 /* ===== Aviso de la pantalla de cuenta (#cuenta-aviso) y del Perfil (#perfil-aviso) ===== */
