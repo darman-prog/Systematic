@@ -6,7 +6,7 @@ import { icono } from "../iconos.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
 
-export function crearHome({ persistencia }) {
+export function crearHome({ persistencia, cargarRoadmap }) {
   const $ = id => document.getElementById(id);
 
   function renderMaterias() {
@@ -61,7 +61,7 @@ export function crearHome({ persistencia }) {
   // roadmap (chunk chico) y se cachea; no se descargan las preguntas hasta entrar al track.
   const roadmapCache = new Map();
   async function roadmapDe(l) {
-    if (!roadmapCache.has(l.id)) roadmapCache.set(l.id, await l.cargarRoadmap());
+    if (!roadmapCache.has(l.id)) roadmapCache.set(l.id, await cargarRoadmap(l));
     return roadmapCache.get(l.id);
   }
 

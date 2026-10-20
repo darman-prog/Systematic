@@ -3,7 +3,8 @@
 // metadata coincida con el contenido real: si diverge, el build se bloquea.
 import fs from "node:fs";
 import path from "node:path";
-import { MATERIAS, LENGUAJES, cargarContenido } from "../src/core/index.js";
+import { MATERIAS, LENGUAJES } from "../src/core/index.js";
+import { cargarContenido } from "../src/student/contenido.js";
 import { validarTodo, validarRoadmap } from "./validador.mjs";
 
 const baseDir = process.cwd();

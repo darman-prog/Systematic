@@ -1,25 +1,6 @@
 ﻿// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
-// Solo guarda metadatos y conteos: el contenido pesado (preguntas, glosario, apuntes,
-// escenarios, casos) se carga bajo demanda desde src/datos/{materias,lenguajes}/<id>/index.js (spec 012).
-// Así el bundle inicial no embebe las ~337 KB de datos y cada track llega en su propio chunk.
-import { topicColors as bd2TopicColors, sqlKeywords as bd2SqlKeywords } from "../../datos/materias/bd2/presentacion.js";
-import { tsKeywords } from "../../datos/lenguajes/ts/presentacion.js";
-import { javaKeywords } from "../../datos/lenguajes/java/presentacion.js";
-import { pythonKeywords } from "../../datos/lenguajes/python/presentacion.js";
-
-export async function cargarContenido(materia) {
-  const mod = await materia.cargar();
-  return {
-    preguntas: mod.preguntas ?? [],
-    glosario: mod.glosario ?? { categorias: [], terminos: [], tips: [] },
-    apuntes: mod.apuntes ?? [],
-    escenarios: mod.escenarios ?? [],
-    casos: mod.casos ?? [],
-    // Solo los tracks de lenguaje declaran roadmap (spec 011).
-    roadmap: mod.roadmap ?? null,
-  };
-}
-
+// Solo guarda metadatos y conteos; la carga del contenido y la presentación vive en
+// src/student/contenido.js. El dominio no conoce rutas de src/datos/ (ADR 011).
 // tipo: clasifica el track para la UI y el mezclado (spec 011/012).
 export const MATERIAS = [
   {
@@ -30,10 +11,7 @@ export const MATERIAS = [
     color: "#9FC5DA",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 90, terminos: 42, apuntes: 0, escenarios: 1, casos: 2 },
-    topicColors: bd2TopicColors,
-    sqlKeywords: bd2SqlKeywords,
-    cargar: () => import("../../datos/materias/bd2/index.js"),
+    conteo: { preguntas: 90, terminos: 42, apuntes: 0, escenarios: 1, casos: 2 }
   },
   {
     id: "isw",
@@ -43,8 +21,7 @@ export const MATERIAS = [
     color: "#A094BA",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 },
-    cargar: () => import("../../datos/materias/isw/index.js"),
+    conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 }
   },
   {
     id: "asw",
@@ -54,8 +31,7 @@ export const MATERIAS = [
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 85, terminos: 27, apuntes: 8, escenarios: 1, casos: 2 },
-    cargar: () => import("../../datos/materias/asw/index.js"),
+    conteo: { preguntas: 85, terminos: 27, apuntes: 8, escenarios: 1, casos: 2 }
   },
   {
     id: "infra",
@@ -65,8 +41,7 @@ export const MATERIAS = [
     color: "#7FC8B0",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 124, terminos: 45, apuntes: 6, escenarios: 5, casos: 0 },
-    cargar: () => import("../../datos/materias/infra/index.js"),
+    conteo: { preguntas: 124, terminos: 45, apuntes: 6, escenarios: 5, casos: 0 }
   }
 ];
 
@@ -86,11 +61,7 @@ export const LENGUAJES = [
     descripcion: "Leé y verificá código generado por IA: trazar, detectar y auditar.",
     color: "#6FA8DC",
     accentText: "#101418",
-    conteo: { preguntas: 100, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
-    sqlKeywords: tsKeywords,
-    cargar: () => import("../../datos/lenguajes/ts/index.js"),
-    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
-    cargarRoadmap: () => import("../../datos/lenguajes/ts/roadmap.js").then(m => m.default),
+    conteo: { preguntas: 100, terminos: 16, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 }
   },
   {
     id: "lenguaje-java",
@@ -100,11 +71,7 @@ export const LENGUAJES = [
     descripcion: "Leé y auditá código Java generado por IA: POO, colecciones y concurrencia.",
     color: "#745e3b",
     accentText: "#101418",
-    conteo: { preguntas: 100, terminos: 20, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
-    sqlKeywords: javaKeywords,
-    cargar: () => import("../../datos/lenguajes/java/index.js"),
-    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
-    cargarRoadmap: () => import("../../datos/lenguajes/java/roadmap.js").then(m => m.default),
+    conteo: { preguntas: 100, terminos: 20, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 }
   },
   {
     id: "lenguaje-python",
@@ -114,11 +81,7 @@ export const LENGUAJES = [
     descripcion: "Leé y auditá código Python generado por IA: sintaxis, estructuras y asincronía.",
     color: "#ffde57",
     accentText: "#101418",
-    conteo: { preguntas: 100, terminos: 23, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 },
-    sqlKeywords: pythonKeywords,
-    cargar: () => import("../../datos/lenguajes/python/index.js"),
-    // Solo el roadmap (chunk chico) para calcular la barra del home sin cargar las preguntas.
-    cargarRoadmap: () => import("../../datos/lenguajes/python/roadmap.js").then(m => m.default),
+    conteo: { preguntas: 100, terminos: 23, apuntes: 0, escenarios: 0, casos: 0, etapas: 5 }
   }
 ];
 
@@ -136,16 +99,3 @@ export function acentoDe(materia) {
   };
 }
 
-// Asíncrona: el contenido ya no vive en MATERIAS (spec 012).
-export async function getRegistroParaMezclador() {
-  const registros = [];
-  for (const materia of MATERIAS) {
-    const contenido = await cargarContenido(materia);
-    registros.push({
-      id: materia.id,
-      nombre: materia.nombre,
-      preguntas: contenido.preguntas.map(p => ({ ...p, materiaId: materia.id }))
-    });
-  }
-  return registros;
-}

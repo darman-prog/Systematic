@@ -2,7 +2,8 @@
 // Solo guarda estado y reglas del track; la presentación (acento, portada, navegación) la hace
 // quien llama, y el progreso/XP siguen en la capa student/app. Dependencias inyectadas
 // (persistencia para competencia, helpers puros del filtrado) para testear sin DOM.
-import { getMateria, getLenguaje, cargarContenido } from "../core/index.js";
+import { getMateria, getLenguaje } from "../core/index.js";
+import { cargarContenido } from "./contenido.js";
 
 export function crearTrack({ persistencia, TIPOS, esDebil, obtenerP, filtrarDiagramas, diagramasDisponibles }) {
   let materia = null;

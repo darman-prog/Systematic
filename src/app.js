@@ -1,4 +1,4 @@
-﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, cargarContenido, acentoDe, fechaSnapshot } from "./core/index.js";
+﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, acentoDe, fechaSnapshot } from "./core/index.js";
 import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
@@ -29,6 +29,7 @@ import { crearLenguaje } from "./orquestacion/lenguaje.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
+import { cargarRoadmap } from "./student/contenido.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
@@ -93,7 +94,7 @@ const gamificacion = crearGamificacion({
 });
 
 // Renderers del home (materias y lenguajes) extraídos a ui/dashboard (ADR 007).
-const home = crearHome({ persistencia });
+const home = crearHome({ persistencia, cargarRoadmap });
 
 // Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
 const track = crearTrack({
