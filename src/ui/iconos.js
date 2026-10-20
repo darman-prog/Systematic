@@ -108,3 +108,10 @@ export function obtenerAlias(nombre) {
 }
 
 export const NOMBRES_ICONO = Object.keys(TRAZOS);
+
+// Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono().
+export function hidratarIconos(raiz) {
+  (raiz || document).querySelectorAll("[data-icono]").forEach(el => {
+    el.outerHTML = icono(el.dataset.icono, el.getAttribute("class") || "");
+  });
+}

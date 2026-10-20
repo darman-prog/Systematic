@@ -1,4 +1,4 @@
-﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, fechaSnapshot } from "./core/index.js";
+﻿import { MATERIAS, LENGUAJES, fechaSnapshot } from "./core/index.js";
 import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
@@ -6,20 +6,23 @@ import { esDebil } from "./core/index.js";
 import { ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
-import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
+import { TIPOS, TIPO_LABELS, DIF_LABELS, animar, saludoSegunHora } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
 import { crearResultadosUI } from "./ui/aprendizaje/resultados.js";
 import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
 
-import { icono } from "./ui/iconos.js";
+import { icono, hidratarIconos } from "./ui/iconos.js";
+import { diagramasDisponibles } from "./ui/entorno.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
 import { crearRouter } from "./orquestacion/router.js";
-import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones.js";
+import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones/index.js";
+import { instalarAtajos } from "./orquestacion/atajos.js";
 import { crearConfigController } from "./orquestacion/config-controller.js";
 import { crearRonda } from "./orquestacion/ronda.js";
+import { crearRespuesta } from "./orquestacion/quiz.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearMisiones } from "./orquestacion/misiones.js";
 import { crearEscenarios } from "./orquestacion/escenarios.js";
@@ -27,6 +30,7 @@ import { crearCasos } from "./orquestacion/casos.js";
 import { crearLenguaje } from "./orquestacion/lenguaje.js";
 import { crearDashboard } from "./orquestacion/dashboard.js";
 import { crearAcceso } from "./orquestacion/acceso.js";
+import { crearContexto } from "./orquestacion/contexto.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -43,18 +47,8 @@ import { aplicarSnapshot } from "./student/aplicar.js";
 import { crearCuentaUI } from "./ui/cuenta.js";
 import { crearPerfil } from "./ui/cuenta/perfil.js";
 
-// Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono() directamente.
-function pintarIconos(raiz) {
-  (raiz || document).querySelectorAll("[data-icono]").forEach(el => {
-    el.outerHTML = icono(el.dataset.icono, el.getAttribute("class") || "");
-  });
-}
-pintarIconos();
-
-
-// El constructor de diagramas (lienzo) se ofrece solo en escritorio: en dispositivos
-// táctiles las preguntas de diagrama se excluyen de todas las rutas de sesión.
-const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").matches;
+// Hidrata los iconos estáticos del shell (spec 005); los renders dinámicos usan icono().
+hidratarIconos();
 
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
@@ -116,14 +110,7 @@ const sesiones = crearSesiones({
   leerTextoDesarrollo: () => { const ta = $("dev-texto"); return ta ? ta.value : ""; }
 });
 
-// Estado explícito que se inyecta a los módulos de src/ui/ (lectura vía getters,
-// porque estas variables se reasignan al cambiar de materia o de sesión).
-const ctx = {
-  get session() { return sesiones.sesion; },
-  get banco() { return track.banco; },
-  get glosario() { return track.glosario; },
-  get materia() { return track.materia; }
-};
+const ctx = crearContexto({ sesiones, track });
 
 // Cuenta y nube (ADR 008): servicios con dependencias inyectadas; la UI de acceso vive en
 // ui/cuenta/autenticacion.js y el panel de sesión en ui/cuenta.js.
@@ -163,33 +150,22 @@ const ajustes = crearAjustes({
   irHome: () => dashboard.goHome(),
   refrescarLenguaje: () => lenguaje.pintar()
 });
-const { clearHistory, resetProgreso, exportarDatos, importarDatos } = ajustes;
+const { importarDatos } = ajustes;
 
 // Prioriza según el progreso del track activo (débiles → vencidas → nuevas).
 const priorizar = lista => ordenarPrioridad(lista, avance.obtenerP);
 
-// El avance (progreso, actividad, historial) vive en student/avance.js; el XP de la ronda,
-// la meta diaria y los logros los resuelve student/session.js.
-function registrarRespuesta(id, ok) {
-  avance.registrar(id, ok);
-  // El bonus de contrarreloj mide contra `sesion.preguntaInicio`; clearTimerPregunta solo
-  // apaga el intervalo, así que el dato sigue intacto para el servicio.
-  if (sesiones.sesion && sesiones.sesion.modo === "contrarreloj") clearTimerPregunta();
-  sesiones.responder(id, ok);
-  // La supervivencia pierde vidas dentro del servicio; el badge lo repinta la UI.
-  if (sesiones.sesion && sesiones.sesion.modo === "supervivencia") quiz.pintarVidas();
-}
+// Coordinador de respuesta: avance + sesión + efectos de UI (timer/vidas).
+const respuesta = crearRespuesta({
+  avance, sesiones,
+  alApagarTimer: () => clearTimerPregunta(),
+  alPerderVida: () => quiz.pintarVidas()
+});
 
 
 
 // ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
 // La tarjeta de perfil vive solo en screen-perfil (ui/cuenta/perfil.js).
-
-// Render de la config de práctica: vive en ui/dashboard/config.js (ADR 007).
-const leerOpciones = configCtl.leerOpciones;
-const preguntasFiltradas = configCtl.preguntasFiltradas;
-const toggleFiltro = configCtl.toggleFiltro;
-const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 
 // Resumen, "usar todas" e ir a config: viven en ui/dashboard/config.js (ADR 007).
 
@@ -202,31 +178,29 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
 const quiz = crearQuizUI({
-  ctx, obtenerP: avance.obtenerP, registrarRespuesta, toggleMarked: avance.toggleMarked
+  ctx, obtenerP: avance.obtenerP, registrarRespuesta: respuesta, toggleMarked: avance.toggleMarked
 });
 const resultados = crearResultadosUI({
-  ctx, registrarRespuesta,
+  ctx, registrarRespuesta: respuesta,
   contarDebiles: () => track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length
 });
 const estudio = crearEstudioUI({
   ctx, obtenerP: avance.obtenerP, toggleMarked: avance.toggleMarked, mostrarPantalla: show
 });
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
-const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla: show });
+const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta: respuesta, mostrarPantalla: show });
 
 // La orquestación de la ronda vive en su controlador (ADR 009); acá quedan los
 // nombres que usan las acciones y los renders vecinos.
 const ronda = crearRonda({
   $, track, sesiones, show, quiz, toast, confirm, goHome: () => dashboard.goHome(),
-  irLenguaje: () => lenguaje.ir(), rondas, preguntasFiltradas
+  irLenguaje: () => lenguaje.ir(), rondas, preguntasFiltradas: configCtl.preguntasFiltradas
 });
 const {
-  iniciarTimerPregunta, actualizarTimerPregunta, clearTimerPregunta,
-  startSession, mostrarQuiz, comenzarPractica, comenzarSimulacro,
+  clearTimerPregunta, startSession, comenzarPractica, comenzarSimulacro,
   startContrarreloj, startSupervivencia, practicarDebiles, practicarTipo,
   practicarArrastre, practicarCasos, practicarVencidas, next, salir,
-  iniciarTimer, actualizarTimer, clearTimer, alternarPausa,
-  finalizar, repetirFalladas, repetirMisma
+  clearTimer, alternarPausa, repetirFalladas, repetirMisma
 } = ronda;
 ronda.instalarTrampaPausa();
 // La trampa del diálogo vive en su componente; acá solo se instala.
@@ -264,42 +238,6 @@ const casos = crearCasos({
   $, track, persistencia, gamificacion, show
 });
 
-document.addEventListener("keydown", e => {
-  const s = sesiones.sesion;
-  if ($("screen-quiz").classList.contains("hidden") || !s) return;
-  const t = e.target;
-  if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
-  const item = s.items[s.idx];
-  const answered = !!s.answers[s.idx];
-  if (answered) {
-    if (e.key === "Enter") next();
-    return;
-  }
-  if (item.tipo === "multi") {
-    const n = parseInt(e.key, 10);
-    if (n >= 1 && n <= item.options.length) quiz.toggleMulti(n - 1);
-    return;
-  }
-  if (!["multiple", "vf", "codigo"].includes(item.tipo)) return;
-  if (item.tipo === "vf") {
-    const k = e.key.toLowerCase();
-    if (k === "v" || k === "f") {
-      const j = item.options.findIndex(o => (/^verdad/i.test(o) ? "v" : "f") === k);
-      if (j >= 0) quiz.responderOpcion(j);
-      return;
-    }
-  }
-  const n = parseInt(e.key, 10);
-  if (n >= 1 && n <= item.options.length) quiz.responderOpcion(n - 1);
-});
-
-document.addEventListener("visibilitychange", () => {
-  const s = sesiones.sesion;
-  if (document.hidden && s && s.modo === "simulacro" && !s.pausado && !s.finalizada) {
-    alternarPausa();
-  }
-});
-
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
 // namespace al arrancar, antes de que el usuario seleccione materia.
 persistencia.migrarLegacy("bd2");
@@ -316,37 +254,31 @@ if (!diagramasDisponibles()) {
 // restaura al recargar. El estado de cuenta vive en el Perfil.
 acceso.iniciar();
 
-// El mapa de acciones vive en su módulo (ADR 009), agrupado por feature; acá solo
-// se instancia con el alcance actual y se instala la delegación de click.
+// El mapa de acciones se compone por feature (ADR 009/010); acá solo se agrupan las
+// dependencias de cada controlador y se instala la delegación de click.
 const ACCIONES = crearAcciones({
-  $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil: acceso.datosPerfil,
-  config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
-  clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome: dashboard.goHome,
-  irMaterias: dashboard.irMaterias, irPerfil: acceso.irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
-  practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
-  repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
-  startContrarreloj, startSupervivencia, salir,
-  seleccionarMateria: dashboard.seleccionarMateria,
-  seleccionarLenguaje: dashboard.seleccionarLenguaje,
-  practicarLeccion: lenguaje.practicarLeccion, rendirExamen: lenguaje.rendirExamen,
-  irLenguaje: lenguaje.ir,
-  startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
-  decidirEscenario: escenarios.decidir, continuarEscenario: escenarios.continuar,
-  startCasos: casos.start, jugarCaso: casos.jugar, comprobarCaso: casos.comprobar,
-  diagramasUI: casos.diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth: acceso.auth,
-  // El caché se reasigna al iniciar: se limpia por callback para no capturar el viejo.
-  limpiarCachePerfil: () => acceso.limpiarCachePerfil(),
-  nube, fechaSnapshot, aplicarSnapshot
+  acceso: {
+    $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI,
+    datosPerfil: acceso.datosPerfil, irPerfil: acceso.irPerfil,
+    cuenta, cuentaUI, auth: acceso.auth, nube, fechaSnapshot, aplicarSnapshot,
+    limpiarCachePerfil: () => acceso.limpiarCachePerfil(),
+    irMaterias: dashboard.irMaterias
+  },
+  practica: {
+    config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
+    flashcards, sesiones, clearTimerPregunta, next, salir,
+    comenzarPractica, comenzarSimulacro, startContrarreloj, startSupervivencia,
+    practicarArrastre, practicarCasos, practicarDebiles, practicarTipo, practicarVencidas,
+    repetirFalladas, repetirMisma,
+    toggleFiltro: configCtl.toggleFiltro, toggleFiltroTodos: configCtl.toggleFiltroTodos
+  },
+  juego: { misiones, escenarios, casos },
+  navegacion: { dashboard, lenguaje, ajustes }
 });
 instalarDelegacion(ACCIONES);
 
-// Listeners puntuales sobre elementos estáticos (eventos change/input, fuera del alcance
-// de la delegación de click).
-["cfg-priorizar", "cfg-solo-debiles", "cfg-solo-marcadas"].forEach(id =>
-  $(id).addEventListener("change", () => config.actualizarResumen())
-);
-$("import-file").addEventListener("change", e => importarDatos(e.target));
-$("study-search").addEventListener("input", e => estudio.renderStudy(e.target.value));
-$("apuntes-search").addEventListener("input", e => apuntesUI.renderApuntes(e.target.value));
-$("glosario-search").addEventListener("input", e => glosarioUI.renderGlosario(e.target.value));
+// Atajos globales: teclado del quiz, auto-pausa y búsquedas estáticas.
+instalarAtajos({
+  $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, importarDatos
+});
 
