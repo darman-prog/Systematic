@@ -43,7 +43,8 @@ pregunta nuevo obligue a tocar UI, dominio y validador.
 - **Riesgos**: diferencias sutiles en evaluación (normalización, textos repetidos), cálculo de
   stats sin tests previos y chunks de Vite al mover los `import()`.
 - **Deuda restante**: no hay contratos tipados ni lint de límites; el mezclador no cableado
-  queda fuera de alcance. Se registra en `docs/features/013-*.md`.
+  queda fuera de alcance. Se registra en
+  [docs/features/015-desacople-app-js-y-limites.md](../features/015-desacople-app-js-y-limites.md).
 
 ## Alternativas descartadas
 

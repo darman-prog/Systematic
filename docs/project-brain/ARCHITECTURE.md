@@ -1,8 +1,8 @@
 ---
 status: vigente
-last_reviewed: 2026-10-05
+last_reviewed: 2026-10-20
 confidence: confirmado
-source: código + ADR 001-008
+source: código + ADR 001-011
 ---
 
 # Arquitectura
@@ -12,40 +12,64 @@ agregar módulos, y al revisar un cambio que cruce capas.
 
 ## Capas actuales
 
-La Dependency Rule apunta hacia adentro: el dominio no conoce UI ni persistencia concreta.
+La Dependency Rule apunta hacia adentro: el dominio no conoce UI, persistencia concreta ni
+la ubicación del contenido.
 
 | Capa | Carpeta | Responsabilidad |
 |---|---|---|
-| Dominio | `src/core/` | Reglas puras, agrupadas por subdominio: `registro/materias.js` (registro de tracks), `estudio/` (progreso con `storage` inyectado, sesiones con `rng` inyectable, mezclador y questionSelector), `juego/` (gamificacion: XP/niveles/logros; escenarios: motor multi-paso), `lenguaje/competencia.js` (barra y gate de etapas, spec 011), `nube/snapshot.js` (snapshot serializable del estado para el respaldo, ADR 008) y `diagramas/diagramas.js` (estado del tablero, conexiones por subtipo, guardas, evaluación y rating). `index.js` re-exporta la API pública; los consumidores importan de ahí, no de las rutas internas (ADR 007) |
-| Aplicación | `src/student/` | Servicios del recorrido del estudiante con dependencias inyectadas: `persistencia.js` (claves `sys.*` centralizadas y CRUD con `storage`), `gamificacion.js` (XP, logros, racha y perfil; presentación por callbacks), `registros.js` (fusiones puras de mejor resultado), `firebase.js` (adaptador lazy de Auth/Firestore), `cuenta.js` (sesión), `nube.js` (subir/bajar respaldo) y `aplicar.js` (pisa el estado local al restaurar), todos ADR 008 |
-| Render | `src/ui/` | `aprendizaje/` con un módulo por pantalla de práctica (`quiz.js`, `resultados.js`, `estudio.js`, `glosario.js`, `flashcards.js`, `escenarios.js`, `apuntes.js`, `casos.js`, `lenguaje.js`), `dashboard/` con los datos del estudiante (`stats.js`, `misiones.js`) y `cuenta.js` + `cuenta/autenticacion.js` (acceso y sesión, ADR 008); `componentes/` con piezas compartidas (`estados.js`, `tarjetas.js`, `etiquetas.js`, `anillo.js`, `avisos.js`, `diagramas.js` como lienzo); en la raíz quedan los compartidos `helpers.js`/`iconos.js`. Reciben estado explícito y no leen estado global ni `localStorage` |
-| Composición | `src/app.js` | Estado de la app, navegación, persistencia por materia y mapa de acciones `ACCIONES` con un único listener delegado |
+| Dominio | `src/core/` | Reglas puras por subdominio: `registro/materias.js` (metadata de tracks, sin `import()` ni rutas de datos), `estudio/` (progreso con `storage` inyectado, sesiones con `rng` inyectable, `evaluacion.js` con la correctitud por tipo), `juego/` (gamificación, escenarios y `misiones.js` con el gate secuencial), `lenguaje/competencia.js`, `nube/snapshot.js` y `diagramas/diagramas.js`. `index.js` re-exporta la API pública (ADR 007) |
+| Aplicación | `src/student/` | Servicios con dependencias inyectadas: `persistencia.js` (claves `sys.*`), `avance.js` (progreso, actividad, meta e historial), `gamificacion.js`, `registros.js`, `track.js` (track activo y filtros), `session.js` (estado de la ronda), `rondas.js` (selección de preguntas por modo), `estadisticas.js` (cálculo del panel), `contenido.js` (único módulo que conoce `src/datos/` y los chunks), `exportacion.js` (serializar/validar import/export), `firebase.js`, `cuenta.js`, `nube.js` y `aplicar.js` (ADR 008) |
+| Orquestación | `src/orquestacion/` | Controladores y contratos de interacción: `router.js`, `contexto.js`, `acciones/` (mapas por feature + compositor con guard de duplicados), `ronda.js` (timers, pausa y DOM de la ronda), `quiz.js` (coordinador de respuesta), `ajustes.js`, `misiones.js`, `escenarios.js`, `casos.js`, `lenguaje.js`, `dashboard.js`, `acceso.js` (cuenta/onboarding/arranque) y `atajos.js` |
+| Render | `src/ui/` | `aprendizaje/` (una pantalla por flujo), `dashboard/` (`home.js`, `config.js`, `stats.js`, `misiones.js`, `portada.js`), `cuenta/` (acceso y perfil), `componentes/` (estados, tarjetas, etiquetas, anillo, avisos, confirmación, lienzo) y compartidos `helpers.js`/`iconos.js`/`entorno.js`. Reciben estado explícito; no leen `localStorage`, datos de materias ni estado global |
+| Composición | `src/app.js` | Composition root: instancia servicios y controladores, compone `ACCIONES`, instala atajos y arranca. No contiene reglas de negocio ni estado mutable de una feature |
 | Contenido | `src/datos/{materias,lenguajes}/<track>/` | Preguntas, glosario, apuntes, escenarios, casos, roadmap y presentación (colores/keywords) por track |
 
 `src/main.js` importa estilos y arranca `app.js`. `index.html` es el shell con las pantallas.
+`src/ui/componentes/diagramas.js` es un componente compartido: el quiz lo usa para el tipo
+`diagrama` y `orquestacion/casos.js` lo instancia para el modo de casos.
 
-`src/ui/componentes/diagramas.js` es un componente compartido: el quiz lo usa para el tipo de pregunta
-`diagrama` y el modo de casos lo instancia aparte con `obtenerItem`/`obtenerEstado`/`guardarEstado`,
-sin acoplarse a la sesión del quiz.
+## Flujo de una acción
+
+1. El HTML declara `data-action` y sus parámetros en `data-*`.
+2. `orquestacion/acciones/index.js` compone los mapas por feature y `instalarDelegacion` resuelve
+   el click.
+3. El controlador correspondiente actualiza el estado o llama al servicio de `student/`.
+4. Las reglas puras se ejecutan en `core/` (progreso, sesiones, evaluación, misiones, diagramas).
+5. La persistencia escribe en `localStorage` con claves `sys.*`.
+6. La UI se repinta con estado explícito; no hay framework ni DOM virtual.
+
+## Límites verificables
+
+- `core/` no importa `student/`, `ui/`, `orquestacion/` ni `src/datos/` en producción.
+- `student/` no importa `ui/`; `ui/` no importa `student/` ni `src/datos/` ni `localStorage`.
+- `orquestacion/` puede usar `student/`, `ui/` y `core/`.
+- `app.js` solo compone; `orquestacion/acciones/` falla ante claves duplicadas y un test verifica
+  que todo `data-action` estático de `index.html` exista.
+- Los formatos persistidos (`sys.*`, snapshot `nube-1`) y los textos de UI no cambiaron con el
+  refuerzo de capas.
 
 ## Decisiones estructurales
 
 - [ADR 001](../adr/001-arquitectura-capas.md): capas, dominio puro y dependencias hacia adentro.
-- [ADR 002](../adr/002-eliminacion-window-globales.md): eventos por `data-action` y mapa de acciones; sin globales en `window` ni `onclick` inline.
-- [ADR 003](../adr/003-contenido-desacoplado-de-ui.md): el contenido específico por materia vive en `src/datos/`, no en core ni UI.
-- [ADR 004](../adr/004-capa-servicios-student.md): servicios de aplicación en `src/student/` con dependencias inyectadas (persistencia, gamificación y registros).
-- [ADR 007](../adr/007-estructura-por-subdominios.md): organización por subdominios en `core/` (con barrel `index.js`), `datos/` (materias/lenguajes) y `ui/` (dashboard/aprendizaje).
-- [ADR 008](../adr/008-cuenta-y-sincronizacion-firestore.md): cuenta opcional (Firebase Auth) y respaldo del progreso en Firestore; `localStorage` sigue siendo la fuente de verdad y la app funciona sin claves configuradas.
+- [ADR 002](../adr/002-eliminacion-window-globales.md): `data-action` y mapa de acciones; sin
+  globales en `window` ni `onclick` inline.
+- [ADR 003](../adr/003-contenido-desacoplado-de-ui.md): el contenido vive en `src/datos/`.
+- [ADR 004](../adr/004-capa-servicios-student.md): servicios de aplicación con dependencias
+  inyectadas.
+- [ADR 007](../adr/007-estructura-por-subdominios.md): subdominios en `core/`, `datos/` y `ui/`.
+- [ADR 008](../adr/008-cuenta-y-sincronizacion-firestore.md): cuenta opcional y respaldo en
+  Firestore; la app funciona sin claves.
+- [ADR 009](../adr/009-desacople-app-js.md): primeras extracciones de `app.js`.
+- [ADR 010](../adr/010-app-js-composition-root.md): `app.js` como composition root y
+  controladores por feature.
+- [ADR 011](../adr/011-limites-capas-y-contenido.md): reglas de negocio en `core`/`student` y
+  carga de contenido fuera del dominio.
 
 ## Deuda conocida
 
-`src/app.js` sigue concentrando navegación, filtros de práctica, sesión/timers y el mapa
-`ACCIONES`, y supera las 1.000 líneas; el objetivo de la [spec 002](../specs/002-refactor-app-js.md)
-era quedar por debajo de ~400. El [ADR 004](../adr/004-capa-servicios-student.md) ya extrajo la
-capa `src/student/` con persistencia, gamificación y registros (con tests propios).
-
-## Pendiente: resto de la capa `student/` (supuesto)
-
-Falta mover materia/filtros, sesión con clock inyectable y dividir el mapa `ACCIONES` por
-pantalla (con un test que falle ante claves duplicadas), dejando `app.js` como composición root.
-Si el código no coincide con esto, el código gana: es un plan, no un hecho.
+- El mezclador (`core/estudio/mezclador.js` y `questionSelector.js`) sigue sin cablear y
+  conserva un adaptador `storeLocalStorage`; no participa del flujo de producción.
+- No hay contratos tipados ni lint de límites: los límites se sostienen por convención y tests.
+- No hay lint, typecheck ni CI; los gates son `npm run validar`, `npx vitest run`,
+  `npm run build` y `npm run e2e`.
+- Import/export conserva `alert`/`confirm` nativos por decisión de alcance.

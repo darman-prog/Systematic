@@ -3,6 +3,13 @@
 Historial legible de cambios relevantes de Systematic. El detalle por commit vive en
 `git log`; acá solo lo que cambia la experiencia o la arquitectura.
 
+## Sin publicar (rama `refactor/limites-capas`)
+
+- Refuerzo de límites y desacople de `app.js` ([ADR 010](docs/adr/010-app-js-composition-root.md),
+  [ADR 011](docs/adr/011-limites-capas-y-contenido.md)): evaluación, misiones, estadísticas,
+  selección de rondas y carga de contenido en `core`/`student`; controladores por feature;
+  acciones por feature con guard de duplicados; `app.js` de 899 a 284 líneas.
+
 ## Sin publicar (rama `feat/modernizacion-y-contenido`)
 
 - Desacople de `app.js` por extracción sin contenedor DI ([ADR 009](docs/adr/009-desacople-app-js.md)):

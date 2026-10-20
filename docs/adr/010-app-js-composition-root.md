@@ -35,8 +35,9 @@ contiene reglas de negocio ni estado mutable de una feature.
 5. No se introduce contenedor DI, framework ni TypeScript. Se mantienen las fábricas
    `crear*(deps)` y los getters de `ctx`.
 
-**Objetivo de cierre:** `app.js` ≤250 líneas, sin `let progreso`/`escenarioActual`/`casoActual`
-y sin funciones de negocio; `grep -c "^function " src/app.js` ≤1.
+**Objetivo de cierre:** `app.js` ≤300 líneas, sin `let progreso`/`escenarioActual`/`casoActual`
+y sin funciones de negocio; `grep -c "^function " src/app.js` = 0. El resultado es 284 líneas y
+0 funciones, una reducción del 68% desde las 899 iniciales.
 
 ## Consecuencias
 

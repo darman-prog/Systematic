@@ -6,3 +6,4 @@
 |---|---|---|---|
 | 013 | Rediseño unificado de acceso | cerrada | [013](013-rediseno-acceso.md) |
 | 014 | Registro sin scroll en portátiles | cerrada | [014](014-registro-sin-scroll.md) |
+| 015 | Desacople de app.js y límites de capas | cerrada | [015](015-desacople-app-js-y-limites.md) |
