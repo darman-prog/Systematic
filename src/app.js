@@ -1,15 +1,14 @@
-﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, acentoDe, fechaSnapshot } from "./core/index.js";
+﻿import { MATERIAS, LENGUAJES, getMateria, getLenguaje, fechaSnapshot } from "./core/index.js";
 import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
-import { esDebil, hoyISO } from "./core/index.js";
+import { esDebil } from "./core/index.js";
 import { ordenarPrioridad, prepararItem, filtrarDiagramas } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, escapar, animar, saludoSegunHora } from "./ui/helpers.js";
 import { crearQuizUI } from "./ui/aprendizaje/quiz.js";
 import { crearResultadosUI } from "./ui/aprendizaje/resultados.js";
-import { renderHistory as renderHistoryUI, renderStats as renderStatsUI } from "./ui/dashboard/stats.js";
 import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
@@ -26,6 +25,7 @@ import { crearMisiones } from "./orquestacion/misiones.js";
 import { crearEscenarios } from "./orquestacion/escenarios.js";
 import { crearCasos } from "./orquestacion/casos.js";
 import { crearLenguaje } from "./orquestacion/lenguaje.js";
+import { crearDashboard } from "./orquestacion/dashboard.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -60,6 +60,7 @@ const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").match
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
 let trackIdActual = null;
 let lenguaje = null;
+let dashboard = null;
 
 const $ = id => document.getElementById(id);
 
@@ -206,17 +207,15 @@ const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPanta
 // Export/import, borrar historial y reiniciar progreso (orquestacion/ajustes.js).
 const ajustes = crearAjustes({
   $, persistencia, track, avance, confirm,
-  renderStats, renderHistory, irHome: goHome, refrescarLenguaje: () => lenguaje.pintar()
+  renderStats: () => dashboard.renderStats(),
+  renderHistory: () => dashboard.renderHistory(),
+  irHome: () => dashboard.goHome(),
+  refrescarLenguaje: () => lenguaje.pintar()
 });
 const { clearHistory, resetProgreso, exportarDatos, importarDatos } = ajustes;
 
 // Prioriza según el progreso del track activo (débiles → vencidas → nuevas).
 const priorizar = lista => ordenarPrioridad(lista, avance.obtenerP);
-
-function cambiarMeta(valor) {
-  avance.cambiarMeta(valor);
-  renderStats();
-}
 
 // El avance (progreso, actividad, historial) vive en student/avance.js; el XP de la ronda,
 // la meta diaria y los logros los resuelve student/session.js.
@@ -248,49 +247,7 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 // Arranca una ronda: ver src/app/ronda.js (ADR 009).
 
 
-function renderTiposPanel() {
-  const panel = $("tipos-panel");
-  if (!panel) return;
-  const conteos = {};
-  track.banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
-  panel.innerHTML = TIPOS.filter(t => conteos[t] && (diagramasDisponibles() || t !== "diagrama")).map(t =>
-    '<button class="chip" data-action="practicarTipo" data-tipo="' + t + '">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
-  ).join("");
-}
-
 // La salida, el avance y los relojes de la ronda viven en src/app/ronda.js (ADR 009).
-
-// Wrappers que inyectan los datos persistidos al módulo de estadísticas.
-function renderStats() {
-  if (!track.materia) return;
-  renderStatsUI({
-    materia: track.materia,
-    banco: track.banco,
-    obtenerP: avance.obtenerP,
-    historial: avance.historial(),
-    actividad: avance.actividad(),
-    meta: avance.meta(),
-    onCambiarMeta: cambiarMeta
-  });
-}
-
-function renderHistory() {
-  renderHistoryUI(avance.historial(), null, persistencia.nombre());
-}
-
-// Home (materias y lenguajes): renderMaterias/renderLenguajes viven en ui/dashboard/home.js (ADR 007).
-
-function irMaterias() {
-  clearTimer();
-  sesiones.limpiar();
-  // Salir del track de lenguaje: que no quede activo para export/import ni para el quiz.
-  track.limpiarLenguaje();
-  aplicarAcento(null);
-  const temaMeta = document.querySelector('meta[name="theme-color"]');
-  if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
-  show("materias");
-    home.renderMaterias();
-}
 
 // Perfil (4 bloques): identidad local + cuenta + datos + peligro. Reúne nombre,
 // sesión y gamificación y los pasa como estado explícito a la UI (ADR 001).
@@ -315,105 +272,6 @@ async function irPerfil() {
   $("perfil-titulo")?.focus({ preventScroll: true });
 }
 
-async function seleccionarMateria(id) {
-  if (!await track.seleccionarMateria(id)) return;
-  aplicarAcento(track.materia);
-  persistencia.migrarLegacy(track.materia.id);
-  trackIdActual = track.materia.id;
-  avance.cargar();
-  config.renderConfig();
-  renderMateriaUI();
-  goHome();
-}
-
-// ─── Track de lenguaje (spec 011) ─────────────────────────────────────
-async function seleccionarLenguaje(id) {
-  if (!await track.seleccionarLenguaje(id)) return;
-  // Progreso propio del lenguaje: si no se recarga, se arrastra el de la
-  // materia anterior y se persiste bajo la clave equivocada.
-  trackIdActual = track.lenguaje.id;
-  avance.cargar();
-  apuntesUI.resetTema();
-  aplicarAcento(track.lenguaje);
-  // La portada del dashboard lleva los datos del track activo, también para lenguajes:
-  // sin esto, el título por defecto de index.html ("Base de Datos 2") queda congelado
-  // y al salir de una sesión se ve el dashboard de otra materia.
-  renderMateriaUI();
-  lenguaje.pintar();
-  show("lenguaje");
-}
-
-function renderMateriaUI() {
-  document.title = track.materia.nombre + " — Systematic";
-  const nombre = $("materia-nombre");
-  const iconoSpan = $("materia-icono");
-  if (nombre) nombre.textContent = track.materia.nombre;
-  if (iconoSpan) {
-    iconoSpan.innerHTML = icono(track.materia.icono);
-  }
-  const sub = $("portada-sub");
-  if (sub) sub.textContent = track.materia.descripcion || "";
-  const temaMeta = document.querySelector('meta[name="theme-color"]');
-  if (temaMeta) temaMeta.setAttribute("content", track.materia.color);
-  const gloTitulo = $("glosario-titulo");
-  if (gloTitulo) gloTitulo.textContent = "Glosario";
-}
-
-
-function aplicarAcento(materia) {
-  const root = document.documentElement;
-  if (!materia) {
-    root.style.removeProperty("--materia-accent");
-    root.style.removeProperty("--materia-accent-texto");
-    return;
-  }
-  const a = acentoDe(materia);
-  root.style.setProperty("--materia-accent", a.color);
-  root.style.setProperty("--materia-accent-texto", a.texto);
-}
-
-
-
-// Pantalla de apuntes: vive en ui/aprendizaje/apuntes.js (crearApuntesUI, ADR 007).
-
-// Franja de continuidad del dashboard: última visita + débiles por repasar.
-// Solo aparece si ya hay actividad; el CTA reutiliza practicarDebiles.
-function renderContinuidad() {
-  const slot = $("continuidad");
-  if (!slot) return;
-  if (!track.materia) { slot.innerHTML = ""; return; }
-  const dias = Object.keys(avance.actividad());
-  if (!dias.length) { slot.innerHTML = ""; return; }
-  const ultima = dias.sort().pop();
-  // Ambas fechas son YYYY-MM-DD: la resta da días enteros.
-  const hace = Math.round((new Date(hoyISO()) - new Date(ultima)) / 86400000);
-  const cuando = hace <= 0 ? "hoy" : hace === 1 ? "ayer" : "hace " + hace + " días";
-  const debiles = track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length;
-  slot.innerHTML = '<div class="continuidad">' +
-    '<div class="min-w-0"><div class="continuidad-titulo">Sigue donde lo dejaste</div>' +
-    '<div class="continuidad-sub">Última vez ' + cuando + (debiles ? " · " + debiles + " débiles por repasar" : " · sin débiles pendientes") + '</div></div>' +
-    (debiles ? '<button class="btn btn-primary btn-sm shrink-0" data-action="practicarDebiles">Seguir con débiles</button>' : "") +
-  '</div>';
-  if (slot.firstChild) animar(slot.firstChild);
-}
-
-function goHome() {
-  // El dashboard refleja siempre el track activo: al volver de una sesión (o al salir de
-  // ella con "Salir") la portada y el tema deben ser del track vigente, no de la última
-  // materia visitada.
-  if (track.materia) renderMateriaUI();
-  // En un track de lenguaje el dashboard es la práctica libre: dejar a mano el acceso al
-  // mapa de etapas (en una materia no aplica y se oculta).
-  const btnEtapas = $("btn-etapas");
-  if (btnEtapas) btnEtapas.classList.toggle("hidden", !track.lenguaje);
-  show("start");
-  renderContinuidad();
-  renderStats();
-  renderHistory();
-  renderTiposPanel();
-  glosarioUI.renderTip();
-}
-
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
 const quiz = crearQuizUI({
   ctx, obtenerP: avance.obtenerP, registrarRespuesta, toggleMarked: avance.toggleMarked
@@ -431,8 +289,8 @@ const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostr
 // La orquestación de la ronda vive en su controlador (ADR 009); acá quedan los
 // nombres que usan las acciones y los renders vecinos.
 const ronda = crearRonda({
-  $, track, sesiones, show, quiz, toast, confirm, goHome, irLenguaje: () => lenguaje.ir(),
-  rondas, preguntasFiltradas
+  $, track, sesiones, show, quiz, toast, confirm, goHome: () => dashboard.goHome(),
+  irLenguaje: () => lenguaje.ir(), rondas, preguntasFiltradas
 });
 const {
   iniciarTimerPregunta, actualizarTimerPregunta, clearTimerPregunta,
@@ -447,7 +305,14 @@ ronda.instalarTrampaPausa();
 confirm.instalarTrampa();
 
 // Controlador del track de lenguaje (orquestacion/lenguaje.js).
-lenguaje = crearLenguaje({ $, track, show, goHome, startSession });
+lenguaje = crearLenguaje({ $, track, show, goHome: () => dashboard.goHome(), startSession });
+
+// Controlador del dashboard (orquestacion/dashboard.js): portada, stats, historial y track.
+dashboard = crearDashboard({
+  $, persistencia, track, avance, home, show, config, sesiones, apuntesUI,
+  lenguaje, glosarioUI, clearTimer, diagramasDisponibles,
+  alCambiarTrack: id => { trackIdActual = id; avance.cargar(); }
+});
 
 // Controlador del mapa de misiones (orquestacion/misiones.js).
 const misiones = crearMisiones({
@@ -583,11 +448,13 @@ async function entrarConCuenta(usuario) {
 const ACCIONES = crearAcciones({
   $, persistencia, home, show, toast, icono, saludoSegunHora, perfilUI, datosPerfil,
   config, alternarPausa, confirm, quiz, resultados, apuntesUI, estudio, glosarioUI,
-  clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome,
-  irMaterias, irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
+  clearHistory, comenzarPractica, comenzarSimulacro, exportarDatos, goHome: dashboard.goHome,
+  irMaterias: dashboard.irMaterias, irPerfil, iniciarMision: misiones.iniciar, irMisiones: misiones.ir, next, practicarArrastre,
   practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
   repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
-  startContrarreloj, startSupervivencia, salir, seleccionarMateria, seleccionarLenguaje,
+  startContrarreloj, startSupervivencia, salir,
+  seleccionarMateria: dashboard.seleccionarMateria,
+  seleccionarLenguaje: dashboard.seleccionarLenguaje,
   practicarLeccion: lenguaje.practicarLeccion, rendirExamen: lenguaje.rendirExamen,
   irLenguaje: lenguaje.ir,
   startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
