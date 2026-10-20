@@ -7,7 +7,7 @@ updated: 2026-10-20
 # Feature 015 — Desacople de app.js y refuerzo de límites de capas
 
 > `app.js` deja de ser un god object y las reglas de negocio vuelven a `core`/`student`,
-> sin cambiar comportamiento, datos persistidos ni UI. Cerrada con 15 commits y E2E completo.
+> sin cambiar comportamiento, datos persistidos ni UI. Cerrada con 17 commits y E2E completo.
 
 ## Objetivo
 
@@ -45,7 +45,7 @@ Ver [ADR 010](../adr/010-app-js-composition-root.md) y
 | 5 | `npx vitest run` verde | 403 tests verdes |
 | 6 | `npm run validar` verde | 4 materias · 3 lenguajes · 697 preguntas · 191 términos |
 | 7 | `npm run build` verde y chunks por track | build OK; chunks de contenido y presentación separados |
-| 8 | `npm run e2e` verde | 95 pass, 1 skipped |
+| 8 | `npm run e2e` verde | 95 pass, 1 skipped; un flake de spacing móvil pasó al reintentar y aislado |
 
 ## Pasos
 
@@ -72,4 +72,6 @@ Cada paso fue un commit independiente con su validación.
 - Decisión de arquitectura: [ADR 010](../adr/010-app-js-composition-root.md) y
   [ADR 011](../adr/011-limites-capas-y-contenido.md).
 - `app.js`: 899 → 273 líneas; 0 funciones de feature.
+- Auditoría pre-merge (`97f7189`): stats a `core/estudio`, guard de acciones entre
+  submódulos, `vencidas` reutilizado y atajos/entorno fuera de `app.js`.
 - Deuda restante: mezclador no cableado, contratos implícitos y ausencia de lint/CI.
