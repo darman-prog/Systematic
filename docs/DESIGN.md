@@ -123,6 +123,9 @@ acotada al resto de la app: se permite vidrio, glow ambiental y silueta ribbon s
   estados se comunican con texto además del color.
 - **Responsive:** card fluida hasta 440px; en móvil 100% del área con padding 20px, logo 80px,
   targets ≥44px y scroll vertical si el registro no entra.
+- **Portátiles:** el registro compacta según la altura (≤1040px, ≤820px, ≤740px) para no
+  scrollear en 1440x900, 1366x768 y 1280x720; el login conserva su layout. En ≤820 se oculta
+  el subtítulo y en ≤740 el eyebrow.
 - **Accesibilidad:** AA, foco visible, `aria-describedby` en errores/hint, `prefers-reduced-motion`
   respetado y `aria-label="Acceso"` en la sección cuando el título “Cuenta” está oculto.
 

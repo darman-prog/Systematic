@@ -185,7 +185,7 @@ const PIES = {
 // Un solo marco: emblema, cabecera, formulario y enlaces; cambia solo el contenido de la vista.
 function plantilla(vista, conGoogle, conInvitado) {
   return `
-    <div class="auth-caja">
+    <div class="auth-caja" data-vista="${vista}">
       <div class="auth-ribbon-wrap">
         <div class="auth-ribbon-back" aria-hidden="true"></div>
         <div class="auth-ribbon">
@@ -292,7 +292,7 @@ export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogl
   function renderEnviado(correo) {
     renderizando = true;
     raiz().innerHTML = `
-      <div class="auth-caja">
+      <div class="auth-caja" data-vista="enviado">
         <div class="auth-ribbon-wrap">
           <div class="auth-ribbon-back" aria-hidden="true"></div>
           <div class="auth-ribbon">

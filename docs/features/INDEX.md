@@ -5,3 +5,4 @@
 | ID | Feature | Estado | Spec |
 |---|---|---|---|
 | 013 | Rediseño unificado de acceso | cerrada | [013](013-rediseno-acceso.md) |
+| 014 | Registro sin scroll en portátiles | cerrada | [014](014-registro-sin-scroll.md) |

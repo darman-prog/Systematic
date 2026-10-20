@@ -84,3 +84,16 @@ test('login y registro comparten el shell y se puede cambiar de vista', async ({
   await expect(page.locator('#auth-root')).toContainText('Bienvenido');
   await expect(page.locator('#login-email')).toBeVisible();
 });
+
+test('el registro no scrollea en portátiles', async ({ page }) => {
+  for (const [width, height] of [[1366, 768], [1280, 720]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Crea una' }).click();
+    const medidas = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollHeight,
+      inner: window.innerHeight
+    }));
+    expect(medidas.scroll, `${width}x${height}`).toBeLessThanOrEqual(medidas.inner + 1);
+  }
+});

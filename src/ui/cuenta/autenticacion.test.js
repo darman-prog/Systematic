@@ -179,10 +179,12 @@ describe("ui/cuenta/autenticacion", () => {
   it("login y registro comparten las clases del shell", () => {
     const { auth } = montar({ alGoogle: vi.fn(async () => {}) });
     auth.renderLogin();
+    expect(document.querySelector(".auth-caja").dataset.vista).toBe("login");
     expect(document.querySelectorAll(".campo").length).toBe(2);
     expect(document.querySelectorAll(".btn-sec").length).toBe(1);
 
     auth.renderRegistro();
+    expect(document.querySelector(".auth-caja").dataset.vista).toBe("register");
     expect(document.querySelectorAll(".campo").length).toBe(4);
     expect(document.querySelectorAll(".auth-ribbon").length).toBe(1);
     expect(document.querySelectorAll(".auth-logo").length).toBe(1);
