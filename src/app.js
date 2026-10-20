@@ -15,9 +15,6 @@ import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
 
-import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/index.js";
-import { crearDiagramasUI } from "./ui/componentes/diagramas.js";
-import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
 import { icono } from "./ui/iconos.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
@@ -28,13 +25,14 @@ import { crearRonda } from "./orquestacion/ronda.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearMisiones } from "./orquestacion/misiones.js";
 import { crearEscenarios } from "./orquestacion/escenarios.js";
+import { crearCasos } from "./orquestacion/casos.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
 import { crearGamificacion } from "./student/gamificacion.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
-import { fusionarMejor, fusionarMision } from "./student/registros.js";
+import { fusionarMision } from "./student/registros.js";
 // Cuenta y nube (ADR 008): servicios listos; falta cablearlos (docs/guias/aplicar-snapshots.md).
 import { cargarFirebase } from "./student/firebase.js";
 import { crearCuenta } from "./student/cuenta.js";
@@ -247,50 +245,6 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 
 // Arranca una ronda: ver src/app/ronda.js (ADR 009).
 
-// ===== Casos de diagramación (spec 003, H6c) =====
-
-let casoActual = null;
-let casoEstado = null;
-
-function startCasos() {
-  show("casos");
-  const casos = (track.materia && track.materia.casos) || [];
-  pintarListaCasos(casos, persistencia.casos());
-}
-
-function jugarCaso(id) {
-  const casos = (track.materia && track.materia.casos) || [];
-  const c = casos.find(x => x.id === id);
-  if (!c) return;
-  casoActual = c;
-  casoEstado = crearTablero(c.diagrama);
-  $("caso-titulo").textContent = c.titulo;
-  pintarCaso(c, casoEstado);
-  show("caso");
-  diagramasUI.renderDiagrama(c.diagrama, $("lienzo-caso"));
-  $("caso-titulo").focus({ preventScroll: true });
-}
-
-function comprobarCaso() {
-  if (!casoActual || !casoEstado) return;
-  const res = evaluarDiagrama(casoActual.diagrama, casoEstado);
-  // Vara deliberadamente indulgente (decisión en spec 003): el rating de casos es por
-  // porcentaje (≥80 éxito) y no exige exactitud total como el quiz, para no castigar el tanteo.
-  const rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
-  const resultado = { rating, detalle: res };
-  
-  // Guardar resultado
-  const registros = persistencia.casos();
-  registros[casoActual.id] = fusionarMejor(registros[casoActual.id], rating);
-  persistencia.guardarCasos(registros);
-  
-  // XP y logros
-  const xp = rating === "exito" ? 60 : rating === "parcial" ? 25 : 0;
-  if (xp) gamificacion.sumarXp(xp);
-  if (rating === "exito") gamificacion.revisarLogros({ casoExito: true });
-  
-  pintarCaso(casoActual, casoEstado, resultado);
-}
 
 function renderTiposPanel() {
   const panel = $("tipos-panel");
@@ -512,15 +466,6 @@ const estudio = crearEstudioUI({
 });
 const glosarioUI = crearGlosarioUI({ ctx, mostrarPantalla: show });
 const flashcards = crearFlashcardsUI({ ctx, priorizar, registrarRespuesta, mostrarPantalla: show });
-const diagramasUI = crearDiagramasUI({
-  obtenerItem: () => casoActual && casoActual.diagrama,
-  obtenerEstado: () => casoEstado,
-  guardarEstado: estado => { casoEstado = estado; },
-  areaId: "lienzo-caso",
-  accionComprobar: "comprobarCaso",
-  accionCancelarTipo: "cancelarDiagramaTipoCaso",
-  mostrarPregunta: false
-});
 
 // La orquestación de la ronda vive en su controlador (ADR 009); acá quedan los
 // nombres que usan las acciones y los renders vecinos.
@@ -548,6 +493,11 @@ const misiones = crearMisiones({
 
 // Controlador de escenarios (orquestacion/escenarios.js).
 const escenarios = crearEscenarios({
+  $, track, persistencia, gamificacion, show
+});
+
+// Controlador de casos (orquestacion/casos.js): estado y lienzo propios.
+const casos = crearCasos({
   $, track, persistencia, gamificacion, show
 });
 
@@ -677,8 +627,8 @@ const ACCIONES = crearAcciones({
   practicarLeccion, rendirExamen, irLenguaje,
   startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
   decidirEscenario: escenarios.decidir, continuarEscenario: escenarios.continuar,
-  startCasos, jugarCaso, comprobarCaso,
-  diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth,
+  startCasos: casos.start, jugarCaso: casos.jugar, comprobarCaso: casos.comprobar,
+  diagramasUI: casos.diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth,
   // El caché se reasigna al iniciar: se limpia por callback para no capturar el viejo.
   limpiarCachePerfil: () => { cachePerfilCuenta.email = null; },
   nube, fechaSnapshot, aplicarSnapshot
