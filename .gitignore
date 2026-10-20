@@ -28,3 +28,6 @@ Thumbs.db
 coverage/
 playwright-report/
 test-results/
+
+# Prototipos de diseño (insumo local, no se versionan)
+docs/PrototiposDiseños/
