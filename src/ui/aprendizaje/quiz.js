@@ -2,7 +2,9 @@
 // Recibe el estado de la app vía `ctx` (session/banco como getters) y callbacks para
 // persistencia y acciones; no lee localStorage ni importa datos de materias.
 import {
-  respuestaCorrecta, evaluarDiagrama, normalizarClave, planCorreccion, resumenDiagrama
+  respuestaCorrecta, evaluarDiagrama, planCorreccion, resumenDiagrama,
+  evaluarOpcion, evaluarMulti, evaluarDragdrop, evaluarOrden, evaluarRelacion,
+  parejaRelacionValida
 } from "../../core/index.js";
 import {
   TIPO_LABELS, DIF_LABELS,
@@ -86,19 +88,19 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const session = ctx.session;
     if (session.answers[session.idx]) return;
     const item = session.items[session.idx];
+    const res = evaluarOpcion(item, idx);
     const buttons = document.querySelectorAll("#options-container .option");
     buttons.forEach(b => b.disabled = true);
-    const ok = idx === item.correct;
-    if (ok) {
+    if (res.ok) {
       buttons[idx].classList.add("option-correct");
     } else {
       buttons[idx].classList.add("option-wrong");
       buttons[item.correct].classList.add("option-correct");
       buttons[idx].classList.add("shake");
     }
-    session.answers[session.idx] = { ok, selected: item.options[idx], expected: item.options[item.correct] };
-    registrarRespuesta(item.id, ok);
-    mostrarResultadoPregunta(item, ok);
+    session.answers[session.idx] = res;
+    registrarRespuesta(item.id, res.ok);
+    mostrarResultadoPregunta(item, res.ok);
   }
 
   function renderMulti(item, area) {
@@ -151,17 +153,12 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const e = session.multi;
     if (!e || e.bloqueado || session.answers[session.idx]) return;
     const item = e.item;
-    const sel = Object.keys(e.sel).map(Number).sort((a, b) => a - b);
-    const ok = sel.length === item.correctos.length && sel.every((v, i) => v === item.correctos[i]);
+    const res = evaluarMulti(item, Object.keys(e.sel).map(Number));
     e.bloqueado = true;
     pintarMulti();
-    session.answers[session.idx] = {
-      ok,
-      selected: sel.length ? sel.map(i => item.options[i]).join(" + ") : "(ninguna)",
-      expected: item.correctos.map(i => item.options[i]).join(" + ")
-    };
-    registrarRespuesta(item.id, ok);
-    mostrarResultadoPregunta(item, ok);
+    session.answers[session.idx] = res;
+    registrarRespuesta(item.id, res.ok);
+    mostrarResultadoPregunta(item, res.ok);
   }
 
   // Feedback con siguiente paso: veredicto + explicación + qué revisar.
@@ -374,7 +371,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     // las opciones repetidas con la cantidad de campos que las esperan.
     // OJO: e.derecha está barajada — la entrada se busca por idx, no por posición.
     const derechaEntrada = e.derecha.find(d => d.idx === idx);
-    if (derechaEntrada && normalizarClave(e.pares[e.seleccion][1]) === normalizarClave(derechaEntrada.texto)) {
+    if (derechaEntrada && parejaRelacionValida(e.item, e.seleccion, derechaEntrada.texto)) {
       // Par correcto (spec 009): número correlativo y color compartido en ambas columnas.
       e.parDeIzq[e.seleccion] = e.parContador;
       e.parContador++;
@@ -410,17 +407,13 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     e.bloqueado = true;
     limpiarErrorRel(e);
     const item = e.item;
-    const ok = e.fallos === 0;
+    const res = evaluarRelacion(item, e.fallos);
     pintarRelacionar();
-    session.answers[session.idx] = {
-      ok,
-      selected: item.pares.map(p => p[0] + " → " + p[1]).join(" | "),
-      expected: item.pares.map(p => p[0] + " → " + p[1]).join(" | ")
-    };
-    registrarRespuesta(item.id, ok);
+    session.answers[session.idx] = res;
+    registrarRespuesta(item.id, res.ok);
     if (session.modo !== "simulacro") {
-      pintarFeedback(item, ok ? "feedback-ok" : "feedback-bad",
-        ok ? icono("check", "icono-sm") + "<span>¡Todas las parejas correctas!</span>"
+      pintarFeedback(item, res.ok ? "feedback-ok" : "feedback-bad",
+        res.ok ? icono("check", "icono-sm") + "<span>¡Todas las parejas correctas!</span>"
           : icono("cruz", "icono-sm") + "<span>Hubo " + e.fallos + " intento(s) fallido(s)</span>");
     }
     mostrarBotonSiguiente();
@@ -597,17 +590,15 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const item = estado.item;
     if (session.answers[session.idx] || estado.bloqueado || piezasUsadas().length !== estado.slots.length) return;
     const seleccion = estado.slots.map(pid => piezaTexto(pid));
-    const ok = seleccion.every((t, i) => t === item.respuestas[i]);
+    const res = evaluarDragdrop(item, seleccion);
     estado.bloqueado = true;
-    if (session.modo !== "simulacro") {
-      estado.resultado = estado.slots.map((pid, i) => piezaTexto(pid) === item.respuestas[i]);
-    }
+    if (session.modo !== "simulacro") estado.resultado = res.detalle;
     pintarDragdrop();
-    session.answers[session.idx] = { ok, selected: seleccion.join(" / "), expected: item.respuestas.join(" / ") };
-    registrarRespuesta(item.id, ok);
+    session.answers[session.idx] = res;
+    registrarRespuesta(item.id, res.ok);
     if (session.modo !== "simulacro") {
-      pintarFeedback(item, ok ? "feedback-ok" : "feedback-bad",
-        ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era: <b>" + escapar(item.respuestas.join(" / ")) + "</b>");
+      pintarFeedback(item, res.ok ? "feedback-ok" : "feedback-bad",
+        res.ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era: <b>" + escapar(item.respuestas.join(" / ")) + "</b>");
     }
     mostrarBotonSiguiente();
   }
@@ -690,18 +681,16 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     const estado = session.orden;
     if (!estado || session.answers[session.idx] || estado.bloqueado) return;
     const item = estado.item;
-    const ok = estado.orden.every((t, i) => t === item.bloques[i]);
+    const res = evaluarOrden(item, estado.orden);
     estado.bloqueado = true;
-    if (session.modo !== "simulacro") {
-      estado.resultado = estado.orden.map((t, i) => t === item.bloques[i]);
-    }
+    if (session.modo !== "simulacro") estado.resultado = res.detalle;
     pintarOrden();
-    session.answers[session.idx] = { ok, selected: estado.orden.join(" → "), expected: item.bloques.join(" → ") };
-    registrarRespuesta(item.id, ok);
+    session.answers[session.idx] = res;
+    registrarRespuesta(item.id, res.ok);
     if (session.modo !== "simulacro") {
-      pintarFeedback(item, ok ? "feedback-ok" : "feedback-bad",
-        ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era:",
-        ok ? null : '<ol class="list-decimal list-inside font-mono text-xs mb-3">' + item.bloques.map(b => "<li>" + escapar(b) + "</li>").join("") + '</ol><div>' + item.exp + '</div>');
+      pintarFeedback(item, res.ok ? "feedback-ok" : "feedback-bad",
+        res.ok ? icono("check", "icono-sm") + " ¡Correcto!" : icono("cruz", "icono-sm") + " Incorrecto — el orden correcto era:",
+        res.ok ? null : '<ol class="list-decimal list-inside font-mono text-xs mb-3">' + item.bloques.map(b => "<li>" + escapar(b) + "</li>").join("") + '</ol><div>' + item.exp + '</div>');
     }
     mostrarBotonSiguiente();
   }
