@@ -15,8 +15,6 @@ import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
 
-import { iniciarEscenario, decidir as decidirEscenarioPaso, continuar as continuarEscenarioPaso, xpDeEscenario } from "./core/index.js";
-import { pintarListaEscenarios, pintarEscenario } from "./ui/aprendizaje/escenarios.js";
 import { crearTablero, evaluarDiagrama, ratingDiagrama } from "./core/index.js";
 import { crearDiagramasUI } from "./ui/componentes/diagramas.js";
 import { pintarListaCasos, pintarCaso } from "./ui/aprendizaje/casos.js";
@@ -29,6 +27,7 @@ import { crearConfigController } from "./orquestacion/config-controller.js";
 import { crearRonda } from "./orquestacion/ronda.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearMisiones } from "./orquestacion/misiones.js";
+import { crearEscenarios } from "./orquestacion/escenarios.js";
 import { crearPersistencia } from "./student/persistencia.js";
 import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
@@ -61,8 +60,6 @@ const diagramasDisponibles = () => !window.matchMedia("(pointer: coarse)").match
 // Progreso del track activo (persiste en sys.progreso.<id>). El resto del estado del track
 // (materia, banco, glosario, lenguaje, competencia, filtros) vive en student/track.js.
 let trackIdActual = null;
-let escenarioActual = null;
-let escenarioEstado = null;
 
 const $ = id => document.getElementById(id);
 
@@ -249,42 +246,6 @@ const toggleFiltroTodos = configCtl.toggleFiltroTodos;
 // ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/estudio/sesiones.js (testeables).
 
 // Arranca una ronda: ver src/app/ronda.js (ADR 009).
-
-// ===== Escenarios multi-paso (spec 003): decidir → consecuencias → final con rating =====
-
-function startEscenarios() {
-  show("escenarios");
-  pintarListaEscenarios((track.materia && track.materia.escenarios) || [], persistencia.escenarios());
-}
-
-function jugarEscenario(id) {
-  const e = ((track.materia && track.materia.escenarios) || []).find(x => x.id === id);
-  if (!e) return;
-  escenarioActual = e;
-  escenarioEstado = iniciarEscenario(e);
-  $("escenario-titulo").textContent = e.titulo;
-  pintarEscenario(e, escenarioEstado);
-  show("escenario");
-}
-
-function decidirEscenario(idx) {
-  if (!escenarioActual || !escenarioEstado) return;
-  escenarioEstado = decidirEscenarioPaso(escenarioActual, escenarioEstado, idx);
-  pintarEscenario(escenarioActual, escenarioEstado);
-}
-
-function continuarEscenario() {
-  if (!escenarioActual || !escenarioEstado) return;
-  escenarioEstado = continuarEscenarioPaso(escenarioActual, escenarioEstado);
-  pintarEscenario(escenarioActual, escenarioEstado);
-  if (!escenarioEstado.terminado) return;
-  const xp = xpDeEscenario(escenarioEstado);
-  if (xp) gamificacion.sumarXp(xp);
-  const registros = persistencia.escenarios();
-  registros[escenarioActual.id] = fusionarMejor(registros[escenarioActual.id], escenarioEstado.rating);
-  persistencia.guardarEscenarios(registros);
-  gamificacion.revisarLogros({ escenarioExito: escenarioEstado.rating === "exito" });
-}
 
 // ===== Casos de diagramación (spec 003, H6c) =====
 
@@ -585,6 +546,11 @@ const misiones = crearMisiones({
   rondas, startSession
 });
 
+// Controlador de escenarios (orquestacion/escenarios.js).
+const escenarios = crearEscenarios({
+  $, track, persistencia, gamificacion, show
+});
+
 document.addEventListener("keydown", e => {
   const s = sesiones.sesion;
   if ($("screen-quiz").classList.contains("hidden") || !s) return;
@@ -708,8 +674,10 @@ const ACCIONES = crearAcciones({
   practicarCasos, practicarDebiles, practicarTipo, practicarVencidas, repetirFalladas,
   repetirMisma, resetProgreso, flashcards, sesiones, clearTimerPregunta,
   startContrarreloj, startSupervivencia, salir, seleccionarMateria, seleccionarLenguaje,
-  practicarLeccion, rendirExamen, irLenguaje, startEscenarios, jugarEscenario,
-  decidirEscenario, continuarEscenario, startCasos, jugarCaso, comprobarCaso,
+  practicarLeccion, rendirExamen, irLenguaje,
+  startEscenarios: escenarios.start, jugarEscenario: escenarios.jugar,
+  decidirEscenario: escenarios.decidir, continuarEscenario: escenarios.continuar,
+  startCasos, jugarCaso, comprobarCaso,
   diagramasUI, toggleFiltro, toggleFiltroTodos, cuenta, cuentaUI, auth,
   // El caché se reasigna al iniciar: se limpia por callback para no capturar el viejo.
   limpiarCachePerfil: () => { cachePerfilCuenta.email = null; },
