@@ -112,6 +112,17 @@ test('el dashboard muestra el catálogo real y filtra', async ({ page }) => {
   await expect(page.locator('#materias-seccion')).toBeVisible();
   await expect(page.locator('#lenguajes-seccion')).toBeHidden();
   await expect(page.getByRole('button', { name: /Materias \(4\)/ })).toHaveAttribute('aria-pressed', 'true');
+
+  const animacion = await page.locator('#materias-list .materia-card:not(.hidden)').first()
+    .evaluate(el => getComputedStyle(el).animationName);
+  expect(animacion).toBe('catalogo-entrada');
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.getByRole('button', { name: /Lenguajes \(3\)/ }).click();
+  const sinAnimacion = await page.locator('#lenguajes-list .materia-card:not(.hidden)').first()
+    .evaluate(el => getComputedStyle(el).animationName);
+  expect(sinAnimacion).toBe('none');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
 });
 
 test('el registro no scrollea en portátiles', async ({ page }) => {

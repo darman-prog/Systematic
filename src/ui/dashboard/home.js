@@ -168,10 +168,22 @@ export function crearHome({ persistencia, cargarRoadmap }) {
     });
   }
 
-  function aplicarFiltros() {
+  function animarEntrada(cards) {
+    if (!cards.length) return;
+    // Quita la clase y fuerza un único reflow: así la animación se reinicia aunque la
+    // card ya estuviera visible. El stagger se corta a 5 pasos (máx. 120ms).
+    cards.forEach(card => card.classList.remove("catalogo-entra"));
+    void cards[0].offsetWidth;
+    cards.forEach((card, i) => {
+      card.style.setProperty("--entrada-delay", `${Math.min(i, 5) * 24}ms`);
+      card.classList.add("catalogo-entra");
+    });
+  }
+
+  function aplicarFiltros({ animar = false } = {}) {
     const q = busqueda.trim().toLowerCase();
     const cards = [...document.querySelectorAll("#materias-list .materia-card, #lenguajes-list .materia-card")];
-    let visibles = 0;
+    const visiblesCards = [];
 
     cards.forEach(card => {
       const tipo = card.dataset.tipo;
@@ -183,14 +195,15 @@ export function crearHome({ persistencia, cargarRoadmap }) {
         (filtroActivo === "en-curso" && estado === "en-curso");
       const visible = coincideFiltro && (!q || (card.dataset.busqueda || "").includes(q));
       card.classList.toggle("hidden", !visible);
-      if (visible) visibles++;
+      if (visible) visiblesCards.push(card);
     });
 
     const hayMaterias = cards.some(c => c.dataset.tipo === "materia" && !c.classList.contains("hidden"));
     const hayLenguajes = cards.some(c => c.dataset.tipo === "lenguaje" && !c.classList.contains("hidden"));
     $("materias-seccion")?.classList.toggle("hidden", !hayMaterias);
     $("lenguajes-seccion")?.classList.toggle("hidden", !hayLenguajes);
-    $("catalogo-vacio")?.classList.toggle("hidden", visibles > 0);
+    $("catalogo-vacio")?.classList.toggle("hidden", visiblesCards.length > 0);
+    if (animar) animarEntrada(visiblesCards);
   }
 
   function conectarCatalogo() {
@@ -227,7 +240,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       tab.addEventListener("click", () => {
         filtroActivo = tab.dataset.filtro || "todas";
         actualizarTabs();
-        aplicarFiltros();
+        aplicarFiltros({ animar: true });
       });
     });
 

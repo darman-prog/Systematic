@@ -1427,6 +1427,21 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   cursor: not-allowed;
 }
 
+/* Entrada del catálogo: home.js re-dispara esta animación al cambiar de filtro. */
+@keyframes catalogo-entrada {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.home-dashboard .materia-card.catalogo-entra {
+  animation: catalogo-entrada var(--mov-base) var(--mov-ease) both;
+  animation-delay: var(--entrada-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-dashboard .materia-card.catalogo-entra { animation: none; }
+}
+
 @supports not (backdrop-filter: blur(1px)) {
   .catalogo-barra,
   .home-dashboard .materia-card { background: var(--study-surface-2); }

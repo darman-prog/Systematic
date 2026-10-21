@@ -129,11 +129,15 @@ describe("ui/dashboard/home", () => {
     materias.click();
     expect(materias.getAttribute("aria-pressed")).toBe("true");
     expect(document.getElementById("lenguajes-seccion").classList.contains("hidden")).toBe(true);
-    expect(visibles("#materias-list .materia-card")).toHaveLength(4);
+    const materiasVisibles = visibles("#materias-list .materia-card");
+    expect(materiasVisibles).toHaveLength(4);
+    expect(materiasVisibles.every(c => c.classList.contains("catalogo-entra"))).toBe(true);
 
     curso.click();
     expect(curso.getAttribute("aria-pressed")).toBe("true");
-    expect(visibles(".materia-card")).toHaveLength(2);
+    const enCursoVisibles = visibles(".materia-card");
+    expect(enCursoVisibles).toHaveLength(2);
+    expect(enCursoVisibles.every(c => c.classList.contains("catalogo-entra"))).toBe(true);
     expect(document.getElementById("materias-seccion").classList.contains("hidden")).toBe(false);
     expect(document.getElementById("lenguajes-seccion").classList.contains("hidden")).toBe(false);
   });

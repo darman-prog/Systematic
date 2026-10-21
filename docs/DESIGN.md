@@ -147,6 +147,8 @@ pantallas conserva el ancho de lectura.
   limpiar y estado vacío con `role="status"`; no promete buscar dentro de preguntas.
 - **Filtros:** `Todas (7)`, `Materias (4)`, `Lenguajes (3)`, `En curso (N)`; `aria-pressed` y
   conteos dinámicos. Sin categorías/niveles que no existan en el registro.
+- **Motion de filtros:** al cambiar una opción, las cards visibles se reaniman con fade + 6px y
+  stagger de 24ms (tope 120ms); la búsqueda no anima y `prefers-reduced-motion` las muestra directo.
 - **Responsive:** 1 columna móvil, 2 en tablet, 3 desde `≥1024px` y 4 para materias en
   `≥1280px`; lenguajes 3 desde `≥768px`. Cards y controles con foco y targets ≥44px.
 - **Prohibido:** niveles/“Nuevo”/“Recomendado”/“Sandbox”/“94%” ficticios, “Guía curricular”
