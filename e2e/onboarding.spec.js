@@ -85,6 +85,34 @@ test('login y registro comparten el shell y se puede cambiar de vista', async ({
   await expect(page.locator('#login-email')).toBeVisible();
 });
 
+test('el dashboard muestra el catálogo real y filtra', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Continuar sin cuenta' }).click();
+  await page.getByRole('button', { name: 'Continuar sin nombre' }).click();
+
+  await expect(page.locator('#screen-materias')).toBeVisible();
+  await expect(page.locator('.app')).toHaveClass(/app-dashboard/);
+  await expect(page.locator('#materias-list .materia-card')).toHaveCount(4);
+  await expect(page.locator('#lenguajes-list .materia-card')).toHaveCount(3);
+  await expect(page.locator('#materias-list')).toContainText('Base de Datos 2');
+  await expect(page.locator('#materias-list')).not.toContainText('Sistemas Distribuidos');
+  await expect(page.locator('#lenguajes-list')).toContainText('Java');
+  await expect(page.locator('#lenguajes-list')).not.toContainText('Rust');
+  await expect(page.locator('#filtro-todas-count')).toHaveText('7');
+
+  await page.locator('#catalog-search').fill('Python');
+  await expect(page.locator('#lenguajes-list .materia-card:not(.hidden)')).toHaveCount(1);
+  await expect(page.locator('#materias-seccion')).toBeHidden();
+
+  await page.locator('#catalog-search').fill('zzz');
+  await expect(page.locator('#catalogo-vacio')).toBeVisible();
+  await page.locator('#catalog-search').fill('');
+  await page.getByRole('button', { name: /Materias \(4\)/ }).click();
+  await expect(page.locator('#materias-seccion')).toBeVisible();
+  await expect(page.locator('#lenguajes-seccion')).toBeHidden();
+  await expect(page.getByRole('button', { name: /Materias \(4\)/ })).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('el registro no scrollea en portátiles', async ({ page }) => {
   for (const [width, height] of [[1366, 768], [1280, 720]]) {
     await page.setViewportSize({ width, height });
