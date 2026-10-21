@@ -8,11 +8,16 @@ import {
 
 export function crearDashboard({
   $, persistencia, track, avance, home, show, config, sesiones, apuntesUI,
-  lenguaje, glosarioUI, clearTimer, alCambiarTrack, diagramasDisponibles
+  lenguaje, glosarioUI, clearTimer, alCambiarTrack, diagramasDisponibles,
+  ui = {
+    pintarPortada, aplicarAcento, pintarTiposPanel, pintarContinuidad,
+    renderStats: renderStatsUI, renderHistory: renderHistoryUI
+  },
+  hoy = hoyISO
 }) {
   function renderStats() {
     if (!track.materia) return;
-    renderStatsUI({
+    ui.renderStats({
       materia: track.materia,
       banco: track.banco,
       obtenerP: avance.obtenerP,
@@ -24,7 +29,7 @@ export function crearDashboard({
   }
 
   function renderHistory() {
-    renderHistoryUI(avance.historial(), null, persistencia.nombre());
+    ui.renderHistory(avance.historial(), null, persistencia.nombre());
   }
 
   // Franja de continuidad: última visita + débiles por repasar.
@@ -35,21 +40,21 @@ export function crearDashboard({
     const dias = Object.keys(avance.actividad());
     if (!dias.length) { slot.innerHTML = ""; return; }
     const ultima = dias.sort().pop();
-    const hace = Math.round((new Date(hoyISO()) - new Date(ultima)) / 86400000);
+    const hace = Math.round((new Date(hoy()) - new Date(ultima)) / 86400000);
     const cuando = hace <= 0 ? "hoy" : hace === 1 ? "ayer" : "hace " + hace + " días";
     const debiles = track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length;
-    pintarContinuidad($, { cuando, debiles });
+    ui.pintarContinuidad($, { cuando, debiles });
   }
 
   function goHome() {
-    if (track.materia) pintarPortada($, track);
+    if (track.materia) ui.pintarPortada($, track);
     const btnEtapas = $("btn-etapas");
     if (btnEtapas) btnEtapas.classList.toggle("hidden", !track.lenguaje);
     show("start");
     renderContinuidad();
     renderStats();
     renderHistory();
-    pintarTiposPanel($, track, diagramasDisponibles);
+    ui.pintarTiposPanel($, track, diagramasDisponibles);
     glosarioUI.renderTip();
   }
 
@@ -58,7 +63,7 @@ export function crearDashboard({
     sesiones.limpiar();
     // Salir del track de lenguaje: que no quede activo para export/import ni para el quiz.
     track.limpiarLenguaje();
-    aplicarAcento(null);
+    ui.aplicarAcento(null);
     const temaMeta = document.querySelector('meta[name="theme-color"]');
     if (temaMeta) temaMeta.setAttribute("content", "#1a1c22");
     show("materias");
@@ -67,11 +72,11 @@ export function crearDashboard({
 
   async function seleccionarMateria(id) {
     if (!await track.seleccionarMateria(id)) return;
-    aplicarAcento(track.materia);
+    ui.aplicarAcento(track.materia);
     persistencia.migrarLegacy(track.materia.id);
     alCambiarTrack(track.materia.id);
     config.renderConfig();
-    pintarPortada($, track);
+    ui.pintarPortada($, track);
     goHome();
   }
 
@@ -80,9 +85,9 @@ export function crearDashboard({
     // Progreso propio del lenguaje: si no se recarga, se arrastra el de la materia anterior.
     alCambiarTrack(track.lenguaje.id);
     apuntesUI.resetTema();
-    aplicarAcento(track.lenguaje);
+    ui.aplicarAcento(track.lenguaje);
     // La portada del dashboard lleva los datos del track activo, también para lenguajes.
-    pintarPortada($, track);
+    ui.pintarPortada($, track);
     lenguaje.pintar();
     show("lenguaje");
   }
