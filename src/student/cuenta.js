@@ -54,7 +54,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
     if (adaptador === null) {
       try {
         adaptador = (await cargarNube()) || false;
-      } catch (e) {
+      } catch {
         adaptador = false;
       }
     }

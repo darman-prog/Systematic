@@ -120,7 +120,7 @@ export function crearDiagramasUI({
     });
   }
 
-  function activarPool(area) {
+  function activarPool(_area) {
     const cont = $("pool-diagrama");
     if (cont) cont.querySelectorAll("[data-nodo]").forEach(n => {
       n.addEventListener("pointerdown", inicioDesdePool);
@@ -281,7 +281,7 @@ export function crearDiagramasUI({
     const l0 = n.offsetLeft, t0 = n.offsetTop;
     let movido = false;
 
-    try { n.setPointerCapture(e.pointerId); } catch (_) { /* pointer no capturable */ }
+    try { n.setPointerCapture(e.pointerId); } catch { /* pointer no capturable */ }
 
     const mover = ev => {
       if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 6) movido = true;

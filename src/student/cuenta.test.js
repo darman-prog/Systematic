@@ -9,11 +9,11 @@ function adaptadorFake({ error = null } = {}) {
   };
   return {
     auth: {
-      registrar: vi.fn(async (email, pass) => {
+      registrar: vi.fn(async (email, _pass) => {
         await lanzar();
         return { uid: "u1", email, nombre: "" };
       }),
-      ingresar: vi.fn(async (email, pass) => {
+      ingresar: vi.fn(async (email, _pass) => {
         await lanzar();
         return { uid: "u1", email, nombre: "" };
       }),

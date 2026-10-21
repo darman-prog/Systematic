@@ -26,7 +26,7 @@ export function crearNube({ cargarNube, persistencia, materias, lenguajes, ahora
     if (adaptador === null) {
       try {
         adaptador = (await cargarNube()) || false;
-      } catch (e) {
+      } catch {
         adaptador = false;
       }
     }

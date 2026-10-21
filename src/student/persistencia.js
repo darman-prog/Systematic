@@ -23,7 +23,7 @@ export function crearPersistencia(storage) {
   const leer = (clave, porDefecto) => leerJSON(storage, clave, porDefecto);
   const escribir = (clave, valor) => escribirJSON(storage, clave, valor);
   const borrar = clave => {
-    try { storage.removeItem(clave); } catch (e) { /* sin persistencia */ }
+    try { storage.removeItem(clave); } catch { /* sin persistencia */ }
   };
 
   return {

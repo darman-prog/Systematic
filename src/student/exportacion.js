@@ -39,7 +39,7 @@ export function parsearImportacion(texto) {
   try {
     datos = JSON.parse(texto);
   } catch (e) {
-    throw new Error("formato");
+    throw new Error("formato", { cause: e });
   }
   if (!datos || typeof datos !== "object" || Array.isArray(datos)) throw new Error("formato");
 

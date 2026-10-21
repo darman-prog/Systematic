@@ -89,7 +89,7 @@ export function crearAjustes({
         aplicarMateria({ datos, track, persistencia, avance });
         irHome();
         avisar("Progreso importado correctamente.");
-      } catch (e) {
+      } catch {
         avisar("El archivo no es válido. Debe ser un JSON exportado desde esta app.");
       } finally {
         input.value = "";

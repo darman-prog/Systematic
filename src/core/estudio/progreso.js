@@ -36,7 +36,7 @@ export function migrarClavesLegacy(storage, materiaId) {
     });
     storage.setItem(FLAG_MIGRACION, new Date().toISOString());
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -47,7 +47,7 @@ export function leerJSON(storage, clave, porDefecto) {
     if (bruto === null) return porDefecto;
     const valor = JSON.parse(bruto);
     return valor === null || valor === undefined ? porDefecto : valor;
-  } catch (e) {
+  } catch {
     return porDefecto;
   }
 }
@@ -56,7 +56,7 @@ export function escribirJSON(storage, clave, valor) {
   try {
     storage.setItem(clave, JSON.stringify(valor));
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

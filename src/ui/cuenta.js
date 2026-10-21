@@ -8,7 +8,7 @@
 //   #perfil-cuenta       → bloque de cuenta dentro del Perfil (lo pinta ui/cuenta/perfil.js)
 //   #cuenta-email-actual → correo del usuario logueado
 //   #cuenta-aviso/#perfil-aviso → role="status" para éxito/error/procesando
-export function crearCuentaUI({ ctx }) {
+export function crearCuentaUI() {
   const $ = id => document.getElementById(id);
   const PANELES = ["cuenta-anon", "cuenta-sesion", "perfil-cuenta"];
   const AVISOS = ["cuenta-aviso", "perfil-aviso"];
