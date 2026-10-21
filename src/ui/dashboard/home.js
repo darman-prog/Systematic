@@ -51,8 +51,6 @@ export function crearHome({ persistencia, cargarRoadmap }) {
 
     cont.innerHTML = MATERIAS.map(m => {
       const e = estadoMateria(m);
-      const estadoTexto = e.pendiente ? "En preparación" : e.enCurso ? "En curso" : "Disponible";
-      const estadoClase = e.pendiente ? "pendiente" : e.enCurso ? "curso" : "inactivo";
       const estadoDato = e.pendiente ? "pendiente" : e.enCurso ? "en-curso" : "disponible";
       const disabledAttr = e.pendiente ? 'disabled aria-disabled="true"' : "";
 
@@ -65,10 +63,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
                 data-busqueda="${escapar(textoBusqueda(m.nombre, m.descripcion))}"
                 ${disabledAttr}
                 style="--materia-color: ${m.color}">
-          <span class="materia-card-top">
-            <span class="materia-icono" aria-hidden="true">${icono(m.icono)}</span>
-            <span class="materia-estado materia-estado--${estadoClase}">${estadoTexto}</span>
-          </span>
+          <span class="materia-icono" aria-hidden="true">${icono(m.icono)}</span>
           <span class="materia-nombre">${escapar(m.nombre)}</span>
           <span class="materia-desc">${escapar(m.descripcion)}</span>
           <span class="materia-progreso">
@@ -119,7 +114,6 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       const ariaDesc = `${l.descripcion}. ${detalles}. Competencia: ${competenciaTexto}. ${
         enCurso ? "Presiona para continuar." : "Presiona para iniciar."
       }`;
-      const estadoTexto = enCurso ? "En curso" : "No iniciado";
 
       return `
         <button class="materia-card materia-card--lenguaje"
@@ -130,10 +124,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
                 data-busqueda="${escapar(textoBusqueda(l.nombre, l.descripcion))}"
                 aria-describedby="lenguaje-desc-${l.id}"
                 style="--materia-color: ${l.color}">
-          <span class="materia-card-top">
-            <span class="materia-icono" aria-hidden="true">${icono(l.icono)}</span>
-            <span class="materia-estado materia-estado--${enCurso ? "curso" : "inactivo"}">${estadoTexto}</span>
-          </span>
+          <span class="materia-icono" aria-hidden="true">${icono(l.icono)}</span>
           <span class="materia-nombre">${escapar(l.nombre)}</span>
           <span class="materia-desc">${escapar(l.descripcion)}</span>
           <span class="materia-stats materia-stats--lenguaje">

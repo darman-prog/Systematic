@@ -136,12 +136,13 @@ El home (`#screen-materias.home-dashboard`) usa un layout wide dentro de `.app-d
 pantallas conserva el ancho de lectura.
 
 - **Cards:** `<button>` de card completa, superficie tonal con glass sutil, icono en tile con
-  acento por materia, estado en texto, progreso/competencia y conteos. Hover cambia borde,
+  acento por materia, progreso/competencia y conteos. Sin pill de estado: el avance se comunica
+  con la barra y su texto, y `data-estado` queda solo para el filtro. Hover cambia borde,
   fondo y sombra; no traslada la card. Foco visible de 2px.
-- **Materias:** estado “En curso” si hay respuestas o historial; si no, “Disponible”. Barra
-  “X de Y respondidas” derivada de `persistencia.progreso(id)`, sin porcentajes inventados.
-- **Lenguajes:** `barraDeCompetencia` real (“X de 5 etapas”), estado “En curso”/“No iniciado”,
-  CTA visual “Continuar”/“Iniciar” dentro del mismo botón.
+- **Materias:** la barra “X de Y respondidas” sale de `persistencia.progreso(id)`; el estado
+  “En curso” se calcula para el filtro, no como etiqueta visible.
+- **Lenguajes:** `barraDeCompetencia` real (“X de 5 etapas”), CTA visual “Continuar”/“Iniciar”
+  dentro del mismo botón; `data-estado` alimenta el filtro sin pill visible.
 - **Búsqueda:** label visible para lectores (sr-only), filtro por nombre/descripción, botón
   limpiar y estado vacío con `role="status"`; no promete buscar dentro de preguntas.
 - **Filtros:** `Todas (7)`, `Materias (4)`, `Lenguajes (3)`, `En curso (N)`; `aria-pressed` y

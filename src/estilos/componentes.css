@@ -1432,13 +1432,6 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   .home-dashboard .materia-card { background: var(--study-surface-2); }
 }
 
-.materia-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
 .home-dashboard .materia-icono {
   display: flex;
   align-items: center;
@@ -1454,45 +1447,6 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 .home-dashboard .materia-icono .icono {
   width: 24px;
   height: 24px;
-}
-
-.materia-estado {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 9999px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.materia-estado::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-
-.materia-estado--curso {
-  color: var(--study-text);
-  background: color-mix(in srgb, var(--materia-color, var(--study-accent)) 16%, transparent);
-  border-color: color-mix(in srgb, var(--materia-color, var(--study-accent)) 35%, transparent);
-}
-
-.materia-estado--inactivo {
-  color: var(--study-muted);
-  background: var(--study-surface-3);
-  border-color: var(--study-border);
-}
-
-.materia-estado--pendiente {
-  color: var(--study-warning);
-  background: color-mix(in srgb, var(--study-warning) 14%, transparent);
-  border-color: color-mix(in srgb, var(--study-warning) 35%, transparent);
 }
 
 .home-dashboard .materia-nombre {

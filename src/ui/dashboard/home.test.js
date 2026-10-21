@@ -84,10 +84,13 @@ describe("ui/dashboard/home", () => {
     const ts = tarjetas.find(c => c.dataset.lenguaje === "lenguaje-ts");
 
     expect(bd2.textContent).toContain("1 de 90 respondidas");
-    expect(bd2.textContent).toContain("En curso");
-    expect(java.textContent).toContain("No iniciado");
-    expect(ts.textContent).toContain("En curso");
     expect(ts.textContent).toContain("1 de 5 etapas");
+    // El estado no ocupa una pill: vive en data-estado para el filtro y se comunica con la barra.
+    expect(bd2.dataset.estado).toBe("en-curso");
+    expect(java.dataset.estado).toBe("no-iniciado");
+    expect(ts.dataset.estado).toBe("en-curso");
+    expect(bd2.textContent).not.toContain("En curso");
+    expect(java.textContent).not.toContain("No iniciado");
     expect(document.body.textContent).not.toContain("94%");
     expect(document.body.textContent).not.toContain("Dificultad");
   });
