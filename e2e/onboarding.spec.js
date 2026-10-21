@@ -91,6 +91,7 @@ test('el dashboard muestra el catálogo real y filtra', async ({ page }) => {
   await page.getByRole('button', { name: 'Continuar sin nombre' }).click();
 
   await expect(page.locator('#screen-materias')).toBeVisible();
+  await expect(page.locator('#screen-materias [data-action="irPerfil"] svg')).toHaveCount(1);
   await expect(page.locator('.app')).toHaveClass(/app-dashboard/);
   await expect(page.locator('#materias-list .materia-card')).toHaveCount(4);
   await expect(page.locator('#lenguajes-list .materia-card')).toHaveCount(3);
