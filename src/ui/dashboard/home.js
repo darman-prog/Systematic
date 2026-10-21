@@ -8,6 +8,16 @@ import { escapar, saludoSegunHora } from "../helpers.js";
 export function crearHome({ persistencia, cargarRoadmap }) {
   /** @type {(id: string) => any} */
   const $ = id => document.getElementById(id);
+
+  // El DOM devuelve Element; el catálogo necesita dataset/clases de HTMLElement.
+  /**
+   * @param {string} selector
+   * @returns {HTMLElement[]}
+   */
+  function elementos(selector) {
+    return /** @type {HTMLElement[]} */ ([...document.querySelectorAll(selector)]);
+  }
+
   let filtroActivo = "todas";
   let busqueda = "";
   let catalogoConectado = false;
@@ -147,7 +157,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
   }
 
   function actualizarConteos() {
-    const cards = [...document.querySelectorAll("#materias-list .materia-card, #lenguajes-list .materia-card")];
+    const cards = elementos("#materias-list .materia-card, #lenguajes-list .materia-card");
     const materias = cards.filter(c => c.dataset.tipo === "materia").length;
     const lenguajes = cards.filter(c => c.dataset.tipo === "lenguaje").length;
     const enCurso = cards.filter(c => c.dataset.estado === "en-curso").length;
@@ -161,7 +171,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
   }
 
   function actualizarTabs() {
-    document.querySelectorAll(".catalogo-tab").forEach(tab => {
+    elementos(".catalogo-tab").forEach(tab => {
       const activo = tab.dataset.filtro === filtroActivo;
       tab.classList.toggle("is-active", activo);
       tab.setAttribute("aria-pressed", String(activo));
@@ -182,7 +192,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
 
   function aplicarFiltros({ animar = false } = {}) {
     const q = busqueda.trim().toLowerCase();
-    const cards = [...document.querySelectorAll("#materias-list .materia-card, #lenguajes-list .materia-card")];
+    const cards = elementos("#materias-list .materia-card, #lenguajes-list .materia-card");
     const visiblesCards = [];
 
     cards.forEach(card => {
@@ -236,7 +246,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       input.focus();
     });
 
-    document.querySelectorAll(".catalogo-tab").forEach(tab => {
+    elementos(".catalogo-tab").forEach(tab => {
       tab.addEventListener("click", () => {
         filtroActivo = tab.dataset.filtro || "todas";
         actualizarTabs();
