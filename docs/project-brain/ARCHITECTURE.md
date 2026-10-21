@@ -67,9 +67,9 @@ la ubicación del contenido.
 
 ## Deuda conocida
 
-- El mezclador (`core/estudio/mezclador.js` y `questionSelector.js`) sigue sin cablear y
-  conserva un adaptador `storeLocalStorage`; no participa del flujo de producción.
-- No hay contratos tipados ni lint de límites: los límites se sostienen por convención y tests.
+- El mezclador se retiró en [ADR 012](../adr/012-retiro-mezclador.md); la lógica quedó
+  archivada en el tag `archive/mezclador`.
+- No hay contratos tipados globales todavía: los límites se sostienen por convención y tests.
 - No hay lint, typecheck ni CI; los gates son `npm run validar`, `npx vitest run`,
   `npm run build` y `npm run e2e`.
 - Import/export conserva `alert`/`confirm` nativos por decisión de alcance.

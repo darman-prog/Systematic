@@ -88,10 +88,10 @@ Los nombres de etapa, el orden, el umbral y la versión de cada examen viven en
 
 ### Pendiente por decidir antes de implementar
 
-- **Entrada al mezclador global**: `getRegistroParaMezclador` (`src/core/materias.js:98`) alimenta el
-  simulacro mixto con las materias. Recomendación: **que el track de lenguaje no entre** en el MVP,
-  para no alterar el comportamiento del simulacro mixto ni los E2E que entran por índice. Se resuelve
-  al implementar la tarea 1.
+- **Entrada al mezclador global**: descartada en el MVP. El mezclador no cableado se retiró
+  en [ADR 012](../adr/012-retiro-mezclador.md) y su implementación quedó en el tag
+  `archive/mezclador`; si se retoma un simulacro mixto, será una feature nueva sobre
+  `student/contenido` y `student/rondas`.
 
 ## Modelo de datos
 

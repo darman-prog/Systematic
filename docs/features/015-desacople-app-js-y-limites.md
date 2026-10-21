@@ -74,4 +74,5 @@ Cada paso fue un commit independiente con su validación.
 - `app.js`: 899 → 273 líneas; 0 funciones de feature.
 - Auditoría pre-merge (`97f7189`): stats a `core/estudio`, guard de acciones entre
   submódulos, `vencidas` reutilizado y atajos/entorno fuera de `app.js`.
-- Deuda restante: mezclador no cableado, contratos implícitos y ausencia de lint/CI.
+- Deuda restante: contratos implícitos y ausencia de lint/CI; el mezclador se retiró en
+  [ADR 012](../adr/012-retiro-mezclador.md).

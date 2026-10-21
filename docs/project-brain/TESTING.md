@@ -19,7 +19,7 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
 
 ## Suites actuales
 
-- Dominio: `src/core/estudio/{progreso,sesiones,sesion,evaluacion,estadisticas,mezclador}.test.js`;
+- Dominio: `src/core/estudio/{progreso,sesiones,sesion,evaluacion,estadisticas}.test.js`;
   `src/core/juego/{gamificacion,escenarios,misiones}.test.js`;
   `src/core/lenguaje/competencia.test.js`; `src/core/nube/snapshot.test.js`;
   `src/core/diagramas/diagramas.test.js`; `src/core/registro/materias.test.js`.
