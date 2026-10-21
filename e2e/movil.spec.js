@@ -96,6 +96,8 @@ test('pantalla de perfil compacta sin espacio vertical excesivo en móvil', asyn
   // Abrir perfil desde materias
   await page.locator('#screen-materias [data-action="irPerfil"]').click();
   await expect(page.locator('#screen-perfil')).toBeVisible();
+  // Las fuentes cambian el alto del subtítulo: se espera antes de medir el gap.
+  await page.evaluate(() => document.fonts.ready);
 
   // Medir distancia vertical entre el subtítulo de la cabecera y el botón ← Materias
   const subBox = await page.locator('#screen-perfil .perfil-head .perfil-sub').boundingBox();
@@ -107,5 +109,9 @@ test('pantalla de perfil compacta sin espacio vertical excesivo en móvil', asyn
   // La distancia vertical (gap) debe ser compacta (menor a 30px), evitando el vacío de flex-basis
   const distanciaVertical = btnBox.y - (subBox.y + subBox.height);
   expect(distanciaVertical).toBeGreaterThanOrEqual(0);
-  expect(distanciaVertical).toBeLessThanOrEqual(30);
+  await expect.poll(async () => {
+    const sub = await page.locator('#screen-perfil .perfil-head .perfil-sub').boundingBox();
+    const btn = await page.locator('#screen-perfil [data-action="irMaterias"]').boundingBox();
+    return sub && btn ? btn.y - (sub.y + sub.height) : Infinity;
+  }, { timeout: 5000 }).toBeLessThanOrEqual(30);
 });
