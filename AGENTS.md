@@ -45,6 +45,8 @@ desplegado en Vercel.
 - `npm run dev` — servidor de desarrollo.
 - `npm run build` — build de producción a `dist/`.
 - `npm run preview` — sirve el build local.
+- `npm run lint` - ESLint sin warnings.
+- `npm run typecheck` - typecheck de JS con JSDoc (`tsc --noEmit`).
 - `npm run validar` — valida el schema de datos de todos los tracks.
 - `npm run revision` — revisión de calidad de contenido (avisos, no bloquea).
 - `npm run test` — Vitest (unitario).

@@ -2,7 +2,7 @@
 status: vigente
 last_reviewed: 2026-10-20
 confidence: confirmado
-source: código + ADR 001-011
+source: código + ADR 001-013
 ---
 
 # Arquitectura
@@ -64,12 +64,22 @@ la ubicación del contenido.
   controladores por feature.
 - [ADR 011](../adr/011-limites-capas-y-contenido.md): reglas de negocio en `core`/`student` y
   carga de contenido fuera del dominio.
+- [ADR 012](../adr/012-retiro-mezclador.md): retiro del mezclador no cableado; queda en el tag
+  `archive/mezclador`.
+- [ADR 013](../adr/013-contratos-y-gates.md): JSDoc/`checkJs`, ESLint y CI.
+
+## Calidad automatizada
+
+- `npm run lint`: ESLint con errores reales, sin reglas de estilo.
+- `npm run typecheck`: `tsc --noEmit` sobre `src`, `scripts`, `e2e` y configs; los contratos
+  viven en `src/core/tipos.js` y en JSDoc. `strict` queda como deuda posterior.
+- `npm run validar`: schema y conteos de contenido.
+- `npx vitest run`: unitarios de dominio, servicios, orquestación y UI.
+- `npm run build` y `npm run e2e`.
+- CI en `.github/workflows/ci.yml`: `calidad` en push/PR y `e2e` en PR.
 
 ## Deuda conocida
 
-- El mezclador se retiró en [ADR 012](../adr/012-retiro-mezclador.md); la lógica quedó
-  archivada en el tag `archive/mezclador`.
-- No hay contratos tipados globales todavía: los límites se sostienen por convención y tests.
-- No hay lint, typecheck ni CI; los gates son `npm run validar`, `npx vitest run`,
-  `npm run build` y `npm run e2e`.
+- `strict`/`noImplicitAny` no están activos; el typecheck global usa `strict: false`.
 - Import/export conserva `alert`/`confirm` nativos por decisión de alcance.
+- La branch protection de GitHub se configura fuera del repo.

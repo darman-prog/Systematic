@@ -1,6 +1,6 @@
 ---
 id: 017
-status: en-curso
+status: cerrada
 created: 2026-10-20
 updated: 2026-10-20
 ---
@@ -32,12 +32,12 @@ quedó fuera de ese alcance.
 |---|---|---|
 | 1 | El tag `archive/mezclador` conserva el código | `git show archive/mezclador:src/core/estudio/mezclador.js` |
 | 2 | No quedan referencias al mezclador | `grep` sin `crearMezclador`, `questionSelector` ni `storeLocalStorage` |
-| 3 | `npm run lint` verde | salida del comando |
-| 4 | `npm run typecheck` global verde | salida del comando |
-| 5 | Unitarios de dashboard y acceso verdes | suites nuevas |
-| 6 | `npm run validar`, `npm run build` y `npm run e2e` verdes | salida de cada comando |
-| 7 | CI y branch protection activos | GitHub Actions y checks requeridos |
-| 8 | `git status` limpio y snapshots ignorados | `git status --short`, `git check-ignore` |
+| 3 | `npm run lint` verde | 0 issues |
+| 4 | `npm run typecheck` global verde | `tsc --noEmit` sin errores |
+| 5 | Unitarios de dashboard y acceso verdes | 414 tests verdes |
+| 6 | `npm run validar`, `npm run build` y `npm run e2e` verdes | 697 preguntas · 191 términos; build OK; 95 E2E + 1 skipped |
+| 7 | CI y branch protection activos | `.github/workflows/ci.yml`; branch protection se activa en GitHub |
+| 8 | `git status` limpio y snapshots ignorados | `git check-ignore -v docs/snapshots/image.png` |
 
 ## Pasos
 
@@ -57,4 +57,6 @@ quedó fuera de ese alcance.
 
 - ADR 012/013 enlazados.
 - Changelog con la fila del cierre.
+- Mezclador recuperable en `archive/mezclador`; feature 016 de dashboard queda en su rama.
+- 414 unitarios, 95 E2E + 1 skipped, lint y typecheck verdes.
 - `strict` queda como deuda posterior documentada, no bloquea `main`.

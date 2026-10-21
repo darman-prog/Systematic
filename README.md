@@ -6,7 +6,8 @@ ER/UML), apuntes, flashcards y glosario. Sitio estático (Vite + Tailwind, sin s
 el progreso se guarda en el navegador (localStorage) y puede exportarse/importarse como JSON;
 con una cuenta opcional (Firebase) se respalda en la nube y se lleva entre dispositivos (ADR 008).
 
-**Materias:** Base de Datos 2 · Ingeniería de Software · Arquitectura de Software.
+**Materias:** Base de Datos 2 · Ingeniería de Software · Arquitectura de Software ·
+Infraestructura. **Lenguajes:** TypeScript · Java · Python.
 
 ## Uso
 
@@ -38,9 +39,11 @@ técnico: [ADR 008](docs/adr/008-cuenta-y-sincronizacion-firestore.md) y
 | `npm run dev` | Servidor de desarrollo |
 | `npm run build` | Build de producción a `dist/` |
 | `npm run preview` | Sirve el build local |
+| `npm run lint` | ESLint sin warnings |
+| `npm run typecheck` | Typecheck de JS con JSDoc (`tsc --noEmit`) |
 | `npm run validar` | Valida el schema de datos de todas las materias |
 | `npm run test` | Tests unitarios (Vitest) |
-| `npm run e2e` | Smoke E2E (Playwright, compila y sirve el build) |
+| `npm run e2e` | Suite E2E (Playwright, compila y sirve el build) |
 
 ## Deploy (Vercel)
 

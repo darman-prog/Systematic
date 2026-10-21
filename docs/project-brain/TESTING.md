@@ -24,7 +24,7 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
   `src/core/lenguaje/competencia.test.js`; `src/core/nube/snapshot.test.js`;
   `src/core/diagramas/diagramas.test.js`; `src/core/registro/materias.test.js`.
 - Aplicación: `src/student/{persistencia,avance,gamificacion,registros,track,session,rondas,contenido,exportacion,cuenta,nube,firebase,aplicar}.test.js`.
-- Orquestación: `src/orquestacion/{quiz,ajustes,acceso}.test.js` y
+- Orquestación: `src/orquestacion/{quiz,ajustes,acceso,dashboard}.test.js` y
   `src/orquestacion/acciones/acciones.test.js` (duplicados + contrato `data-action`).
 - UI: `src/ui/{iconos,helpers}.test.js`; `src/ui/aprendizaje/{apuntes,lenguaje}.test.js`;
   `src/ui/componentes/{estados,componentes,competencia}.test.js`;
@@ -33,6 +33,20 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
   `scripts/revision-contenido.test.js`.
 - E2E: `smoke`, `onboarding`, `perfil`, `lenguajes`, `infraestructura`, `movil` y las tres
   auditorías (`a11y`, `teclado`, `funcionalidad`).
+
+## Gates
+
+| Gate | Comando |
+|---|---|
+| Lint | `npm run lint` |
+| Typecheck | `npm run typecheck` |
+| Datos | `npm run validar` |
+| Unitarios | `npx vitest run` |
+| Build | `npm run build` |
+| E2E | `npm run e2e` |
+
+CI (`.github/workflows/ci.yml`) corre lint, typecheck, validar, unitarios y build en cada
+push/PR; E2E corre en PR. La branch protection exige ambos checks antes de mergear a `main`.
 
 ## Reglas
 
@@ -48,4 +62,4 @@ Estrategia y suites de tests del proyecto. Leelo al agregar tests o antes de cer
 - Cambio de dominio, datos o servicios: `npx vitest run` y `npm run validar`.
 - Cambio de UI, acciones o flujos: `npm run build` y `npm run e2e`.
 - Cierre de una tarea: `npm run validar`, `npx vitest run`, `npm run build` y `npm run e2e`.
-- El repo no tiene lint, typecheck ni CI; se declara en el PR.
+- El CI es el gate final; un PR no se mergea con `calidad` o `e2e` en rojo.

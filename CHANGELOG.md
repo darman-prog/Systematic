@@ -9,6 +9,10 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
   [ADR 011](docs/adr/011-limites-capas-y-contenido.md)): evaluación, misiones, estadísticas,
   selección de rondas y carga de contenido en `core`/`student`; controladores por feature;
   acciones por feature con guard de duplicados; `app.js` de 899 a 273 líneas.
+- Cierre de deuda pre-main ([ADR 012](docs/adr/012-retiro-mezclador.md),
+  [ADR 013](docs/adr/013-contratos-y-gates.md)): mezclador archivado en `archive/mezclador`
+  y retirado; JSDoc/`checkJs`, ESLint, CI con E2E en PR, unitarios de dashboard/acceso,
+  typecheck de scripts/e2e y `docs/snapshots/` ignorado.
 
 ## Sin publicar (rama `feat/modernizacion-y-contenido`)
 
