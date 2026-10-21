@@ -31,3 +31,6 @@ test-results/
 
 # Prototipos de diseño (insumo local, no se versionan)
 docs/PrototiposDiseños/
+
+# Snapshots locales de diseño (no se versionan)
+docs/snapshots/
