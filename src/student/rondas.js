@@ -2,13 +2,22 @@
 // funciones puras inyectadas; orquestacion/ronda.js se queda con timers, pausa y pantalla.
 import { esDebil, vencida, ordenarPrioridad, shuffle, filtrarDiagramas } from "../core/index.js";
 
+/**
+ * @param {{
+ *   obtenerP: (id: string) => any,
+ *   filtrar?: (preguntas: any[], disponibles: boolean) => any[],
+ *   diagramasDisponibles?: () => boolean,
+ *   rng?: () => number,
+ *   priorizar?: (lista: any[]) => any[]
+ * }} deps
+ */
 export function crearRondas({
   obtenerP,
   filtrar = filtrarDiagramas,
   diagramasDisponibles = () => true,
   rng = Math.random,
   priorizar = lista => ordenarPrioridad(lista, obtenerP, rng)
-} = {}) {
+}) {
   const sinDiagramas = qs => filtrar(qs, diagramasDisponibles());
   const barajar = qs => shuffle(qs, rng);
   const ordenar = qs => priorizar(qs);

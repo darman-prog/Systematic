@@ -44,6 +44,9 @@ export function emailValido(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || "").trim());
 }
 
+/**
+ * @param {{ cargarNube: () => Promise<any>, alCambiarSesion?: (usuario: any) => void }} deps
+ */
 export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
   let adaptador = null;
   let usuario = null;
@@ -138,7 +141,7 @@ export function crearCuenta({ cargarNube, alCambiarSesion = () => {} }) {
   // Resuelve con la función para dejar de observar (o null sin cuenta) DESPUÉS del primer
   // evento de sesión, para que el arranque decida la pantalla con el estado real.
   async function iniciar() {
-    const api = await nube();
+    const api = /** @type {any} */ (await nube());
     if (!api) return null;
     return new Promise(resolve => {
       let primera = true;

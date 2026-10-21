@@ -16,7 +16,7 @@ export const DIFICULTADES = ["facil", "media", "dificil"];
 export const frac = h => (h.total ? h.score / h.total : 0);
 export const pct = h => Math.round(frac(h) * 100);
 
-export const ordenarHistorial = h => [...h].sort((a, b) => new Date(b.date) - new Date(a.date));
+export const ordenarHistorial = h => [...h].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
 const isoLocal = d =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -36,7 +36,7 @@ function calcularTendencia(hist) {
 
 export function calcularStats({
   materia, banco, obtenerP, historial, actividad, meta,
-  colorDeTema = () => null
+  colorDeTema = (_materia, _tema) => null
 }) {
   /* Una sola pasada por el banco (antes eran ~10 recorridos con filter). */
   let ok = 0, fail = 0, respondidas = 0, debiles = 0, vencidas = 0;
