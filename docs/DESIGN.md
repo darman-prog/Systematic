@@ -129,6 +129,28 @@ acotada al resto de la app: se permite vidrio, glow ambiental y silueta ribbon s
 - **Accesibilidad:** AA, foco visible, `aria-describedby` en errores/hint, `prefers-reduced-motion`
   respetado y `aria-label="Acceso"` en la sección cuando el título “Cuenta” está oculto.
 
+## Dashboard / Catálogo
+
+El home (`#screen-materias.home-dashboard`) usa un layout wide dentro de `.app-dashboard`
+(máx. 72rem) y muestra solo el catálogo real: 4 materias y 3 lenguajes. El resto de las
+pantallas conserva el ancho de lectura.
+
+- **Cards:** `<button>` de card completa, superficie tonal con glass sutil, icono en tile con
+  acento por materia, estado en texto, progreso/competencia y conteos. Hover cambia borde,
+  fondo y sombra; no traslada la card. Foco visible de 2px.
+- **Materias:** estado “En curso” si hay respuestas o historial; si no, “Disponible”. Barra
+  “X de Y respondidas” derivada de `persistencia.progreso(id)`, sin porcentajes inventados.
+- **Lenguajes:** `barraDeCompetencia` real (“X de 5 etapas”), estado “En curso”/“No iniciado”,
+  CTA visual “Continuar”/“Iniciar” dentro del mismo botón.
+- **Búsqueda:** label visible para lectores (sr-only), filtro por nombre/descripción, botón
+  limpiar y estado vacío con `role="status"`; no promete buscar dentro de preguntas.
+- **Filtros:** `Todas (7)`, `Materias (4)`, `Lenguajes (3)`, `En curso (N)`; `aria-pressed` y
+  conteos dinámicos. Sin categorías/niveles que no existan en el registro.
+- **Responsive:** 1 columna móvil, 2 en tablet, 3 desde `≥1024px` y 4 para materias en
+  `≥1280px`; lenguajes 3 desde `≥768px`. Cards y controles con foco y targets ≥44px.
+- **Prohibido:** niveles/“Nuevo”/“Recomendado”/“Sandbox”/“94%” ficticios, “Guía curricular”
+  muerta, Material Symbols/CDN o un logo distinto al “S” de Systematic.
+
 ## Iconography
 
 La iconografía es un set propio de SVG de trazo (`src/ui/iconos.js`): stroke 1.5, viewBox 24,
