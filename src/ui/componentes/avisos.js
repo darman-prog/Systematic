@@ -1,5 +1,6 @@
 // Avisos efímeros: toast de mensajes y confeti de celebración.
 // Vivían en app.js; se mueven aquí para que la composición root no cargue DOM de celebración.
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function toast(mensaje) {

@@ -13,6 +13,7 @@ import {
 import { icono } from "../iconos.js";
 import { crearDiagramasUI } from "../componentes/diagramas.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked }) {
@@ -89,7 +90,7 @@ export function crearQuizUI({ ctx, obtenerP, registrarRespuesta, toggleMarked })
     if (session.answers[session.idx]) return;
     const item = session.items[session.idx];
     const res = evaluarOpcion(item, idx);
-    const buttons = document.querySelectorAll("#options-container .option");
+    const buttons = /** @type {NodeListOf<HTMLButtonElement>} */ (document.querySelectorAll("#options-container .option"));
     buttons.forEach(b => b.disabled = true);
     if (res.ok) {
       buttons[idx].classList.add("option-correct");

@@ -14,6 +14,7 @@ import { calcularStats, ordenarHistorial, pct, CFG_ESTADISTICAS } from "../../co
 import { DIF_LABELS, colorTema, escapar } from "../helpers.js";
 import { aviso } from "../componentes/estados.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 /* ═══════════════════════════════════════════════════════════════
@@ -180,7 +181,7 @@ function filaHistorial(h, i, hist, mejorIdx) {
   const esSim = h.modo === "simulacro";
   const prev = hist[i + 1];   // el historial completo, no el slice visible
 
-  let tendencia = "";
+  let tendencia = /** @type {any} */ ("");
   if (prev) {
     const diff = p - pct(prev);
     tendencia = diff > 0
@@ -686,7 +687,7 @@ function enlazarPanel(panel) {
 
 /* Si algo dispara un re-render completo, el foco vuelve al mismo control. */
 function selectorFoco(panel) {
-  const a = document.activeElement;
+  const a = /** @type {HTMLElement|null} */ (document.activeElement);
   if (!a || !panel.contains(a)) return null;
   if (a.id) return "#" + CSS.escape(a.id);
   if (a.dataset?.paso) return `.meta-btn[data-paso="${a.dataset.paso}"]`;

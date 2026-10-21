@@ -2,7 +2,8 @@
 // y el resumen de preguntas que coinciden. Recibe el estado y los helpers por parámetro; no toca
 // localStorage ni conoce el estado global (ADR 001/007).
 export function crearConfig({ getFiltros, valoresDe, contarPor, leerOpciones, preguntasFiltradas, diagramasDisponibles, TIPO_LABELS, DIF_LABELS, mostrarPantalla }) {
-  const $ = id => document.getElementById(id);
+  /** @type {(id: string) => any} */
+const $ = id => document.getElementById(id);
 
   function renderConfig() {
     const filtros = getFiltros();

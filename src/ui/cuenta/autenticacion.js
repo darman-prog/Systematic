@@ -202,7 +202,8 @@ function plantilla(vista, conGoogle, conInvitado) {
 }
 
 export function crearAuth({ alIniciarSesion, alRegistrarse, alRecuperar, alGoogle, alContinuarSinCuenta }) {
-  const $ = id => document.getElementById(id);
+  /** @type {(id: string) => any} */
+const $ = id => document.getElementById(id);
   const raiz = () => $("auth-root");
 
   let vista = "login";

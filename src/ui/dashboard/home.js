@@ -7,7 +7,8 @@ import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
 
 export function crearHome({ persistencia, cargarRoadmap }) {
-  const $ = id => document.getElementById(id);
+  /** @type {(id: string) => any} */
+const $ = id => document.getElementById(id);
 
   function renderMaterias() {
     const cont = $("materias-list");

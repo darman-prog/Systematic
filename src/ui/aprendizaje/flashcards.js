@@ -8,6 +8,7 @@ import {
   bloqueCaso, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function crearFlashcardsUI({ ctx, obtenerP, registrarRespuesta, mostrarPantalla }) {

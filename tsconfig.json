@@ -12,6 +12,6 @@
     "strict": false,
     "noImplicitAny": false
   },
-  "include": ["src/core/**/*.js", "src/student/**/*.js"],
+  "include": ["src/**/*.js"],
   "exclude": ["**/*.test.js", "**/*.spec.js"]
 }

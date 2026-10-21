@@ -12,7 +12,7 @@ const DOMPurify = typeof DOMPurifyImport === "function" && !DOMPurifyImport.sani
   : DOMPurifyImport;
 
 export function apunteAHTML(markdown) {
-  const html = marked.parse(String(markdown || ""), { breaks: true, gfm: true });
+  const html = /** @type {string} */ (marked.parse(String(markdown || ""), { breaks: true, gfm: true }));
   return DOMPurify.sanitize(html);
 }
 
@@ -27,7 +27,8 @@ export function filtrarApuntes(apuntes, filtro, temaActivo) {
 // Pantalla de apuntes: lista filtrada por tema y buscador. El tema activo es estado del módulo;
 // recibe la materia activa y la navegación por parámetro (no toca localStorage ni estado global).
 export function crearApuntesUI({ getMateria, mostrarPantalla }) {
-  const $ = id => document.getElementById(id);
+  /** @type {(id: string) => any} */
+const $ = id => document.getElementById(id);
   let apunteTema = "todos";
 
   function apuntesDeMateria() {
@@ -53,6 +54,7 @@ export function crearApuntesUI({ getMateria, mostrarPantalla }) {
     $("apuntes-list").innerHTML = lista.map(a => tarjeta({
       tema: a.tema,
       titulo: a.titulo,
+      pie: "",
       cuerpo: '<div class="apunte-contenido">' + apunteAHTML(a.contenido) + '</div>' +
         '<div class="apunte-fuente">Fuente: ' + escapar(a.fuente) + '</div>'
     })).join("") || estadoVacio("Aún no hay apuntes para esta materia.");

@@ -9,6 +9,7 @@ import {
   asignarMiembro, conectar, quitarConexion, actualizarPosicion
 } from "../../core/index.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 // Área interna (papel) del lienzo: los nodos se posicionan y se dibujan respecto a ella;
 // #lienzo-diagrama es el marco scrollable (en móvil el papel es más grande que el marco).
@@ -23,6 +24,18 @@ const $area = () => document.getElementById("lienzo-area");
 //   accionComprobar  — data-action del botón comprobar.
 //   accionCancelarTipo — data-action del botón cancelar tipo de relación.
 //   mostrarPregunta  — si false, no pinta bloqueCaso ni el enunciado (modo casos).
+/**
+ * @param {{
+ *   ctx?: any,
+ *   guardarEstado?: (estado: any) => void,
+ *   obtenerItem?: () => any,
+ *   obtenerEstado?: () => any,
+ *   areaId?: string,
+ *   accionComprobar?: string,
+ *   accionCancelarTipo?: string,
+ *   mostrarPregunta?: boolean
+ * }} [opciones]
+ */
 export function crearDiagramasUI({
   ctx,
   guardarEstado,
@@ -191,7 +204,7 @@ export function crearDiagramasUI({
       if (ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom) {
         if (esMiembro) {
           const bajo = document.elementFromPoint(ev.clientX, ev.clientY);
-          const nodo = bajo && bajo.closest(".nodo-puesto");
+          const nodo = bajo && /** @type {HTMLElement|null} */ (bajo.closest(".nodo-puesto"));
           if (nodo) {
             guardar(asignarMiembro(estado(), etiqueta, nodo.dataset.label));
             renderDiagrama(itemActual(), zona());
@@ -429,9 +442,11 @@ export function crearDiagramasUI({
 
     const cerrar = () => {
       modal.remove();
-      if (focoPrevio && typeof focoPrevio.focus === "function") focoPrevio.focus({ preventScroll: true });
+      if (focoPrevio && typeof /** @type {HTMLElement} */ (focoPrevio).focus === "function") {
+        /** @type {HTMLElement} */ (focoPrevio).focus({ preventScroll: true });
+      }
     };
-    const primero = modal.querySelector(".btn-guarda");
+    const primero = /** @type {HTMLElement|null} */ (modal.querySelector(".btn-guarda"));
     if (primero) primero.focus();
 
     modal.addEventListener("keydown", e => {
@@ -442,8 +457,8 @@ export function crearDiagramasUI({
       }
       // Trampa de foco: Tab cicla solo entre los botones del diálogo (WCAG 2.1.2).
       if (e.key !== "Tab") return;
-      const botones = Array.from(modal.querySelectorAll("button"));
-      const idx = botones.indexOf(document.activeElement);
+      const botones = /** @type {HTMLButtonElement[]} */ (Array.from(modal.querySelectorAll("button")));
+      const idx = botones.indexOf(/** @type {HTMLButtonElement} */ (document.activeElement));
       if (e.shiftKey && idx <= 0) {
         e.preventDefault();
         botones[botones.length - 1].focus();
@@ -455,7 +470,7 @@ export function crearDiagramasUI({
     // Cierre tocando el fondo del overlay (útil en táctil).
     modal.addEventListener("pointerdown", e => { if (e.target === modal) cerrar(); });
 
-    modal.querySelectorAll(".btn-guarda").forEach(btn => {
+    /** @type {NodeListOf<HTMLElement>} */ (modal.querySelectorAll(".btn-guarda")).forEach(btn => {
       btn.addEventListener("click", () => {
         const guarda = btn.dataset.guarda || undefined;
         const est = estado();
@@ -606,7 +621,7 @@ export function crearDiagramasUI({
     inyectarMarcador();
     papel.querySelectorAll(".etiqueta-arista").forEach(el => el.remove());
     const mapa = {};
-    papel.querySelectorAll(".nodo-puesto").forEach(n => { mapa[n.dataset.label] = n; });
+    /** @type {NodeListOf<HTMLElement>} */ (papel.querySelectorAll(".nodo-puesto")).forEach(n => { mapa[n.dataset.label] = n; });
     const r = papel.getBoundingClientRect();
     svg.setAttribute("width", Math.max(papel.clientWidth, 1));
     svg.setAttribute("height", Math.max(papel.clientHeight, r.height || 320));

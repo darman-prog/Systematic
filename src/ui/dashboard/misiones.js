@@ -4,6 +4,7 @@ import { icono } from "../iconos.js";
 import { estadoVacio } from "../componentes/estados.js";
 import { colorTema, escapar } from "../helpers.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 /* ─── Paleta "Noche calma" (alinee con stats.js/resultados.js) ─── */

@@ -40,7 +40,7 @@ export function crearDashboard({
     const dias = Object.keys(avance.actividad());
     if (!dias.length) { slot.innerHTML = ""; return; }
     const ultima = dias.sort().pop();
-    const hace = Math.round((new Date(hoy()) - new Date(ultima)) / 86400000);
+    const hace = Math.round((new Date(hoy()).getTime() - new Date(ultima).getTime()) / 86400000);
     const cuando = hace <= 0 ? "hoy" : hace === 1 ? "ayer" : "hace " + hace + " días";
     const debiles = track.banco.filter(q => esDebil(avance.obtenerP(q.id))).length;
     ui.pintarContinuidad($, { cuando, debiles });

@@ -3,6 +3,7 @@
 import { escapar, resaltarSQL, sqlKeywordsDe } from "../helpers.js";
 import { icono } from "../iconos.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function crearGlosarioUI({ ctx, mostrarPantalla }) {

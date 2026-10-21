@@ -45,7 +45,7 @@ export function crearAcciones({ acceso, practica, juego, navegacion }) {
 // El listener delegado vive junto al mapa que resuelve (ADR 002).
 export function instalarDelegacion(mapa) {
   document.addEventListener("click", event => {
-    const el = event.target.closest("[data-action]");
+    const el = /** @type {HTMLElement|null} */ (/** @type {any} */ (event.target).closest("[data-action]"));
     if (!el) return;
     const accion = mapa[el.dataset.action];
     if (accion) accion(el);

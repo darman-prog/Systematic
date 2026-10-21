@@ -6,6 +6,7 @@ import { estadoVacio } from "../componentes/estados.js";
 import { tarjeta } from "../componentes/tarjetas.js";
 import { tagRating } from "../componentes/etiquetas.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function pintarListaCasos(casos, registros) {

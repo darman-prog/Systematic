@@ -9,7 +9,8 @@ import { icono } from "../iconos.js";
 const plural = (n, uno, varios) => (n === 1 ? uno : varios);
 
 export function crearPerfil() {
-  const $ = id => document.getElementById(id);
+  /** @type {(id: string) => any} */
+const $ = id => document.getElementById(id);
 
   // Pinta la identidad con el mismo lenguaje visual del home (anillo + chips).
   function pintarIdentidad(cont, { nombre, email, perfil }) {

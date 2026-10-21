@@ -5,6 +5,7 @@ import { animar, colorTema, escapar, resaltarSQL, sqlKeywordsDe } from "../helpe
 import { icono } from "../iconos.js";
 import { anilloPuntaje } from "../componentes/anillo.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 /* ─── Paleta "Noche calma" ─── */
@@ -59,7 +60,7 @@ export function crearResultadosUI({ ctx, registrarRespuesta, contarDebiles }) {
     const colorAnillo = r.pct >= 75 ? TEMA.exito : r.pct >= 50 ? TEMA.alerta : TEMA.error;
     
     let html = '<div class="results-hero">' +
-      anilloPuntaje(r.pct, colorAnillo, r.aciertos + " de " + r.totalCal + " correctas (" + r.pct + "%)") +
+      anilloPuntaje(r.pct, colorAnillo) +
       '<p class="text-base sm:text-lg font-medium text-slate-100 mt-1">' + mensaje + '</p>' +
       (r.supervivencia ? '<p class="text-xs text-slate-400 mt-2 flex items-center justify-center gap-1.5">' + icono("supervivencia", "icono-sm") + '<span>Respondiste ' + r.supervivencia.jugadas + ' pregunta(s) · mejor combo: ' + r.supervivencia.mejorCombo + '</span></p>' : "") +
       (r.desarrollos.length ? '<p class="text-xs text-slate-400 mt-2">' + r.desarrollos.length + ' pregunta(s) de desarrollo se autoevalúan aparte.</p>' : "") +

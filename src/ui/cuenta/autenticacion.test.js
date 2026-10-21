@@ -10,6 +10,7 @@ function montar({ alIniciarSesion = vi.fn(async () => {}), alRegistrarse = vi.fn
   return { auth, alIniciarSesion, alRegistrarse, alRecuperar, alGoogle, alContinuarSinCuenta };
 }
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 const flush = () => new Promise(r => setTimeout(r, 0));
 const enviar = () => $("auth-form").dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));

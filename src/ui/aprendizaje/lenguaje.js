@@ -5,6 +5,7 @@ import { estadoVacio } from "../componentes/estados.js";
 import { etapaDesbloqueada, aprobadoVigente, umbralDeExamen } from "../../core/index.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function estadoEtapas(roadmap, competencia) {

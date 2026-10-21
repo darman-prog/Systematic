@@ -6,6 +6,7 @@ import {
   bloqueCaso, colorTema, diagramaER, escapar, respuestaEstudio, resaltarSQL, sqlKeywordsDe, tablaDatos
 } from "../helpers.js";
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 export function crearEstudioUI({ ctx, obtenerP, toggleMarked, mostrarPantalla }) {

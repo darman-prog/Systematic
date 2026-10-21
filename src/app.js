@@ -56,6 +56,7 @@ let lenguaje = null;
 let dashboard = null;
 let acceso = null;
 
+/** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
 
 // El diálogo de confirmación vive en su componente (ADR 009); acá solo se instancia.
@@ -99,7 +100,7 @@ const track = crearTrack({
 const sesiones = crearSesiones({
   persistencia, gamificacion, track, obtenerP: avance.obtenerP, xpDeRespuesta, XP_EVENTOS,
   estrellasDeMision, fusionarMision, registrarExamen, prepararItem,
-  guardarIntento: avance.guardarIntento, conNombre,
+  ahora: () => Date.now(), guardarIntento: avance.guardarIntento, conNombre,
   // El toast del examen no lleva icono: se pasa el texto tal cual.
   notificar: texto => toast(texto),
   alFinalizar: () => { resultados.pintarResultados(false); show("results"); },
@@ -110,7 +111,7 @@ const ctx = crearContexto({ sesiones, track });
 
 // Cuenta y nube (ADR 008): servicios con dependencias inyectadas; la UI de acceso vive en
 // ui/cuenta/autenticacion.js y el panel de sesión en ui/cuenta.js.
-const cuentaUI = crearCuentaUI({ ctx });
+const cuentaUI = crearCuentaUI();
 const perfilUI = crearPerfil();
 const cuenta = crearCuenta({
   cargarNube: cargarFirebase,
@@ -131,8 +132,8 @@ const config = crearConfig({
   getFiltros: () => track.filtros,
   valoresDe: track.valoresDe, contarPor: track.contarPor,
   // Los puentes llegan del controlador (las const alias viven más abajo, en zona muerta acá).
-  leerOpciones: (...args) => configCtl.leerOpciones(...args),
-  preguntasFiltradas: (...args) => configCtl.preguntasFiltradas(...args),
+  leerOpciones: configCtl.leerOpciones,
+  preguntasFiltradas: configCtl.preguntasFiltradas,
   diagramasDisponibles, TIPO_LABELS, DIF_LABELS,
   mostrarPantalla: show
 });
