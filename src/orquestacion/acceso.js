@@ -11,13 +11,16 @@ export function decidirInicio({ disponible, usuario, onboardingHecho, nombre }) 
 
 export function crearAcceso({
   $, persistencia, home, show, cuenta, cuentaUI, perfilUI, nube, gamificacion,
-  fechaSnapshot, aplicarSnapshot, sesiones, clearTimer
+  fechaSnapshot, aplicarSnapshot, sesiones, clearTimer,
+  crearAuthUI = crearAuth,
+  recargar = () => location.reload()
 }) {
   let cache = { disponible: false, email: null };
 
   function datosPerfil() {
     const usuario = cuenta.estado();
-    const email = usuario?.email ?? usuario?.correo ?? null;
+    // `cache.email` cubre el cambio de sesión antes de que el servicio vuelva a consultar.
+    const email = usuario?.email ?? usuario?.correo ?? cache.email ?? null;
     const cuentaEstado = !cache.disponible ? "no-disponible" : (email ? "sesion" : "invitado");
     return { nombre: persistencia.nombre(), email, cuentaEstado, perfil: gamificacion.perfil() };
   }
@@ -58,7 +61,7 @@ export function crearAcceso({
     const cuando = fecha ? fecha.toLocaleString() : "una fecha desconocida";
     if (!window.confirm("Encontramos un respaldo del " + cuando + ". ¿Restaurar tu progreso en este dispositivo?")) return false;
     aplicarSnapshot(r.datos, persistencia);
-    location.reload();
+    recargar();
     return true;
   }
 
@@ -103,7 +106,7 @@ export function crearAcceso({
     return r;
   }
 
-  const auth = crearAuth({
+  const auth = crearAuthUI({
     alIniciarSesion: datos => pedirCuenta(
       () => cuenta.ingresar(datos.correo, datos.contrasena),
       r => entrarConCuenta(r.usuario)
