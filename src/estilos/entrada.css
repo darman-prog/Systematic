@@ -115,6 +115,9 @@
 /* Flashcards: la pantalla usa un contenedor extendido (.app-ancha, ver router)
    y las caras crecen con el contenido en lugar de quedar recortadas a 16rem. */
 .app-ancha { max-width: 56rem; }
+
+/* Dashboard: grilla de 4 columnas solo en el home de materias. */
+.app-dashboard { max-width: 72rem; }
 #screen-flashcards .flash-card { @apply min-h-0 sm:p-8; }
 /* Los estilos del constructor de diagramas viven en lienzo.css (importado desde main.js). */
 
@@ -125,8 +128,6 @@
   padding: 20px;
   background: color-mix(in srgb, var(--materia-color) 8%, var(--study-surface));
   border: 1px solid var(--study-border);
-  /* Acento por materia en versión tenue: identidad sin la barra gruesa. */
-  border-left: 3px solid color-mix(in srgb, var(--materia-color) 65%, transparent);
   border-radius: 12px;
   text-align: left;
   cursor: pointer;

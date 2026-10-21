@@ -46,20 +46,51 @@
     </div>
   </section>
 
-  <section id="screen-materias" class="card hidden">
-    <h1 class="brand-title mb-2">Systematic</h1>
-    <p class="text-sm text-slate-400 mb-2" id="saludo-home"></p>
-    <p class="subtitle">Elige la materia. Práctica, simulacro, modo estudio, flashcards, glosario y apuntes, con tu progreso guardado por separado en cada una.</p>
-    <div class="flex justify-end mb-2">
+  <section id="screen-materias" class="card home-dashboard hidden" aria-labelledby="home-titulo">
+    <header class="home-head">
+      <div class="home-brand">
+        <img src="/logo.svg" alt="" width="32" height="32" class="home-logo">
+        <h1 id="home-titulo" class="brand-title">Systematic</h1>
+      </div>
       <button class="btn btn-ghost btn-sm" data-action="irPerfil">Ver mi perfil</button>
+    </header>
+    <p class="home-saludo" id="saludo-home"></p>
+    <p class="subtitle">Elegí una materia o un lenguaje. Tu progreso se guarda por separado.</p>
+
+    <div class="catalogo-barra">
+      <div class="catalogo-busca">
+        <span data-icono="buscar" class="catalogo-busca-icono" aria-hidden="true"></span>
+        <label class="sr-only" for="catalog-search">Buscar materias y lenguajes</label>
+        <input id="catalog-search" type="search" placeholder="Buscar materias y lenguajes por nombre o descripción…" autocomplete="off" aria-controls="materias-list lenguajes-list" aria-keyshortcuts="Control+K Meta+K" aria-describedby="catalog-atajo">
+        <button type="button" id="catalog-clear" class="catalogo-clear hidden" aria-label="Limpiar búsqueda"><span data-icono="cerrar" aria-hidden="true"></span></button>
+        <kbd id="catalog-atajo" class="catalogo-atajo">Ctrl K</kbd>
+      </div>
+      <div class="catalogo-filtros" role="group" aria-label="Filtrar catálogo">
+        <button type="button" class="catalogo-tab is-active" data-filtro="todas" aria-pressed="true">Todas (<span id="filtro-todas-count">7</span>)</button>
+        <button type="button" class="catalogo-tab" data-filtro="materias" aria-pressed="false">Materias (<span id="filtro-materias-count">4</span>)</button>
+        <button type="button" class="catalogo-tab" data-filtro="lenguajes" aria-pressed="false">Lenguajes (<span id="filtro-lenguajes-count">3</span>)</button>
+        <button type="button" class="catalogo-tab" data-filtro="en-curso" aria-pressed="false">En curso (<span id="filtro-curso-count">0</span>)</button>
+      </div>
     </div>
-    <div id="materias-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-    <div id="lenguajes-seccion" class="hidden">
-      <br>
-      <h2 class="section-title text-center justify-center">Lenguajes</h2>
-      <p class="subtitle text-center mx-auto">Leé y verificá código generado por IA. Avanzá por etapas con exámenes.</p>
-      <div id="lenguajes-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-    </div>
+
+    <section id="materias-seccion" class="catalogo-seccion" aria-labelledby="materias-titulo">
+      <div class="catalogo-head">
+        <h2 id="materias-titulo" class="catalogo-titulo">Materias de <em>Ingeniería</em></h2>
+        <span id="materias-count" class="catalogo-count">4 materias</span>
+      </div>
+      <div id="materias-list" class="catalogo-grid"></div>
+    </section>
+
+    <section id="lenguajes-seccion" class="catalogo-seccion hidden" aria-labelledby="lenguajes-titulo">
+      <div class="catalogo-head">
+        <h2 id="lenguajes-titulo" class="catalogo-titulo">Lenguajes y <em>Runtimes</em></h2>
+        <span id="lenguajes-count" class="catalogo-count">3 lenguajes</span>
+      </div>
+      <p class="catalogo-sub">Leé y verificá código generado por IA. Avanzá por etapas con exámenes.</p>
+      <div id="lenguajes-list" class="catalogo-grid catalogo-grid--lenguajes"></div>
+    </section>
+
+    <p id="catalogo-vacio" class="catalogo-vacio hidden" role="status">No encontramos materias ni lenguajes con esa búsqueda.</p>
   </section>
 
   <section id="screen-start" class="card hidden">

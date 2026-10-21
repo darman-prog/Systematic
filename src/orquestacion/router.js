@@ -10,6 +10,8 @@ const PANTALLAS = [
 // Ancho extendido: flashcards necesita más superficie de lectura para que el
 // reverso no quede atrapado en un rectángulo pequeño con scroll interno.
 const PANTALLAS_ANCHA = ["flashcards"];
+// El dashboard necesita una grilla de 4 columnas; el resto mantiene el ancho de lectura.
+const PANTALLAS_DASHBOARD = ["materias"];
 
 export function crearRouter({ $, animar }) {
   function show(screen) {
@@ -17,7 +19,10 @@ export function crearRouter({ $, animar }) {
       $("screen-" + s).classList.toggle("hidden", s !== screen)
     );
     const app = document.querySelector(".app");
-    if (app) app.classList.toggle("app-ancha", PANTALLAS_ANCHA.includes(screen));
+    if (app) {
+      app.classList.toggle("app-ancha", PANTALLAS_ANCHA.includes(screen));
+      app.classList.toggle("app-dashboard", PANTALLAS_DASHBOARD.includes(screen));
+    }
     animar($("screen-" + screen));
     // Cada pantalla arranca desde arriba para no heredar el scroll anterior.
     window.scrollTo({ top: 0, behavior: "smooth" });
