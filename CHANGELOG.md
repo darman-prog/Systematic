@@ -3,7 +3,7 @@
 Historial legible de cambios relevantes de Systematic. El detalle por commit vive en
 `git log`; acá solo lo que cambia la experiencia o la arquitectura.
 
-## Sin publicar (rama `refactor/limites-capas`)
+## Sin publicar (pre-deploy)
 
 - Refuerzo de límites y desacople de `app.js` ([ADR 010](docs/adr/010-app-js-composition-root.md),
   [ADR 011](docs/adr/011-limites-capas-y-contenido.md)): evaluación, misiones, estadísticas,
@@ -13,6 +13,8 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
   [ADR 013](docs/adr/013-contratos-y-gates.md)): mezclador archivado en `archive/mezclador`
   y retirado; JSDoc/`checkJs`, ESLint, CI con E2E en PR, unitarios de dashboard/acceso,
   typecheck de scripts/e2e y `docs/snapshots/` ignorado.
+- Dashboard con catálogo real (feature 016): home wide con 4 materias y 3 lenguajes,
+  búsqueda/filtros, progreso real, cards sin pill de estado y animación de entrada al filtrar.
 
 ## Sin publicar (rama `feat/modernizacion-y-contenido`)
 
