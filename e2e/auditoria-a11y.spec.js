@@ -145,6 +145,7 @@ test.describe('Auditoría de accesibilidad — axe-core', () => {
       // Ejecutar axe y recolectar violaciones.
       const resultados = await page.evaluate(() => {
         return new Promise((resolve) => {
+          // @ts-ignore axe se inyecta en la página antes de este evaluate.
           axe.run(document, {
             runOnly: {
               type: 'tag',

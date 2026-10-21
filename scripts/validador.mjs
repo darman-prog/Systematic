@@ -111,7 +111,12 @@ export function validarPregunta(p, idsVistos) {
   return errores;
 }
 
-export function validarCasos(casos, { validarDiagramaRef } = {}) {
+/**
+ * @param {any} casos
+ * @param {{ validarDiagramaRef?: (ref: any, diagrama: any) => string[] }} [opciones]
+ */
+export function validarCasos(casos, opciones = {}) {
+  const { validarDiagramaRef } = opciones;
   if (casos === undefined) return [];
   if (!esArreglo(casos)) return ["[casos] debe ser arreglo"];
   const errores = [];
@@ -236,7 +241,12 @@ export function validarGlosario(g) {
   return errores;
 }
 
-export function validarApuntes(apuntes, { existeFuente } = {}) {
+/**
+ * @param {any} apuntes
+ * @param {{ existeFuente?: (fuente: string) => boolean }} [opciones]
+ */
+export function validarApuntes(apuntes, opciones = {}) {
+  const { existeFuente } = opciones;
   if (apuntes === undefined) return [];
   if (!esArreglo(apuntes)) return ["[apuntes] debe ser arreglo"];
   const errores = [];
@@ -301,7 +311,12 @@ export function validarCasosDiagramacion(casos) {
   return validarCasos(casos);
 }
 
-export function validarMateria(m, { existeFuente, idsVistos } = {}) {
+/**
+ * @param {any} m
+ * @param {{ existeFuente?: (fuente: string) => boolean, idsVistos?: Set<string> }} [opciones]
+ */
+export function validarMateria(m, opciones = {}) {
+  const { existeFuente, idsVistos } = opciones;
   if (!m || !textoNoVacio(m.id)) return ["[materia] sin id"];
   const errores = [];
   if (!textoNoVacio(m.nombre)) errores.push(`[${m.id}] sin nombre`);
@@ -313,7 +328,12 @@ export function validarMateria(m, { existeFuente, idsVistos } = {}) {
   return errores;
 }
 
-export function validarTodo(materias, { existeFuente } = {}) {
+/**
+ * @param {any} materias
+ * @param {{ existeFuente?: (fuente: string) => boolean }} [opciones]
+ */
+export function validarTodo(materias, opciones = {}) {
+  const { existeFuente } = opciones;
   const errores = [];
   const idsVistos = new Set();
   const resumen = { materias: 0, preguntas: 0, terminos: 0 };
@@ -328,7 +348,12 @@ export function validarTodo(materias, { existeFuente } = {}) {
 
 // Valida el roadmap de un track de lenguaje (spec 011): etapas con lecciones y un
 // examen, y que cada pregunta referenciada exista en el banco del track.
-export function validarRoadmap(roadmap, { idsBanco } = {}) {
+/**
+ * @param {any} roadmap
+ * @param {{ idsBanco?: Set<string> }} [opciones]
+ */
+export function validarRoadmap(roadmap, opciones = {}) {
+  const { idsBanco } = opciones;
   const errores = [];
   if (!roadmap || typeof roadmap !== "object") return ["[roadmap] no es un objeto"];
   if (!textoNoVacio(roadmap.lenguaje)) errores.push("[roadmap] sin lenguaje");
