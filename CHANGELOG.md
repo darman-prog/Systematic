@@ -5,6 +5,12 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 
 ## Sin publicar (pre-deploy)
 
+- Contenido ASW + BD2 NoSQL (feature 018): 3 PDFs de arquitectura convertidos con
+  MarkItDown y curados (`BancoDeInformacion/ArquitecturaDeSoftware/13–15`); ASW
+  suma Hexagonal, Evolución de arquitecturas y Microservicios (45 preguntas,
+  3 apuntes, 24 términos); BD2 suma MongoDB documental y Neo4j/Cypher desde la
+  documentación oficial (30 preguntas, 16 términos, colores por tema).
+
 - Refuerzo de límites y desacople de `app.js` ([ADR 010](docs/adr/010-app-js-composition-root.md),
   [ADR 011](docs/adr/011-limites-capas-y-contenido.md)): evaluación, misiones, estadísticas,
   selección de rondas y carga de contenido en `core`/`student`; controladores por feature;

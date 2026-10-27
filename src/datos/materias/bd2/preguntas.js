@@ -1367,6 +1367,470 @@ const preguntas = [
       { de: "Asignatura", a: "Horas", tipo: "1:N" }
     ],
     exp: "La relación Profesor—Asignatura es <b>N:M</b>, así que se resuelve con la puente <b>Horas</b>: cada puente apunta 1:N a sus dos padres. Conectar Profesor—Asignatura directo como 1:N perdería las combinaciones reales."
+  },
+  // Lote 018: MongoDB documental (fuentes oficiales: mongodb.com/docs/manual —
+  // CRUD, data-modeling y aggregation). NoSQL frente al modelo relacional de BD2.
+  {
+    id: "P1-081",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Cómo se organiza la información en MongoDB frente a las tablas relacionales?",
+    options: [
+      "En documentos (parecidos a JSON) agrupados en colecciones, sin esquema fijo obligatorio",
+      "En tablas con filas y columnas de esquema rígido, igual que Oracle",
+      "En archivos de texto plano sin ningún tipo de consulta"
+    ],
+    correct: 0,
+    exp: "MongoDB es <b>documental</b>: guarda <b>documentos BSON</b> en <b>colecciones</b>. Dos documentos de la misma colección pueden tener campos distintos: <b>esquema flexible</b>.",
+    ref: "https://www.mongodb.com/docs/manual/core/document/"
+  },
+  {
+    id: "P1-082",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué hacen db.coleccion.insertOne() y db.coleccion.insertMany()?",
+    options: [
+      "Insertan un documento o varios documentos en una colección (creándola si no existe)",
+      "Crean índices sobre la colección",
+      "Eliminan documentos que cumplan un filtro"
+    ],
+    correct: 0,
+    exp: "<b>Create</b> del CRUD: <code>insertOne({...})</code> para uno, <code>insertMany([{...}, {...}])</code> para varios. Si la colección no existe, MongoDB <b>la crea sola</b>.",
+    ref: "https://www.mongodb.com/docs/manual/crud/"
+  },
+  {
+    id: "P1-083",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué devuelve db.usuarios.find({ edad: { $gt: 25 } })?",
+    options: [
+      "Todos los documentos de usuarios con edad mayor a 25",
+      "Solo el primer usuario de la colección sin importar la edad",
+      "Un error porque $gt no existe en MongoDB"
+    ],
+    correct: 0,
+    exp: "<b>Read</b> del CRUD: <code>find(filtro)</code> con operadores como <code>$gt</code> (mayor que). Equivale al <code>WHERE edad > 25</code> de SQL.",
+    ref: "https://www.mongodb.com/docs/manual/tutorial/query-documents/"
+  },
+  {
+    id: "P1-084",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace db.usuarios.updateOne({ nombre: 'Ana' }, { $set: { edad: 26 } })?",
+    options: [
+      "Actualiza la edad a 26 en el primer documento con nombre Ana, sin tocar los demás campos",
+      "Reemplaza toda la colección por un solo documento",
+      "Crea una tabla nueva llamada usuarios"
+    ],
+    correct: 0,
+    exp: "<b>Update</b> del CRUD: el primer objeto es el <b>filtro</b> y <code>$set</code> cambia <b>solo</b> los campos indicados. Sin <code>$set</code> reemplazarías el documento entero.",
+    ref: "https://www.mongodb.com/docs/manual/crud/"
+  },
+  {
+    id: "P1-085",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué diferencia a deleteOne() de deleteMany()?",
+    options: [
+      "deleteOne borra el primer documento del filtro y deleteMany borra todos los que cumplan el filtro",
+      "deleteOne borra la colección y deleteMany borra la base entera",
+      "Son alias del mismo comando sin diferencia"
+    ],
+    correct: 0,
+    exp: "<b>Delete</b> del CRUD: <code>deleteOne({nombre:'Ana'})</code> borra <b>uno</b>; <code>deleteMany({})</code> con filtro vacío <b>vacía la colección</b> (como DELETE sin WHERE, pero la colección sigue existiendo)."
+  },
+  {
+    id: "P1-086",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En MongoDB puedes embeber (anidar) documentos o referenciarlos por _id. ¿Cuándo conviene EMBEBER?",
+    options: [
+      "Cuando los datos se acceden juntos y pertenecen al mismo contexto (ej. dirección dentro del usuario)",
+      "Cuando dos colecciones gigantes se consultan siempre por separado",
+      "Nunca: embeber está prohibido en MongoDB"
+    ],
+    correct: 0,
+    exp: "Principio de oro del modelado: <b>lo que se accede junto, se guarda junto</b>. Embeber evita joins y devuelve todo en <b>una sola lectura</b>.",
+    ref: "https://www.mongodb.com/docs/manual/data-modeling/"
+  },
+  {
+    id: "P1-087",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Cuándo conviene REFERENCIAR (guardar _id) en vez de embeber?",
+    options: [
+      "Cuando el dato embebido crece sin límite, se comparte entre muchos documentos o necesita consistencia independiente",
+      "Siempre: referenciar es más rápido en todos los casos",
+      "Cuando los documentos son pequeños y se leen juntos"
+    ],
+    correct: 0,
+    exp: "Referencia cuando hay <b>arreglos unbounded</b> (miles de reseñas), <b>muchos-a-muchos</b> o el dato vive solo. Es el equivalente documental a la tabla puente N:M.",
+    ref: "https://www.mongodb.com/docs/manual/data-modeling/"
+  },
+  {
+    id: "P1-088",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "vf",
+    q: "En MongoDB los documentos de una misma colección pueden tener campos y tipos de dato distintos entre sí.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>: esquema flexible y datos polimórficos. Un catálogo puede guardar zapatos (con talla) y libros (con autor) en la <b>misma colección</b>, cosa imposible en una tabla rígida.",
+    ref: "https://www.mongodb.com/docs/manual/data-modeling/"
+  },
+  {
+    id: "P1-089",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué garantía de atomicidad ofrecen las escrituras en MongoDB?",
+    options: [
+      "Toda escritura es atómica a nivel de un solo documento (aunque toque varios campos o arreglos anidados)",
+      "Toda escritura es atómica en toda la base de datos como en Oracle",
+      "Ninguna: dos escrituras concurrentes siempre se mezclan"
+    ],
+    correct: 0,
+    exp: "Atomicidad <b>por documento</b>: embeber lo que cambia junto te da transacciones gratis. Para varios documentos existen <b>transacciones multi-documento</b>, pero cuestan rendimiento.",
+    ref: "https://www.mongodb.com/docs/manual/core/write-operations-atomicity/"
+  },
+  {
+    id: "P1-090",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué hace un pipeline de agregación como db.ventas.aggregate([ { $match: { anio: 2026 } }, { $group: { _id: '$sucursal', total: { $sum: '$monto' } } } ])?",
+    options: [
+      "Filtra las ventas de 2026 y luego agrupa por sucursal sumando los montos (como WHERE + GROUP BY)",
+      "Crea dos colecciones nuevas llamadas match y group",
+      "Elimina las ventas anteriores a 2026"
+    ],
+    correct: 0,
+    exp: "Agregación = <b>etapas en tubería</b>: <code>$match</code> filtra (WHERE) y <code>$group</code> agrupa y calcula (GROUP BY + SUM). Potente para reportes sin mover datos al código.",
+    ref: "https://www.mongodb.com/docs/manual/aggregation/"
+  },
+  {
+    id: "P1-091",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Para qué sirven los índices en MongoDB?",
+    options: [
+      "Para acelerar las lecturas (find, filtros, ordenamientos) a cambio de espacio en disco y escrituras algo más lentas",
+      "Para impedir que se borren documentos por accidente",
+      "Para crear copias de seguridad automáticas"
+    ],
+    correct: 0,
+    exp: "Igual que en relacional: el índice es el <b>índice del libro</b> (búsquedas rápidas), pero cada <code>insert/update</code> debe <b>reorganizarlo</b>. Se crean con <code>createIndex()</code>.",
+    ref: "https://www.mongodb.com/docs/manual/indexes/"
+  },
+  {
+    id: "P1-092",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Vienes de SQL y necesitas el equivalente a un JOIN entre pedidos y clientes. ¿Qué usas en MongoDB y qué prefiere el modelado documental?",
+    options: [
+      "La etapa $lookup hace el join, pero el modelado prefiere embeber los datos que se leen juntos para evitarlo",
+      "Los JOIN no existen ni hay alternativa: hay que migrar a Oracle",
+      "$lookup reemplaza al WHERE y siempre es más rápido que embeber"
+    ],
+    correct: 0,
+    exp: "<code>$lookup</code> = <b>JOIN de emergencia</b>. Funciona, pero si lo usas en cada consulta tu modelo pide a gritos <b>embeber</b>. Diseña por patrones de acceso, no por normalización.",
+    ref: "https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/"
+  },
+  {
+    id: "P1-093",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es un replica set en MongoDB?",
+    options: [
+      "Un conjunto de nodos con los mismos datos (primario + secundarios) que da alta disponibilidad: si cae el primario, uno secundario toma su lugar",
+      "Una copia de seguridad manual en un archivo .bak",
+      "Un tipo de índice compuesto por varias columnas"
+    ],
+    correct: 0,
+    exp: "Replica set = <b>redundancia automática</b>. Escrituras al primario, lecturas replicadas, <b>failover</b> sin intervención. Disponibilidad, no escalado de escritura (eso es sharding)."
+  },
+  {
+    id: "P1-094",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué es el sharding y cuándo lo necesitas?",
+    options: [
+      "Particionar los datos en fragmentos (shards) repartidos entre servidores cuando el volumen o el tráfico superan a un solo nodo",
+      "Fragmentar los documentos para que ocupen menos espacio en disco",
+      "Dividir la base en dos: una relacional y una documental"
+    ],
+    correct: 0,
+    exp: "Sharding = <b>escalado horizontal</b>: la shard key decide qué fragmento guarda cada dato. Potente pero con costo operativo; primero agota <b>índices y replica sets</b>."
+  },
+  {
+    id: "P1-095",
+    parcial: "Parcial 1",
+    tema: "MongoDB",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es el _id y el ObjectId en un documento MongoDB?",
+    options: [
+      "La clave primaria obligatoria del documento; el ObjectId es su valor por defecto: un identificador único de 12 bytes con marca de tiempo",
+      "Un comentario opcional que describe el documento",
+      "La contraseña de acceso a la colección"
+    ],
+    correct: 0,
+    exp: "Todo documento tiene <b>_id único</b> (como el PRIMARY KEY). El <b>ObjectId</b> se genera solo, es globalmente único y hasta dice <b>cuándo</b> se creó el documento."
+  },
+  // Lote 018: Neo4j y Cypher (fuentes oficiales: neo4j.com/docs — Cypher Manual y
+  // Getting Started). Grafos frente al modelo relacional y documental de BD2.
+  {
+    id: "P1-096",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿De qué está hecho un grafo en Neo4j?",
+    options: [
+      "De nodos (entidades), relaciones (conexiones con dirección y tipo) y propiedades (datos en ambos)",
+      "De tablas, filas y columnas como en Oracle",
+      "De documentos JSON sueltos sin conexión entre sí"
+    ],
+    correct: 0,
+    exp: "Tres ciudadanos de primera clase: <b>nodos, relaciones y propiedades</b>. A diferencia del relacional, la <b>relación es un dato</b>, no un JOIN que se calcula cada vez.",
+    ref: "https://neo4j.com/docs/getting-started/cypher-intro/"
+  },
+  {
+    id: "P1-097",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Por qué la sintaxis de Cypher se describe como «ASCII-art»?",
+    options: [
+      "Porque los dibujos en el código no hacen nada y son decorativos",
+      "Porque los paréntesis representan nodos (o) y los corchetes con flecha representan relaciones: (:Ana)-[:CONOCE_A]->(:Luis) se lee como el dibujo del grafo",
+      "Porque solo acepta caracteres de arte ASCII y no letras normales"
+    ],
+    correct: 1,
+    exp: "Cypher <b>se ve como el grafo</b>: <code>()</code> son círculos (nodos) y <code>-[]-></code> son flechas (relaciones). Lo que dibujas es lo que consultas.",
+    ref: "https://neo4j.com/docs/getting-started/cypher-intro/"
+  },
+  {
+    id: "P1-098",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace MATCH (p:Persona) RETURN p en Cypher?",
+    options: [
+      "Busca el patrón (todos los nodos con etiqueta Persona) y devuelve los encontrados",
+      "Crea una persona nueva y la devuelve",
+      "Borra todas las personas de la base de datos"
+    ],
+    correct: 0,
+    exp: "<code>MATCH</code> = <b>describe el patrón a buscar</b> (como el WHERE que dibuja); <code>RETURN</code> = <b>qué devolver</b> (como el SELECT). Leer en Cypher siempre es MATCH + RETURN.",
+    ref: "https://neo4j.com/docs/cypher-manual/current/clauses/match/"
+  },
+  {
+    id: "P1-099",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace CREATE (s:Persona {nombre:'Ana'})-[r:CONOCE_A]->(l:Persona {nombre:'Luis'})?",
+    options: [
+      "Crea dos nodos Persona con sus nombres y una relación CONOCE_A entre ellos, devolviéndolos con RETURN",
+      "Solo consulta si Ana conoce a Luis sin crear nada",
+      "Crea una tabla Persona con dos filas"
+    ],
+    correct: 0,
+    exp: "<code>CREATE</code> = <b>escribe el patrón</b> tal cual lo dibujas: nodos con propiedades entre llaves y relación dirigida. Un solo comando crea el mini-grafo completo."
+  },
+  {
+    id: "P1-100",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué son las etiquetas (labels) como :Persona o :Empresa en Neo4j?",
+    options: [
+      "Etiquetas que agrupan nodos por tipo, como las tablas agrupan filas: permiten filtrar y optimizan la consulta",
+      "Comentarios que el motor ignora por completo",
+      "Contraseñas de acceso a cada nodo"
+    ],
+    correct: 0,
+    exp: "El label es el <b>«tabla» del grafo</b>: <code>(p:Persona)</code> equivale a buscar en la tabla Persona. Sin label, Cypher revisa <b>todos los nodos</b> (lento en grafos grandes)."
+  },
+  {
+    id: "P1-101",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué significan (a)-[:LE_GUSTA]->(b), (a)<-[:LE_GUSTA]-(b) y (a)-[:LE_GUSTA]-(b)?",
+    options: [
+      "Son tres consultas idénticas sin diferencia",
+      "Relación de izquierda a derecha, de derecha a izquierda, y sin dirección (se recorre en ambos sentidos, útil si no conoces la dirección)",
+      "La tercera es un error de sintaxis porque toda relación debe llevar flecha"
+    ],
+    correct: 1,
+    exp: "Las relaciones <b>siempre tienen dirección guardada</b>, pero al consultar puedes omitirla. Ojo: sin dirección Cypher recorre <b>ambos sentidos</b> (doble trabajo).",
+    ref: "https://neo4j.com/docs/getting-started/cypher-intro/"
+  },
+  {
+    id: "P1-102",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En MATCH (p:Persona)-[r:LE_GUSTA]->(t:Tecnologia) RETURN p, r, t, ¿qué son p, r y t?",
+    options: [
+      "Variables que enlazan los nodos y la relación para reutilizarlos en el resto de la consulta (aquí, en el RETURN)",
+      "Los nombres reales guardados en la base de datos",
+      "Tipos de dato como VARCHAR2 o NUMBER"
+    ],
+    correct: 0,
+    exp: "Las variables son <b>amarres temporales</b>: nombras lo que matcheas para usarlo después (filtrar, devolver, seguir navegando). Minúsculas por convención."
+  },
+  {
+    id: "P1-103",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "vf",
+    q: "En Cypher el tipo de relación siempre lleva dos puntos delante (:LE_GUSTA); sin los dos puntos, [LE_GUSTA] sería una variable de relación, no un tipo.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. El <code>:</code> distingue tipo de variable. Sin dos puntos, Cypher buscaría <b>todos</b> los tipos de relación (caro y probablemente no lo que quieres).",
+    ref: "https://neo4j.com/docs/getting-started/cypher-intro/"
+  },
+  {
+    id: "P1-104",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Dónde pueden vivir las propiedades en Neo4j?",
+    options: [
+      "Solo en los nodos, como las columnas de una tabla",
+      "Tanto en nodos como en relaciones (ej. desde: 2020 en un CONOCE_A)",
+      "En ningún lado: los grafos no guardan datos, solo conexiones"
+    ],
+    correct: 1,
+    exp: "Ventaja del grafo: la <b>relación también guarda datos</b> (fecha, peso, rol). En relacional ese dato pediría una tabla puente; aquí viaja en la flecha."
+  },
+  {
+    id: "P1-105",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace MATCH (p:Persona) WHERE p.edad > 30 RETURN p.nombre?",
+    options: [
+      "Filtra las personas mayores de 30 y devuelve solo sus nombres",
+      "Borra las personas menores de 30",
+      "Crea una persona de 30 años llamada nombre"
+    ],
+    correct: 0,
+    exp: "<code>WHERE</code> filtra el patrón (como en SQL) y <code>RETURN p.nombre</code> proyecta <b>solo la propiedad</b>, no el nodo entero. Menos datos viajando = más rápido."
+  },
+  {
+    id: "P1-106",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Cómo borras un nodo que tiene relaciones en Cypher?",
+    options: [
+      "Con DELETE directo, que borra nodo y relaciones automáticamente",
+      "Con DETACH DELETE, que primero suelta sus relaciones y luego borra el nodo",
+      "Los nodos con relaciones no se pueden borrar nunca"
+    ],
+    correct: 1,
+    exp: "<code>DELETE</code> solo borra nodos <b>sueltos</b> (protege contra borrados accidentales). <code>DETACH DELETE</code> = <b>suelta las flechas y borra</b>. Piensa en el ON DELETE CASCADE, pero explícito."
+  },
+  {
+    id: "P1-107",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué hace MERGE (p:Persona {nombre:'Ana'})?",
+    options: [
+      "Busca el patrón y lo crea solo si no existe (el «obtén-o-crea» del grafo, ideal para cargas sin duplicados)",
+      "Fusiona dos bases de datos en una sola",
+      "Mezcla todas las personas en un único nodo"
+    ],
+    correct: 0,
+    exp: "<code>MERGE</code> = <b>MATCH + CREATE condicional</b>. Cargas el mismo script diez veces y sigues con una sola Ana. El mejor amigo de las importaciones idempotentes."
+  },
+  {
+    id: "P1-108",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué expresa MATCH (a:Persona)-[:CONOCE_A*2..3]->(b:Persona) y por qué es difícil en SQL?",
+    options: [
+      "Los conocidos a 2 o 3 saltos de distancia; en SQL pediría joins recursivos costosos, en el grafo es navegación nativa",
+      "Un error de sintaxis: Cypher no acepta asteriscos",
+      "Una multiplicación de dos columnas numéricas"
+    ],
+    correct: 0,
+    exp: "Caminos de <b>longitud variable</b> (<code>*2..3</code>): amigos de amigos (de amigos). El grafo <b>salta flechas</b>; el relacional tendría que auto-joinear la tabla N veces.",
+    ref: "https://neo4j.com/docs/cypher-manual/current/patterns/variable-length-paths/"
+  },
+  {
+    id: "P1-109",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Para qué sirve shortestPath() en Cypher?",
+    options: [
+      "Para calcular el camino más corto entre dos nodos (ej. grados de separación o ruta mínima), recorriendo relaciones",
+      "Para acortar los nombres largos de los nodos",
+      "Para comprimir la base de datos y que pese menos"
+    ],
+    correct: 0,
+    exp: "<code>MATCH p = shortestPath((a)-[*]-(b))</code>: el motor <b>explora el grafo</b> hasta conectar ambos. Recomendaciones, rutas, fraude: el pan de cada día de Neo4j.",
+    ref: "https://neo4j.com/docs/cypher-manual/current/patterns/shortest-paths/"
+  },
+  {
+    id: "P1-110",
+    parcial: "Parcial 1",
+    tema: "Neo4j",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En el modelo relacional las relaciones se implican con claves foráneas y JOINs. ¿Qué cambia en el modelo de grafos?",
+    options: [
+      "Nada: los grafos también necesitan JOINs para cada consulta",
+      "Las relaciones son ciudadanos de primera clase: existen físicamente y se recorren sin calcular JOINs, por eso los grafos brillan en datos muy conectados",
+      "Los grafos no pueden guardar relaciones, solo nodos sueltos"
+    ],
+    correct: 1,
+    exp: "En grafos la relación <b>ya está materializada</b>: seguir una flecha es O(1), no un JOIN. Regla práctica: <b>pocas conexiones → relacional/documental; red densa → grafo</b>."
   }
 ];
 export default preguntas;

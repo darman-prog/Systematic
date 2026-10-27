@@ -11,7 +11,8 @@ export const MATERIAS = [
     color: "#9FC5DA",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 90, terminos: 42, apuntes: 0, escenarios: 1, casos: 2 }
+    // Lote 018: +30 preguntas (MongoDB P1-081–095, Neo4j P1-096–110) y +16 términos NoSQL.
+    conteo: { preguntas: 120, terminos: 58, apuntes: 0, escenarios: 1, casos: 2 }
   },
   {
     id: "isw",
@@ -31,7 +32,8 @@ export const MATERIAS = [
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 85, terminos: 27, apuntes: 8, escenarios: 1, casos: 2 }
+    // Lote 018: +45 preguntas (ASW-086–130), +24 términos y +3 apuntes (hexagonal, evolución, microservicios).
+    conteo: { preguntas: 130, terminos: 51, apuntes: 11, escenarios: 1, casos: 2 }
   },
   {
     id: "infra",

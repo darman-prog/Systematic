@@ -6,7 +6,9 @@ const glosario = {
     { id: "indices", nombre: "Índices y rendimiento", corto: "Índices", color: "#facc15" },
     { id: "funciones", nombre: "Funciones SQL", corto: "Funciones", color: "#22d3ee" },
     { id: "modelado", nombre: "Modelado y tipos de datos", corto: "Modelado", color: "#34d399" },
-    { id: "consultas", nombre: "Consultas y agrupación", corto: "Consultas", color: "#fb923c" }
+    { id: "consultas", nombre: "Consultas y agrupación", corto: "Consultas", color: "#fb923c" },
+    // Lote 018: categoría NoSQL (MongoDB documental + Neo4j grafos).
+    { id: "nosql", nombre: "NoSQL — MongoDB y Neo4j", corto: "NoSQL", color: "#4ade80" }
   ],
   terminos: [
     {
@@ -260,6 +262,103 @@ const glosario = {
       categoria: "consultas",
       definicion: "Cláusula que filtra grupos después de agrupar, a diferencia de WHERE que filtra filas antes.",
       ejemplo: "HAVING COUNT(*) > 1"
+    },
+    // Lote 018: términos MongoDB (docs.mongodb.com/manual) y Neo4j (neo4j.com/docs).
+    {
+      termino: "Documento (BSON)",
+      categoria: "nosql",
+      definicion: "Unidad de almacenamiento de MongoDB: estructura parecida a JSON (en binario BSON) con campos y valores, incluidos subdocumentos y arreglos.",
+      ejemplo: "{ nombre: 'Ana', edad: 26, cursos: ['BD2', 'ASW'] }"
+    },
+    {
+      termino: "Colección",
+      categoria: "nosql",
+      definicion: "Agrupación de documentos MongoDB, equivalente aproximado a una tabla pero sin esquema fijo obligatorio.",
+      ejemplo: "db.usuarios.insertOne({...}) guarda en la colección usuarios, creándola si no existe."
+    },
+    {
+      termino: "ObjectId",
+      categoria: "nosql",
+      definicion: "Valor por defecto de _id: identificador único de 12 bytes con marca de tiempo, generado automáticamente por documento.",
+      ejemplo: "_id: ObjectId('66f1...') identifica al documento y revela cuándo se creó."
+    },
+    {
+      termino: "Embeber vs. referenciar",
+      categoria: "nosql",
+      definicion: "Dos formas de modelar relaciones en MongoDB: anidar el dato (embeber, para lo que se lee junto) o guardar su _id (referenciar, para datos compartidos o ilimitados).",
+      ejemplo: "Dirección embebida en usuario; reseñas de miles de usuarios referenciadas en otra colección."
+    },
+    {
+      termino: "find() y operadores",
+      categoria: "nosql",
+      definicion: "Lectura de documentos con filtros y operadores ($gt, $in, $and): el WHERE del mundo documental.",
+      ejemplo: "db.usuarios.find({ edad: { $gt: 25 } })"
+    },
+    {
+      termino: "$set",
+      categoria: "nosql",
+      definicion: "Operador de actualización que cambia solo los campos indicados, sin reemplazar el documento entero.",
+      ejemplo: "db.usuarios.updateOne({ nombre: 'Ana' }, { $set: { edad: 26 } })"
+    },
+    {
+      termino: "Pipeline de agregación",
+      categoria: "nosql",
+      definicion: "Consultas por etapas encadenadas ($match, $group, $sort, $lookup): el WHERE + GROUP BY + JOIN programable de MongoDB.",
+      ejemplo: "[ { $match: { anio: 2026 } }, { $group: { _id: '$sucursal', total: { $sum: '$monto' } } } ]"
+    },
+    {
+      termino: "$lookup",
+      categoria: "nosql",
+      definicion: "Etapa de agregación que une documentos de otra colección: el JOIN de emergencia cuando el modelo no embebió lo que se lee junto.",
+      ejemplo: "{ $lookup: { from: 'clientes', localField: 'idCliente', foreignField: '_id', as: 'cliente' } }"
+    },
+    {
+      termino: "Nodo",
+      categoria: "nosql",
+      definicion: "Entidad del grafo Neo4j (persona, empresa, película), agrupada por etiquetas y descrita con propiedades.",
+      ejemplo: "(ana:Persona {nombre: 'Ana'})"
+    },
+    {
+      termino: "Relación",
+      categoria: "nosql",
+      definicion: "Conexión dirigida con tipo entre dos nodos, que también puede guardar propiedades: ciudadana de primera clase del grafo.",
+      ejemplo: "(ana)-[r:CONOCE_A {desde: 2020}]->(luis)"
+    },
+    {
+      termino: "MATCH / RETURN",
+      categoria: "nosql",
+      definicion: "Cláusulas Cypher para describir el patrón a buscar (MATCH, como el WHERE que dibuja) y lo que se devuelve (RETURN, como el SELECT).",
+      ejemplo: "MATCH (p:Persona) WHERE p.edad > 30 RETURN p.nombre"
+    },
+    {
+      termino: "CREATE",
+      categoria: "nosql",
+      definicion: "Cláusula Cypher que escribe el patrón tal cual se dibuja: crea nodos, relaciones y propiedades de una vez.",
+      ejemplo: "CREATE (a:Persona {nombre:'Ana'})-[:CONOCE_A]->(b:Persona {nombre:'Luis'})"
+    },
+    {
+      termino: "MERGE",
+      categoria: "nosql",
+      definicion: "Obtén-o-crea del grafo: busca el patrón y solo lo crea si no existe, evitando duplicados en cargas repetidas.",
+      ejemplo: "MERGE (p:Persona {nombre: 'Ana'})"
+    },
+    {
+      termino: "DETACH DELETE",
+      categoria: "nosql",
+      definicion: "Borrado que primero suelta las relaciones del nodo y luego lo elimina (DELETE solo borra nodos sin relaciones).",
+      ejemplo: "MATCH (p:Persona {nombre:'Ana'}) DETACH DELETE p"
+    },
+    {
+      termino: "Camino de longitud variable",
+      categoria: "nosql",
+      definicion: "Patrón que navega 2, 3 o N saltos de un tirón (amigos de amigos): lo que en SQL pediría joins recursivos.",
+      ejemplo: "MATCH (a:Persona)-[:CONOCE_A*2..3]->(b:Persona)"
+    },
+    {
+      termino: "shortestPath()",
+      categoria: "nosql",
+      definicion: "Función Cypher que calcula el camino más corto entre dos nodos: base de recomendaciones, rutas y detección de fraude.",
+      ejemplo: "MATCH p = shortestPath((a)-[*]-(b)) RETURN p"
     }
   ],
   tips: [

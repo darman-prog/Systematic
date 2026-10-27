@@ -1228,6 +1228,678 @@ const preguntas = [
     ],
     correctos: [0, 1],
     exp: "Antídoto: <b>regla al modelo/servicio</b> y controlador <b>delgado que traduce</b>. Vista con SQL y controlador que hace todo son <b>deuda con intereses</b>."
+  },
+  // Lote 018: Arquitectura Hexagonal (fuente 13 - Arquitectura Hexagonal.md). Puertos,
+  // adaptadores, DIP/DI, Adapter GoF y Repository como puerto secundario.
+  {
+    id: "ASW-086",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué propone la arquitectura hexagonal en una frase?",
+    options: [
+      "Aislar el núcleo de negocio en el interior y rodearlo de puertos (contratos) y adaptadores (traductores de tecnología)",
+      "Dividir el sistema en tres niveles físicos: cliente, servidor de aplicación y base de datos",
+      "Decorar las entidades del dominio con anotaciones de la base de datos para ir más rápido"
+    ],
+    correct: 0,
+    exp: "Hexagonal = <b>núcleo soberano</b> adentro, <b>puertos</b> como frontera y <b>adaptadores</b> traduciendo la tecnología de afuera. Cambias de BD o de protocolo sin tocar el dominio."
+  },
+  {
+    id: "ASW-087",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál de estas limitaciones del N-Tier motiva la arquitectura hexagonal?",
+    options: [
+      "Que la UI y la BD queden en el mismo servidor físico",
+      "La fuga de abstracción: las entidades del dominio terminan decoradas con @Entity, @Table, @Column y tipos SQL",
+      "Que las capas no puedan comunicarse entre sí por red"
+    ],
+    correct: 1,
+    exp: "La <b>fuga de abstracción</b> contamina el dominio con detalles de persistencia. En hexagonal el núcleo <b>jamás conoce</b> la BD: esa es la frontera que los puertos protegen."
+  },
+  {
+    id: "ASW-088",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "En la arquitectura hexagonal el código del núcleo puede importar drivers de bases de datos si solo los usa para leer.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "<b>Falso</b>. Agnosticismo tecnológico total: el interior <b>nunca depende del exterior</b> ni filtra sus detalles. La BD vive afuera y se alcanza solo vía puertos."
+  },
+  {
+    id: "ASW-089",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es un puerto (port) en la arquitectura hexagonal?",
+    options: [
+      "El puerto TCP donde escucha la base de datos",
+      "Un contrato o interfaz pura definida por el propósito del negocio, que marca la frontera del hexágono",
+      "Una librería que traduce JSON a XML automáticamente"
+    ],
+    correct: 1,
+    exp: "El puerto es <b>contrato funcional</b>: se diseña pensando en el negocio (ej. <code>getRate(amt)</code>), no en la tecnología que lo implementará."
+  },
+  {
+    id: "ASW-090",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace un adaptador en la arquitectura hexagonal?",
+    options: [
+      "Traduce señales técnicas externas a llamadas que el dominio entiende, y viceversa",
+      "Ejecuta las reglas de negocio en lugar del núcleo para ahorrarle trabajo",
+      "Elimina la necesidad de puertos porque conecta todo directo"
+    ],
+    correct: 0,
+    exp: "El adaptador es <b>traductor de tecnología</b>: si una API o framework cambia de versión, <b>solo se toca el adaptador</b> y el dominio ni se entera."
+  },
+  {
+    id: "ASW-091",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Marca los ejemplos de adaptadores PRIMARIOS (driving / inbound).",
+    options: [
+      "Un Controlador REST que extrae JSON, valida tipos y llama al dominio",
+      "Un comando de consola (CLI) que convierte argumentos en comandos de dominio",
+      "Un arnés de pruebas automatizadas (JUnit) que ejercita los casos de uso",
+      "Un adaptador Hibernate que traduce objetos del dominio a consultas SQL"
+    ],
+    correctos: [0, 1, 2],
+    exp: "Los primarios <b>despiertan a la app</b> desde afuera (REST, CLI, tests). Hibernate es <b>secundario</b>: lo invoca el dominio hacia la infraestructura."
+  },
+  {
+    id: "ASW-092",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Un adaptador Hibernate traduce objetos del dominio a SQL y mapea los resultados. ¿Qué tipo de adaptador es?",
+    options: [
+      "Primario, porque lo dispara el usuario desde la UI",
+      "Secundario (driven / outbound), porque convierte peticiones del dominio en llamadas de infraestructura",
+      "No es un adaptador, es un puerto primario"
+    ],
+    correct: 1,
+    exp: "Es <b>secundario</b>: la app lo invoca para persistir o consultar. Vive en infraestructura e implementa el puerto que el dominio definió."
+  },
+  {
+    id: "ASW-093",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué dice el Principio de Inversión de Dependencias (DIP) en la frontera de persistencia?",
+    options: [
+      "Los módulos de alto nivel no deben depender de los de bajo nivel; ambos deben depender de abstracciones",
+      "La base de datos debe depender del framework web para mantener la consistencia",
+      "El dominio debe importar directamente el driver SQL para evitar intermediarios"
+    ],
+    correct: 0,
+    exp: "DIP <b>invierte las flechas</b>: la ejecución fluye hacia la BD, pero la dependencia de código apunta al <b>dominio</b>. El dominio define la interfaz; la infraestructura la implementa."
+  },
+  {
+    id: "ASW-094",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "Con inyección de dependencias (DI), en tiempo de ejecución se inyecta el adaptador concreto (SQL o en memoria) mediante constructores, sin que el dominio cambie.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. Esa es la gracia: en producción inyectas <code>SqlRateRepository</code> y en tests <code>MockRateRepository</code>. El dominio solo ve la interfaz."
+  },
+  {
+    id: "ASW-095",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué propone el patrón Adapter (GoF)?",
+    options: [
+      "Crear una clase Adaptador que envuelve la clase incompatible (Adaptee), implementa la interfaz que el cliente espera (Target) y le delega el trabajo real",
+      "Heredar directamente de la clase de terceros y sobrescribir todos sus métodos",
+      "Duplicar la librería externa dentro del proyecto para poder modificarla"
+    ],
+    correct: 0,
+    exp: "Adapter = <b>envolver, traducir y delegar</b>. Como el adaptador físico de enchufe: no cambias tu cable ni el tomacorriente, pones un puente en el medio."
+  },
+  {
+    id: "ASW-096",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿En qué se diferencia el Adapter GoF del adaptador hexagonal?",
+    options: [
+      "Son lo mismo con distinto nombre y se usan indistintamente",
+      "Adapter GoF es un patrón de clases que compatibiliza interfaces; el adaptador hexagonal es un rol arquitectónico que traduce tecnología en la frontera del dominio",
+      "El adaptador hexagonal solo sirve para bases de datos relacionales"
+    ],
+    correct: 1,
+    exp: "Distinto nivel: GoF resuelve <b>incompatibilidad de interfaces</b> entre clases; el hexagonal protege la <b>frontera del dominio</b> (puede usar un Adapter GoF adentro, pero su rol es arquitectónico)."
+  },
+  {
+    id: "ASW-097",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es el patrón Repository?",
+    options: [
+      "Una capa de abstracción entre el dominio y el acceso a datos, para que la app trate la BD como una colección en memoria de objetos de dominio",
+      "Un ORM que genera las tablas automáticamente desde las clases",
+      "Un endpoint REST que expone la base de datos completa a la UI"
+    ],
+    correct: 0,
+    exp: "Repository <b>encapsula el acceso a datos</b> tras una interfaz de dominio (<code>guardar</code>, <code>obtener_por_id</code>). Cambias de motor o de ORM tocando solo la implementación."
+  },
+  {
+    id: "ASW-098",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Si la lógica de negocio hace SQL directo o llama al ORM, ¿qué problemas aparecen?",
+    options: [
+      "Alto acoplamiento: cambiar de motor u ORM obliga a modificar la aplicación donde haya consultas",
+      "Imposibilidad de probar el negocio aislado, porque el código siempre intenta conectarse a una BD real",
+      "El código se vuelve más rápido porque evita capas intermedias"
+    ],
+    correctos: [0, 1],
+    exp: "Los dos males clásicos: <b>acoplamiento al motor</b> y <b>tests que necesitan BD real</b>. Repository + puerto secundario curan ambos."
+  },
+  {
+    id: "ASW-099",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "En la hexagonal, ¿dónde viven la interfaz y la implementación del Repository?",
+    options: [
+      "Ambas en la infraestructura, junto a los drivers",
+      "La interfaz es un puerto secundario dentro del núcleo; la implementación es un adaptador secundario en la infraestructura",
+      "La interfaz en la UI y la implementación en el dominio"
+    ],
+    correct: 1,
+    exp: "La <b>interfaz adentro</b> (la define el dominio) y la <b>implementación afuera</b> (<code>RepositorioUsuarioSQL</code> vs <code>RepositorioUsuarioMemoria</code>). Sustitución inmediata para tests."
+  },
+  {
+    id: "ASW-100",
+    parcial: "Parcial 1",
+    tema: "Arquitectura Hexagonal",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuándo NO conviene adoptar la arquitectura hexagonal?",
+    options: [
+      "Cuando el dominio tiene reglas cambiantes y múltiples canales de entrada",
+      "En sistemas CRUD simples donde el negocio es un intermediario hacia la BD, o en prototipos rápidos donde la abstracción cuesta más que el beneficio",
+      "Cuando se necesita velocidad de pruebas de regresión sin infraestructura"
+    ],
+    correct: 1,
+    exp: "Hexagonal <b>cuesta</b>: más interfaces, mapeos de DTOs y configuración. En un CRUD simple o un prototipo, esa sobrecarga <b>supera el beneficio</b>."
+  },
+  // Lote 018: Evolución de arquitecturas (fuente 14 - Evolución de las Arquitecturas
+  // de Software.md). Big Ball of Mud, N-Tier, capas abiertas/cerradas, quantum y falacias.
+  {
+    id: "ASW-101",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es el antipatrón Big Ball of Mud?",
+    options: [
+      "Una jungla de código espagueti construida con soluciones rápidas, que crece sin regulaciones ni estructura",
+      "Un monolito bien estructurado con capas separadas",
+      "Un sistema distribuido con demasiados microservicios"
+    ],
+    correct: 0,
+    exp: "Big Ball of Mud = <b>ausencia de estructura</b>. Todo rápido y acoplado: imposible desplegar ágil, nula testabilidad y rendimiento estancado."
+  },
+  {
+    id: "ASW-102",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es el síntoma principal del Big Ball of Mud?",
+    options: [
+      "Que el sistema tenga demasiadas capas de aislamiento",
+      "Que la información se comparta promiscuamente y modificar una clase tenga efectos secundarios impredecibles",
+      "Que los despliegues sean demasiado frecuentes"
+    ],
+    correct: 1,
+    exp: "El síntoma es el <b>acoplamiento invisible</b>: todo toca todo. Tocas una clase y se rompe algo en la otra punta del sistema."
+  },
+  {
+    id: "ASW-103",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué cambió del modelo 2-Tier al 3-Tier?",
+    options: [
+      "Se eliminó la base de datos y todo quedó en memoria",
+      "Se introdujo el servidor de aplicaciones: la lógica salió del escritorio y se centralizó en el servidor (presentación, aplicación, datos)",
+      "Se dividió la base de datos en una por cada usuario"
+    ],
+    correct: 1,
+    exp: "El impulso fue <b>separar interfaces ligeras del procesamiento pesado</b>. Pero ojo: la infra se separó y el <b>código de negocio siguió acoplado</b>."
+  },
+  {
+    id: "ASW-104",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuál es el principio clave de la arquitectura N-Tier por capas?",
+    options: [
+      "Separación de preocupaciones técnicas: cada capa solo conoce la capa inmediatamente inferior",
+      "Cada capa puede saltarse a cualquiera otra para ir más rápido",
+      "La capa de presentación debe contener la lógica de negocio"
+    ],
+    correct: 0,
+    exp: "N-Tier = <b>capas cerradas</b>: la petición baja Presentación → Negocios → Persistencia → BD. Saltarse niveles <b>destruye el aislamiento</b>."
+  },
+  {
+    id: "ASW-105",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué permite una capa declarada como ABIERTA (open) en N-Tier?",
+    options: [
+      "Que cualquier capa la ignore por completo sin consecuencias",
+      "Que la capa superior consuma sus utilidades o la atraviese directo (fast-lane) sin penalización estructural, como una capa de servicios compartidos",
+      "Que la capa deje de validar los contratos con la inferior"
+    ],
+    correct: 1,
+    exp: "La capa abierta da <b>flexibilidad pragmática</b>: pasar directo está permitido ahí. En capas <b>cerradas</b>, el fast-lane rompe el aislamiento y acopla el sistema."
+  },
+  {
+    id: "ASW-106",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es el antipatrón Architecture Sinkhole?",
+    options: [
+      "Peticiones que atraviesan todas las capas como simples conductos (pass-through), sin ejecutar lógica, sumando costo sin valor",
+      "Un agujero de seguridad en la capa de presentación",
+      "Una base de datos que se hunde por falta de índices"
+    ],
+    correct: 0,
+    exp: "El sumidero <b>gasta CPU/memoria en puro tránsito</b>: objetos instanciados solo para pasar el mensaje. Estructura que cuesta y no aporta."
+  },
+  {
+    id: "ASW-107",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué dice la regla del 80/20 frente al Architecture Sinkhole?",
+    options: [
+      "Que el 80% del código debe estar en la UI y el 20% en la BD",
+      "Aceptable si solo el 20% de las peticiones son conductos directos; si el 80% son sinkholes, el patrón N-Tier es el equivocado",
+      "Que hay que reescribir el sistema cuando el 20% de los tests falla"
+    ],
+    correct: 1,
+    exp: "Un poco de pass-through es normal. Si <b>casi todo</b> atraviesa sin aportar lógica, las capas <b>estorban</b>: ese sistema no necesitaba N-Tier."
+  },
+  {
+    id: "ASW-108",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué diferencia un corte horizontal de uno vertical?",
+    options: [
+      "El horizontal organiza por roles técnicos (presentación/lógica/datos) y un cambio de negocio toca todas las capas; el vertical organiza por flujos de dominio (Catálogo, Checkout, Pagos) y el cambio queda encapsulado",
+      "El horizontal es para monolitos y el vertical solo para mainframes",
+      "No hay diferencia: son dos nombres del mismo particionamiento"
+    ],
+    correct: 0,
+    exp: "Horizontal = <b>técnica</b> (domain smearing: el Checkout untado en todas las capas). Vertical = <b>dominio/DDD</b> (cada módulo lleva su propia pila). Ese es el punto de inflexión."
+  },
+  {
+    id: "ASW-109",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué es un quantum arquitectónico y qué lo diferencia entre monolito y distribuido?",
+    options: [
+      "Un artefacto desplegable independiente con alta cohesión: en el monolito Quantum = 1 (todo comparte perfil operativo) y en lo distribuido Quantum = N (cada servicio escala y despliega solo)",
+      "Una unidad de medida del código espagueti en el Big Ball of Mud",
+      "El número de capas que tiene el sistema"
+    ],
+    correct: 0,
+    exp: "Quantum = <b>lo que se despliega junto</b>. Monolito: no puedes escalar Pagos sin escalar Reportes. Distribuido: cada servicio con <b>perfil operativo propio</b>."
+  },
+  {
+    id: "ASW-110",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué ventaja define la elasticidad de los sistemas distribuidos?",
+    options: [
+      "Escalar exclusivamente las áreas bajo presión de carga, sin desperdiciar recursos en el resto",
+      "Que el sistema nunca falle porque no usa red",
+      "Que el costo inicial sea menor que el del monolito"
+    ],
+    correct: 0,
+    exp: "<b>Elasticidad inigualable</b>: escala lo caliente, no todo. El monolito te obliga a replicar el sistema entero para aliviar un solo punto."
+  },
+  {
+    id: "ASW-111",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En tolerancia a fallos (MTTR), ¿qué cambia del monolito al distribuido?",
+    options: [
+      "Nada: ambos se caen completos ante cualquier error",
+      "En el monolito un error fatal derriba la aplicación; en redes distribuidas el fallo se aísla en un nodo y se preserva la disponibilidad global",
+      "El distribuido elimina todos los errores posibles"
+    ],
+    correct: 1,
+    exp: "<b>Aislamiento de fallos</b>: el error queda contenido en un nodo. Por eso lo distribuido gana en el radar de tolerancia, aunque pierda en simplicidad."
+  },
+  {
+    id: "ASW-112",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Falacia 1 de la red: «la red es confiable». ¿Cuál es la realidad?",
+    options: [
+      "Que la red nunca falla en la nube moderna",
+      "Timeouts, particiones de red y caídas de switches son la norma: se requieren patrones de retry o circuit breakers",
+      "Que basta con aumentar el ancho de banda para que sea confiable"
+    ],
+    correct: 1,
+    exp: "La red <b>falla por diseño</b>. Quien asume confiabilidad construye castillos en el aire: hay que <b>diseñar para el fallo</b> (reintentos, cortacircuitos)."
+  },
+  {
+    id: "ASW-113",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "facil",
+    tipo: "vf",
+    q: "Falacia 2: «la latencia es cero». En realidad, enviar un objeto en memoria local toma nanosegundos y hacerlo por REST toma milisegundos, degradando el rendimiento general.",
+    options: ["Verdadero", "Falso"],
+    correct: 0,
+    exp: "<b>Verdadero</b>. Cada salto de red <b>cuesta miles de veces más</b> que una llamada local. Por eso los chats finos entre servicios matan el rendimiento."
+  },
+  {
+    id: "ASW-114",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Falacia 5: «la topología nunca cambia». ¿Cuál es la realidad en sistemas distribuidos?",
+    options: [
+      "Que los servidores físicos nunca se apagan",
+      "Los contenedores suben y bajan dinámicamente: la arquitectura requiere descubrimiento de servicios (Service Registries)",
+      "Que la topología la fija el programador una sola vez"
+    ],
+    correct: 1,
+    exp: "En la nube <b>nada es estático</b>: los nodos nacen y mueren. Sin <b>service discovery</b>, los servicios pierden de vista a sus vecinos."
+  },
+  {
+    id: "ASW-115",
+    parcial: "Parcial 1",
+    tema: "Evolución de arquitecturas",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según la matriz de trade-offs y Richards & Ford, ¿qué afirmación es correcta?",
+    options: [
+      "El monolito por capas gana en despliegue ágil y el distribuido en simplicidad inicial",
+      "No existen respuestas correctas o incorrectas en arquitectura, solo trade-offs: el monolito gana en simplicidad y costo inicial (ACID simple, time-to-market), lo distribuido en agilidad, elasticidad y tolerancia",
+      "Siempre hay que migrar a distribuidos porque el monolito es moralmente inferior"
+    ],
+    correct: 1,
+    exp: "La conclusión del material: la distribución <b>no es imperativo moral</b> sino respuesta a presión empresarial. <b>Complejidad solo cuando el dominio exija su recompensa</b>."
+  },
+  // Lote 018: Microservicios (fuente 15 - Arquitectura de Microservicios.md).
+  // Comunicación sync/async, datos por servicio, sagas, migración y costos.
+  {
+    id: "ASW-116",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué es la arquitectura de microservicios?",
+    options: [
+      "Un monolito dividido en tres niveles físicos",
+      "Un enfoque donde una aplicación grande se construye como un conjunto de servicios independientes y especializados, cada uno autónomo con su propia base de datos",
+      "Una técnica para escribir todo el sistema en un solo archivo desplegable"
+    ],
+    correct: 1,
+    exp: "Microservicios = <b>servicios autónomos por dominio</b> (usuarios, pedidos, pagos...), cada uno con su BD. Lo opuesto al <b>bloque único</b> con BD compartida."
+  },
+  {
+    id: "ASW-117",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Marca las características de los servicios autónomos y acotados.",
+    options: [
+      "Modelados alrededor de un dominio de negocio",
+      "Desplegables de forma independiente sin afectar a otros componentes",
+      "Obligados a compartir la misma base de datos relacional",
+      "Exponen sus esquemas de BD para que otros servicios los consulten directo"
+    ],
+    correctos: [0, 1],
+    exp: "Autónomo = <b>dominio propio + despliegue propio</b>. Compartir BD o exponer esquemas está <b>prohibido</b>: eso es acoplamiento oculto."
+  },
+  {
+    id: "ASW-118",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es un Bounded Context (DDD) y qué rol juega en microservicios?",
+    options: [
+      "Un límite de memoria que no puede superar cada servicio",
+      "La frontera explícita del modelo de dominio que define la responsabilidad exacta de cada microservicio, con lenguaje ubicuo sin ambigüedades",
+      "Un tipo de balanceador de carga entre servicios"
+    ],
+    correct: 1,
+    exp: "El Bounded Context <b>dibuja la frontera</b>: qué es de este servicio y qué no. Sin fronteras explícitas, los servicios se pisan y el lenguaje se vuelve ambiguo."
+  },
+  {
+    id: "ASW-119",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Según la Ley de Conway, ¿cómo deben organizarse los equipos para lograr microservicios desacoplados?",
+    options: [
+      "En silos tecnológicos: todo el frontend junto, todo el backend junto y los DBA aparte",
+      "En torno a capacidades de negocio, porque las organizaciones diseñan sistemas que reflejan sus estructuras de comunicación",
+      "En un solo equipo gigante que coordine cada despliegue"
+    ],
+    correct: 1,
+    exp: "<b>Conway</b>: la arquitectura copia la comunicación. Equipos por <b>capacidad de negocio</b> → servicios desacoplados. Silos técnicos → sistema enredado."
+  },
+  {
+    id: "ASW-120",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "facil",
+    tipo: "multiple",
+    q: "¿Qué dice la regla de las dos pizzas?",
+    options: [
+      "Que los despliegues deben hacerse después de almorzar",
+      "Equipos pequeños e independientes (5 a 9 personas), dueños del ciclo de vida completo: you build it, you run it",
+      "Que cada microservicio debe costar lo mismo que dos pizzas"
+    ],
+    correct: 1,
+    exp: "Dos pizzas = <b>equipo que se alimenta con dos pizzas</b>. Pequeño, autónomo y responsable de su servicio en producción: velocidad sin reuniones eternas."
+  },
+  {
+    id: "ASW-121",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué caracteriza a la comunicación síncrona (REST/gRPC) entre microservicios?",
+    options: [
+      "El emisor bloquea esperando la respuesta, con alto acoplamiento temporal; riesgos de latencia acumulada y fallos en cascada",
+      "Desacoplamiento temporal total con buffering natural",
+      "Los servicios nunca esperan respuesta y todo es tolerante a fallos"
+    ],
+    correct: 0,
+    exp: "Síncrono = <b>bloqueo + espera</b>. Ideal para consultas puntuales de baja latencia; peligroso en cadenas largas, donde un servicio lento <b>arrastra a todos</b>."
+  },
+  {
+    id: "ASW-122",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué regla manda sobre los datos en microservicios?",
+    options: [
+      "Todos los servicios comparten una única base relacional para mantener el ACID global",
+      "Database per microservice: cada servicio es dueño único de su almacenamiento; prohibido compartir bases relacionales",
+      "Cada servicio debe usar obligatoriamente el mismo motor de base de datos"
+    ],
+    correct: 1,
+    exp: "<b>Una BD por servicio</b>: evita acoplamiento de esquema y deja elegir el motor idóneo (relacional, NoSQL, caché). Compartir BD es el <b>monolito disfrazado</b>."
+  },
+  {
+    id: "ASW-123",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué es CQRS?",
+    options: [
+      "Un protocolo de red para comunicar microservicios",
+      "La segregación de responsabilidades entre comandos y consultas: separar el modelo de lectura optimizada del modelo de escritura",
+      "Una técnica de respaldo incremental de bases de datos"
+    ],
+    correct: 1,
+    exp: "CQRS = <b>leer y escribir por modelos distintos</b>. Las lecturas van a vistas optimizadas; las escrituras al modelo de dominio. Escala cada lado por separado."
+  },
+  {
+    id: "ASW-124",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Qué es Event Sourcing?",
+    options: [
+      "Persistir los cambios como una secuencia inmutable de eventos en lugar de actualizar el estado actual",
+      "Enviar correos de notificación cada vez que cambia un dato",
+      "Guardar el estado actual y borrar el historial para ahorrar espacio"
+    ],
+    correct: 0,
+    exp: "Event Sourcing = <b>el historial es la verdad</b>. El estado se reconstruye rejugando eventos. Auditoría gratis y viaje en el tiempo; cuesta vistas de lectura."
+  },
+  {
+    id: "ASW-125",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿En qué se diferencian orquestación y coreografía?",
+    options: [
+      "Son sinónimos: ambas usan un orquestador central",
+      "Orquestación: un coordinador central dirige paso a paso (visible, pero riesgo de monolito distribuido). Coreografía: cada servicio escucha eventos y reacciona solo (máximo desacople, pero difícil de rastrear)",
+      "La coreografía solo sirve para procesos síncronos simples"
+    ],
+    correct: 1,
+    exp: "Orquestador = <b>director de orquesta</b> (claro pero centralizado). Coreografía = <b>baile sin director</b> (escalable pero difícil de depurar). Elige según el proceso."
+  },
+  {
+    id: "ASW-126",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "¿Cómo gestiona el patrón Saga una transacción distribuida?",
+    options: [
+      "Bloqueando todas las bases con un ACID global hasta terminar",
+      "Como secuencia de transacciones locales: cada servicio ejecuta la suya y publica el evento que dispara la siguiente; si un paso falla, transacciones compensatorias en orden inverso deshacen lo hecho",
+      "Evitando las transacciones por completo y aceptando datos corruptos"
+    ],
+    correct: 1,
+    exp: "Saga = <b>consistencia eventual con plan B</b>. Sin bloqueos globales (rápido y disponible), pero cada paso necesita su <b>acción de reversión</b>."
+  },
+  {
+    id: "ASW-127",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué es el patrón Strangler Fig en una migración a microservicios?",
+    options: [
+      "Reescribir todo el monolito de golpe en un big bang",
+      "Migración gradual: un API Gateway enruta peticiones progresivamente a los nuevos servicios hasta que el monolito desaparece",
+      "Estrangular el tráfico para que el monolito rinda menos"
+    ],
+    correct: 1,
+    exp: "Strangler = <b>rodear y reemplazar por partes</b>, como la higuera al árbol. Sin big bangs: cada ruta migra cuando está lista y el monolito se achica."
+  },
+  {
+    id: "ASW-128",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Qué hace Data Liberation con CDC (ej. Debezium)?",
+    options: [
+      "Borra los datos legacy para liberar espacio",
+      "Captura cambios directos en la BD del monolito y publica eventos en tiempo real al broker, alimentando los nuevos servicios sin modificar el código legacy",
+      "Libera a los desarrolladores de escribir pruebas de integración"
+    ],
+    correct: 1,
+    exp: "CDC = <b>espiar la BD vieja sin tocarla</b>. Cada cambio se vuelve evento y los servicios nuevos se alimentan frescos mientras el legacy sigue vivo."
+  },
+  {
+    id: "ASW-129",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Marca los costos del «Microservice Tax».",
+    options: [
+      "Alto costo inicial en infraestructura, CI/CD y redes",
+      "Inversión obligatoria en observabilidad (trazas, métricas, logs)",
+      "Pérdida de la simplicidad ACID: consistencia eventual y datos duplicados",
+      "Eliminación total de la latencia de red"
+    ],
+    correctos: [0, 1, 2],
+    exp: "El tax se paga en <b>infra, observabilidad y consistencia</b>. Y la latencia no desaparece: las llamadas de red <b>reemplazan</b> a la memoria local."
+  },
+  {
+    id: "ASW-130",
+    parcial: "Parcial 1",
+    tema: "Microservicios",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "¿Cuáles son las tres conclusiones del material sobre microservicios?",
+    options: [
+      "Empezar siempre con microservicios, organizar por capas tecnológicas y multiplicar servicios antes de automatizar",
+      "No empezar con microservicios si no los necesitas; modelar por dominios (bounded contexts), no por capas; automatizar la infraestructura antes de multiplicar servicios",
+      "Evitar los bounded contexts, compartir la BD y desplegar todo junto"
+    ],
+    correct: 1,
+    exp: "Las tres reglas de oro: <b>monolito bien estructurado primero</b>, <b>dominios no capas</b> y <b>CI/CD + observabilidad + IaC antes</b> de tener decenas de servicios."
   }
 ];
 

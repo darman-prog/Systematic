@@ -83,7 +83,8 @@ describe("ui/dashboard/home", () => {
     const java = tarjetas.find(c => c.dataset.lenguaje === "lenguaje-java");
     const ts = tarjetas.find(c => c.dataset.lenguaje === "lenguaje-ts");
 
-    expect(bd2.textContent).toContain("1 de 90 respondidas");
+    // Lote 018: BD2 pasa de 90 a 120 preguntas (temas MongoDB + Neo4j).
+    expect(bd2.textContent).toContain("1 de 120 respondidas");
     expect(ts.textContent).toContain("1 de 5 etapas");
     // El estado no ocupa una pill: vive en data-estado para el filtro y se comunica con la barra.
     expect(bd2.dataset.estado).toBe("en-curso");

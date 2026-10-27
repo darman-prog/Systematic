@@ -7,7 +7,11 @@ const glosario = {
     { id: "creacionales", nombre: "Patrones Creacionales", corto: "Creacionales", color: "#f472b6" },
     { id: "estructurales", nombre: "Patrones Estructurales", corto: "Estructurales", color: "#fbbf24" },
     { id: "comportamiento", nombre: "Patrones de Comportamiento", corto: "Comportamiento", color: "#a78bfa" },
-    { id: "fundamentos", nombre: "Fundamentos del desarrollo", corto: "Fundamentos", color: "#f472b6" }
+    { id: "fundamentos", nombre: "Fundamentos del desarrollo", corto: "Fundamentos", color: "#f472b6" },
+    // Lote 018: categorías de los 3 temas nuevos (hexagonal, evolución, microservicios).
+    { id: "hexagonal", nombre: "Arquitectura Hexagonal", corto: "Hexagonal", color: "#4ade80" },
+    { id: "evolucion", nombre: "Evolución de arquitecturas", corto: "Evolución", color: "#38bdf8" },
+    { id: "microservicios", nombre: "Microservicios", corto: "Micro", color: "#fb923c" }
   ],
   terminos: [
     {
@@ -171,6 +175,153 @@ const glosario = {
       categoria: "fundamentos",
       definicion: "Migración por estrangulamiento: rodear el sistema legado con servicios nuevos, enrutarles tráfico y retirar lo viejo por partes, en vez de reescribir de golpe.",
       ejemplo: "Sacar primero el login del monolito a un servicio de autenticación y apagar el módulo viejo."
+    },
+    // Lote 018: términos de Arquitectura Hexagonal (fuente 13).
+    {
+      termino: "Puerto (port)",
+      categoria: "hexagonal",
+      definicion: "Contrato o interfaz pura que marca la frontera del hexágono; se define por el propósito del negocio, no por la tecnología que lo implementará.",
+      ejemplo: "La interfaz RateRepository con getRate(amt) que el dominio define y la infraestructura implementa."
+    },
+    {
+      termino: "Adaptador primario (driving)",
+      categoria: "hexagonal",
+      definicion: "Traductor que convierte peticiones externas (HTTP, eventos, consola) en comandos de dominio; despierta a la aplicación desde afuera.",
+      ejemplo: "Un Controlador REST que extrae JSON, valida tipos y llama al servicio del dominio."
+    },
+    {
+      termino: "Adaptador secundario (driven)",
+      categoria: "hexagonal",
+      definicion: "Traductor que convierte peticiones del dominio en llamadas de infraestructura (persistencia, pagos, eventos).",
+      ejemplo: "Un adaptador Hibernate que traduce objetos del dominio a SQL y mapea los resultados."
+    },
+    {
+      termino: "Inversión de dependencias (DIP)",
+      categoria: "hexagonal",
+      definicion: "Módulos de alto y bajo nivel dependen de abstracciones: la ejecución fluye hacia la BD pero la dependencia de código apunta al dominio.",
+      ejemplo: "DiscounterApp depende de la interfaz RateRepository, no de SqlRateRepository ni del driver JDBC."
+    },
+    {
+      termino: "Inyección de dependencias (DI)",
+      categoria: "hexagonal",
+      definicion: "En tiempo de ejecución se inyecta el adaptador concreto (SQL en producción, memoria en tests) mediante constructores, sin cambiar el dominio.",
+      ejemplo: "new DiscounterApp(new MockRateRepository()) en un test unitario ultrarrápido."
+    },
+    {
+      termino: "Lenguaje ubicuo",
+      categoria: "hexagonal",
+      definicion: "Vocabulario del negocio compartido entre negocio y código: el núcleo refleja el problema del negocio, no la infraestructura.",
+      ejemplo: "Hablar de descuento y monto en el dominio, no de tablas ORDERS ni de JSON."
+    },
+    {
+      termino: "Repository",
+      categoria: "hexagonal",
+      definicion: "Patrón que media entre dominio y datos como colección en memoria: su interfaz es puerto secundario en el núcleo y su implementación es adaptador secundario en infraestructura.",
+      ejemplo: "UserRepository con save/getById, implementado por SQLRepository y por TestRepository en memoria."
+    },
+    {
+      termino: "Casos de uso sobre el puerto",
+      categoria: "hexagonal",
+      definicion: "Especificar la intención del negocio (precondiciones, reglas, postcondiciones) agnóstica al origen del dato, en vez de acoplar el caso a la UI.",
+      ejemplo: "«El sistema calcula el descuento dado un monto válido» en lugar de «clic en guardar → guarda en ORDERS»."
+    },
+    // Lote 018: términos de Evolución de arquitecturas (fuente 14).
+    {
+      termino: "Big Ball of Mud",
+      categoria: "evolucion",
+      definicion: "Antipatrón de ausencia de estructura: jungla de código espagueti con soluciones rápidas, información promiscua y efectos secundarios impredecibles.",
+      ejemplo: "Tocar una clase de reportes y romper el login sin relación aparente."
+    },
+    {
+      termino: "Capa cerrada",
+      categoria: "evolucion",
+      definicion: "Capa que no puede saltarse: la petición debe atravesar la capa inmediata inferior de forma estricta, conteniendo el impacto del cambio.",
+      ejemplo: "En N-Tier la UI no accede directo a persistencia; pasa por negocio."
+    },
+    {
+      termino: "Capa abierta",
+      categoria: "evolucion",
+      definicion: "Capa que la superior puede consumir o atravesar directo (fast-lane) sin penalización estructural, aportando flexibilidad pragmática.",
+      ejemplo: "Una capa de servicios compartidos que negocio puede usar o ignorar limpiamente."
+    },
+    {
+      termino: "Architecture Sinkhole",
+      categoria: "evolucion",
+      definicion: "Antipatrón donde las peticiones cruzan todas las capas como pass-through sin lógica: la estructura suma costo sin valor.",
+      ejemplo: "Cuatro capas que solo reenvían el DTO hasta la BD sin transformar nada."
+    },
+    {
+      termino: "Quantum arquitectónico",
+      categoria: "evolucion",
+      definicion: "Artefacto desplegable independiente con alta cohesión: vale 1 en el monolito (todo junto) y N en lo distribuido (cada servicio por separado).",
+      ejemplo: "No poder escalar Pagos sin escalar Reportes delata Quantum = 1."
+    },
+    {
+      termino: "Corte horizontal vs. vertical",
+      categoria: "evolucion",
+      definicion: "Particionar por roles técnicos (presentación/lógica/datos) frente a particionar por flujos de dominio (Catálogo, Checkout, Pagos con su propia pila).",
+      ejemplo: "Un cambio en Catálogo que toca todas las capas pide un corte vertical."
+    },
+    {
+      termino: "Falacias de la red",
+      categoria: "evolucion",
+      definicion: "Ocho asunciones letales de lo distribuido: red confiable, latencia cero, ancho infinito, red segura, topología fija, un admin, transporte gratis y red homogénea.",
+      ejemplo: "Asumir latencia cero y diseñar chats finos entre servicios por REST."
+    },
+    {
+      termino: "Trade-off arquitectónico",
+      categoria: "evolucion",
+      definicion: "Toda decisión de arquitectura sacrifica algo: el monolito gana simplicidad y costo inicial; lo distribuido gana agilidad, elasticidad y tolerancia.",
+      ejemplo: "Elegir consistencia eventual (sagas) para ganar disponibilidad y elasticidad."
+    },
+    // Lote 018: términos de Microservicios (fuente 15).
+    {
+      termino: "Bounded Context",
+      categoria: "microservicios",
+      definicion: "Frontera explícita del modelo de dominio (DDD) que define la responsabilidad exacta de cada microservicio con lenguaje ubicuo.",
+      ejemplo: "Pedidos y Pagos como contextos separados, cada uno dueño de sus datos."
+    },
+    {
+      termino: "Database per microservice",
+      categoria: "microservicios",
+      definicion: "Cada servicio es dueño único de su almacenamiento; prohibido compartir bases relacionales para evitar acoplamiento de esquema.",
+      ejemplo: "Búsqueda en NoSQL + caché, Reservas en relacional estricta, cada una la suya."
+    },
+    {
+      termino: "CQRS",
+      categoria: "microservicios",
+      definicion: "Segregación de responsabilidades entre comandos y consultas: modelos separados para escritura y para lectura optimizada.",
+      ejemplo: "Escribir en el modelo de dominio y leer desde vistas materializadas rápidas."
+    },
+    {
+      termino: "Event Sourcing",
+      categoria: "microservicios",
+      definicion: "Persistir los cambios como secuencia inmutable de eventos en vez del estado actual; el estado se reconstruye rejugándolos.",
+      ejemplo: "La cuenta se reconstruye sumando Depósito/Retiro en vez de guardar solo el saldo."
+    },
+    {
+      termino: "Orquestación",
+      categoria: "microservicios",
+      definicion: "Coordinación con un orquestador central paso a paso: estado global visible, con riesgo de monolito distribuido.",
+      ejemplo: "Un Orchestrator Service que comanda a Servicio 1, 2 y 3 y recoge sus estados."
+    },
+    {
+      termino: "Coreografía",
+      categoria: "microservicios",
+      definicion: "Coordinación donde cada servicio escucha eventos y reacciona solo: máximo desacople, difícil de rastrear.",
+      ejemplo: "Tres servicios que publican y consumen del event bus sin director central."
+    },
+    {
+      termino: "Saga",
+      categoria: "microservicios",
+      definicion: "Transacciones distribuidas como secuencia de transacciones locales encadenadas por eventos, con compensatorias en reversa ante fallos.",
+      ejemplo: "Reserva → Pago → Notificación; si el pago falla, se compensa cancelando la reserva."
+    },
+    {
+      termino: "Microservice Tax",
+      categoria: "microservicios",
+      definicion: "Costo fijo de lo distribuido: infraestructura, CI/CD, redes, observabilidad obligatoria y pérdida del ACID simple.",
+      ejemplo: "Montar trazas, métricas y logs distribuidos antes del primer servicio productivo."
     }
   ],
   tips: [
