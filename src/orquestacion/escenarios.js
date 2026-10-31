@@ -8,6 +8,7 @@ import { fusionarMejor } from "../student/registros.js";
 
 export function crearEscenarios({
   $, track, persistencia, gamificacion, show,
+  alFinalizar = _estado => {},
   pintarLista = pintarListaEscenarios,
   pintar = pintarEscenario,
   fusionar = fusionarMejor
@@ -47,6 +48,8 @@ export function crearEscenarios({
     registros[actual.id] = fusionar(registros[actual.id], estado.rating);
     persistencia.guardarEscenarios(registros);
     gamificacion.revisarLogros({ escenarioExito: estado.rating === "exito" });
+    // Permite sincronizar el árbol de talentos cuando el escenario actúa como Boss Battle.
+    alFinalizar(estado);
   }
 
   return {

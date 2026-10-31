@@ -138,7 +138,7 @@ function renderizarPanelTitulos(arbolEvaluado, tituloActivo) {
   );
 }
 
-export function pintarTalentos({ arbolEvaluado, materia, tituloActivo = "" } = {}) {
+export function pintarTalentos({ arbolEvaluado = null, materia = null, tituloActivo = "" } = {}) {
   const cont = $("talentos-vista");
   if (!cont) return;
 

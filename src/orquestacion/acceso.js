@@ -22,7 +22,9 @@ export function crearAcceso({
     // `cache.email` cubre el cambio de sesión antes de que el servicio vuelva a consultar.
     const email = usuario?.email ?? usuario?.correo ?? cache.email ?? null;
     const cuentaEstado = !cache.disponible ? "no-disponible" : (email ? "sesion" : "invitado");
-    return { nombre: persistencia.nombre(), email, cuentaEstado, perfil: gamificacion.perfil() };
+    // Adjunta el título profesional activo si la instancia de persistencia lo soporta.
+    const tituloActivo = typeof persistencia.tituloActivo === "function" ? persistencia.tituloActivo() : "";
+    return { nombre: persistencia.nombre(), email, cuentaEstado, perfil: gamificacion.perfil(), tituloActivo };
   }
 
   function repintarPerfil() {

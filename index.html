@@ -180,6 +180,13 @@
             <span class="mode-desc block">Gana estrellas por tema, nodo a nodo</span>
           </span>
         </button>
+        <button class="mode-card" data-action="irTalentos">
+          <span class="icono icono-lg" data-icono="medalla"></span>
+          <span class="min-w-0">
+            <span class="mode-titulo block">Árbol de Talentos</span>
+            <span class="mode-desc block">Desbloquea especialidades y expande tu radar técnico</span>
+          </span>
+        </button>
         <button class="mode-card" data-action="startEscenarios">
           <span class="icono icono-lg" data-icono="escenarios"></span>
           <span class="min-w-0">
@@ -321,6 +328,15 @@
     </div>
     <p class="subtitle">Completa misiones por tema y gana hasta 3 estrellas según tu precisión. Cada nodo se desbloquea con al menos 1 estrella del anterior.</p>
     <div id="misiones-lista"></div>
+  </section>
+
+  <section id="screen-talentos" class="card hidden">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+      <h1 class="screen-titulo">Árbol de Talentos</h1>
+      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+    </div>
+    <p class="subtitle">Domina las misiones por tema, supera los Incidentes en Producción (Boss Battles) para desbloquear especialidades, expandir tu Radar Técnico y equipar títulos profesionales.</p>
+    <div id="talentos-vista"></div>
   </section>
 
   <section id="screen-escenarios" class="card hidden">

@@ -6,6 +6,7 @@ import { componerAcciones, crearAcciones } from "./index.js";
 // Stubs mínimos: las fábricas devuelven funciones que solo se ejecutan al hacer clic.
 const accionesStub = {
   misiones: { acciones: { irMisiones: () => {}, iniciarMision: () => {} } },
+  talentos: { acciones: { irTalentos: () => {}, equiparTitulo: () => {}, afrontarBoss: () => {} } },
   escenarios: { acciones: { startEscenarios: () => {}, jugarEscenario: () => {}, decidirEscenario: () => {}, continuarEscenario: () => {} } },
   casos: { acciones: { startCasos: () => {}, jugarCaso: () => {}, comprobarCaso: () => {}, cancelarDiagramaTipoCaso: () => {} } }
 };
@@ -38,6 +39,7 @@ describe("acciones", () => {
     const acciones = mapaCompleto();
     expect(typeof acciones.goHome).toBe("function");
     expect(typeof acciones.startCasos).toBe("function");
+    expect(typeof acciones.irTalentos).toBe("function");
     expect(typeof acciones.exportarDatos).toBe("function");
   });
 

@@ -7,6 +7,7 @@ import { fusionarMejor } from "../student/registros.js";
 
 export function crearCasos({
   $, track, persistencia, gamificacion, show,
+  alFinalizar = _resultado => {},
   pintarLista = pintarListaCasos,
   pintar = pintarCaso,
   fusionar = fusionarMejor
@@ -58,6 +59,8 @@ export function crearCasos({
     const xp = rating === "exito" ? 60 : rating === "parcial" ? 25 : 0;
     if (xp) gamificacion.sumarXp(xp);
     if (rating === "exito") gamificacion.revisarLogros({ casoExito: true });
+    // Sincroniza los nodos del árbol de talentos asociados a este caso de diagramación.
+    alFinalizar(resultado);
 
     pintar(actual, estado, resultado);
   }

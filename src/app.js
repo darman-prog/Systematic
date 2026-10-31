@@ -1,4 +1,4 @@
-﻿import { MATERIAS, LENGUAJES, fechaSnapshot } from "./core/index.js";
+import { MATERIAS, LENGUAJES, fechaSnapshot } from "./core/index.js";
 import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
@@ -24,6 +24,7 @@ import { crearRonda } from "./orquestacion/ronda.js";
 import { crearRespuesta } from "./orquestacion/quiz.js";
 import { crearAjustes } from "./orquestacion/ajustes.js";
 import { crearMisiones } from "./orquestacion/misiones.js";
+import { crearTalentos } from "./orquestacion/talentos.js";
 import { crearEscenarios } from "./orquestacion/escenarios.js";
 import { crearCasos } from "./orquestacion/casos.js";
 import { crearLenguaje } from "./orquestacion/lenguaje.js";
@@ -55,6 +56,7 @@ let trackIdActual = null;
 let lenguaje = null;
 let dashboard = null;
 let acceso = null;
+let talentos = null;
 
 /** @type {(id: string) => any} */
 const $ = id => document.getElementById(id);
@@ -103,7 +105,11 @@ const sesiones = crearSesiones({
   ahora: () => Date.now(), guardarIntento: avance.guardarIntento, conNombre,
   // El toast del examen no lleva icono: se pasa el texto tal cual.
   notificar: texto => toast(texto),
-  alFinalizar: () => { resultados.pintarResultados(false); show("results"); },
+  alFinalizar: () => {
+    talentos?.sincronizarDesbloqueos();
+    resultados.pintarResultados(false);
+    show("results");
+  },
   leerTextoDesarrollo: () => { const ta = $("dev-texto"); return ta ? ta.value : ""; }
 });
 
@@ -155,20 +161,6 @@ const respuesta = crearRespuesta({
   alApagarTimer: () => clearTimerPregunta(),
   alPerderVida: () => quiz.pintarVidas()
 });
-
-
-
-// ===== Gamificación (spec 003): el servicio vive en src/student/gamificacion.js =====
-// La tarjeta de perfil vive solo en screen-perfil (ui/cuenta/perfil.js).
-
-// Resumen, "usar todas" e ir a config: viven en ui/dashboard/config.js (ADR 007).
-
-// ordenarPrioridad, prepararItem y respuestaCorrecta viven en core/estudio/sesiones.js (testeables).
-
-// Arranca una ronda: ver src/app/ronda.js (ADR 009).
-
-
-// La salida, el avance y los relojes de la ronda viven en src/app/ronda.js (ADR 009).
 
 // Módulos de render por pantalla (ADR 001): reciben estado explícito y callbacks.
 const quiz = crearQuizUI({
@@ -226,12 +218,28 @@ const misiones = crearMisiones({
 
 // Controlador de escenarios (orquestacion/escenarios.js).
 const escenarios = crearEscenarios({
-  $, track, persistencia, gamificacion, show
+  $, track, persistencia, gamificacion, show,
+  alFinalizar: () => talentos?.sincronizarDesbloqueos()
 });
 
 // Controlador de casos (orquestacion/casos.js): estado y lienzo propios.
 const casos = crearCasos({
-  $, track, persistencia, gamificacion, show
+  $, track, persistencia, gamificacion, show,
+  alFinalizar: () => talentos?.sincronizarDesbloqueos()
+});
+
+// Controlador del Árbol de Talentos y Radar de Especialidades (orquestacion/talentos.js).
+talentos = crearTalentos({
+  persistencia, track, gamificacion, sesiones, show, clearTimer, clearTimerPregunta,
+  escenarios, casos,
+  alDesbloquear: nodo => {
+    toast(icono("medalla", "icono-sm") + conNombre("¡Talento desbloqueado, @: " + nodo.nombre + "!") + " (+" + XP_EVENTOS.talento + " XP)");
+    confeti();
+  },
+  alEquiparTitulo: titulo => {
+    toast(icono("medalla", "icono-sm") + "Título equipado: " + titulo);
+    acceso?.repintarPerfil();
+  }
 });
 
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
@@ -259,7 +267,7 @@ const ACCIONES = crearAcciones({
     repetirFalladas, repetirMisma,
     toggleFiltro: configCtl.toggleFiltro, toggleFiltroTodos: configCtl.toggleFiltroTodos
   },
-  juego: { misiones, escenarios, casos },
+  juego: { misiones, talentos, escenarios, casos },
   navegacion: { dashboard, lenguaje, ajustes }
 });
 instalarDelegacion(ACCIONES);
@@ -271,4 +279,3 @@ instalarAtajos({
 
 // Cuenta (ADR 008): decide la pantalla inicial una vez instaladas acciones y atajos.
 acceso.iniciar();
-

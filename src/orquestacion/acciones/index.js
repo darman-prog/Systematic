@@ -20,20 +20,26 @@ export function componerAcciones(grupos) {
 }
 
 // Aplana cada submódulo como un grupo propio: el guard detecta colisiones también entre
-// dashboard/lenguaje/ajustes y entre misiones/escenarios/casos.
+// dashboard/lenguaje/ajustes y entre misiones/talentos/escenarios/casos.
 function gruposDe(prefijo, mapas) {
   return Object.fromEntries(Object.entries(mapas).map(([nombre, mapa]) => [prefijo + ":" + nombre, mapa]));
 }
 
 export function crearAcciones({ acceso, practica, juego, navegacion }) {
+  const gruposJuego = {
+    misiones: juego.misiones.acciones,
+    escenarios: juego.escenarios.acciones,
+    casos: juego.casos.acciones
+  };
+  // Incluye las acciones del árbol de talentos cuando el controlador está registrado.
+  if (juego.talentos && juego.talentos.acciones) {
+    gruposJuego.talentos = juego.talentos.acciones;
+  }
+
   return componerAcciones({
     acceso: accionesAcceso(acceso),
     practica: accionesPractica(practica),
-    ...gruposDe("juego", {
-      misiones: juego.misiones.acciones,
-      escenarios: juego.escenarios.acciones,
-      casos: juego.casos.acciones
-    }),
+    ...gruposDe("juego", gruposJuego),
     ...gruposDe("navegacion", {
       dashboard: navegacion.dashboard.acciones,
       lenguaje: navegacion.lenguaje.acciones,
