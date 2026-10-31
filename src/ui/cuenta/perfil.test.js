@@ -58,4 +58,15 @@ describe("ui/cuenta/perfil", () => {
     expect(chips).not.toContain("🏅");
   });
 
+  it("muestra el título profesional equipado cuando está activo", () => {
+    const ui = montar();
+    ui.render({
+      nombre: "Ana",
+      email: null,
+      cuentaEstado: "invitado",
+      perfil: PERFIL_BASE,
+      tituloActivo: "DBA de Alto Rendimiento"
+    });
+    expect(document.querySelector("#perfil-identidad").textContent).toContain("DBA de Alto Rendimiento");
+  });
 });

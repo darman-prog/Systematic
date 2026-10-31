@@ -10,13 +10,17 @@ const plural = (n, uno, varios) => (n === 1 ? uno : varios);
 
 export function crearPerfil() {
   /** @type {(id: string) => any} */
-const $ = id => document.getElementById(id);
+  const $ = id => document.getElementById(id);
 
   // Pinta la identidad con el mismo lenguaje visual del home (anillo + chips).
-  function pintarIdentidad(cont, { nombre, email, perfil }) {
+  function pintarIdentidad(cont, { nombre, email, perfil, tituloActivo }) {
     const p = perfil || { nivel: 1, xp: 0, pct: 0, faltante: 0, racha: 0, insignias: 0 };
     const pct = Math.max(0, Math.min(100, Math.round(p.pct || 0)));
     const titulo = nombre ? `Perfil de ${escapar(nombre)}` : "Tu perfil";
+    // Muestra el título técnico desbloqueado si el estudiante equipó uno desde el árbol de talentos.
+    const insigniaEspecialidad = tituloActivo
+      ? `<p class="perfil-titulo-especialidad">${icono("medalla", "icono-xs")} <span>${escapar(tituloActivo)}</span></p>`
+      : "";
     const correo = email ? `<p class="perfil-correo">Sesión: <b>${escapar(email)}</b></p>` : "";
     const faltan = p.faltante
       ? `<p class="perfil-faltan">Faltan ${p.faltante} XP para el nivel ${p.nivel + 1}</p>`
@@ -34,6 +38,7 @@ const $ = id => document.getElementById(id);
         </div>
         <div class="perfil-datos">
           <p class="perfil-nombre">${titulo}</p>
+          ${insigniaEspecialidad}
           <p class="perfil-xp"><b>${p.xp}</b> XP</p>
           ${correo}
           ${faltan}
@@ -77,10 +82,10 @@ const $ = id => document.getElementById(id);
       <p class="subtitle">Sin cuenta en este dispositivo: la sincronización en la nube no está activada, así que tu progreso vive solo en este navegador. Puedes exportarlo abajo para llevarlo a otro dispositivo.</p>`;
   }
 
-  function render({ nombre = "", email = null, cuentaEstado = "no-disponible", perfil = null } = {}) {
+  function render({ nombre = "", email = null, cuentaEstado = "no-disponible", perfil = null, tituloActivo = "" } = {}) {
     const identidad = $("perfil-identidad");
     const cuenta = $("perfil-cuenta");
-    if (identidad) pintarIdentidad(identidad, { nombre, email, perfil });
+    if (identidad) pintarIdentidad(identidad, { nombre, email, perfil, tituloActivo });
     if (cuenta) pintarCuenta(cuenta, { email, cuentaEstado });
   }
 
