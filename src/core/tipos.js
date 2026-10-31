@@ -72,4 +72,35 @@
  * @property {string} modo
  */
 
+/**
+ * @typedef {Object} Talento
+ * @property {string} id
+ * @property {string} nombre
+ * @property {string} descripcion
+ * @property {string} eje
+ * @property {number} puntosRadar
+ * @property {string} titulo
+ * @property {string} [icono]
+ * @property {string[]} misionesRequeridas
+ * @property {number} [minEstrellas]
+ * @property {string} [bossId]
+ * @property {"escenario"|"caso"} [bossTipo]
+ * @property {string} [bossNombre]
+ * @property {string|null} [talentoPrevioId]
+ */
+
+/**
+ * @typedef {Object} RamaTalentos
+ * @property {string} id
+ * @property {string} nombre
+ * @property {string} descripcion
+ * @property {Talento[]} nodos
+ */
+
+/**
+ * @typedef {Object} ArbolTalentos
+ * @property {string[]} ejes
+ * @property {RamaTalentos[]} ramas
+ */
+
 export {};

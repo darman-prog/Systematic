@@ -10,6 +10,7 @@ export * from "./estudio/estadisticas.js";
 export * from "./juego/gamificacion.js";
 export * from "./juego/escenarios.js";
 export * from "./juego/misiones.js";
+export * from "./juego/talentos.js";
 export * from "./lenguaje/competencia.js";
 export * from "./nube/snapshot.js";
 export * from "./diagramas/diagramas.js";

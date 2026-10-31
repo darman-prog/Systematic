@@ -1,4 +1,4 @@
-﻿// Gamificación amable (spec 003): XP, niveles y logros.
+// Gamificación amable (spec 003): XP, niveles y logros.
 // Funciones puras: la persistencia (sys.xp, sys.logros, sys.xp-eventos) vive en app.js.
 
 export const XP_EVENTOS = {
@@ -7,7 +7,8 @@ export const XP_EVENTOS = {
   metaDiaria: 50,
   logro: 25,
   escenaCorrecta: 15, // se usa desde H5 (escenarios)
-  estrella: 40        // se usa desde H4 (misiones)
+  estrella: 40,       // se usa desde H4 (misiones)
+  talento: 100        // recompensa al desbloquear un nodo del árbol de talentos
 };
 
 // Un acierto en una pregunta con caja >= 3 cuenta como "dominada": menos XP.
