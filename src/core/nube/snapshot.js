@@ -15,6 +15,10 @@ export function construirSnapshot({ persistencia, materias, lenguajes, ahora = n
       meta: persistencia.meta(m.id),
       misiones: persistencia.misiones(m.id)
     };
+    // Si la instancia de persistencia soporta talentos por materia, los incluye en el respaldo.
+    if (typeof persistencia.talentos === "function") {
+      materiasDatos[m.id].talentos = persistencia.talentos(m.id);
+    }
   }
   const lenguajesDatos = {};
   for (const l of lenguajes) {
@@ -59,7 +63,8 @@ function materiaValida(datos) {
     historialValido(datos.historial) &&
     esObjeto(datos.actividad) &&
     Number.isInteger(datos.meta) && datos.meta > 0 &&
-    esObjeto(datos.misiones);
+    esObjeto(datos.misiones) &&
+    (datos.talentos === undefined || esObjeto(datos.talentos));
 }
 
 function globalValida(g) {

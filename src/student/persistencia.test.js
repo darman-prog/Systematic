@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { crearPersistencia, CLAVES_GLOBALES, claveMisiones, claveCompetencia } from "./persistencia.js";
+import { crearPersistencia, CLAVES_GLOBALES, claveMisiones, claveTalentos, claveCompetencia } from "./persistencia.js";
 
 function storageMemoria() {
   const datos = {};
@@ -23,6 +23,7 @@ describe("persistencia", () => {
     expect(p.clavesMateria("bd2").progreso).toBe("sys.progreso.bd2");
     expect(CLAVES_GLOBALES.xp).toBe("sys.xp");
     expect(claveMisiones("isw")).toBe("sys.misiones.isw");
+    expect(claveTalentos("bd2")).toBe("sys.talentos.bd2");
   });
 
   it("lee con valor por defecto y escribe JSON", () => {
@@ -54,11 +55,12 @@ describe("persistencia", () => {
     expect(p.historial("bd2")).toEqual([]);
   });
 
-  it("reiniciarMateria borra progreso, racha, historial y misiones; conserva meta y globales", () => {
+  it("reiniciarMateria borra progreso, racha, historial, misiones y talentos; conserva meta y globales", () => {
     p.guardarProgreso("bd2", { a: 1 });
     p.guardarActividad("bd2", { "2026-01-01": 3 });
     p.guardarHistorial("bd2", [{ date: 1 }]);
     p.guardarMisiones("bd2", { m1: { estrellas: 2 } });
+    p.guardarTalento("bd2", "TAL-01", { fecha: 123 });
     p.guardarMeta("bd2", 30);
     p.guardarXp(120);
     p.guardarLogros({ l1: "fecha" });
@@ -71,6 +73,7 @@ describe("persistencia", () => {
     expect(p.actividad("bd2")).toEqual({});
     expect(p.historial("bd2")).toEqual([]);
     expect(p.misiones("bd2")).toEqual({});
+    expect(p.talentos("bd2")).toEqual({});
     expect(p.meta("bd2")).toBe(30);
     expect(p.xp()).toBe(120);
     expect(p.logros().l1).toBe("fecha");
@@ -82,14 +85,18 @@ describe("persistencia", () => {
     expect(p.progreso("isw")).toEqual({ b: 2 });
   });
 
-  it("guarda y lee escenarios, casos, misiones y logros", () => {
+  it("guarda y lee escenarios, casos, misiones, talentos y logros", () => {
     p.guardarEscenarios({ e1: { mejorRating: "exito", jugadas: 1 } });
     p.guardarCasos({ c1: { mejorRating: "parcial", jugadas: 2 } });
     p.guardarMisiones("asw", { t1: { estrellas: 3 } });
+    p.guardarTalento("asw", "TAL-ASW-01", { fecha: 500 });
     p.guardarLogros({ l1: "fecha" });
+    p.guardarTituloActivo("Arquitecto Hexagonal");
     expect(p.escenarios().e1.mejorRating).toBe("exito");
     expect(p.casos().c1.jugadas).toBe(2);
     expect(p.misiones("asw").t1.estrellas).toBe(3);
+    expect(p.talentos("asw")["TAL-ASW-01"].fecha).toBe(500);
+    expect(p.tituloActivo()).toBe("Arquitecto Hexagonal");
     expect(p.logros().l1).toBe("fecha");
   });
 

@@ -17,8 +17,7 @@ export function aplicarSnapshot(datos, persistencia) {
   // solo se toca si el respaldo lo trae encendido.
   if (datos.global.onboarding) persistencia.guardarOnboardingHecho();
 
-  // Materias: los cinco bloques por id. Los métodos de persistencia ya normalizan
-  // (historial a 15 entradas, meta positiva), así que acá se escriben tal cual.
+  // Materias: los cinco bloques base por id y talentos si están presentes en el snapshot.
   const materias = Object.entries(datos.materias);
   for (const [id, m] of materias) {
     persistencia.guardarProgreso(id, m.progreso);
@@ -26,6 +25,9 @@ export function aplicarSnapshot(datos, persistencia) {
     persistencia.guardarActividad(id, m.actividad);
     persistencia.guardarMeta(id, m.meta);
     persistencia.guardarMisiones(id, m.misiones);
+    if (m.talentos && typeof persistencia.guardarTalentos === "function") {
+      persistencia.guardarTalentos(id, m.talentos);
+    }
   }
 
   // Lenguajes: competencia por id.

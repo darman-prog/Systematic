@@ -10,12 +10,15 @@ export const CLAVES_GLOBALES = {
   escenarios: "sys.escenarios",
   casos: "sys.casos-diagrama",
   nombre: "sys.nombre",
-  onboarding: "sys.onboarding.v1"
+  onboarding: "sys.onboarding.v1",
+  tituloActivo: "sys.titulo-activo"
 };
 
 const NOMBRE_MAX = 24;
+const TITULO_MAX = 48;
 
 export const claveMisiones = materiaId => "sys.misiones." + materiaId;
+export const claveTalentos = materiaId => "sys.talentos." + materiaId;
 // Competencia por lenguaje (spec 011): separada de las claves por materia.
 export const claveCompetencia = lenguajeId => "sys.competencia." + lenguajeId;
 
@@ -43,13 +46,14 @@ export function crearPersistencia(storage) {
       borrar(claves(materiaId).actividad);
     },
     borrarHistorial: materiaId => borrar(claves(materiaId).historial),
-    // Reset por materia: borra progreso, racha, historial de intentos y misiones.
+    // Reset por materia: borra progreso, racha, historial de intentos, misiones y talentos.
     // Conserva la meta (preferencia) y todo lo global (XP, logros, casos, escenarios).
     reiniciarMateria: materiaId => {
       borrar(claves(materiaId).progreso);
       borrar(claves(materiaId).actividad);
       borrar(claves(materiaId).historial);
       borrar(claveMisiones(materiaId));
+      borrar(claveTalentos(materiaId));
     },
 
     // ---- Globales ----
@@ -61,6 +65,14 @@ export function crearPersistencia(storage) {
     guardarLogros: valor => escribir(CLAVES_GLOBALES.logros, valor),
     misiones: materiaId => leer(claveMisiones(materiaId), {}),
     guardarMisiones: (materiaId, valor) => escribir(claveMisiones(materiaId), valor),
+    talentos: materiaId => leer(claveTalentos(materiaId), {}),
+    guardarTalentos: (materiaId, valor) => escribir(claveTalentos(materiaId), valor),
+    // Registra un talento individual conservando los que ya estaban desbloqueados en la materia.
+    guardarTalento: (materiaId, talentoId, registro = { fecha: Date.now() }) => {
+      const actual = Object.assign({}, leer(claveTalentos(materiaId), {}));
+      actual[talentoId] = registro;
+      return escribir(claveTalentos(materiaId), actual);
+    },
     // Competencia por lenguaje: estado por etapa { aprobado, version, ultimoPct, intentos }.
     competencia: lenguajeId => leer(claveCompetencia(lenguajeId), {}),
     guardarCompetencia: (lenguajeId, valor) => escribir(claveCompetencia(lenguajeId), valor),
@@ -69,11 +81,16 @@ export function crearPersistencia(storage) {
     casos: () => leer(CLAVES_GLOBALES.casos, {}),
     guardarCasos: valor => escribir(CLAVES_GLOBALES.casos, valor),
 
-    // ---- Identidad (onboarding) ----
+    // ---- Identidad (onboarding y título profesional) ----
     nombre: () => String(leer(CLAVES_GLOBALES.nombre, "") || "").slice(0, NOMBRE_MAX),
     guardarNombre: valor => {
       const limpio = String(valor || "").trim().slice(0, NOMBRE_MAX);
       return escribir(CLAVES_GLOBALES.nombre, limpio);
+    },
+    tituloActivo: () => String(leer(CLAVES_GLOBALES.tituloActivo, "") || "").slice(0, TITULO_MAX),
+    guardarTituloActivo: valor => {
+      const limpio = String(valor || "").trim().slice(0, TITULO_MAX);
+      return escribir(CLAVES_GLOBALES.tituloActivo, limpio);
     },
     onboardingHecho: () => leer(CLAVES_GLOBALES.onboarding, false) === true,
     guardarOnboardingHecho: () => escribir(CLAVES_GLOBALES.onboarding, true)

@@ -47,6 +47,8 @@ export async function cargarContenido(track) {
     apuntes: mod.apuntes ?? [],
     escenarios: mod.escenarios ?? [],
     casos: mod.casos ?? [],
+    // Árbol de talentos y ejes de especialidad para las materias que lo declaran.
+    talentos: mod.talentos ?? null,
     // Solo los tracks de lenguaje declaran roadmap (spec 011).
     roadmap: mod.roadmap ?? null,
     ...(presentacion || {})
