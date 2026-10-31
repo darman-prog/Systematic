@@ -4,3 +4,4 @@ export { default as glosario } from "./glosario.js";
 export { default as apuntes } from "./apuntes.js";
 export { default as escenarios } from "./escenarios.js";
 export { default as casos } from "./casos.js";
+export { default as talentos } from "./talentos.js";

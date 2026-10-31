@@ -33,4 +33,31 @@ describe("agregadores de datos por track", () => {
       expect((await cargarContenido(l)).roadmap, `${l.id} debería tener roadmap`).toBeTruthy();
     }
   });
+
+  it("cada materia declara un árbol de talentos cuyos temas y Boss Battles existen en su banco", async () => {
+    for (const m of MATERIAS) {
+      const mod = await cargarContenido(m);
+      expect(mod.talentos, `${m.id} debe declarar talentos`).toBeTruthy();
+      expect(mod.talentos.ejes).toHaveLength(5);
+      expect(mod.talentos.ramas.length).toBeGreaterThanOrEqual(3);
+
+      const temasDisponibles = new Set(mod.preguntas.map(p => p.tema));
+      const escenariosIds = new Set(mod.escenarios.map(e => e.id));
+      const casosIds = new Set(mod.casos.map(c => c.id));
+      const ejesSet = new Set(mod.talentos.ejes);
+
+      for (const rama of mod.talentos.ramas) {
+        for (const nodo of rama.nodos) {
+          expect(ejesSet.has(nodo.eje), `${m.id}/${nodo.id}: eje ${nodo.eje} no existe`).toBe(true);
+          for (const tema of nodo.misionesRequeridas) {
+            expect(temasDisponibles.has(tema), `${m.id}/${nodo.id}: tema ${tema} no existe en banco`).toBe(true);
+          }
+          if (nodo.bossId) {
+            const existeBoss = nodo.bossTipo === "caso" ? casosIds.has(nodo.bossId) : escenariosIds.has(nodo.bossId);
+            expect(existeBoss, `${m.id}/${nodo.id}: boss ${nodo.bossId} no existe`).toBe(true);
+          }
+        }
+      }
+    }
+  });
 });
