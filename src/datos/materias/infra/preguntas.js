@@ -78,7 +78,7 @@ const preguntas = [
     tema: "Linux: comandos básicos",
     dificultad: "facil",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Emparejá cada comando básico de información del sistema con su función:",
     pares: [
       ["pwd", "Muestra el directorio actual de trabajo"],
       ["ls", "Lista el contenido de un directorio"],
@@ -104,7 +104,7 @@ const preguntas = [
     tema: "Linux: comandos básicos",
     dificultad: "facil",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Relacioná cada herramienta de ayuda y documentación en Linux con su propósito:",
     pares: [
       ["help", "Ayuda interna del shell"],
       ["man", "Abre el manual de un comando"],
@@ -153,7 +153,7 @@ const preguntas = [
     tema: "Linux: comandos básicos",
     dificultad: "media",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Asociá cada utilidad de monitoreo de procesos y recursos con lo que muestra:",
     pares: [
       ["ps -A", "Lista todos los procesos con su PID"],
       ["top -n 1", "Muestra una pasada de procesos en vivo"],
@@ -192,7 +192,7 @@ const preguntas = [
     tema: "Linux: comandos básicos",
     dificultad: "facil",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Emparejá cada comando de visualización y filtrado de ficheros con su comportamiento:",
     pares: [
       ["cat", "Muestra el contenido de un fichero"],
       ["head -n 5", "Muestra las primeras líneas de un fichero"],
@@ -242,7 +242,7 @@ const preguntas = [
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Relacioná cada comando de administración de cuentas de usuario con la acción que realiza:",
     pares: [
       ["useradd", "Crea un usuario nuevo"],
       ["usermod", "Modifica un usuario existente"],
@@ -257,7 +257,7 @@ const preguntas = [
     tema: "Linux: usuarios y grupos",
     dificultad: "facil",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Emparejá cada comando de gestión de grupos del sistema con su propósito:",
     pares: [
       ["groupadd", "Crea un grupo"],
       ["groupmod", "Modifica un grupo existente"],
@@ -298,7 +298,7 @@ const preguntas = [
     tema: "Linux: usuarios y grupos",
     dificultad: "media",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Asociá cada comando de consulta y modificación de usuarios y contraseñas con su función:",
     pares: [
       ["usermod", "Modifica un usuario existente"],
       ["useradd", "Crea un usuario nuevo"],
@@ -363,10 +363,11 @@ const preguntas = [
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "facil",
     tipo: "vf",
-    q: "La letra «w» en los permisos de Linux simboliza el permiso de escritura.",
+    // Evalúa la regla de permisos en directorios: 'w' permite borrar y crear entradas, no solo editar archivos.
+    q: "En un directorio de Linux, el permiso «w» solo permite modificar el texto de los archivos existentes, pero impide crear o eliminar archivos dentro de él.",
     options: ["Verdadero", "Falso"],
-    correct: 0,
-    exp: "Verdadero: «w» es escritura (write). En un directorio, permite crear y eliminar archivos dentro de él."
+    correct: 1,
+    exp: "Falso: en un directorio de Linux, el permiso de escritura («w») otorga precisamente la capacidad de crear, renombrar y eliminar entradas de archivos dentro de él, independientemente de los permisos individuales que tenga cada archivo contenido."
   },
   {
     id: "INF-029",
@@ -397,7 +398,7 @@ const preguntas = [
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Relacioná cada comando de permisos, propiedad y atributos de archivos con su efecto:",
     pares: [
       ["chmod", "Cambia los permisos de un archivo"],
       ["chown", "Cambia el propietario de un archivo"],
@@ -424,7 +425,7 @@ const preguntas = [
     tema: "Linux: permisos de archivos y directorios",
     dificultad: "media",
     tipo: "relacionar",
-    q: "Emparejá cada comando con lo que hace.",
+    q: "Emparejá cada utilidad de privilegios y control de acceso en ficheros y usuarios con su operación:",
     pares: [
       ["chown", "Cambia el propietario de un archivo"],
       ["chgrp", "Cambia el grupo propietario de un archivo"],

@@ -759,6 +759,40 @@ const preguntas = [
       { de: "rechazar solicitud", a: "fin rechazado", tipo: "transición" }
     ],
     exp: "En un <b>diagrama de actividad</b>, el nodo de <b>decisión</b> (rombo) tiene salidas con <b>guardas</b> que determinan el camino. Aquí la solicitud solo se implementa si el cambio es aprobado [sí]; de lo contrario se rechaza [no]. Los nodos de inicio y de fin son puntos fijos del flujo."
+  },
+  // Pregunta conceptual para completar el mínimo de preguntas requeridas en el tema Casos de Uso.
+  {
+    id: "ISW-099",
+    parcial: "Parcial 1",
+    tema: "Casos de Uso",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En un diagrama de casos de uso UML, ¿cuál es la diferencia fundamental entre una relación «include» y una relación «extend»?",
+    options: [
+      "«include» indica una inclusión obligatoria en el flujo base; «extend» modela un comportamiento opcional o condicional bajo un punto de extensión",
+      "«include» solo se usa entre actores; «extend» se utiliza exclusivamente entre la base de datos y la interfaz",
+      "«extend» es mandatoria en cada ejecución; «include» se dispara solo cuando ocurre una excepción en el sistema",
+      "«include» duplica el código fuente en el compilador; «extend» crea una subclase polimórfica en tiempo de diseño"
+    ],
+    correct: 0,
+    exp: "La relación <b>«include»</b> representa una dependencia mandatoria donde el caso de uso base siempre incorpora el comportamiento del caso incluido. La relación <b>«extend»</b> añade funcionalidad suplementaria de forma opcional o bajo condiciones específicas definidas en puntos de extensión."
+  },
+  // Pregunta sobre concurrencia y sincronización en diagramas de actividad UML.
+  {
+    id: "ISW-100",
+    parcial: "Parcial 1",
+    tema: "Diagramas de Actividad",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En un diagrama de actividades UML, ¿qué representan las barras de sincronización (Fork y Join)?",
+    options: [
+      "Fork divide un único flujo en dos o más flujos concurrentes/paralelos; Join sincroniza y espera que todos los flujos entrantes culminen antes de continuar",
+      "Fork toma una decisión excluyente según una guarda booleana; Join bifurca los procesos aleatoriamente",
+      "Fork marca el inicio absoluto del sistema; Join actúa como el destructor de memoria del proceso",
+      "Fork modela la base de datos transaccional; Join representa la conexión por sockets TCP"
+    ],
+    correct: 0,
+    exp: "Las barras de sincronización en UML gestionan la concurrencia: una barra <b>Fork</b> (bifurcación) divide un flujo entrante en múltiples flujos paralelos independientes, mientras que una barra <b>Join</b> (unión) sincroniza dichos flujos concurrentes, esperando a que todos finalicen para continuar con la siguiente acción."
   }
 ];
 

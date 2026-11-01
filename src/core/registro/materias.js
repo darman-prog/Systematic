@@ -1,4 +1,4 @@
-﻿// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
+// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
 // Solo guarda metadatos y conteos; la carga del contenido y la presentación vive en
 // src/student/contenido.js. El dominio no conoce rutas de src/datos/ (ADR 011).
 // tipo: clasifica el track para la UI y el mezclado (spec 011/012).
@@ -22,7 +22,7 @@ export const MATERIAS = [
     color: "#A094BA",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 }
+    conteo: { preguntas: 100, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 }
   },
   {
     id: "asw",
