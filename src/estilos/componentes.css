@@ -817,7 +817,7 @@ input, textarea { caret-color: var(--study-accent); }
 }
 
 /* ===== RESPONSIVE ===== */
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .materia-card {
     flex-wrap: wrap;
     padding: 1rem;
@@ -1118,7 +1118,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 
   /* Enlaces de selección rápida en configuración con área táctil cómoda */
   .link-btn {
-    min-height: 38px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     padding: 0.35rem 0.6rem;
@@ -1179,8 +1179,8 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 }
 
 .home-logo {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   flex: none;
 }
@@ -1240,7 +1240,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   background: var(--study-bg);
   color: var(--study-text);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 #catalog-search::placeholder {
@@ -1256,9 +1256,9 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 
 .catalogo-clear {
   position: absolute;
-  right: 3.1rem;
-  width: 32px;
-  height: 32px;
+  right: 2.8rem;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1384,7 +1384,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   border: 1px dashed var(--study-border);
   border-radius: 12px;
   color: var(--study-muted);
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-align: center;
 }
 
