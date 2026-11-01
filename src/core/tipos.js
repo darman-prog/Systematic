@@ -41,6 +41,10 @@
  * @property {number|null} last
  * @property {boolean|null} lastOk
  * @property {boolean} marked
+ * @property {number} [reps]
+ * @property {number} [intervalo]
+ * @property {number} [efactor]
+ * @property {number} [proximo]
  */
 
 /**

@@ -2,6 +2,7 @@
 // tendencia y peores preguntas. Sin DOM: el color de tema entra por parámetro y la UI se
 // queda con las vistas, el canvas y el diagnóstico en prosa.
 import { esDebil, vencida, hoyISO, calcularRacha } from "./progreso.js";
+import { clasificarBanco } from "./repaso.js";
 
 export const CFG_ESTADISTICAS = Object.freeze({
   diasHeatmap: 7,
@@ -119,8 +120,12 @@ export function calcularStats({
     .sort((a, b) => b.score - a.score || b.p.fail - a.p.fail)
     .slice(0, CFG_ESTADISTICAS.topPeores);
 
+  // Clasificación SM-2 del banco en las 4 fases de memoria (nuevas, aprendiendo, vencidas, consolidadas).
+  const retencion = clasificarBanco(banco, obtenerP);
+
   return {
     ok, fail, totalResp, precision, respondidas, debiles, vencidas,
+    retencion,
     total: banco.length,
     parciales: new Set(banco.map(q => q.parcial)).size,
     totalTemas: porTema.size,

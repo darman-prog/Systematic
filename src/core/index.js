@@ -3,6 +3,7 @@
 // asi un reordenamiento futuro no vuelve a tocar a quien consume.
 export * from "./registro/materias.js";
 export * from "./estudio/progreso.js";
+export * from "./estudio/repaso.js";
 export * from "./estudio/sesiones.js";
 export * from "./estudio/sesion.js";
 export * from "./estudio/evaluacion.js";

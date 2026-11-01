@@ -94,6 +94,10 @@ export function intervaloDias(box) {
 
 export function vencida(p, ahora = Date.now()) {
   if (!p.last) return true;
+  // Si la entrada ya tiene fecha SM-2 explícita (`proximo`), se evalúa directamente contra ella.
+  if (typeof p.proximo === "number" && Number.isFinite(p.proximo)) {
+    return ahora >= p.proximo;
+  }
   return ahora - p.last >= intervaloDias(p.box) * 86400000;
 }
 
