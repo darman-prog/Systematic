@@ -22,7 +22,7 @@ export const MATERIAS = [
     color: "#A094BA",
     accentText: "#101418",
     tipo: "materia",
-    conteo: { preguntas: 98, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 }
+    conteo: { preguntas: 100, terminos: 18, apuntes: 9, escenarios: 1, casos: 2 }
   },
   {
     id: "asw",

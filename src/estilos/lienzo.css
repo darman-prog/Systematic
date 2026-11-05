@@ -1,4 +1,4 @@
-﻿/* Estilos del constructor de diagramas (lienzo, nodos, etiquetas, modal de guarda). */
+/* Estilos del constructor de diagramas (lienzo, nodos, etiquetas, modal de guarda). */
 /* Extraido de entrada.css al descongelar la zona (spec 006); incluye overrides moviles. */
 
 /* ===== ZONA CONGELADA: constructor de diagramas =====
@@ -46,7 +46,7 @@
 .nodo-puesto, .etiqueta-arista { touch-action: none; }
 #pool-diagrama .pieza, #pool-miembros .pieza { touch-action: none; }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   #lienzo-diagrama {
     min-height: 340px;
     max-height: 60vh;

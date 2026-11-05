@@ -21,9 +21,10 @@ describe("revisión de contenido", () => {
     expect(errores).toEqual([]);
   });
 
-  it("detecta avisos en el banco real (el chequeo no está ciego)", async () => {
+  // Tras la fase de calidad y enriquecimiento, el banco real no debe dejar avisos pendientes.
+  it("no deja avisos de calidad en el banco real", async () => {
     const avisos = (await cargadas()).flatMap(m => analizarMateria(m).avisos);
-    expect(avisos.length).toBeGreaterThan(0);
+    expect(avisos).toEqual([]);
   });
 
   it("detecta un enunciado repetido dentro del mismo tema", () => {
