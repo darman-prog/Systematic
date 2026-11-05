@@ -128,6 +128,31 @@ describe("validarEscenarios", () => {
     expect(errores).toContain("puntos inválidos");
     expect(errores).toContain("finales incompletos");
   });
+
+  it("acepta campos pedagógicos opcionales (tema, variantes, lentes, autopsia) y valida su estructura", () => {
+    const enriquecido = JSON.parse(JSON.stringify(ok));
+    enriquecido.pasos[0].tema = "Arquitectura Hexagonal";
+    enriquecido.pasos[0].variantes = ["Narrativa alternativa 1"];
+    enriquecido.pasos[0].lentes = { negocio: "Dolor", calidad: "Latencia", sintoma: "Acoplamiento" };
+    enriquecido.pasos[0].opciones[1].autopsia = {
+      incidente: "Caída de servicio",
+      trampa: "Atajo de código",
+      principio: "DIP"
+    };
+    expect(validarEscenarios([enriquecido])).toEqual([]);
+
+    const conErrores = JSON.parse(JSON.stringify(enriquecido));
+    conErrores.pasos[0].tema = "   ";
+    conErrores.pasos[0].variantes = [""];
+    conErrores.pasos[0].lentes = { negocio: "" };
+    conErrores.pasos[0].opciones[1].autopsia = { incidente: "", trampa: "T", principio: "P" };
+
+    const errores = validarEscenarios([conErrores]).join(" ");
+    expect(errores).toContain("con tema vacío");
+    expect(errores).toContain("contiene variantes vacías");
+    expect(errores).toContain("lente \"negocio\" vacío");
+    expect(errores).toContain("autopsia requiere incidente, trampa y principio no vacíos");
+  });
 });
 
 describe("validarPregunta tipo diagrama", () => {

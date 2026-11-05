@@ -107,4 +107,54 @@
  * @property {RamaTalentos[]} ramas
  */
 
+/**
+ * @typedef {Object} AutopsiaOpcion
+ * @property {string} incidente Consecuencia catastrófica en producción
+ * @property {string} trampa Mentalidad o sesgo que sedujo a tomar la opción
+ * @property {string} principio Regla o principio arquitectónico que la descalifica
+ */
+
+/**
+ * @typedef {Object} LentesPaso
+ * @property {string} [negocio] Perspectiva de dolor o impacto de negocio
+ * @property {string} [calidad] Perspectiva de atributo de calidad según SEI/ISO 25010
+ * @property {string} [sintoma] Perspectiva de síntoma o antipatrón técnico
+ */
+
+/**
+ * @typedef {Object} OpcionEscenario
+ * @property {string} texto
+ * @property {string} feedback
+ * @property {number} puntos
+ * @property {string} siguiente
+ * @property {AutopsiaOpcion} [autopsia]
+ */
+
+/**
+ * @typedef {Object} PasoEscenario
+ * @property {string} id
+ * @property {string} narrativa
+ * @property {string} [tema]
+ * @property {string[]} [variantes]
+ * @property {LentesPaso} [lentes]
+ * @property {OpcionEscenario[]} opciones
+ */
+
+/**
+ * @typedef {Object} FinalesEscenario
+ * @property {string} exito
+ * @property {string} parcial
+ * @property {string} fracaso
+ */
+
+/**
+ * @typedef {Object} Escenario
+ * @property {string} id
+ * @property {string} titulo
+ * @property {string} tema
+ * @property {string} intro
+ * @property {PasoEscenario[]} pasos
+ * @property {FinalesEscenario} finales
+ */
+
 export {};

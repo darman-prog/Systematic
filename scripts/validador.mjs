@@ -285,6 +285,26 @@ export function validarEscenarios(escenarios) {
       e.pasos.forEach(p => {
         if (!p || !textoNoVacio(p.id)) errores.push(ref + " con paso sin id");
         if (!p || !textoNoVacio(p.narrativa)) errores.push(ref + " paso \"" + (p && p.id || "?") + "\" sin narrativa");
+        // Valida atributos pedagógicos opcionales del paso: tema para el puente, variantes y lentes.
+        if (p && p.tema !== undefined && !textoNoVacio(p.tema)) errores.push(ref + " paso \"" + p.id + "\" con tema vacío");
+        if (p && p.variantes !== undefined) {
+          if (!esArreglo(p.variantes) || p.variantes.length === 0) {
+            errores.push(ref + " paso \"" + p.id + "\" variantes debe ser un arreglo no vacío");
+          } else if (p.variantes.some(v => !textoNoVacio(v))) {
+            errores.push(ref + " paso \"" + p.id + "\" contiene variantes vacías");
+          }
+        }
+        if (p && p.lentes !== undefined) {
+          if (!p.lentes || typeof p.lentes !== "object" || esArreglo(p.lentes)) {
+            errores.push(ref + " paso \"" + p.id + "\" lentes debe ser un objeto");
+          } else {
+            ["negocio", "calidad", "sintoma"].forEach(k => {
+              if (p.lentes[k] !== undefined && !textoNoVacio(p.lentes[k])) {
+                errores.push(ref + " paso \"" + p.id + "\" lente \"" + k + "\" vacío");
+              }
+            });
+          }
+        }
         if (!p || !esArreglo(p.opciones) || p.opciones.length < 2) {
           errores.push(ref + " paso \"" + (p && p.id || "?") + "\" necesita al menos 2 opciones");
         } else {
@@ -295,6 +315,14 @@ export function validarEscenarios(escenarios) {
             if (!o || !textoNoVacio(o.siguiente)) errores.push(refO + " sin siguiente");
             else if (o.siguiente !== "fin" && !idsPasos.has(o.siguiente)) errores.push(refO + " apunta a un paso inexistente: " + o.siguiente);
             if (!o || !Number.isInteger(o.puntos) || o.puntos < 0 || o.puntos > 2) errores.push(refO + " con puntos inválidos");
+            // Estructura de autopsia arquitectónica (incidente, trampa, principio) para aprendizaje de fallos.
+            if (o && o.autopsia !== undefined) {
+              if (!o.autopsia || typeof o.autopsia !== "object" || esArreglo(o.autopsia)) {
+                errores.push(refO + " autopsia debe ser un objeto");
+              } else if (!textoNoVacio(o.autopsia.incidente) || !textoNoVacio(o.autopsia.trampa) || !textoNoVacio(o.autopsia.principio)) {
+                errores.push(refO + " autopsia requiere incidente, trampa y principio no vacíos");
+              }
+            }
           });
         }
       });
