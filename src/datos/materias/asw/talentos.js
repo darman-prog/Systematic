@@ -66,6 +66,9 @@ const talentos = {
           icono: "chispa",
           misionesRequeridas: ["Arquitectura Hexagonal"],
           minEstrellas: 1,
+          bossId: "ESC-ASW-02",
+          bossTipo: "escenario",
+          bossNombre: "Escenario: De Monolito N-Tier a Servicios Resilientes",
           talentoPrevioId: "TAL-ASW-03"
         }
       ]
@@ -78,16 +81,16 @@ const talentos = {
         {
           id: "TAL-ASW-05",
           nombre: "Arquitecto de Sistemas Distribuidos",
-          descripcion: "Diseña microservicios resilientes y desacopla reportes pesados en tiempo real.",
+          descripcion: "Diseña microservicios resilientes y migra sistemas con Strangler Fig.",
           eje: "Microservicios",
           puntosRadar: 100,
           titulo: "Principal Cloud Architect",
           icono: "rayo",
           misionesRequeridas: ["Evolución de arquitecturas", "Microservicios"],
           minEstrellas: 1,
-          bossId: "ESC-ASW-01",
+          bossId: "ESC-ASW-03",
           bossTipo: "escenario",
-          bossNombre: "Incidente: Reportes lentos en la app de streaming",
+          bossNombre: "Escenario: Monolito Modular vs. Microservicios",
           talentoPrevioId: null
         }
       ]

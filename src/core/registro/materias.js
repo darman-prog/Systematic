@@ -1,4 +1,4 @@
-﻿// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
+// Registro de tracks de la app: MATERIAS (cursada) y LENGUAJES (spec 011).
 // Solo guarda metadatos y conteos; la carga del contenido y la presentación vive en
 // src/student/contenido.js. El dominio no conoce rutas de src/datos/ (ADR 011).
 // tipo: clasifica el track para la UI y el mezclado (spec 011/012).
@@ -32,8 +32,8 @@ export const MATERIAS = [
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    // Lote 018: +45 preguntas (ASW-086–130), +24 términos y +3 apuntes (hexagonal, evolución, microservicios).
-    conteo: { preguntas: 130, terminos: 51, apuntes: 11, escenarios: 1, casos: 2 }
+    // Lote 018: +45 preguntas (ASW-086–130), +24 términos y +3 apuntes (hexagonal, evolución, microservicios). +2 escenarios examen.
+    conteo: { preguntas: 130, terminos: 51, apuntes: 11, escenarios: 3, casos: 2 }
   },
   {
     id: "infra",
