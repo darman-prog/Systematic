@@ -99,6 +99,23 @@ describe("rondas", () => {
     expect(r.items.length).toBeLessThanOrEqual(10);
   });
 
+  it("repasoDiario prioriza preguntas vencidas estudiadas y rellena con debiles sin incluir nuevas", () => {
+    const ahora = 100 * 86400000;
+    const estado = {
+      a: { ok: 2, fail: 0, box: 2, last: ahora - 3 * 86400000, proximo: ahora - 2 * 86400000, lastOk: true },
+      c: { ok: 1, fail: 0, box: 2, last: ahora - 2 * 86400000, proximo: ahora - 1 * 86400000, lastOk: true },
+      d: { ok: 0, fail: 2, box: 1, last: ahora, proximo: ahora + 86400000, lastOk: false }
+    };
+    const r = montar({
+      obtenerP: id => estado[id] || { ok: 0, fail: 0, box: 1, last: null, lastOk: null }
+    }).repasoDiario({ banco: banco(), tope: 5, ahora });
+
+    expect(r.modo).toBe("repaso");
+    expect(r.conTimer).toBe(false);
+    // "a" venció antes que "c", y "d" entra como refuerzo débil; las no estudiadas quedan fuera.
+    expect(r.items.map(x => x.id)).toEqual(["a", "c", "d"]);
+  });
+
   it("mision filtra por tema", () => {
     const r = montar().mision({ banco: banco(), tema: "T2" });
     expect(r.items.map(x => x.id).sort()).toEqual(["c", "d"]);
@@ -110,12 +127,15 @@ describe("rondas", () => {
   });
 
   it("devuelve null cuando no hay preguntas", () => {
-    const r = montar();
+    const r = montar({
+      obtenerP: () => ({ ok: 0, fail: 0, box: 1, last: null, lastOk: null })
+    });
     expect(r.practica({ items: [], cantidad: 10 })).toBeNull();
     expect(r.simulacro({ items: [] })).toBeNull();
     expect(r.contrarreloj({ banco: [] })).toBeNull();
     expect(r.supervivencia({ banco: [] })).toBeNull();
     expect(r.debiles({ banco: [] })).toBeNull();
+    expect(r.repasoDiario({ banco: [] })).toBeNull();
     expect(r.mision({ banco: [], tema: "T1" })).toBeNull();
   });
 });

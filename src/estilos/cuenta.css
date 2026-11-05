@@ -561,7 +561,7 @@
   }
 
   #auth-root .auth-caja[data-vista="register"] .auth-titulo {
-    font-size: 1.75rem;
+    font-size: var(--tipo-3xl);
   }
 
   #auth-root .auth-caja[data-vista="register"] .auth-sub {
@@ -713,7 +713,7 @@
 /* Titular con la display serif del proyecto; el foco de app.js sigue en este h1. */
 #screen-perfil .perfil-titulo {
   font-family: var(--fuente-display);
-  font-size: 1.75rem;
+  font-size: var(--tipo-3xl);
   line-height: 1.15;
   letter-spacing: -0.02em;
   text-wrap: balance;
@@ -788,6 +788,6 @@
   /* En flex vertical, flex-basis: 16rem inflaba la altura a 256px creando un vacío gigante antes del botón */
   #screen-perfil .perfil-head-texto { flex: none; width: 100%; }
   #screen-perfil .perfil-head-lado { justify-content: flex-start; }
-  #screen-perfil .perfil-titulo { font-size: 1.5rem; }
+  #screen-perfil .perfil-titulo { font-size: var(--tipo-2xl); }
   #screen-perfil .perfil-tarjeta { padding: 1rem; }
 }

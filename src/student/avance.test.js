@@ -32,13 +32,28 @@ describe("avance", () => {
     expect(avance.obtenerP("q1").ok).toBe(2);
   });
 
-  it("registra una respuesta, guarda el progreso y suma actividad", () => {
+  it("registra una respuesta, guarda el progreso SM-2 y suma actividad", () => {
     avance.cargar();
     const entrada = avance.registrar("q1", true);
     expect(entrada.ok).toBe(1);
     expect(entrada.box).toBe(2);
+    expect(entrada.reps).toBe(1);
+    expect(entrada.intervalo).toBe(1);
     expect(persistencia.progreso("bd2").q1.ok).toBe(1);
     expect(avance.actividad()[hoyISO()]).toBe(1);
+  });
+
+  it("admite calificación graduada SM-2 (1..4) y resume el estado de repaso del banco", () => {
+    const t0 = 100 * 86400000;
+    const av = crearAvance({ persistencia, getTrackId: () => "bd2", ahora: () => t0 });
+    av.cargar();
+    const facil = av.registrar("q1", 4);
+    expect(facil.intervalo).toBe(2);
+    expect(facil.efactor).toBeGreaterThan(2.5);
+
+    const resumen = av.resumenRepaso([{ id: "q1" }, { id: "q2" }], t0 + 3 * 86400000);
+    expect(resumen.vencidas.map(q => q.id)).toEqual(["q1"]);
+    expect(resumen.nuevas.map(q => q.id)).toEqual(["q2"]);
   });
 
   it("alterna la marca de repaso sin perder el resto de la entrada", () => {

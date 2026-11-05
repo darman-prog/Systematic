@@ -1,7 +1,7 @@
-// Avance del estudiante para el track activo: progreso Leitner, actividad diaria, meta,
+// Avance del estudiante para el track activo: progreso Leitner/SM-2, actividad diaria, meta,
 // historial de intentos y marcas de repaso. Sin DOM ni gamificación: recibe persistencia y
 // un getter del id activo; app.js decide cuándo recargar al cambiar de materia o lenguaje.
-import { aplicarRespuesta, obtenerEntrada, hoyISO } from "../core/index.js";
+import { calcularSM2, clasificarBanco, obtenerEntrada, hoyISO } from "../core/index.js";
 
 export function crearAvance({ persistencia, getTrackId, ahora = () => Date.now(), metaPorDefecto = 20 }) {
   let progreso = {};
@@ -28,12 +28,17 @@ export function crearAvance({ persistencia, getTrackId, ahora = () => Date.now()
     return obtenerEntrada(progreso, id);
   }
 
-  // Registra una respuesta en el progreso Leitner y suma la actividad del día.
-  function registrar(id, ok) {
-    progreso[id] = aplicarRespuesta(obtenerP(id), ok, ahora());
+  // Registra una respuesta con el motor SM-2 (admite booleano o calidad 1..4) y suma la actividad del día.
+  function registrar(id, okOCalidad) {
+    progreso[id] = calcularSM2(obtenerP(id), okOCalidad, ahora());
     guardar();
     registrarActividad();
     return progreso[id];
+  }
+
+  // Clasifica el banco de la materia activa en las 4 fases de retención (nuevas, aprendiendo, vencidas, consolidadas).
+  function resumenRepaso(banco = [], instante = ahora()) {
+    return clasificarBanco(banco, obtenerP, instante);
   }
 
   function toggleMarked(id) {
@@ -108,6 +113,7 @@ export function crearAvance({ persistencia, getTrackId, ahora = () => Date.now()
     guardar,
     obtenerP,
     registrar,
+    resumenRepaso,
     toggleMarked,
     actividad,
     registrarActividad,

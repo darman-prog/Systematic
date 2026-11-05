@@ -867,7 +867,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 /* ===== GRUPOS DE MODOS EN PORTADA (mejora 2) ===== */
 .mode-group-title {
   font-family: var(--fuente-display);
-  font-size: 0.85rem;
+  font-size: var(--tipo-sm);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1344,7 +1344,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 .catalogo-titulo {
   margin: 0;
   font-family: var(--fuente-display);
-  font-size: 1.5rem;
+  font-size: var(--tipo-2xl);
   line-height: 1.2;
   color: var(--study-text);
 }
@@ -1384,7 +1384,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   border: 1px dashed var(--study-border);
   border-radius: 12px;
   color: var(--study-muted);
-  font-size: 0.9rem;
+  font-size: var(--tipo-sm);
   text-align: center;
 }
 
@@ -1590,7 +1590,7 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   .catalogo-atajo { display: none; }
   #catalog-search { padding-right: 2.8rem; }
   .catalogo-clear { right: 0.35rem; }
-  .catalogo-titulo { font-size: 1.25rem; }
+  .catalogo-titulo { font-size: var(--tipo-xl); }
   .home-dashboard .materia-card,
   .home-dashboard .materia-card--lenguaje { padding: 1rem; }
 }

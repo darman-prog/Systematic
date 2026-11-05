@@ -1,6 +1,6 @@
 // Selección de preguntas por modo de ronda. Sin DOM: recibe el banco, el progreso y las
 // funciones puras inyectadas; orquestacion/ronda.js se queda con timers, pausa y pantalla.
-import { esDebil, vencida, ordenarPrioridad, shuffle, filtrarDiagramas } from "../core/index.js";
+import { esDebil, vencida, clasificarBanco, ordenarPrioridad, shuffle, filtrarDiagramas } from "../core/index.js";
 
 /**
  * @param {{
@@ -83,11 +83,28 @@ export function crearRondas({
     return { items: recorte(ordenar(lista), 10), modo: "practica", conTimer: false };
   }
 
+  // Repaso diario inteligente (SM-2): prioriza preguntas estudiadas cuyo intervalo venció
+  // ordenadas por urgencia y, si faltan para el tope, completa con preguntas débiles.
+  function repasoDiario({ banco, tope = 15, ahora = Date.now() }) {
+    const disponibles = sinDiagramas(banco || []);
+    const { vencidas: urgentes } = clasificarBanco(disponibles, obtenerP, ahora);
+    const idsUrgentes = new Set(urgentes.map(q => q.id));
+    const refuerzo = barajar(
+      disponibles.filter(q => !idsUrgentes.has(q.id) && esDebil(obtenerP(q.id)))
+    );
+    const combinada = urgentes.concat(refuerzo);
+    if (!combinada.length) return null;
+    return { items: recorte(combinada, tope), modo: "repaso", conTimer: false };
+  }
+
   function mision({ banco, tema }) {
     const lista = sinDiagramas((banco || []).filter(q => q.tema === tema));
     if (!lista.length) return null;
     return { items: recorte(ordenar(lista), 10), modo: "mision", conTimer: false };
   }
 
-  return { practica, simulacro, contrarreloj, supervivencia, debiles, porTipo, arrastre, casos, vencidas, mision };
+  return {
+    practica, simulacro, contrarreloj, supervivencia, debiles,
+    porTipo, arrastre, casos, vencidas, repasoDiario, mision
+  };
 }
