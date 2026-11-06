@@ -789,60 +789,25 @@ button.talento-req:hover {
   color: var(--study-accent, #9BB8C9);
 }
 
-/* ===== SCROLL REVEAL Y ANIMACIONES DE ENTRADA (Opción B) ===== */
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: opacity, transform;
-}
-
-.scroll-reveal.is-revealed {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Retardo escalonado rápido (stagger) para tarjetas del catálogo */
-.catalogo-grid .materia-card.scroll-reveal:nth-child(1) { transition-delay: 20ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(2) { transition-delay: 60ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(3) { transition-delay: 100ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(4) { transition-delay: 140ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(5) { transition-delay: 180ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(6) { transition-delay: 220ms; }
-
-/* Modos de estudio y tarjetas de navegación */
-.modes-container .mode-card.scroll-reveal:nth-child(1) { transition-delay: 25ms; }
-.modes-container .mode-card.scroll-reveal:nth-child(2) { transition-delay: 65ms; }
-.modes-container .mode-card.scroll-reveal:nth-child(3) { transition-delay: 105ms; }
-
-/* Scroll-Driven Animations nativas en navegadores compatibles */
-@supports (animation-timeline: view()) {
-  .scroll-reveal {
-    animation: reveal-suave 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-timeline: view();
-    animation-range: entry 5% cover 25%;
-    transition: none;
+/* ===== SCROLL REVEAL ===== */
+@media (prefers-reduced-motion: no-preference) {
+  /* Oculto solo si el JS está activo (clase .js-reveal en <html>) */
+  .js-reveal .scroll-reveal:not(.is-revealed) {
+    opacity: 0;
   }
 
-  @keyframes reveal-suave {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Animación de una sola vez; al terminar suelta opacity/translate */
+  .js-reveal .scroll-reveal.is-revealed {
+    animation: reveal-entrada 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
   }
 }
 
-/* Accesibilidad estricta: usuarios con preferencia de movimiento reducido */
-@media (prefers-reduced-motion: reduce) {
-  .scroll-reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-    animation: none !important;
-  }
+@keyframes reveal-entrada {
+  from { opacity: 0; translate: 0 14px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@media print {
+  .scroll-reveal { opacity: 1 !important; }
 }

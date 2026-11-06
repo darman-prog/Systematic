@@ -1,49 +1,46 @@
-// Módulo de revelación animada de tarjetas al hacer scroll (Opción B: Scroll Reveal).
-// No altera la velocidad ni la inercia nativa del ratón (desplazamiento 100% nativo y ágil).
-// Utiliza IntersectionObserver y CSS Scroll-Driven Animations nativas.
-// Respeta estrictamente prefers-reduced-motion (WCAG 2.2 AA).
+// Revelación de tarjetas al hacer scroll.
+// Desplazamiento 100% nativo; solo añade la clase .is-revealed al entrar al viewport.
+// Respeta prefers-reduced-motion y funciona con contenido renderizado dinámicamente.
 
 /**
- * Observa elementos marcados con .scroll-reveal para aplicar su animación al entrar al viewport.
+ * Observa los elementos .scroll-reveal que aún no se han revelado.
+ * Se puede volver a llamar tras re-renderizar listas: ignora los ya revelados.
  * @param {HTMLElement | Document} [raiz=document]
- * @returns {IntersectionObserver | null}
+ * @returns {IntersectionObserver | null} null si no hay nada que observar o no hace falta animar.
  */
-export function observarScrollReveal(raiz = (typeof document !== "undefined" ? document : null)) {
-  if (!raiz) return null;
+export function observarScrollReveal(raiz = typeof document !== "undefined" ? document : null) {
+  if (!raiz?.querySelectorAll) return null;
 
-  const elementos = raiz.querySelectorAll ? [...raiz.querySelectorAll(".scroll-reveal")] : [];
+  const elementos = [...raiz.querySelectorAll(".scroll-reveal:not(.is-revealed)")];
   if (!elementos.length) return null;
 
-  // En entornos de testing o navegadores antiguos sin IntersectionObserver, revelamos de inmediato.
-  if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
-    elementos.forEach(el => el.classList.add("is-revealed"));
+  const sinAnimacion =
+    typeof window === "undefined" ||
+    !("IntersectionObserver" in window) ||
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  // Sin soporte o con movimiento reducido: todo visible de inmediato.
+  if (sinAnimacion) {
+    elementos.forEach((el) => el.classList.add("is-revealed"));
     return null;
   }
 
-  // Respeta la preferencia de movimiento reducido sin animaciones.
-  const prefiereReducido = typeof window.matchMedia === "function"
-    ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    : false;
-
-  if (prefiereReducido) {
-    elementos.forEach(el => el.classList.add("is-revealed"));
-    return null;
-  }
-
-  // Observador con margen inferior para activar la entrada fluida sin retardo en el scroll.
-  const observador = new IntersectionObserver((entradas) => {
-    entradas.forEach(entrada => {
-      if (entrada.isIntersecting) {
-        entrada.target.classList.add("is-revealed");
-        // Desconecta el elemento observado una vez revelado para evitar recálculos continuos.
-        observador.unobserve(entrada.target);
+  const observador = new IntersectionObserver(
+    (entradas, obs) => {
+      let i = 0; // índice del lote, para el stagger
+      for (const entrada of entradas) {
+        // También revela lo que ya quedó por encima (scroll restaurado, anclas).
+        if (entrada.isIntersecting || (entrada.boundingClientRect && entrada.boundingClientRect.top < 0)) {
+          const el = /** @type {HTMLElement} */ (entrada.target);
+          el.style.setProperty("--i", String(Math.min(i++, 6)));
+          el.classList.add("is-revealed");
+          (obs || observador)?.unobserve(el);
+        }
       }
-    });
-  }, {
-    rootMargin: "0px 0px -20px 0px",
-    threshold: 0.08
-  });
+    },
+    { rootMargin: "0px 0px -20px 0px", threshold: 0.08 }
+  );
 
-  elementos.forEach(el => observador.observe(el));
+  elementos.forEach((el) => observador.observe(el));
   return observador;
 }

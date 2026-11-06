@@ -63,7 +63,7 @@ describe("ui/componentes/scroll-suave (Scroll Reveal)", () => {
 
     // Simula intersección en el elemento 1
     const el1 = document.getElementById("el1");
-    callbackIO([{ target: el1, isIntersecting: true }]);
+    callbackIO([{ target: el1, isIntersecting: true }], obs);
     expect(el1?.classList.contains("is-revealed")).toBe(true);
     expect(unobserveSpy).toHaveBeenCalledWith(el1);
   });
