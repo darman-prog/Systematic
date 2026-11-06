@@ -4,6 +4,7 @@ import { MATERIAS, LENGUAJES, barraDeCompetencia } from "../../core/index.js";
 import { icono } from "../iconos.js";
 import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
+import { observarScrollReveal } from "../componentes/scroll-suave.js";
 
 export function crearHome({ persistencia, cargarRoadmap }) {
   /** @type {(id: string) => any} */
@@ -65,7 +66,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       const disabledAttr = e.pendiente ? 'disabled aria-disabled="true"' : "";
 
       return `
-        <button class="materia-card materia-card--materia"
+        <button class="materia-card materia-card--materia scroll-reveal"
                 data-action="seleccionarMateria"
                 data-materia="${m.id}"
                 data-tipo="materia"
@@ -92,6 +93,8 @@ export function crearHome({ persistencia, cargarRoadmap }) {
 
     actualizarConteos();
     aplicarFiltros();
+    // Activa la revelación progresiva fluida de las tarjetas del catálogo.
+    observarScrollReveal(cont);
     // La sección de lenguajes se pinta después; cuando termina vuelve a aplicar los filtros.
     return renderLenguajes();
   }
@@ -126,7 +129,7 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       }`;
 
       return `
-        <button class="materia-card materia-card--lenguaje"
+        <button class="materia-card materia-card--lenguaje scroll-reveal"
                 data-action="seleccionarLenguaje"
                 data-lenguaje="${l.id}"
                 data-tipo="lenguaje"
@@ -149,6 +152,8 @@ export function crearHome({ persistencia, cargarRoadmap }) {
     cont.innerHTML = tarjetas.join("");
     actualizarConteos();
     aplicarFiltros();
+    // Revela suavemente las tarjetas de lenguajes al montarse o scrollear.
+    observarScrollReveal(cont);
   }
 
   function setTexto(id, texto) {

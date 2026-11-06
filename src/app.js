@@ -16,6 +16,7 @@ import { icono, hidratarIconos } from "./ui/iconos.js";
 import { diagramasDisponibles, ocultarCasosEnTactil } from "./ui/entorno.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
+import { iniciarScrollSuave, observarScrollReveal } from "./ui/componentes/scroll-suave.js";
 import { crearRouter } from "./orquestacion/router.js";
 import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones/index.js";
 import { instalarAtajos } from "./orquestacion/atajos.js";
@@ -64,7 +65,14 @@ const $ = id => document.getElementById(id);
 // El diálogo de confirmación vive en su componente (ADR 009); acá solo se instancia.
 const confirm = crearConfirm({ $ });
 // La navegación vive en el router (ADR 009); show conserva su nombre y firma.
-const show = crearRouter({ $, animar }).show;
+const show = crearRouter({
+  $,
+  animar,
+  // Activa la revelación fluida al cambiar a cualquier pantalla con elementos scroll-reveal.
+  alMostrar: nodo => {
+    if (nodo) observarScrollReveal(nodo);
+  }
+}).show;
 
 // Servicios del recorrido del estudiante (spec 006): persistencia y gamificación con
 // dependencias inyectadas. La presentación (toast/confeti/perfil) entra por callbacks.
@@ -279,3 +287,6 @@ instalarAtajos({
 
 // Cuenta (ADR 008): decide la pantalla inicial una vez instaladas acciones y atajos.
 acceso.iniciar();
+
+// Desplazamiento inercial suave sin saltos bruscos en el dashboard (Opción C).
+iniciarScrollSuave();

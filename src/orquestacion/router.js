@@ -12,7 +12,7 @@ const PANTALLAS_ANCHA = ["flashcards", "talentos"];
 // El dashboard necesita una grilla de 4 columnas; el resto mantiene el ancho de lectura.
 const PANTALLAS_DASHBOARD = ["materias"];
 
-export function crearRouter({ $, animar }) {
+export function crearRouter({ $, animar, alMostrar = null }) {
   function show(screen) {
     PANTALLAS.forEach(s => {
       const nodo = $("screen-" + s);
@@ -23,7 +23,10 @@ export function crearRouter({ $, animar }) {
       app.classList.toggle("app-ancha", PANTALLAS_ANCHA.includes(screen));
       app.classList.toggle("app-dashboard", PANTALLAS_DASHBOARD.includes(screen));
     }
-    animar($("screen-" + screen));
+    const activo = $("screen-" + screen);
+    animar(activo);
+    // Callback para activar observadores de scroll reveal en la pantalla activa.
+    if (typeof alMostrar === "function") alMostrar(activo);
     // Cada pantalla arranca desde arriba para no heredar el scroll anterior.
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
