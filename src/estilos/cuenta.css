@@ -737,10 +737,25 @@
   flex-wrap: wrap;
 }
 
+/* Bento Grid de dos columnas para Cuenta y Datos Locales */
+#screen-perfil .perfil-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+#screen-perfil .perfil-bento-grid .perfil-tarjeta {
+  margin-top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
 /* Tarjetas internas: separan Cuenta y Datos sin cards anidadas profundas. */
 #screen-perfil .perfil-tarjeta {
   margin-top: 1rem;
-  padding: 1.1rem 1.25rem;
+  padding: 1.25rem 1.35rem;
   background: var(--study-surface-2);
   border: 1px solid var(--study-border);
   border-radius: 14px;
@@ -748,9 +763,72 @@
 
 #screen-perfil .perfil-tarjeta-titulo {
   margin-top: 0;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--study-text);
+}
+
+/* Indicador visual de estado de sesión (punto verde/ámbar pulsante) */
+#screen-perfil .perfil-sesion-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+#screen-perfil .perfil-sesion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--study-success) 12%, var(--study-surface));
+  border: 1px solid color-mix(in srgb, var(--study-success) 35%, transparent);
+  font-size: 0.8125rem;
+  color: var(--study-text);
+  margin-bottom: 0.45rem;
+}
+
+#screen-perfil .perfil-sesion-badge--invitado {
+  background: color-mix(in srgb, var(--study-warning) 12%, var(--study-surface));
+  border-color: color-mix(in srgb, var(--study-warning) 35%, transparent);
+}
+
+#screen-perfil .perfil-sesion-badge--local {
+  background: color-mix(in srgb, var(--study-accent) 12%, var(--study-surface));
+  border-color: color-mix(in srgb, var(--study-accent) 30%, transparent);
+}
+
+#screen-perfil .perfil-sesion-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--study-success);
+  box-shadow: 0 0 6px var(--study-success);
+  flex-shrink: 0;
+}
+
+#screen-perfil .perfil-sesion-dot--invitado {
+  background: var(--study-warning);
+  box-shadow: 0 0 6px var(--study-warning);
+}
+
+#screen-perfil .perfil-sesion-dot--local {
+  background: var(--study-accent);
+  box-shadow: 0 0 6px var(--study-accent);
+}
+
+#screen-perfil .perfil-cuenta-sub {
+  margin: 0;
+  font-size: 0.825rem;
+  line-height: 1.45;
 }
 
 /* Zona de peligro: borde y tinte de error en toda la tarjeta, sin franja lateral. */
@@ -781,6 +859,12 @@
 /* Iconos dentro de botones del Perfil: heredan el color del botón. */
 #screen-perfil .btn .icono { width: 16px; height: 16px; flex: none; }
 #screen-perfil #nombre-input { min-height: 2.5rem; }
+
+@media (max-width: 768px) {
+  #screen-perfil .perfil-bento-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* Móvil unificado: la cabecera se apila y el hero respira acorde a pantallas <= 639px */
 @media (max-width: 639px) {

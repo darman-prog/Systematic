@@ -404,26 +404,34 @@
         <button class="btn btn-ghost btn-sm" data-action="irMaterias">← Materias</button>
       </div>
     </div>
-    <h2 class="section-title">Identidad</h2>
     <div id="perfil-identidad"></div>
-    <div class="perfil-tarjeta">
-      <h2 class="section-title perfil-tarjeta-titulo">Cuenta</h2>
-      <div id="perfil-cuenta"></div>
-    </div>
-    <p id="perfil-aviso" class="text-sm mt-3 hidden" role="status"></p>
-    <div class="perfil-tarjeta">
-      <h2 class="section-title perfil-tarjeta-titulo">Datos locales</h2>
-      <div class="flex gap-2 flex-wrap items-center">
-        <button class="btn btn-ghost btn-sm" data-action="toggleNombreEditor"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Cambiar nombre</button>
-        <div id="nombre-editor" class="hidden flex gap-2 items-center">
-          <input id="nombre-input" class="stat-input w-44" maxlength="24" placeholder="Tu nombre" aria-label="Tu nombre">
-          <button class="btn btn-primary btn-sm" data-action="guardarNombreAjustes">Guardar nombre</button>
+    <div class="perfil-bento-grid">
+      <div class="perfil-tarjeta perfil-tarjeta--cuenta">
+        <h2 class="section-title perfil-tarjeta-titulo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>Cuenta y sincronización</h2>
+        <div id="perfil-cuenta"></div>
+      </div>
+      <div class="perfil-tarjeta perfil-tarjeta--datos">
+        <h2 class="section-title perfil-tarjeta-titulo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>Datos locales</h2>
+        <div class="perfil-sesion-info">
+          <div class="perfil-sesion-badge perfil-sesion-badge--local">
+            <span class="perfil-sesion-dot perfil-sesion-dot--local" aria-hidden="true"></span>
+            <span class="perfil-sesion-texto">Almacenamiento en este navegador</span>
+          </div>
+          <p class="subtitle perfil-cuenta-sub">Tu progreso y notas se guardan en este equipo. Puedes respaldar una copia en archivo JSON o restaurarla.</p>
         </div>
-        <button class="btn btn-ghost btn-sm" data-action="exportarDatos"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Exportar progreso</button>
-        <button class="btn btn-ghost btn-sm" data-action="importarArchivo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Importar</button>
-        <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+        <div class="flex gap-2 flex-wrap items-center mt-2">
+          <button class="btn btn-ghost btn-sm" data-action="toggleNombreEditor"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Cambiar nombre</button>
+          <div id="nombre-editor" class="hidden flex gap-2 items-center">
+            <input id="nombre-input" class="stat-input w-44" maxlength="24" placeholder="Tu nombre" aria-label="Tu nombre">
+            <button class="btn btn-primary btn-sm" data-action="guardarNombreAjustes">Guardar nombre</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" data-action="exportarDatos"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Exportar progreso</button>
+          <button class="btn btn-ghost btn-sm" data-action="importarArchivo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Importar</button>
+          <input type="file" id="import-file" accept=".json,application/json" class="hidden">
+        </div>
       </div>
     </div>
+    <p id="perfil-aviso" class="text-sm mt-3 hidden" role="status"></p>
     <div class="perfil-tarjeta perfil-peligro">
       <h2 class="section-title perfil-tarjeta-titulo perfil-peligro-titulo"><svg class="icono icono-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>Zona de peligro</h2>
       <p class="subtitle perfil-sub">Estas acciones no se pueden deshacer. Te pedimos confirmación antes de borrar nada.</p>

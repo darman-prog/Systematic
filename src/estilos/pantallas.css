@@ -776,11 +776,15 @@ button.talento-req:hover {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
   margin: 2px 0 6px;
   padding: 3px 10px;
   border-radius: 9999px;
   font-size: 0.8125rem;
   font-weight: 600;
-  background: color-mix(in srgb, var(--study-accent, #9BB8C9) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--study-accent, #9BB8C9) 30%, transparent);
+  background: color-mix(in srgb, var(--study-accent, #9BB8C9) 14%, var(--study-surface-2));
   color: var(--study-accent, #9BB8C9);
 }

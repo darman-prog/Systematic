@@ -767,25 +767,186 @@ input, textarea { caret-color: var(--study-accent); }
 .perfil-chip--racha  { --chip-color: #f09a4a; }
 .perfil-chip--logros { --chip-color: var(--study-accent-strong); }
 
-/* Variante hero del Perfil: mismo anillo + chips, con más aire que en el home. */
+/* Variante hero del Perfil: credencial técnica con anillo, progreso y métricas. */
 .perfil-card--hero {
-  gap: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   padding: 1.5rem 1.75rem;
   background: linear-gradient(180deg, var(--study-surface), var(--study-surface-2));
+  border: 1px solid var(--study-border);
+  border-radius: 16px;
   box-shadow: var(--study-shadow);
 }
-.perfil-card--hero .perfil-anillo { width: 6.5rem; height: 6.5rem; }
-.perfil-card--hero .perfil-datos { gap: 0.45rem; }
 
-/* Móvil unificado (<= 639px): anillo y tipografías más chicas. */
+.perfil-hero-principal {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.perfil-card--hero .perfil-anillo { width: 6.25rem; height: 6.25rem; flex-shrink: 0; }
+.perfil-card--hero .perfil-datos { gap: 0.35rem; width: 100%; }
+
+.perfil-card--hero .perfil-nombre {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--study-text);
+  line-height: 1.25;
+}
+
+/* Barra de progreso de XP hacia el siguiente nivel. */
+.perfil-progreso-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+.perfil-progreso-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: var(--study-muted);
+}
+
+.perfil-progreso-pct {
+  font-weight: 700;
+  color: var(--study-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.perfil-barra {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: color-mix(in srgb, var(--study-surface-3) 80%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.perfil-barra-relleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--study-accent-strong), var(--study-accent));
+  border-radius: 999px;
+  transition: width var(--mov-base) var(--mov-ease);
+}
+
+/* Grid de tarjetas de estadísticas (Stat Cards) para XP, Racha y Logros. */
+.perfil-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.perfil-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  background: color-mix(in srgb, var(--study-surface-3) 50%, var(--study-surface-2));
+  border: 1px solid var(--study-border);
+  border-radius: 12px;
+  transition: border-color var(--mov-rapida) var(--mov-ease), transform var(--mov-rapida) var(--mov-ease);
+}
+
+.perfil-stat-card:hover {
+  border-color: color-mix(in srgb, var(--study-accent) 40%, var(--study-border));
+}
+
+.perfil-stat-icono {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--study-accent) 14%, transparent);
+  color: var(--study-accent);
+  flex-shrink: 0;
+}
+
+.perfil-stat-icono--racha {
+  background: color-mix(in srgb, #f09a4a 16%, transparent);
+  color: #f09a4a;
+}
+
+.perfil-stat-icono--xp {
+  background: color-mix(in srgb, var(--study-accent-strong) 16%, transparent);
+  color: var(--study-accent-strong);
+}
+
+.perfil-stat-icono--logros {
+  background: color-mix(in srgb, var(--study-accent) 16%, transparent);
+  color: var(--study-accent);
+}
+
+.perfil-stat-datos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.perfil-stat-valor {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--study-text);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.perfil-stat-valor b {
+  font-weight: 800;
+}
+
+.perfil-stat-unit {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--study-muted);
+}
+
+.perfil-stat-label {
+  font-size: 0.7rem;
+  color: var(--study-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.1rem;
+}
+
+/* Móvil unificado (<= 639px): apilado vertical y tipografías más chicas. */
 @media (max-width: 639px) {
   .perfil-card { gap: 1rem; padding: 1rem; }
   .perfil-card--hero { gap: 1.1rem; padding: 1.15rem 1rem; }
+  .perfil-hero-principal {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 1rem;
+  }
+  .perfil-card--hero .perfil-datos {
+    text-align: center;
+    justify-items: center;
+  }
+  .perfil-card--hero .perfil-titulo-especialidad {
+    justify-self: center;
+  }
   .perfil-card--hero .perfil-anillo { width: 5rem; height: 5rem; }
-  /* En móvil el hero se apila y centra: evita la mezcla de anillo lateral con texto centrado. */
-  .perfil-card--hero { grid-template-columns: 1fr; justify-items: center; text-align: center; }
-  .perfil-card--hero .perfil-datos { text-align: center; justify-items: center; }
-  .perfil-card--hero .perfil-chips { justify-content: center; }
+  .perfil-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
   .perfil-anillo { width: 4.75rem; height: 4.75rem; }
   .perfil-num { font-size: 1.6rem; }
   .perfil-xp b { font-size: 1.7rem; }
