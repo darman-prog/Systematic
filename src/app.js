@@ -16,7 +16,7 @@ import { icono, hidratarIconos } from "./ui/iconos.js";
 import { diagramasDisponibles, ocultarCasosEnTactil } from "./ui/entorno.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
-import { iniciarScrollSuave, observarScrollReveal } from "./ui/componentes/scroll-suave.js";
+import { observarScrollReveal } from "./ui/componentes/scroll-suave.js";
 import { crearRouter } from "./orquestacion/router.js";
 import { crearAcciones, instalarDelegacion } from "./orquestacion/acciones/index.js";
 import { instalarAtajos } from "./orquestacion/atajos.js";
@@ -287,6 +287,3 @@ instalarAtajos({
 
 // Cuenta (ADR 008): decide la pantalla inicial una vez instaladas acciones y atajos.
 acceso.iniciar();
-
-// Desplazamiento inercial suave sin saltos bruscos en el dashboard (Opción C).
-iniciarScrollSuave();

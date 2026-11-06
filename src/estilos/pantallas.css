@@ -789,12 +789,12 @@ button.talento-req:hover {
   color: var(--study-accent, #9BB8C9);
 }
 
-/* ===== SCROLL REVEAL Y ANIMACIONES DE ENTRADA SUAVE (Opción C) ===== */
+/* ===== SCROLL REVEAL Y ANIMACIONES DE ENTRADA (Opción B) ===== */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(14px);
+  transition: opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: opacity, transform;
 }
 
@@ -803,32 +803,32 @@ button.talento-req:hover {
   transform: translateY(0);
 }
 
-/* Retardo escalonado (stagger) para tarjetas del catálogo */
-.catalogo-grid .materia-card.scroll-reveal:nth-child(1) { transition-delay: 30ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(2) { transition-delay: 80ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(3) { transition-delay: 130ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(4) { transition-delay: 180ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(5) { transition-delay: 230ms; }
-.catalogo-grid .materia-card.scroll-reveal:nth-child(6) { transition-delay: 280ms; }
+/* Retardo escalonado rápido (stagger) para tarjetas del catálogo */
+.catalogo-grid .materia-card.scroll-reveal:nth-child(1) { transition-delay: 20ms; }
+.catalogo-grid .materia-card.scroll-reveal:nth-child(2) { transition-delay: 60ms; }
+.catalogo-grid .materia-card.scroll-reveal:nth-child(3) { transition-delay: 100ms; }
+.catalogo-grid .materia-card.scroll-reveal:nth-child(4) { transition-delay: 140ms; }
+.catalogo-grid .materia-card.scroll-reveal:nth-child(5) { transition-delay: 180ms; }
+.catalogo-grid .materia-card.scroll-reveal:nth-child(6) { transition-delay: 220ms; }
 
 /* Modos de estudio y tarjetas de navegación */
-.modes-container .mode-card.scroll-reveal:nth-child(1) { transition-delay: 40ms; }
-.modes-container .mode-card.scroll-reveal:nth-child(2) { transition-delay: 90ms; }
-.modes-container .mode-card.scroll-reveal:nth-child(3) { transition-delay: 140ms; }
+.modes-container .mode-card.scroll-reveal:nth-child(1) { transition-delay: 25ms; }
+.modes-container .mode-card.scroll-reveal:nth-child(2) { transition-delay: 65ms; }
+.modes-container .mode-card.scroll-reveal:nth-child(3) { transition-delay: 105ms; }
 
 /* Scroll-Driven Animations nativas en navegadores compatibles */
 @supports (animation-timeline: view()) {
   .scroll-reveal {
-    animation: reveal-suave 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: reveal-suave 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
     animation-timeline: view();
-    animation-range: entry 10% cover 28%;
+    animation-range: entry 5% cover 25%;
     transition: none;
   }
 
   @keyframes reveal-suave {
     from {
       opacity: 0;
-      transform: translateY(16px);
+      transform: translateY(14px);
     }
     to {
       opacity: 1;
