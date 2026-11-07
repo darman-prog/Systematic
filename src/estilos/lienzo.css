@@ -10,7 +10,7 @@
   margin-top: 8px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1100px) {
   .diagrama-workbench {
     grid-template-columns: 280px minmax(0, 1fr);
     gap: 20px;
@@ -90,11 +90,21 @@
 }
 
 /* Diferenciación visual entre entidades/clases y miembros en el pool */
+.pieza {
+  min-width: 44px;
+  min-height: 44px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
 #pool-diagrama .pieza {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   width: 100%;
+  min-height: 44px;
   justify-content: space-between;
   background: var(--study-surface-2);
   border: 1.5px solid var(--study-border);
@@ -103,6 +113,9 @@
   font-weight: 600;
   color: var(--study-text);
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
 }
 
@@ -116,12 +129,17 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
   background: color-mix(in srgb, var(--study-surface-2) 75%, #0b101b);
   border: 1.5px solid var(--study-border);
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 0.78rem;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: border-color 140ms ease, background-color 140ms ease;
 }
 
@@ -203,15 +221,21 @@
 .btn-expandir-lienzo {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--study-muted);
   background: var(--study-surface-2);
   border: 1px solid var(--study-border);
   border-radius: 7px;
-  padding: 4px 10px;
+  padding: 6px 12px;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   transition: color 140ms ease, border-color 140ms ease;
 }
 
@@ -237,8 +261,8 @@
 }
 
 #tipos-diagrama .btn-mini {
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 44px;
+  min-height: 44px;
   margin-left: auto;
 }
 
@@ -256,10 +280,17 @@
   );
   background-size: 22px 22px;
   box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.35);
-  overflow: hidden;
-  touch-action: manipulation;
+  overflow: auto;
+  touch-action: pan-x pan-y;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   transition: min-height 200ms ease, border-color 150ms ease;
+}
+
+#lienzo-diagrama.lienzo-esperando-colocar {
+  border-color: var(--study-accent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--study-accent) 45%, transparent), inset 0 2px 12px rgba(0, 0, 0, 0.35);
+  cursor: crosshair;
 }
 
 .workbench-expandido #lienzo-diagrama {
@@ -270,19 +301,24 @@
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: inherit;
+  min-width: 720px;
+  min-height: 520px;
 }
 
-/* Estado vacío guiado dentro del lienzo cuando no hay nodos colocados */
+/* Estado vacío guiado centrado siempre dentro del ancho visible de #lienzo-diagrama */
 .lienzo-vacio {
-  position: absolute;
-  inset: 0;
+  position: sticky;
+  left: 0;
+  top: 0;
+  width: min(100%, calc(100vw - 56px));
+  height: 100%;
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 24px;
+  padding: 20px;
   text-align: center;
   pointer-events: none;
   color: var(--study-muted);
@@ -336,6 +372,7 @@
 .nodo-puesto {
   position: absolute;
   min-width: 128px;
+  min-height: 44px;
   max-width: 220px;
   background: var(--study-surface-2);
   border: 2px solid var(--study-border);
@@ -345,6 +382,7 @@
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-touch-callout: none;
   touch-action: none;
   color: var(--study-text);
   box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.45);
@@ -417,10 +455,14 @@
   border: 0;
   color: var(--study-muted);
   cursor: pointer;
-  padding: 0 3px;
-  font-size: 0.8rem;
+  padding: 2px 6px;
+  font-size: 0.85rem;
   line-height: 1;
   border-radius: 4px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .miembro-quitar:hover {
@@ -428,29 +470,46 @@
   background: rgba(248, 113, 113, 0.15);
 }
 
+/* Hit-area táctil de 44×44 sin agigantar el botón visual (círculo interno de 24×24 en ::before) */
 .nodo-quitar {
   position: absolute;
-  top: -9px;
-  right: -9px;
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  top: -16px;
+  right: -16px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 9999px;
-  background: #232730;
+  background: transparent;
   color: var(--study-text);
-  border: 1.5px solid var(--study-error);
+  border: 0;
   font-size: 12px;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  transition: transform 120ms ease, background-color 120ms ease;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  z-index: 2;
 }
 
-.nodo-quitar:hover {
+.nodo-quitar::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 9999px;
+  background: #232730;
+  border: 1.5px solid var(--study-error);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 120ms ease, background-color 120ms ease;
+  z-index: -1;
+}
+
+.nodo-quitar:hover::before {
   transform: scale(1.1);
   background: #3b1d26;
 }
@@ -458,21 +517,27 @@
 .etiqueta-arista {
   position: absolute;
   transform: translate(-50%, -50%);
+  min-width: 44px;
+  min-height: 44px;
   background: var(--study-bg);
   border: 1.5px solid var(--study-accent);
   color: var(--study-accent);
   border-radius: 9999px;
   font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 10px 3px 10px;
+  padding: 4px 12px;
   gap: 4px;
   cursor: pointer;
   white-space: nowrap;
   font-family: inherit;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   z-index: 15;
   transition: background-color 120ms ease, transform 120ms ease;
 }
@@ -729,41 +794,99 @@
 .btn-cancelar { background: transparent; color: var(--study-muted); border: 1px solid var(--study-border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; width: 100%; }
 .btn-cancelar:hover { background: var(--study-surface-2); }
 
-@media (max-width: 639px) {
-  #lienzo-diagrama {
-    min-height: 420px;
-    max-height: 68vh;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+/* Pestañas compactas para alternar entre Clases/Entidades y Miembros bajo 1100px */
+.diagrama-tabs-movil {
+  display: none;
+}
+
+.diagrama-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--study-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.diagrama-tab--activa {
+  background: var(--study-surface-2);
+  color: var(--study-text);
+  border-color: color-mix(in srgb, var(--study-accent) 45%, var(--study-border));
+}
+
+/* Dock compacto bajo 1100px: pestañas + una sola bandeja visible sin cubrir el lienzo */
+@media (max-width: 1099px) {
+  .diagrama-sidebar {
+    position: sticky;
+    top: 6px;
+    z-index: 25;
+    padding: 8px 10px;
+    gap: 6px;
+    box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.55);
   }
-  #lienzo-area {
-    min-width: 700px;
-    min-height: 540px;
+  .diagrama-tabs-movil {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    background: rgba(9, 13, 22, 0.65);
+    padding: 3px;
+    border-radius: 9px;
+    border: 1px solid var(--study-border);
+  }
+  .panel-oculto-movil {
+    display: none !important;
+  }
+  .diagrama-panel--con-tabs .diagrama-panel-head {
+    display: none;
+  }
+  .diagrama-panel + .diagrama-panel {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .diagrama-panel-sub {
+    display: none;
+  }
+  .diagrama-pool {
+    max-height: 98px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    gap: 6px;
   }
   #pool-diagrama .pieza {
     width: auto;
   }
+  .diagrama-guia {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  #lienzo-diagrama {
+    min-height: 340px;
+    height: 50vh;
+    max-height: 430px;
+  }
   .nodo-puesto {
     min-width: 110px;
     min-height: 48px;
-    padding: 10px 40px 10px 12px;
+    padding: 10px 36px 10px 12px;
     font-size: 14px;
-  }
-  .nodo-quitar {
-    width: 36px;
-    height: 36px;
-    top: -10px;
-    right: -10px;
   }
   .pieza {
     min-height: 44px;
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-  .etiqueta-arista {
-    min-width: 40px;
-    min-height: 40px;
-    padding: 8px 16px 8px 10px;
+    padding: 8px 12px;
+    font-size: 13.5px;
   }
   #tipos-diagrama {
     position: sticky;
