@@ -29,14 +29,17 @@ export function nombreAccesible(nombre, tipo = "nodo") {
 }
 
 export function claveArista(de, a, tipo, dirigido) {
-  const extremos = dirigido ? [de, a] : [de, a].slice().sort();
-  return extremos.join("|") + "|" + normalizarClave(tipo);
+  // En relaciones no dirigidas ordenamos los extremos para que A–B y B–A produzcan la misma clave.
+  const extremos = dirigido ? [de, a] : [de, a].sort();
+  return JSON.stringify([extremos[0], extremos[1], normalizarClave(tipo)]);
 }
 
 function claveDe(rel, dirigido) {
-  let clave = claveArista(rel.de, rel.a, rel.tipo, dirigido);
-  if (rel.guarda) clave += "|" + normalizarClave(rel.guarda);
-  return clave;
+  const extremos = dirigido ? [rel.de, rel.a] : [rel.de, rel.a].sort();
+  const partes = [extremos[0], extremos[1], normalizarClave(rel.tipo)];
+  // La guarda solo forma parte de la clave cuando existe, permitiendo transiciones paralelas con distinta condición.
+  if (rel.guarda) partes.push(normalizarClave(rel.guarda));
+  return JSON.stringify(partes);
 }
 
 export function esDirigido(subtipo) {
@@ -50,44 +53,45 @@ export function esDirigidoTipo(subtipo, tipo) {
   return !sinDireccion.some(t => normalizarClave(t) === normalizarClave(tipo));
 }
 
-function calcularPosicionInicial(index, total) {
-  const espaciado = 150;
-  const columnas = Math.max(2, Math.ceil(Math.sqrt(total)));
-  const fila = Math.floor(index / columnas);
-  const columna = index % columnas;
-  return {
-    x: 100 + columna * espaciado,
-    y: 100 + fila * espaciado
-  };
+const PASO_REJILLA = 170;
+const COLUMNAS_REJILLA = 3;
+
+// Busca el primer hueco libre en la cuadrícula para que nodos nuevos o fijos nunca se solapen.
+export function posicionLibre(posiciones, paso = PASO_REJILLA, columnas = COLUMNAS_REJILLA) {
+  const lista = Object.values(posiciones || {});
+  const ocupada = p => lista.some(
+    q => Math.abs(q.x - p.x) < paso / 2 && Math.abs(q.y - p.y) < paso / 2
+  );
+  for (let i = 0; ; i++) {
+    const p = { x: 60 + (i % columnas) * paso, y: 60 + Math.floor(i / columnas) * 130 };
+    if (!ocupada(p)) return p;
+  }
 }
 
-function calcularPosicionParaNuevoNodo(estado) {
-  const cantidad = estado.nodosColocados.length;
-  const baseX = 50;
-  const baseY = 50;
-  const offsetHorizontal = 120;
-  return {
-    x: baseX + (cantidad * offsetHorizontal),
-    y: baseY
-  };
+export function claveMiembro(m) {
+  if (typeof m === "string") return m;
+  return (m && (m.id ?? m.texto)) || "";
 }
 
 export function crearTablero(pregunta) {
   const nodos = Array.isArray(pregunta.nodosFijos) ? pregunta.nodosFijos.slice() : [];
+  // Usamos diccionarios sin prototipo para evitar colisiones con claves heredadas como "constructor".
+  const miembros = Object.create(null);
+  const posiciones = Object.create(null);
   const estado = {
     preguntaId: pregunta.id,
     nodosColocados: nodos.slice(),
     nodosDisponibles: Array.isArray(pregunta.nodosPool) ? pregunta.nodosPool.slice() : [],
-    miembros: {},
+    miembros,
     conexiones: [],
-    posiciones: {},
+    posiciones,
     ultimoCambio: null
   };
-  nodos.forEach((nombre, index) => {
-    estado.posiciones[nombre] = calcularPosicionInicial(index, nodos.length);
+  nodos.forEach(nombre => {
+    estado.posiciones[nombre] = posicionLibre(estado.posiciones);
   });
   if (Array.isArray(pregunta.miembrosPool)) {
-    pregunta.miembrosPool.forEach(m => { estado.miembros[m.texto] = null; });
+    pregunta.miembrosPool.forEach(m => { estado.miembros[claveMiembro(m)] = null; });
   }
   return estado;
 }
@@ -95,9 +99,9 @@ export function crearTablero(pregunta) {
 export function colocarNodo(estado, nombre) {
   if (!nombre || estado.nodosColocados.indexOf(nombre) !== -1) return estado;
   if (estado.nodosDisponibles.indexOf(nombre) === -1) return estado;
-  const nuevasPosiciones = Object.assign({}, estado.posiciones);
+  const nuevasPosiciones = Object.assign(Object.create(null), estado.posiciones);
   if (!nuevasPosiciones[nombre]) {
-    nuevasPosiciones[nombre] = calcularPosicionParaNuevoNodo(estado);
+    nuevasPosiciones[nombre] = posicionLibre(nuevasPosiciones);
   }
   return Object.assign({}, estado, {
     nodosColocados: estado.nodosColocados.concat([nombre]),
@@ -130,7 +134,7 @@ export function quitarNodo(estado, fijos, nombre) {
 }
 
 function quitarMiembrosDelNodo(miembros, nombre) {
-  const limpio = {};
+  const limpio = Object.create(null);
   Object.keys(miembros).forEach(texto => {
     limpio[texto] = miembros[texto] === nombre ? null : miembros[texto];
   });
@@ -138,9 +142,10 @@ function quitarMiembrosDelNodo(miembros, nombre) {
 }
 
 export function asignarMiembro(estado, texto, nodo) {
-  if (!(texto in estado.miembros)) return estado;
+  // Verificamos propiedad propia para que claves como "constructor" o "toString" no pasen por el prototipo.
+  if (!estado.miembros || !Object.hasOwn(estado.miembros, texto)) return estado;
   if (nodo && estado.nodosColocados.indexOf(nodo) === -1) return estado;
-  const miembros = Object.assign({}, estado.miembros);
+  const miembros = Object.assign(Object.create(null), estado.miembros);
   miembros[texto] = nodo || null;
   const mensaje = nodo
     ? "Miembro " + nombreAccesible(texto, "miembro") + " asignado a " + nombreAccesible(nodo, "nodo")
@@ -261,7 +266,8 @@ export function evaluarDiagrama(pregunta, estado) {
   const miembrosMalDetalle = [];
   if (Array.isArray(pregunta.miembrosPool)) {
     pregunta.miembrosPool.forEach(m => {
-      if (estado.miembros[m.texto] === m.de) {
+      const clave = claveMiembro(m);
+      if (estado.miembros && Object.hasOwn(estado.miembros, clave) && estado.miembros[clave] === m.de) {
         miembrosOk++;
         miembrosOkDetalle.push(m);
       } else {
@@ -271,6 +277,11 @@ export function evaluarDiagrama(pregunta, estado) {
   }
   const miembrosMal = miembrosMalDetalle.length;
   const totalEsperado = esperadas.size + (Array.isArray(pregunta.miembrosPool) ? pregunta.miembrosPool.length : 0);
+  // Sumamos conexiones y miembros acertados y descontamos las conexiones sobrantes para evitar aprobar conectando todo con todo.
+  const aciertos = correctas + miembrosOk;
+  const porcentaje = totalEsperado > 0
+    ? Math.round((Math.max(0, aciertos - sobrantesRel.length) / totalEsperado) * 100)
+    : 0;
 
   const fmtRel = r => {
     const flecha = esDirigidoTipo(pregunta.subtipo, r.tipo) ? " → " : " – ";
@@ -280,7 +291,9 @@ export function evaluarDiagrama(pregunta, estado) {
 
   return {
     correctas,
-    sobrantes: sobrantesRel.length + miembrosMal,
+    aciertos,
+    porcentaje,
+    sobrantes: sobrantesRel.length,
     faltantes: faltantesRel.length,
     miembrosOk,
     miembrosMal,
@@ -312,7 +325,7 @@ export function resumenDiagrama(res) {
 export function planCorreccion(res) {
   const d = res && res.detalle;
   const total = (res && res.totalEsperado) || 0;
-  const correctas = ((res && res.correctas) || 0) + ((res && res.miembrosOk) || 0);
+  const correctas = res ? (res.aciertos ?? ((res.correctas || 0) + (res.miembrosOk || 0))) : 0;
   return {
     aciertos: total > 0 ? { correctas, total } : null,
     porCrear: (d ? d.faltantes : []).map(x => "Crea: " + x),
@@ -343,35 +356,57 @@ export function resumenDiagramaAccesible(res) {
       summary.push(d.miembrosMal.length + " miembros mal ubicados");
     }
   }
+  const aciertos = res.aciertos ?? ((res.correctas || 0) + (res.miembrosOk || 0));
+  const total = res.totalEsperado || 0;
+  const porcentaje = res.porcentaje ?? (total > 0 ? Math.round((aciertos / total) * 100) : 0);
   return {
     announcements,
     summary: summary.join(". "),
     progress: {
-      correctas: res.correctas,
-      total: res.totalEsperado,
-      porcentaje: res.totalEsperado > 0 ? Math.round((res.correctas / res.totalEsperado) * 100) : 0
+      correctas: aciertos,
+      total,
+      porcentaje
     }
   };
 }
 
-export function ratingDiagrama(correctas, esperadas) {
-  const pct = esperadas > 0 ? Math.round((correctas / esperadas) * 100) : 0;
-  return pct >= 80 ? "exito" : pct >= 50 ? "parcial" : "fracaso";
+// Normaliza tanto el objeto devuelto por evaluarDiagrama como los argumentos sueltos (aciertos, esperadas, sobrantes, ok).
+function normalizarEntradaRating(aciertosORes, esperadas, sobrantes = 0, ok) {
+  if (aciertosORes && typeof aciertosORes === "object") {
+    const res = aciertosORes;
+    const total = res.totalEsperado || 0;
+    const aciertos = res.aciertos ?? ((res.correctas || 0) + (res.miembrosOk || 0));
+    const extras = res.sobrantes || 0;
+    const pct = res.porcentaje ?? (total > 0 ? Math.round((Math.max(0, aciertos - extras) / total) * 100) : 0);
+    return { aciertos, esperadas: total, pct, ok: Boolean(res.ok) };
+  }
+  const aciertos = aciertosORes || 0;
+  const total = esperadas || 0;
+  const extras = typeof sobrantes === "number" ? sobrantes : 0;
+  const esOk = typeof sobrantes === "boolean" ? sobrantes : (typeof ok === "boolean" ? ok : extras === 0);
+  const pct = total > 0 ? Math.round((Math.max(0, aciertos - extras) / total) * 100) : 0;
+  return { aciertos, esperadas: total, pct, ok: esOk };
 }
 
-export function ratingDiagramaAccesible(correctas, esperadas) {
-  const pct = esperadas > 0 ? Math.round((correctas / esperadas) * 100) : 0;
-  let nivel, mensaje, accesible;
-  if (pct >= 80) {
-    nivel = "exito";
+export function ratingDiagrama(aciertosORes, esperadas, sobrantes, ok) {
+  const datos = normalizarEntradaRating(aciertosORes, esperadas, sobrantes, ok);
+  // Si el diagrama no está completamente bien (ok === false), el tope es "parcial" aunque el porcentaje supere 80 %.
+  if (datos.pct >= 80) return datos.ok ? "exito" : "parcial";
+  return datos.pct >= 50 ? "parcial" : "fracaso";
+}
+
+export function ratingDiagramaAccesible(aciertosORes, esperadas, sobrantes, ok) {
+  const datos = normalizarEntradaRating(aciertosORes, esperadas, sobrantes, ok);
+  const nivel = ratingDiagrama(aciertosORes, esperadas, sobrantes, ok);
+  const pct = datos.pct;
+  let mensaje, accesible;
+  if (nivel === "exito") {
     mensaje = "¡Excelente trabajo!";
     accesible = "Has completado el " + pct + "% del diagrama. ¡Excelente trabajo!";
-  } else if (pct >= 50) {
-    nivel = "parcial";
+  } else if (nivel === "parcial") {
     mensaje = "Buen intento, sigue practicando";
     accesible = "Has completado el " + pct + "% del diagrama. Buen intento, sigue practicando.";
   } else {
-    nivel = "fracaso";
     mensaje = "Necesitas repasar los conceptos";
     accesible = "Has completado el " + pct + "% del diagrama. Necesitas repasar los conceptos.";
   }
@@ -380,6 +415,6 @@ export function ratingDiagramaAccesible(correctas, esperadas) {
     porcentaje: pct,
     mensaje,
     accesible,
-    progreso: correctas + " de " + esperadas + " elementos correctos"
+    progreso: datos.aciertos + " de " + datos.esperadas + " elementos correctos"
   };
 }

@@ -47,9 +47,8 @@ export function crearCasos({
   function comprobar() {
     if (!actual || !estado) return;
     const res = evaluarDiagrama(actual.diagrama, estado);
-    // Vara deliberadamente indulgente (decisión en spec 003): el rating de casos es por
-    // porcentaje (≥80 éxito) y no exige exactitud total como el quiz, para no castigar el tanteo.
-    const rating = ratingDiagrama(res.correctas + res.miembrosOk, res.totalEsperado);
+    // El rating descuenta conexiones sobrantes y exige ok: true para alcanzar "exito".
+    const rating = ratingDiagrama(res);
     const resultado = { rating, detalle: res };
 
     const registros = persistencia.casos();

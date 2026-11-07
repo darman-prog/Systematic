@@ -31,6 +31,11 @@ describe("claveArista", () => {
   it("subtipos dirigidos respetan el orden", () => {
     expect(claveArista("A", "B", "herencia", true)).not.toBe(claveArista("B", "A", "herencia", true));
   });
+
+  it("nombres con barra vertical o comillas no generan colisiones de clave", () => {
+    expect(claveArista("A|B", "C", "1:N", true)).not.toBe(claveArista("A", "B|C", "1:N", true));
+    expect(claveArista('A"B', "C", "1:N", true)).not.toBe(claveArista("A", 'B"C', "1:N", true));
+  });
 });
 
 describe("nombreAccesible", () => {
@@ -85,6 +90,18 @@ describe("tablero ER", () => {
     estado = colocarNodo(estado, "Curso");
     expect(estado.posiciones["Estudiante"].y).toBe(estado.posiciones["Curso"].y);
     expect(estado.posiciones["Estudiante"].x).not.toBe(estado.posiciones["Curso"].x);
+  });
+
+  it("colocar A, B, C, quitar B y colocar D no repite posicion", () => {
+    const p = { id: "T-pos", subtipo: "er", nodosPool: ["A", "B", "C", "D"] };
+    let estado = crearTablero(p);
+    estado = colocarNodo(estado, "A");
+    estado = colocarNodo(estado, "B");
+    estado = colocarNodo(estado, "C");
+    estado = quitarNodo(estado, [], "B");
+    estado = colocarNodo(estado, "D");
+    const coords = Object.values(estado.posiciones).map(pos => `${pos.x},${pos.y}`);
+    expect(new Set(coords).size).toBe(coords.length);
   });
 
   it("quitarNodo limpia conexiones y miembros asignados", () => {
@@ -157,15 +174,19 @@ describe("miembros de clase (H6b)", () => {
     const vacio = crearTablero(preguntaUML);
     expect(asignarMiembro(vacio, "generar()", "Reporte")).toBe(vacio);
     expect(asignarMiembro(vacio, "inexistente", null)).toBe(vacio);
+    expect(asignarMiembro(vacio, "constructor", "Reporte")).toBe(vacio);
     let estado = crearTablero(preguntaUML);
     ["Reporte", "Tabular"].forEach(n => { estado = colocarNodo(estado, n); });
+    expect(asignarMiembro(estado, "constructor", "Reporte")).toBe(estado);
     estado = asignarMiembro(estado, "generar()", "Tabular");
     estado = asignarMiembro(estado, "titulo", "Tabular");
     estado = conectar(estado, "Tabular", "Reporte", "herencia", true);
     const res = evaluarDiagrama(preguntaUML, estado);
     expect(res.miembrosOk).toBe(1);
+    expect(res.miembrosMal).toBe(1);
     expect(res.ok).toBe(false);
-    expect(res.sobrantes).toBe(1);
+    // sobrantes solo cuenta conexiones de más; los miembros mal ubicados van en miembrosMal.
+    expect(res.sobrantes).toBe(0);
   });
 
   it("detecta miembros mal asignados", () => {
@@ -185,6 +206,27 @@ describe("miembros de clase (H6b)", () => {
     expect(estado.miembros["generar()"]).toBe("Reporte");
     estado = asignarMiembro(estado, "generar()", null);
     expect(estado.miembros["generar()"]).toBeNull();
+  });
+
+  it("dos miembros con el mismo texto y distinto id no se pisan", () => {
+    const preguntaIdMiembros = {
+      id: "UML-ID",
+      subtipo: "uml-clases",
+      nodosPool: ["Cliente", "Pedido"],
+      miembrosPool: [
+        { id: "m-cliente-id", texto: "id: int", de: "Cliente" },
+        { id: "m-pedido-id", texto: "id: int", de: "Pedido" }
+      ],
+      relacionesEsperadas: [{ de: "Pedido", a: "Cliente", tipo: "asociación" }]
+    };
+    let estado = crearTablero(preguntaIdMiembros);
+    ["Cliente", "Pedido"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = asignarMiembro(estado, "m-cliente-id", "Cliente");
+    estado = asignarMiembro(estado, "m-pedido-id", "Pedido");
+    estado = conectar(estado, "Pedido", "Cliente", "asociación", false);
+    const res = evaluarDiagrama(preguntaIdMiembros, estado);
+    expect(res.miembrosOk).toBe(2);
+    expect(res.ok).toBe(true);
   });
 });
 
@@ -249,6 +291,33 @@ describe("diagramas UML con miembros", () => {
     expect(res.ok).toBe(true);
     expect(res.miembrosOk).toBe(3);
     expect(res.correctas).toBe(2);
+    expect(res.aciertos).toBe(5);
+    expect(res.porcentaje).toBe(100);
+    expect(resumenDiagramaAccesible(res).progress.porcentaje).toBe(100);
+    expect(ratingDiagrama(res)).toBe("exito");
+  });
+
+  it("penaliza conexiones sobrantes y nunca otorga exito si ok es false", () => {
+    let estado = crearTablero(preguntaUML);
+    ["Transaccion", "Tarjeta", "Transferencia"].forEach(n => { estado = colocarNodo(estado, n); });
+    estado = asignarMiembro(estado, "procesar()", "Transaccion");
+    estado = asignarMiembro(estado, "validarNumero()", "Tarjeta");
+    estado = asignarMiembro(estado, "codigoBanco", "Transferencia");
+    estado = conectar(estado, "Tarjeta", "Transaccion", "herencia", true);
+    estado = conectar(estado, "Transferencia", "Transaccion", "herencia", true);
+    // Añadimos cinco conexiones extra para simular conectar todo con todo.
+    estado = conectar(estado, "Transaccion", "Tarjeta", "herencia", true);
+    estado = conectar(estado, "Transaccion", "Transferencia", "herencia", true);
+    estado = conectar(estado, "Tarjeta", "Transferencia", "herencia", true);
+    estado = conectar(estado, "Transferencia", "Tarjeta", "herencia", true);
+    estado = conectar(estado, "Tarjeta", "Transaccion", "composición", true);
+
+    const res = evaluarDiagrama(preguntaUML, estado);
+    expect(res.ok).toBe(false);
+    expect(res.sobrantes).toBe(5);
+    expect(res.porcentaje).toBe(0);
+    expect(ratingDiagrama(res)).not.toBe("exito");
+    expect(ratingDiagramaAccesible(res).nivel).not.toBe("exito");
   });
 });
 
