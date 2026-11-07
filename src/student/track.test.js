@@ -3,7 +3,7 @@
 // materias.test.js, y el progreso/obtenerP se inyectan como fakes.
 import { describe, it, expect } from "vitest";
 import { crearTrack } from "./track.js";
-import { esDebil, filtrarDiagramas } from "../core/index.js";
+import { esDebil } from "../core/index.js";
 
 const TIPOS = ["multiple", "multi", "vf", "codigo", "dragdrop", "ordenar", "desarrollo", "relacionar", "diagrama"];
 
@@ -12,7 +12,7 @@ function trackConBanco(obtenerP = () => ({}), competencia = {}) {
     competencia: () => competencia,
     progreso: () => ({})
   };
-  return crearTrack({ persistencia, TIPOS, esDebil, obtenerP, filtrarDiagramas, diagramasDisponibles: () => true });
+  return crearTrack({ persistencia, TIPOS, esDebil, obtenerP });
 }
 
 describe("student/track", () => {

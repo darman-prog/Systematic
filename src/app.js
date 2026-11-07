@@ -2,8 +2,7 @@ import { MATERIAS, LENGUAJES, fechaSnapshot } from "./core/index.js";
 import { registrarExamen } from "./core/index.js";
 import { crearHome } from "./ui/dashboard/home.js";
 import { crearConfig } from "./ui/dashboard/config.js";
-import { esDebil } from "./core/index.js";
-import { prepararItem, filtrarDiagramas } from "./core/index.js";
+import { esDebil, prepararItem } from "./core/index.js";
 import { XP_EVENTOS, xpDeRespuesta, estrellasDeMision } from "./core/index.js";
 import { crearApuntesUI } from "./ui/aprendizaje/apuntes.js";
 import { TIPOS, TIPO_LABELS, DIF_LABELS, animar, saludoSegunHora, conNombre as conNombreUI } from "./ui/helpers.js";
@@ -13,7 +12,6 @@ import { crearEstudioUI } from "./ui/aprendizaje/estudio.js";
 import { crearGlosarioUI } from "./ui/aprendizaje/glosario.js";
 import { crearFlashcardsUI } from "./ui/aprendizaje/flashcards.js";
 import { icono, hidratarIconos } from "./ui/iconos.js";
-import { diagramasDisponibles, ocultarCasosEnTactil } from "./ui/entorno.js";
 import { toast, confeti } from "./ui/componentes/avisos.js";
 import { crearConfirm } from "./ui/componentes/confirm.js";
 import { observarScrollReveal } from "./ui/componentes/scroll-suave.js";
@@ -81,7 +79,7 @@ const persistencia = crearPersistencia(localStorage);
 // `trackIdActual` lo fija app.js al seleccionar materia o lenguaje.
 const avance = crearAvance({ persistencia, getTrackId: () => trackIdActual });
 // Selección de preguntas por modo (student/rondas.js); el DOM/timers viven en ronda.js.
-const rondas = crearRondas({ obtenerP: avance.obtenerP, diagramasDisponibles });
+const rondas = crearRondas({ obtenerP: avance.obtenerP });
 // El sistema le habla al estudiante por su nombre en los hitos (onboarding).
 const conNombre = texto => conNombreUI(persistencia.nombre(), texto);
 const gamificacion = crearGamificacion({
@@ -102,7 +100,7 @@ const home = crearHome({ persistencia, cargarRoadmap });
 // Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
 const track = crearTrack({
   persistencia, TIPOS, esDebil,
-  obtenerP: avance.obtenerP, filtrarDiagramas, diagramasDisponibles
+  obtenerP: avance.obtenerP
 });
 
 // Servicio de la ronda de quiz (student/session.js): estado y orquestación. La parte que
@@ -148,7 +146,7 @@ const config = crearConfig({
   // Los puentes llegan del controlador (las const alias viven más abajo, en zona muerta acá).
   leerOpciones: configCtl.leerOpciones,
   preguntasFiltradas: configCtl.preguntasFiltradas,
-  diagramasDisponibles, TIPO_LABELS, DIF_LABELS,
+  TIPO_LABELS, DIF_LABELS,
   mostrarPantalla: show
 });
 const apuntesUI = crearApuntesUI({ getMateria: () => track.materia, mostrarPantalla: show });
@@ -208,7 +206,7 @@ lenguaje = crearLenguaje({ $, track, show, goHome: () => dashboard.goHome(), sta
 // Controlador del dashboard (orquestacion/dashboard.js): portada, stats, historial y track.
 dashboard = crearDashboard({
   $, persistencia, track, avance, home, show, config, sesiones, apuntesUI,
-  lenguaje, glosarioUI, clearTimer, diagramasDisponibles,
+  lenguaje, glosarioUI, clearTimer,
   alCambiarTrack: id => { trackIdActual = id; avance.cargar(); }
 });
 
@@ -253,9 +251,6 @@ talentos = crearTalentos({
 // Los datos legacy (quizBD2.*) pertenecen a la app anterior de BD2: se migran a su
 // namespace al arrancar, antes de que el usuario seleccione materia.
 persistencia.migrarLegacy("bd2");
-
-// El constructor de diagramas y los casos técnicos solo se ofrecen en escritorio.
-ocultarCasosEnTactil();
 
 // El mapa de acciones se compone por feature (ADR 009/010); acá solo se agrupan las
 // dependencias de cada controlador y se instala la delegación de click.

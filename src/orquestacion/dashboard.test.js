@@ -46,7 +46,6 @@ function montar(over = {}) {
     glosarioUI: { renderTip: vi.fn() },
     clearTimer: vi.fn(),
     alCambiarTrack: vi.fn(),
-    diagramasDisponibles: () => true,
     ui,
     hoy: () => "2026-10-20",
     ...over.deps
@@ -65,7 +64,7 @@ describe("dashboard", () => {
     expect(deps.show).toHaveBeenCalledWith("start");
     expect(ui.renderStats).toHaveBeenCalled();
     expect(ui.renderHistory).toHaveBeenCalled();
-    expect(ui.pintarTiposPanel).toHaveBeenCalledWith(deps.$, deps.track, deps.diagramasDisponibles);
+    expect(ui.pintarTiposPanel).toHaveBeenCalledWith(deps.$, deps.track);
     expect(deps.glosarioUI.renderTip).toHaveBeenCalled();
     expect(elements["btn-etapas"].classList.toggle).toHaveBeenCalledWith("hidden", true);
   });

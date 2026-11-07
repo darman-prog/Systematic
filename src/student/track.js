@@ -5,7 +5,7 @@
 import { getMateria, getLenguaje } from "../core/index.js";
 import { cargarContenido } from "./contenido.js";
 
-export function crearTrack({ persistencia, TIPOS, esDebil, obtenerP, filtrarDiagramas, diagramasDisponibles }) {
+export function crearTrack({ persistencia, TIPOS, esDebil, obtenerP }) {
   let materia = null;
   let banco = [];
   let glosario = { categorias: [], terminos: [], tips: [] };
@@ -13,9 +13,6 @@ export function crearTrack({ persistencia, TIPOS, esDebil, obtenerP, filtrarDiag
   let lenguajeContenido = null;
   let competencia = {};
   const filtros = { parciales: new Set(), temas: new Set(), dificultades: new Set(), tipos: new Set(), soloDebiles: false, soloMarcadas: false, priorizar: true };
-
-  // El constructor de diagramas no se ofrece en táctil: se filtra en todas las rutas de sesión.
-  const sinDiagramasEnTactil = qs => filtrarDiagramas(qs, diagramasDisponibles());
 
   function limpiarLenguaje() {
     lenguaje = null;
@@ -81,14 +78,14 @@ export function crearTrack({ persistencia, TIPOS, esDebil, obtenerP, filtrarDiag
   }
 
   function preguntasFiltradas() {
-    return sinDiagramasEnTactil(banco.filter(q =>
+    return banco.filter(q =>
       filtros.parciales.has(q.parcial) &&
       filtros.temas.has(q.tema) &&
       filtros.dificultades.has(q.dificultad) &&
       filtros.tipos.has(q.tipo) &&
       (!filtros.soloDebiles || esDebil(obtenerP(q.id))) &&
       (!filtros.soloMarcadas || obtenerP(q.id).marked)
-    ));
+    );
   }
 
   function toggleFiltro(clave, valor) {

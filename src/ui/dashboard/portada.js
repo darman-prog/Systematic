@@ -31,12 +31,12 @@ export function aplicarAcento(materia) {
   root.style.setProperty("--materia-accent-texto", a.texto);
 }
 
-export function pintarTiposPanel($, track, diagramasDisponibles) {
+export function pintarTiposPanel($, track) {
   const panel = $("tipos-panel");
   if (!panel) return;
   const conteos = {};
   track.banco.forEach(q => { conteos[q.tipo] = (conteos[q.tipo] || 0) + 1; });
-  panel.innerHTML = TIPOS.filter(t => conteos[t] && (diagramasDisponibles() || t !== "diagrama")).map(t =>
+  panel.innerHTML = TIPOS.filter(t => conteos[t]).map(t =>
     '<button class="chip" data-action="practicarTipo" data-tipo="' + t + '">' + (TIPO_LABELS[t] || t) + ' · ' + conteos[t] + '</button>'
   ).join("");
 }

@@ -8,7 +8,7 @@ import {
 
 export function crearDashboard({
   $, persistencia, track, avance, home, show, config, sesiones, apuntesUI,
-  lenguaje, glosarioUI, clearTimer, alCambiarTrack, diagramasDisponibles,
+  lenguaje, glosarioUI, clearTimer, alCambiarTrack,
   ui = {
     pintarPortada, aplicarAcento, pintarTiposPanel, pintarContinuidad,
     renderStats: renderStatsUI, renderHistory: renderHistoryUI
@@ -54,7 +54,7 @@ export function crearDashboard({
     renderContinuidad();
     renderStats();
     renderHistory();
-    ui.pintarTiposPanel($, track, diagramasDisponibles);
+    ui.pintarTiposPanel($, track);
     glosarioUI.renderTip();
   }
 

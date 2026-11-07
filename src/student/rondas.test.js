@@ -121,11 +121,6 @@ describe("rondas", () => {
     expect(r.items.map(x => x.id).sort()).toEqual(["c", "d"]);
   });
 
-  it("excluye diagramas cuando no estan disponibles en las rutas que los filtran", () => {
-    const r = montar({ diagramasDisponibles: () => false }).porTipo({ banco: banco(), tipo: "diagrama" });
-    expect(r).toBeNull();
-  });
-
   it("devuelve null cuando no hay preguntas", () => {
     const r = montar({
       obtenerP: () => ({ ok: 0, fail: 0, box: 1, last: null, lastOk: null })
