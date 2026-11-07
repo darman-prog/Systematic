@@ -126,20 +126,81 @@ export function saludoSegunHora(nombre, fecha = new Date()) {
   return quien ? tramo + ", " + quien : tramo;
 }
 
-// Renderiza el plan de corrección (core/diagramas/diagramas.js → planCorreccion) como secciones
-// con pasos numerados: aciertos, qué crear, qué eliminar y qué reubicar. La línea de
-// aciertos solo aparece cuando el diagrama aún no está completo. Compartido por quiz y casos.
+// Formatea una línea del plan ("Crea: A → B (herencia)" o "Ubica: m1 → A") en chips visuales
+// conservando el texto completo para lectores de pantalla y pruebas.
+function formatearPasoCorreccion(item, esMiembro = false) {
+  const mPrefijo = /^(Crea:\s*|Elimina:\s*|Ubica:\s*)(.*)$/.exec(String(item || ""));
+  const prefijo = mPrefijo ? mPrefijo[1] : "";
+  const cuerpo = mPrefijo ? mPrefijo[2] : String(item || "");
+
+  if (esMiembro) {
+    const partes = cuerpo.split(/\s*→\s*/);
+    if (partes.length === 2) {
+      return (
+        '<span class="sr-only">' + escapar(prefijo) + "</span>" +
+        '<code class="corr-chip corr-chip--miembro">' + escapar(partes[0]) + "</code>" +
+        '<span class="corr-flecha" aria-hidden="true">→</span>' +
+        '<span class="corr-chip corr-chip--nodo">' + escapar(partes[1]) + "</span>"
+      );
+    }
+  }
+
+  const mRel = /^(.+?)\s*(→|–)\s*(.+?)\s*\(([^)]+)\)$/.exec(cuerpo);
+  if (mRel) {
+    return (
+      '<span class="sr-only">' + escapar(prefijo) + "</span>" +
+      '<span class="corr-chip corr-chip--nodo">' + escapar(mRel[1]) + "</span>" +
+      '<span class="corr-flecha" aria-hidden="true">' + escapar(mRel[2]) + "</span>" +
+      '<span class="corr-chip corr-chip--nodo">' + escapar(mRel[3]) + "</span>" +
+      '<span class="corr-chip corr-chip--tipo">(' + escapar(mRel[4]) + ")</span>"
+    );
+  }
+
+  return escapar(item);
+}
+
+// Renderiza el plan de corrección (core/diagramas/diagramas.js → planCorreccion) como un tablero
+// de diagnóstico por columnas (qué falta crear, qué sobra y qué miembros ubicar).
 export function seccionesCorreccion(plan) {
   const partes = [];
   if (plan.aciertos && plan.aciertos.correctas < plan.aciertos.total) {
-    partes.push('<p class="text-sm mb-2">Acertaste <b>' + plan.aciertos.correctas + " de " + plan.aciertos.total + "</b> elementos.</p>");
+    const pct = plan.aciertos.total > 0 ? Math.round((plan.aciertos.correctas / plan.aciertos.total) * 100) : 0;
+    partes.push(
+      '<div class="corr-progreso">' +
+        '<div class="corr-progreso-top">' +
+          '<p class="text-sm m-0">Acertaste <b>' + plan.aciertos.correctas + " de " + plan.aciertos.total + "</b> elementos.</p>" +
+          '<span class="corr-progreso-pct">' + pct + "% completado</span>" +
+        "</div>" +
+        '<div class="corr-progreso-barra"><div class="corr-progreso-fill" style="width:' + pct + '%"></div></div>' +
+      "</div>"
+    );
   }
-  const seccion = (titulo, items) => items.length
-    ? '<p class="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1">' + titulo + "</p>" +
-      '<ol class="list-decimal list-inside text-sm mb-3 space-y-0.5">' + items.map(i => "<li>" + escapar(i) + "</li>").join("") + "</ol>"
-    : "";
-  partes.push(seccion("Falta crear", plan.porCrear));
-  partes.push(seccion("Elimina", plan.porQuitar));
-  partes.push(seccion("Ubica", plan.porMover));
+
+  const tarjetas = [];
+  const crearTarjeta = (titulo, subtitulo, variante, items, esMiembro = false) => {
+    if (!items || !items.length) return;
+    tarjetas.push(
+      '<div class="corr-card corr-card--' + variante + '">' +
+        '<div class="corr-card-head">' +
+          '<div>' +
+            '<p class="corr-card-titulo">' + titulo + "</p>" +
+            '<p class="corr-card-sub">' + subtitulo + "</p>" +
+          "</div>" +
+          '<span class="corr-card-badge">' + items.length + "</span>" +
+        "</div>" +
+        '<ol class="corr-lista">' +
+          items.map(i => '<li class="corr-item">' + formatearPasoCorreccion(i, esMiembro) + "</li>").join("") +
+        "</ol>" +
+      "</div>"
+    );
+  };
+
+  crearTarjeta("Falta crear", "Relaciones esperadas que aún no están", "crear", plan.porCrear, false);
+  crearTarjeta("Elimina", "Relaciones incorrectas o con tipo equivocado", "quitar", plan.porQuitar, false);
+  crearTarjeta("Ubica", "Atributos o métodos en su clase correcta", "mover", plan.porMover, true);
+
+  if (tarjetas.length) {
+    partes.push('<div class="corr-grid">' + tarjetas.join("") + "</div>");
+  }
   return partes.join("");
 }

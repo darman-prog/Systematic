@@ -1,4 +1,4 @@
-﻿// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
+// Render de la lista y ejecución de casos de diagramación (spec 003, H6c).
 // Cada caso es una narrativa + un diagrama a construir con el lienzo compartido.
 import { escapar, seccionesCorreccion } from "../helpers.js";
 import { planCorreccion } from "../../core/index.js";
@@ -37,17 +37,24 @@ export function pintarCaso(caso, estado, resultado) {
     const finalTexto = resultado.rating === "exito" ? caso.finales.exito : resultado.rating === "parcial" ? caso.finales.parcial : caso.finales.fracaso;
     const plan = resultado.detalle ? planCorreccion(resultado.detalle) : null;
     cont.innerHTML =
-      '<div class="text-center mb-5">' +
-        tagRating(resultado.rating) +
-        '<p class="text-sm text-slate-300 mt-3">' + escapar(finalTexto) + '</p>' +
-        '<p class="text-xs text-slate-400 mt-1">XP ganada por elementos correctos incluida</p>' +
+      '<div class="caso-veredicto caso-veredicto--' + escapar(resultado.rating) + '">' +
+        '<div class="caso-veredicto-main">' +
+          tagRating(resultado.rating) +
+          '<div>' +
+            '<p class="caso-veredicto-texto">' + escapar(finalTexto) + '</p>' +
+            '<p class="caso-veredicto-xp">XP ganada por elementos correctos incluida</p>' +
+          '</div>' +
+        '</div>' +
       '</div>' +
       (plan ? seccionesCorreccion(plan) : '') +
-      '<div class="apunte-card mb-4">' +
-        '<div class="apunte-tema">Explicación</div>' +
-        '<div class="text-sm text-slate-300">' + caso.diagrama.exp + '</div>' +
+      '<div class="apunte-card mt-4 mb-5">' +
+        '<div class="apunte-tema">Explicación de arquitectura</div>' +
+        '<div class="text-sm text-slate-300 leading-relaxed">' + caso.diagrama.exp + '</div>' +
       '</div>' +
-      '<div class="flex flex-wrap gap-3 justify-center mt-5">' +
+      '<div class="flex flex-wrap gap-3 justify-end mt-5 pt-4 border-t border-slate-700/60">' +
+        (resultado.rating !== "exito"
+          ? '<button class="btn btn-secondary" data-action="jugarCaso" data-id="' + escapar(caso.id) + '">Reintentar este caso</button>'
+          : '') +
         '<button class="btn btn-primary" data-action="startCasos">Volver a casos</button>' +
         '<button class="btn btn-ghost" data-action="goHome">Inicio</button>' +
       '</div>';

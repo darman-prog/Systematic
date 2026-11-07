@@ -138,8 +138,12 @@
    y las caras crecen con el contenido en lugar de quedar recortadas a 16rem. */
 .app-ancha { max-width: 56rem; }
 
-/* Dashboard: grilla de 4 columnas solo en el home de materias. */
-.app-dashboard { max-width: 72rem; }
+/* Dashboard y workbench de diagramación: superficie extendida de 72rem (1152px). */
+.app-dashboard,
+.app:has(#lienzo-diagrama) {
+  max-width: 72rem;
+  transition: max-width 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
 #screen-flashcards .flash-card { @apply min-h-0 sm:p-8; }
 /* Los estilos del constructor de diagramas viven en lienzo.css (importado desde main.js). */
 

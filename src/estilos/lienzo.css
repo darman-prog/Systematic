@@ -1,32 +1,722 @@
-/* Estilos del constructor de diagramas (lienzo, nodos, etiquetas, modal de guarda). */
-/* Extraido de entrada.css al descongelar la zona (spec 006); incluye overrides moviles. */
+/* Estilos del constructor de diagramas: layout workbench (Opción A), lienzo blueprint,
+   nodos diferenciados por subtipo, etiquetas de arista y modal de guarda. */
 
-/* ===== ZONA CONGELADA: constructor de diagramas =====
-   No mover ni editar mientras el área de diagramas esté en trabajo activo
-   (spec 006). Este bloque se extraerá a estilos/lienzo.css al descongelar. */
-#lienzo-diagrama { position: relative; width: 100%; min-height: 320px; border: 1px solid var(--study-border); border-radius: 12px; background: var(--study-surface); overflow: hidden; touch-action: none; }
-#lienzo-area { position: relative; width: 100%; height: 100%; min-height: inherit; }
-#edges-diagrama { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-#edges-diagrama line { stroke: var(--study-accent); stroke-width: 2; }
-#edges-diagrama .flecha-punta { fill: var(--study-accent); }
-.nodo-puesto { position: absolute; min-width: 96px; max-width: 180px; background: var(--study-surface-2); border: 2px solid var(--study-border); border-radius: 8px; padding: 8px 22px 8px 10px; font-size: 0.85rem; cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; color: var(--study-text); }
-.nodo-puesto.seleccionado { border-color: var(--study-accent); box-shadow: 0 0 0 2px rgba(155, 184, 201, 0.35); }
-.nodo-fijo { border-style: solid; background: var(--study-surface-3); }
-.nodo-nombre { font-weight: 600; display: block; }
-.nodo-miembros { margin-top: 6px; border-top: 1px solid var(--study-border); padding-top: 4px; }
-.miembro-item { font-size: 0.75rem; color: var(--study-muted); padding: 2px 0; }
-.nodo-quitar { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px; min-width: 24px; min-height: 24px; border-radius: 9999px; background: #2b2f38; color: var(--study-text); border: 1px solid var(--study-error); font-size: 12px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.etiqueta-arista { position: absolute; transform: translate(-50%, -50%); background: var(--study-bg); border: 1px solid var(--study-accent); color: var(--study-accent); border-radius: 9999px; font-size: 11px; padding: 2px 20px 2px 8px; cursor: pointer; white-space: nowrap; font-family: inherit; display: inline-flex; align-items: center; }
+/* Contenedor principal en 2 columnas en escritorio: bandeja lateral + lienzo amplio */
+.diagrama-workbench {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+  margin-top: 8px;
+}
 
-/* Foco visible coherente con el tema (WCAG 2.4.7): solo para teclado, no para tacto. */
+@media (min-width: 900px) {
+  .diagrama-workbench {
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .diagrama-workbench.workbench-expandido {
+    grid-template-columns: 250px minmax(0, 1fr);
+  }
+}
+
+/* Columna lateral: pools de entidades y miembros */
+.diagrama-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: color-mix(in srgb, var(--study-surface) 88%, #090d16);
+  border: 1px solid var(--study-border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.diagrama-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagrama-panel + .diagrama-panel {
+  padding-top: 12px;
+  border-top: 1px solid var(--study-border);
+}
+
+.diagrama-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.diagrama-panel-titulo {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--study-text);
+}
+
+.diagrama-contador {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--study-surface-2);
+  color: var(--study-accent);
+  border: 1px solid color-mix(in srgb, var(--study-accent) 35%, var(--study-border));
+}
+
+.diagrama-panel-sub {
+  font-size: 0.75rem;
+  color: var(--study-muted);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.diagrama-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 40px;
+  align-content: flex-start;
+}
+
+.diagrama-pool-vacio {
+  font-size: 0.75rem;
+  color: var(--study-muted);
+  font-style: italic;
+  padding: 6px 2px;
+}
+
+/* Diferenciación visual entre entidades/clases y miembros en el pool */
+#pool-diagrama .pieza {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: space-between;
+  background: var(--study-surface-2);
+  border: 1.5px solid var(--study-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  color: var(--study-text);
+  touch-action: none;
+  transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+
+#pool-diagrama .pieza:hover {
+  border-color: var(--study-accent);
+  background: var(--study-surface-3);
+  transform: translateY(-1px);
+}
+
+#pool-miembros .pieza {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: color-mix(in srgb, var(--study-surface-2) 75%, #0b101b);
+  border: 1.5px solid var(--study-border);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  touch-action: none;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+#pool-miembros .pieza:hover {
+  border-color: var(--study-accent);
+}
+
+/* Miembro actualmente seleccionado para asignar vs miembro ya asignado */
+.pieza.pieza-activa {
+  border-color: var(--study-accent) !important;
+  background: color-mix(in srgb, var(--study-accent) 22%, var(--study-surface-2)) !important;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--study-accent) 35%, transparent);
+  color: #fff;
+}
+
+.pieza-dueno {
+  font-size: 0.68rem;
+  opacity: 0.85;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(15, 23, 42, 0.55);
+}
+
+.diagrama-guia {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--study-border);
+  font-size: 0.73rem;
+  color: var(--study-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Columna principal: barra superior, lienzo y pie */
+.diagrama-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lienzo-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--study-surface) 85%, #090d16);
+  border: 1px solid var(--study-border);
+  border-radius: 10px;
+}
+
+.lienzo-toolbar-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lienzo-subtipo-badge {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--study-accent);
+  background: color-mix(in srgb, var(--study-accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--study-accent) 35%, transparent);
+  padding: 3px 9px;
+  border-radius: 6px;
+}
+
+.lienzo-metricas {
+  font-size: 0.76rem;
+  color: var(--study-muted);
+}
+
+.btn-expandir-lienzo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--study-muted);
+  background: var(--study-surface-2);
+  border: 1px solid var(--study-border);
+  border-radius: 7px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+
+.btn-expandir-lienzo:hover {
+  color: var(--study-text);
+  border-color: var(--study-accent);
+}
+
+/* Barra contextual para elegir tipo de relación */
+#tipos-diagrama {
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--study-accent) 12%, var(--study-surface));
+  border: 1.5px solid var(--study-accent);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+}
+
+#tipos-diagrama .tipos-etiqueta {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--study-text);
+  margin-right: 4px;
+}
+
+#tipos-diagrama .btn-mini {
+  min-width: 36px;
+  min-height: 36px;
+  margin-left: auto;
+}
+
+/* Superficie del lienzo con cuadrícula de puntos (blueprint dot-grid) */
+#lienzo-diagrama {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  border: 1.5px solid var(--study-border);
+  border-radius: 14px;
+  background-color: color-mix(in srgb, var(--study-surface) 92%, #070a12);
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--study-border) 75%, transparent) 1.25px,
+    transparent 1.25px
+  );
+  background-size: 22px 22px;
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  touch-action: manipulation;
+  overscroll-behavior: contain;
+  transition: min-height 200ms ease, border-color 150ms ease;
+}
+
+.workbench-expandido #lienzo-diagrama {
+  min-height: 680px;
+}
+
+#lienzo-area {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+}
+
+/* Estado vacío guiado dentro del lienzo cuando no hay nodos colocados */
+.lienzo-vacio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+  color: var(--study-muted);
+}
+
+.lienzo-vacio-caja {
+  border: 1.5px dashed color-mix(in srgb, var(--study-border) 90%, transparent);
+  background: color-mix(in srgb, var(--study-surface) 75%, transparent);
+  border-radius: 12px;
+  padding: 18px 24px;
+  max-width: 360px;
+}
+
+.lienzo-vacio-titulo {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--study-text);
+  margin-bottom: 4px;
+}
+
+.lienzo-vacio-sub {
+  font-size: 0.78rem;
+  color: var(--study-muted);
+  line-height: 1.4;
+}
+
+/* Aristas SVG */
+#edges-diagrama {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#edges-diagrama line {
+  stroke: var(--study-accent);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+}
+
+#edges-diagrama line.arista-punteada {
+  stroke-dasharray: 6 4;
+}
+
+#edges-diagrama .flecha-punta {
+  fill: var(--study-accent);
+}
+
+/* Nodos colocados en el lienzo */
+.nodo-puesto {
+  position: absolute;
+  min-width: 128px;
+  max-width: 220px;
+  background: var(--study-surface-2);
+  border: 2px solid var(--study-border);
+  border-radius: 10px;
+  padding: 10px 28px 10px 12px;
+  font-size: 0.86rem;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  color: var(--study-text);
+  box-shadow: 0 6px 16px -4px rgba(0, 0, 0, 0.45);
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+  z-index: 10;
+}
+
+.nodo-puesto:hover {
+  border-color: color-mix(in srgb, var(--study-accent) 65%, var(--study-border));
+}
+
+.nodo-puesto.arrastrando {
+  cursor: grabbing;
+  z-index: 30;
+  box-shadow: 0 14px 28px -6px rgba(0, 0, 0, 0.65);
+  border-color: var(--study-accent);
+}
+
+.nodo-puesto.seleccionado {
+  border-color: var(--study-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--study-accent) 35%, transparent), 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+  z-index: 20;
+}
+
+.nodo-objetivo {
+  border-color: color-mix(in srgb, var(--study-accent) 80%, var(--study-border));
+  outline: 2px dashed color-mix(in srgb, var(--study-accent) 65%, transparent);
+  outline-offset: 3px;
+}
+
+.nodo-fijo {
+  border-style: solid;
+  background: var(--study-surface-3);
+  border-radius: 9999px;
+  padding: 8px 20px;
+  min-width: 96px;
+  text-align: center;
+}
+
+.nodo-nombre {
+  font-weight: 700;
+  display: block;
+  letter-spacing: -0.01em;
+}
+
+.nodo-miembros {
+  margin-top: 8px;
+  border-top: 1px solid var(--study-border);
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.miembro-item {
+  font-size: 0.76rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--study-text);
+  background: rgba(15, 23, 42, 0.45);
+  border-radius: 5px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.miembro-quitar {
+  background: transparent;
+  border: 0;
+  color: var(--study-muted);
+  cursor: pointer;
+  padding: 0 3px;
+  font-size: 0.8rem;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.miembro-quitar:hover {
+  color: var(--study-error, #f87171);
+  background: rgba(248, 113, 113, 0.15);
+}
+
+.nodo-quitar {
+  position: absolute;
+  top: -9px;
+  right: -9px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 9999px;
+  background: #232730;
+  color: var(--study-text);
+  border: 1.5px solid var(--study-error);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+.nodo-quitar:hover {
+  transform: scale(1.1);
+  background: #3b1d26;
+}
+
+.etiqueta-arista {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: var(--study-bg);
+  border: 1.5px solid var(--study-accent);
+  color: var(--study-accent);
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 10px 3px 10px;
+  gap: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+  touch-action: none;
+  z-index: 15;
+  transition: background-color 120ms ease, transform 120ms ease;
+}
+
+.etiqueta-arista:hover {
+  background: var(--study-surface-2);
+  transform: translate(-50%, -50%) scale(1.04);
+}
+
+/* Pie del lienzo: hint de estado a la izquierda + botón Comprobar a la derecha */
+.lienzo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+
+.lienzo-hint {
+  font-size: 0.8rem;
+  color: var(--study-muted);
+  margin: 0;
+  min-height: 1.25rem;
+  flex: 1;
+}
+
+/* ===== Diagnóstico y plan de corrección tras validar el diagrama ===== */
+.caso-veredicto {
+  background: color-mix(in srgb, var(--study-surface) 90%, #090d16);
+  border: 1px solid var(--study-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+
+.caso-veredicto--exito {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: color-mix(in srgb, #064e3b 22%, var(--study-surface));
+}
+
+.caso-veredicto--parcial {
+  border-color: rgba(251, 191, 36, 0.45);
+  background: color-mix(in srgb, #78350f 20%, var(--study-surface));
+}
+
+.caso-veredicto--fracaso {
+  border-color: rgba(244, 63, 94, 0.45);
+  background: color-mix(in srgb, #881337 20%, var(--study-surface));
+}
+
+.caso-veredicto-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.caso-veredicto-texto {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--study-text);
+  margin: 0 0 4px 0;
+}
+
+.caso-veredicto-xp {
+  font-size: 0.76rem;
+  color: var(--study-muted);
+  margin: 0;
+}
+
+.corr-progreso {
+  background: color-mix(in srgb, var(--study-surface) 88%, #090d16);
+  border: 1px solid var(--study-border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.corr-progreso-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.corr-progreso-pct {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--study-accent);
+}
+
+.corr-progreso-barra {
+  height: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.corr-progreso-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--study-accent);
+  transition: width 260ms ease;
+}
+
+.corr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.corr-card {
+  background: color-mix(in srgb, var(--study-surface) 92%, #080c14);
+  border: 1px solid var(--study-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.corr-card--crear {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.corr-card--quitar {
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+.corr-card--mover {
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.corr-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--study-border);
+}
+
+.corr-card-titulo {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+  color: var(--study-text);
+}
+
+.corr-card--crear .corr-card-titulo { color: #7dd3fc; }
+.corr-card--quitar .corr-card-titulo { color: #fda4af; }
+.corr-card--mover .corr-card-titulo { color: #fcd34d; }
+
+.corr-card-sub {
+  font-size: 0.72rem;
+  color: var(--study-muted);
+  margin: 2px 0 0 0;
+}
+
+.corr-card-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--study-surface-2);
+  color: var(--study-text);
+  border: 1px solid var(--study-border);
+}
+
+.corr-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.corr-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--study-surface-2);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  font-size: 0.8rem;
+}
+
+.corr-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.corr-chip--nodo {
+  background: var(--study-surface-3);
+  color: var(--study-text);
+  border: 1px solid var(--study-border);
+}
+
+.corr-chip--miembro {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.76rem;
+  background: rgba(15, 23, 42, 0.65);
+  color: #fde68a;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.corr-chip--tipo {
+  font-size: 0.73rem;
+  color: var(--study-accent);
+  background: color-mix(in srgb, var(--study-accent) 14%, transparent);
+  margin-left: auto;
+}
+
+.corr-flecha {
+  color: var(--study-muted);
+  font-weight: 700;
+}
+
+/* Foco visible coherente con el tema (WCAG 2.4.7) */
 #lienzo-diagrama:focus-visible, .pieza:focus-visible, .nodo-puesto:focus-visible,
 .etiqueta-arista:focus-visible, .btn-guarda:focus-visible, .btn-cancelar:focus-visible,
-.nodo-quitar:focus-visible, #tipos-diagrama .btn-mini:focus-visible {
+.nodo-quitar:focus-visible, #tipos-diagrama .btn-mini:focus-visible, .btn-expandir-lienzo:focus-visible {
   outline: 2px solid var(--study-accent);
   outline-offset: 2px;
 }
-#ghost-diagrama { position: fixed; z-index: 50; pointer-events: none; opacity: 0.85; }
-#tipos-diagrama .btn-mini { min-width: 44px; min-height: 44px; }
+
+#ghost-diagrama {
+  position: fixed;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.9;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
 
 /* Modal de selección de guarda para diagramas de actividades */
 .modal-guarda { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 100; display: flex; align-items: center; justify-content: center; }
@@ -39,35 +729,29 @@
 .btn-cancelar { background: transparent; color: var(--study-muted); border: 1px solid var(--study-border); border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: 0.9rem; width: 100%; }
 .btn-cancelar:hover { background: var(--study-surface-2); }
 
-
-/* Overrides del lienzo. Van después de la zona congelada para ganarle en cascada.
-   Al descongelar (spec 006) mover este bloque junto con la zona a estilos/lienzo.css. */
-#lienzo-diagrama { touch-action: manipulation; }
-.nodo-puesto, .etiqueta-arista { touch-action: none; }
-#pool-diagrama .pieza, #pool-miembros .pieza { touch-action: none; }
-
 @media (max-width: 639px) {
   #lienzo-diagrama {
-    min-height: 340px;
-    max-height: 60vh;
+    min-height: 420px;
+    max-height: 68vh;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
   }
-  /* Papel interno más grande que el marco: espacio real para 4-6 entidades,
-     se desplaza con scroll (el drag de nodos usa touch-action: none). */
   #lienzo-area {
-    min-width: 640px;
-    min-height: 520px;
+    min-width: 700px;
+    min-height: 540px;
+  }
+  #pool-diagrama .pieza {
+    width: auto;
   }
   .nodo-puesto {
-    min-width: 96px;
+    min-width: 110px;
     min-height: 48px;
     padding: 10px 40px 10px 12px;
     font-size: 14px;
   }
   .nodo-quitar {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     top: -10px;
     right: -10px;
   }
@@ -79,20 +763,11 @@
   .etiqueta-arista {
     min-width: 40px;
     min-height: 40px;
-    padding: 8px 20px 8px 10px;
+    padding: 8px 16px 8px 10px;
   }
   #tipos-diagrama {
     position: sticky;
     bottom: 0;
-    padding: 8px 0;
-    z-index: 20;
-    background: var(--study-bg, #0b1220);
+    z-index: 25;
   }
 }
-
-.nodo-objetivo {
-  outline: 2px dashed rgba(155, 184, 201, .6);
-  outline-offset: 2px;
-}
-
-#lienzo-diagrama { overscroll-behavior: contain; }

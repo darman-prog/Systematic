@@ -9,8 +9,8 @@ const PANTALLAS = [
 
 // Ancho extendido: flashcards y talentos necesitan más superficie horizontal.
 const PANTALLAS_ANCHA = ["flashcards", "talentos"];
-// El dashboard necesita una grilla de 4 columnas; el resto mantiene el ancho de lectura.
-const PANTALLAS_DASHBOARD = ["materias"];
+// El dashboard y el workbench de casos de diagramación usan ancho extendido (72rem).
+const PANTALLAS_DASHBOARD = ["materias", "caso"];
 
 export function crearRouter({ $, animar, alMostrar = null }) {
   function show(screen) {
