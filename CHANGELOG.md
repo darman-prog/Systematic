@@ -5,6 +5,10 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 
 ## Sin publicar (pre-deploy)
 
+- ASW móvil (feature 020): 15 preguntas de decisión (MVI, BFF, API Gateway, GraphQL,
+  offline-first, MBaaS, SDUI, nativo vs multiplataforma) y el apunte `AP-ASW-12`
+  con el contenido del PDF 16, sin diagramas por ahora.
+
 - Remediación de arquitectura (feature 019): SDK de Firebase en chunk bajo demanda
   (JS inicial 1.218 kB → 460 kB), `diagramas.js` y `stats.js` divididos en módulos con
   tests de caracterización, almacenamiento `sys.*` movido de `core` a `student` y lint
