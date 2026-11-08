@@ -103,4 +103,23 @@ describe("lector de apuntes", () => {
     expect(document.getElementById("apunte-lectura").classList.contains("hidden")).toBe(true);
     expect(document.getElementById("apuntes-lista-wrap").classList.contains("hidden")).toBe(false);
   });
+
+  it("envuelve tablas en .apunte-tabla-wrap y agrupa bloques de 'Cómo leerlo' en .apunte-guia-lectura", async () => {
+    const apuntes = [{
+      id: "AP-Y",
+      tema: "POO",
+      titulo: "Relaciones",
+      fuente: "fuente.md",
+      contenido: "## Tabla\n\n| A | B |\n|---|---|\n| 1 | 2 |\n\nCómo leerlo:\n\n- Paso 1\n- Paso 2"
+    }];
+    const ui = crearApuntesUI({ getMateria: () => ({ apuntes }), mostrarPantalla: vi.fn() });
+
+    await ui.abrirApunte("AP-Y");
+
+    const cont = document.getElementById("apunte-lectura-contenido");
+    expect(cont.querySelector(".apunte-tabla-wrap table")).not.toBeNull();
+    const guia = cont.querySelector(".apunte-guia-lectura");
+    expect(guia).not.toBeNull();
+    expect(guia.querySelector("ul")).not.toBeNull();
+  });
 });

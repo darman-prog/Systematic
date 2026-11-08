@@ -111,7 +111,13 @@ test.describe('Systematic — smoke', () => {
 
   test('apuntes: todos los diagramas de la ola 1 renderizan', async ({ page }) => {
     const porMateria = [
-      { indice: 2, ids: ["AP-ASW-01", "AP-ASW-02", "AP-ASW-08", "AP-ASW-09", "AP-ASW-10", "AP-ASW-11", "AP-ASW-12"] },
+      {
+        indice: 2,
+        ids: [
+          "AP-ASW-01", "AP-ASW-02", "AP-ASW-03", "AP-ASW-04", "AP-ASW-05", "AP-ASW-06",
+          "AP-ASW-07", "AP-ASW-08", "AP-ASW-09", "AP-ASW-10", "AP-ASW-11", "AP-ASW-12"
+        ]
+      },
       { indice: 1, ids: ["AP-ISW-07"] },
       { indice: 0, ids: ["AP-BD2-01", "AP-BD2-02", "AP-BD2-03", "AP-BD2-04", "AP-BD2-05", "AP-BD2-06", "AP-BD2-07"] }
     ];
@@ -122,7 +128,7 @@ test.describe('Systematic — smoke', () => {
       await page.getByRole('button', { name: /Apuntes/ }).click();
       for (const id of ids) {
         await page.locator('[data-id="' + id + '"]').click();
-        await expect(page.locator('figure.apunte-diagrama svg')).toBeVisible();
+        await expect(page.locator('figure.apunte-diagrama svg').first()).toBeVisible();
         await page.locator('[data-action="volverApuntes"]').first().click();
       }
     }

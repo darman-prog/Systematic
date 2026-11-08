@@ -293,12 +293,12 @@
   </section>
 
   <section id="screen-apuntes" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
-      <h1 class="screen-titulo">Apuntes</h1>
-      <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
-    </div>
-    <p class="text-sm text-slate-400 mb-4">Resúmenes curados a partir del material de la materia. Busca o filtra por tema.</p>
     <div id="apuntes-lista-wrap">
+      <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+        <h1 class="screen-titulo">Apuntes</h1>
+        <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
+      </div>
+      <p class="text-sm text-slate-400 mb-4">Resúmenes curados a partir del material de la materia. Busca o filtra por tema.</p>
       <label class="sr-only" for="apuntes-search">Buscar en los apuntes</label>
       <input class="search-input" id="apuntes-search" type="search" placeholder="Buscar en los apuntes..." aria-controls="apuntes-list">
       <div id="apuntes-filtros" class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Filtrar apuntes por tema"></div>
@@ -308,7 +308,10 @@
     <div id="apunte-lectura" class="hidden">
       <div class="apunte-lectura-top">
         <button class="btn btn-ghost btn-sm" data-action="volverApuntes">← Apuntes</button>
-        <span class="apunte-lectura-tema" id="apunte-lectura-tema"></span>
+        <div class="apunte-lectura-badges">
+          <span class="apunte-lectura-tema" id="apunte-lectura-tema"></span>
+          <span class="apunte-lectura-tiempo" id="apunte-lectura-tiempo"></span>
+        </div>
       </div>
       <h2 class="apunte-lectura-titulo" id="apunte-lectura-titulo" tabindex="-1"></h2>
       <nav id="apunte-toc" class="apunte-toc" aria-label="Contenido del apunte"></nav>
@@ -316,6 +319,15 @@
       <p id="apunte-lectura-fuente" class="apunte-fuente"></p>
       <div class="apunte-lectura-acciones">
         <button class="btn btn-ghost btn-sm" data-action="volverApuntes">← Volver a apuntes</button>
+      </div>
+    </div>
+    <div id="modal-diagrama-ampliado" class="modal-diagrama hidden" role="dialog" aria-modal="true" aria-labelledby="modal-diagrama-titulo">
+      <div class="modal-diagrama-caja">
+        <div class="modal-diagrama-head">
+          <span id="modal-diagrama-titulo" class="modal-diagrama-titulo">Diagrama ampliado</span>
+          <button type="button" id="cerrar-modal-diagrama" class="btn btn-secondary btn-sm">Cerrar (Esc)</button>
+        </div>
+        <div id="modal-diagrama-cuerpo" class="modal-diagrama-cuerpo"></div>
       </div>
     </div>
   </section>

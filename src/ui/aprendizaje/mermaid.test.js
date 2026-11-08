@@ -4,7 +4,9 @@ import { renderizarDiagramas } from "./mermaid.js";
 
 const mermaidFalso = () => ({
   initialize: vi.fn(),
-  render: vi.fn(async (id, fuente) => ({ svg: `<svg data-id="${id}" data-src="${fuente.length}"></svg>` }))
+  render: vi.fn(async (id, fuente) => ({
+    svg: `<svg id="${id}" viewBox="0 0 300 200" data-src="${fuente.length}"><style>#${id} .relation{fill:none;}</style></svg>`
+  }))
 });
 
 beforeEach(() => {
@@ -52,5 +54,33 @@ A-->B</code></pre></div>`;
     const cargar = vi.fn();
     expect(await renderizarDiagramas(document.getElementById("raiz"), { cargar })).toBe(0);
     expect(cargar).not.toHaveBeenCalled();
+  });
+
+  it("permite ampliar el diagrama en un modal accesible y cerrarlo con Escape devolviendo el foco", async () => {
+    document.body.innerHTML = `
+      <div id="raiz">
+        <p><strong>Figura 1.</strong> Diagrama de prueba</p>
+        <pre><code class="language-mermaid">flowchart LR
+A-->B</code></pre>
+      </div>`;
+    const cargar = vi.fn(async () => mermaidFalso());
+    await renderizarDiagramas(document.getElementById("raiz"), { cargar });
+
+    const btnZoom = /** @type {HTMLButtonElement} */ (document.querySelector(".apunte-diagrama-zoom"));
+    expect(btnZoom).not.toBeNull();
+    btnZoom.click();
+
+    const modal = document.getElementById("modal-diagrama-ampliado");
+    expect(modal).not.toBeNull();
+    expect(modal.classList.contains("hidden")).toBe(false);
+    const svgOriginal = document.querySelector("figure.apunte-diagrama svg");
+    const svgModal = modal.querySelector("#modal-diagrama-cuerpo svg");
+    expect(svgModal).not.toBeNull();
+    expect(svgModal.id).toBe(svgOriginal.id + "-modal");
+    expect(svgModal.innerHTML).toContain("#" + svgOriginal.id + "-modal .relation{fill:none;}");
+
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+    expect(modal.classList.contains("hidden")).toBe(true);
+    expect(document.activeElement).toBe(btnZoom);
   });
 });
