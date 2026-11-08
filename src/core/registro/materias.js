@@ -32,8 +32,8 @@ export const MATERIAS = [
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    // Lote 018: +45 preguntas (ASW-086–130), +24 términos y +3 apuntes (hexagonal, evolución, microservicios). +2 escenarios examen.
-    conteo: { preguntas: 130, terminos: 51, apuntes: 11, escenarios: 3, casos: 2 }
+    // Lote 020: +15 preguntas de arquitecturas móviles (ASW-131–145); apunte móvil en el siguiente commit.
+    conteo: { preguntas: 145, terminos: 51, apuntes: 11, escenarios: 3, casos: 2 }
   },
   {
     id: "infra",

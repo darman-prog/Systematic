@@ -1900,6 +1900,247 @@ const preguntas = [
     ],
     correct: 1,
     exp: "Las tres reglas de oro: <b>monolito bien estructurado primero</b>, <b>dominios no capas</b> y <b>CI/CD + observabilidad + IaC antes</b> de tener decenas de servicios."
+  },
+  // Lote 020: preguntas de decisión sobre arquitecturas móviles (PDF 16). Se prioriza
+  // el escenario y la restricción sobre la definición memorística.
+  {
+    id: "ASW-131",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Una app móvil crece: el controlador ya maneja navegación, validaciones, llamadas de red y estado compartido entre pantallas. Según el material, ¿qué limitación explica el problema y en qué caso MVC sigue siendo una elección razonable?",
+    options: [
+      "El controlador se acopla en exceso en aplicaciones complejas; MVC sigue siendo razonable en prototipos o apps con poca complejidad de estado",
+      "La vista se acopla al modelo; por eso MVC solo se recomienda cuando hay muchas pantallas y estado compartido",
+      "El modelo ejecuta la navegación; por eso MVC no permite probar la lógica"
+    ],
+    correct: 0,
+    exp: "El PDF señala que el <b>Controlador</b> gestiona navegación e interacción y que, en apps complejas, eso genera <b>acoplamiento excesivo</b>. MVC se recomienda para <b>prototipos</b> o clientes con <b>baja complejidad de estado</b>. Que la vista pueda acoplarse al modelo es una característica estructural, no la limitación central.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-132",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Un equipo exige pruebas unitarias puras de la lógica de presentación, sin levantar el framework UI, y acepta escribir más código de coordinación. ¿Qué patrón encaja mejor y por qué?",
+    options: [
+      "MVP: la vista es pasiva y el Presentador concentra la lógica, así se prueba sin depender del framework UI",
+      "MVVM: el ViewModel siempre se prueba sin framework porque el binding no participa en la lógica",
+      "MVC: el Controlador no conoce la vista, así que se prueba aislado sin UI"
+    ],
+    correct: 0,
+    exp: "El PDF atribuye a MVP la ventaja de <b>pruebas unitarias puras del Presentador</b> sin dependencias del framework móvil. MVVM reduce código repetitivo con binding, pero ese enlace sí introduce dependencia del framework; MVC no garantiza un controlador aislado.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-133",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "En Android la pantalla se recrea al rotar y se pierde el estado. El equipo quiere estado observable y enlace declarativo para que la vista se reconstruya sin perderlo. ¿Qué patrón y qué ventaja del material lo explican?",
+    options: [
+      "MVVM: el ViewModel expone estado observable y el binding desacopla la vista de su ciclo de vida",
+      "MVP: el Presentador conserva la vista y por eso sobrevive a cualquier recreación",
+      "MVI: el estado inmutable elimina la necesidad de un ViewModel y del binding"
+    ],
+    correct: 0,
+    exp: "MVVM se apoya en un <b>ViewModel con estado observable</b> y <b>data binding</b>; el PDF destaca que eso <b>desacopla por completo la vista del ciclo de vida</b>. MVP no conserva la vista: la vista es pasiva y delegada; MVI no elimina el estado ni el binding por definición.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-134",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Varios callbacks asíncronos y eventos de usuario mutan el estado al mismo tiempo; la interfaz muestra combinaciones inconsistentes. ¿Qué patrón ataca la causa y con qué mecanismo?",
+    options: [
+      "MVI: estado inmutable, intenciones discretas y un reducer puro que calcula un único estado nuevo por flujo",
+      "MVVM: el binding bidireccional serializa automáticamente todas las mutaciones concurrentes",
+      "MVC: el Controlador actualiza modelo y vista en el mismo callback, así evita la concurrencia"
+    ],
+    correct: 0,
+    exp: "El PDF describe el problema <b>bidireccional</b>: múltiples eventos y callbacks mutan el estado concurrentemente. MVI lo restringe a <b>intents → reducer puro → nuevo estado inmutable</b>, con flujo unidireccional. El binding de MVVM reduce código repetitivo, pero no serializa mutaciones por sí solo.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-135",
+    parcial: "Parcial 1",
+    tema: "MVC y variantes",
+    dificultad: "media",
+    tipo: "multi",
+    q: "Marca las afirmaciones que el material atribuye a MVI.",
+    options: [
+      "El estado se trata como un objeto inmutable y cada intención produce un nuevo estado único",
+      "El binding bidireccional elimina la necesidad de un reducer",
+      "El flujo unidireccional hace cada cambio de interfaz predecible, reproducible y auditable",
+      "El reducer procesa la intención con el estado actual mediante funciones puras"
+    ],
+    correctos: [0, 2, 3],
+    exp: "MVI = <b>estado inmutable + intenciones + reducer puro</b> y flujo de una sola dirección. El binding bidireccional es la base de MVVM, no de MVI; el reducer es justamente lo que MVI conserva para que el cambio sea trazable.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-136",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Una pantalla móvil necesita cinco llamadas para armarse y el API web devuelve campos que la app no usa. ¿Qué pieza del material agrega esas llamadas y filtra el payload antes de que salga por la red móvil?",
+    options: [
+      "El BFF: backend dedicado al cliente que agrega varias llamadas en una respuesta optimizada y filtra/formatea los datos",
+      "El API Gateway: su función principal es agregar respuestas de varios servicios en un payload único para la pantalla",
+      "GraphQL: reemplaza al BFF y elimina la necesidad de cualquier capa de agregación"
+    ],
+    correct: 0,
+    exp: "El <b>BFF</b> es la capa de agregación específica del cliente: une llamadas, filtra campos y formatea antes de transmitir. El <b>API Gateway</b> centraliza entrada, seguridad, TLS y enrutamiento; no es la capa de agregación de pantalla. GraphQL resuelve otra necesidad: que el cliente defina la forma de la consulta.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-137",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multi",
+    q: "El equipo de iOS y el de Android tienen ciclos de despliegue distintos y un cambio de backend rompe a ambos. Marca los beneficios que el material atribuye a mantener un BFF por cliente.",
+    options: [
+      "Agregar varias llamadas a microservicios en una sola respuesta optimizada",
+      "Filtrar y formatear datos en el servidor antes de enviarlos por la red móvil",
+      "Permitir que el equipo móvil mantenga su BFF y alinee sus despliegues con el ciclo de la app",
+      "Eliminar la autenticación porque el BFF ya está dentro de la red"
+    ],
+    correctos: [0, 1, 2],
+    exp: "El BFF agrega, filtra/formatea y da <b>autonomía de equipos</b> para alinear despliegues. No elimina la autenticación: el PDF mantiene el proveedor de identidad y el gateway como entrada segura.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-138",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "Una versión vieja de la app sigue instalada en miles de dispositivos y no puedes obligar a actualizarla. ¿Qué combinación del material permite que siga funcionando sin romperla?",
+    options: [
+      "Versionado de APIs con contratos estables y retrocompatibles, apoyado en un service dictionary de endpoints activos",
+      "Forzar la actualización desde la tienda antes de permitir el uso de la app",
+      "Exponer un único endpoint sin versión para simplificar el backend"
+    ],
+    correct: 0,
+    exp: "El PDF advierte que la <b>fragmentación de versiones</b> es normal en móvil: el versionado de APIs y los <b>contratos retrocompatibles</b> son cruciales, y el <b>service dictionary</b> entrega el mapa de URLs activas. Forzar la actualización no siempre es posible y un endpoint sin versión acelera la rotura.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-139",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "dificil",
+    tipo: "multiple",
+    q: "El cliente móvil debe pedir campos exactos y objetos anidados en una sola consulta de red; con REST necesita tres endpoints y recibe datos de más. ¿Qué opción del material encaja y por qué?",
+    options: [
+      "GraphQL: el cliente define la estructura del payload y resuelve objetos anidados en una consulta, con esquema tipado e introspección",
+      "REST: varias llamadas siempre son más rápidas porque cada endpoint está especializado",
+      "BFF: solo un BFF puede devolver objetos anidados; GraphQL no puede hacerlo"
+    ],
+    correct: 0,
+    exp: "GraphQL permite <b>consultas a medida</b>, traer objetos anidados en <b>una sola consulta</b> y trabajar con <b>tipado fuerte</b>. El PDF compara REST (varias llamadas a `/products`, `/discounts`, `/checkouts`) con GraphQL (una consulta que resuelve todo). El BFF agrega, pero no sustituye la capacidad del cliente de definir la forma.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-140",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "La app debe abrir al instante y mostrar los últimos datos aunque la señal sea mala. En offline-first, ¿de dónde lee la interfaz primero?",
+    options: [
+      "De la base de datos local (por ejemplo SQLite), que actúa como fuente primaria; la sincronización con el backend es asíncrona",
+      "De la red primero; la base local solo se usa si la petición falla después del timeout",
+      "Solo de memoria RAM; no hace falta almacenamiento local"
+    ],
+    correct: 0,
+    exp: "El PDF es explícito: la UI lee prioritariamente del <b>almacenamiento local</b> y no de la red; las acciones se sincronizan después con colas y reintentos. “Red primero” es lo opuesto a offline-first y la memoria sola no sobrevive al cierre de la app.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-141",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "El usuario crea y edita registros mientras está sin conexión. ¿Qué hace la arquitectura offline-first con esas acciones?",
+    options: [
+      "Las encola localmente y las reintenta con políticas de reintento progresivo cuando vuelve la señal",
+      "Las bloquea hasta que haya conexión y no permite escribir nada localmente",
+      "Las descarta para no generar conflictos con el servidor"
+    ],
+    correct: 0,
+    exp: "El PDF describe <b>colas locales</b> y <b>reintentos progresivos</b> al recuperar señal. Bloquear o descartar acciones contradice la experiencia offline-first; el conflicto se gestiona con estrategias de reconciliación, no evitando escribir.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-142",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "dificil",
+    tipo: "vf",
+    q: "En offline-first, la única forma de evitar conflictos es bloquear todas las escrituras hasta recuperar la red; la consistencia eventual no aplica.",
+    options: ["Verdadero", "Falso"],
+    correct: 1,
+    exp: "<b>Falso</b>. El PDF propone <b>estrategias de resolución de conflictos</b> y <b>consistencia eventual</b> para conciliar cambios locales y remotos. Bloquear escrituras es una decisión posible, pero no la única ni la que define el patrón.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-143",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Una startup quiere autenticación, notificaciones push y almacenamiento sin construir infraestructura, pero teme quedar atada a un proveedor. ¿Qué aconseja el material sobre MBaaS?",
+    options: [
+      "Usarlo para acelerar el desarrollo, pero evaluar el nivel de acoplamiento y dependencia frente al coste de mantener un backend propio",
+      "MBaaS elimina la necesidad de backend y no genera dependencia del proveedor",
+      "Construir siempre backend propio; MBaaS solo sirve para prototipos desechables"
+    ],
+    correct: 0,
+    exp: "MBaaS abstrae autenticación, push y almacenamiento y acelera el desarrollo, pero el PDF pide <b>evaluar la dependencia del proveedor</b> frente al coste de construir y mantener el backend propio. No es gratis ni obligatorio: es un trade-off.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-144",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "media",
+    tipo: "multiple",
+    q: "Un bug crítico de interfaz aparece en producción y la revisión de la tienda puede tardar días. ¿Qué estrategia del material permite corregir el comportamiento sin publicar un binario nuevo?",
+    options: [
+      "Server-Driven UI y configuración dinámica: el backend envía estructura, layout o parámetros y la app los aplica en tiempo real",
+      "Enviar una notificación push pidiendo a los usuarios que actualicen la app",
+      "Esperar la revisión de la tienda y publicar una versión nueva"
+    ],
+    correct: 0,
+    exp: "El PDF describe el cuello de botella de las tiendas (aprobación lenta y versiones fragmentadas) y propone <b>mover lógica/UI al servidor</b>: configuración dinámica y SDUI permiten cambiar pantallas o parámetros sin recompilar. Push y nueva versión no resuelven el problema inmediato.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
+  },
+  {
+    id: "ASW-145",
+    parcial: "Parcial 1",
+    tema: "Arquitecturas móviles",
+    dificultad: "dificil",
+    tipo: "multi",
+    q: "App de negocio estándar, equipo pequeño, presupuesto limitado, iOS y Android, sin AR/VR ni gráficos pesados. Marca las decisiones coherentes con el análisis de trade-offs del material.",
+    options: [
+      "Elegir multiplataforma (Flutter/React Native) para compartir lógica y UI, reducir esfuerzo y acelerar la iteración",
+      "Reservar el desarrollo nativo para escenarios que exijan rendimiento máximo, AR/VR o procesamiento pesado en dispositivo",
+      "Evitar BFF, GraphQL y offline-first si la app es un prototipo simple o tiene baja concurrencia",
+      "Adoptar BFF, GraphQL y offline-first desde el primer día para no rehacer la arquitectura después"
+    ],
+    correctos: [0, 1, 2],
+    exp: "El PDF compara nativo (rendimiento y acceso directo al hardware, pero dos bases y equipos especializados) con multiplataforma (código compartido y menor esfuerzo, con ligero sobrecoste). También advierte <b>evitar sobreingeniería</b>: no introducir BFF, GraphQL u offline-first si la app es simple o de baja concurrencia.",
+    ref: "BancoDeInformacion/ArquitecturaDeSoftware/16_-_Arquitecturas_para_Aplicaciones_Moviles.md"
   }
 ];
 
