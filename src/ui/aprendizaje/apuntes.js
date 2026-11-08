@@ -118,8 +118,9 @@ const $ = id => document.getElementById(id);
     apunteActivo = null;
     mostrarDetalle(false);
     if (!id) return;
-    const boton = [...document.querySelectorAll('[data-action="leerApunte"]')].find(b => b.dataset.id === id);
-    if (boton) boton.focus({ preventScroll: true });
+    const boton = [...document.querySelectorAll('[data-action="leerApunte"]')]
+      .find(b => /** @type {HTMLElement} */ (b).dataset.id === id);
+    if (boton) /** @type {HTMLElement} */ (boton).focus({ preventScroll: true });
   }
 
   function cambiarApunteTema(t) {

@@ -69,6 +69,13 @@ async function irAPantalla(page, nombre) {
       await abrirMasModos(page);
       await page.getByRole('button', { name: /Apuntes/ }).click();
       break;
+    case 'apunte':
+      await page.locator('#materias-list .materia-card').first().click();
+      await abrirMasModos(page);
+      await page.getByRole('button', { name: /Apuntes/ }).click();
+      await page.locator('[data-action="leerApunte"]').first().click();
+      await page.locator('figure.apunte-diagrama svg').waitFor();
+      break;
     case 'lenguaje':
       await page.locator('#lenguajes-list .materia-card').first().click();
       break;
@@ -123,7 +130,7 @@ async function irAPantalla(page, nombre) {
 
 const PANTALLAS = [
   'onboarding', 'materias', 'start', 'config', 'quiz', 'results',
-  'study', 'apuntes', 'lenguaje', 'misiones', 'escenarios', 'escenario',
+  'study', 'apuntes', 'apunte', 'lenguaje', 'misiones', 'escenarios', 'escenario',
   'casos', 'caso', 'flashcards', 'glosario', 'cuenta', 'perfil'
 ];
 

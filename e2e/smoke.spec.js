@@ -71,14 +71,42 @@ test.describe('Systematic — smoke', () => {
     await expect(page.locator('#glosario-count')).toContainText('término');
   });
 
-  test('apuntes: botón presente y estado vacío sin contenido', async ({ page }) => {
+  test('apuntes: lista con contenido', async ({ page }) => {
     await page.goto('/');
     await page.locator('#materias-list .materia-card').first().click();
     await abrirMasModos(page);
     await page.getByRole('button', { name: /Apuntes/ }).click();
     await expect(page.locator('#screen-apuntes')).toBeVisible();
-    await expect(page.locator('#apuntes-list')).toContainText('Aún no hay apuntes');
-    await expect(page.locator('#apuntes-count')).toContainText('0 apunte(s)');
+    await expect(page.locator('#apuntes-list .apunte-card').first()).toBeVisible();
+    await expect(page.locator('#apuntes-count')).toContainText('apunte(s)');
+  });
+
+  test('apuntes: lector con TOC y diagrama Mermaid', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .materia-card').first().click();
+    await abrirMasModos(page);
+    await page.getByRole('button', { name: /Apuntes/ }).click();
+    await page.locator('[data-action="leerApunte"]').first().click();
+
+    await expect(page.locator('#apunte-lectura')).toBeVisible();
+    await expect(page.locator('#apunte-toc a').first()).toBeVisible();
+    await expect(page.locator('figure.apunte-diagrama svg')).toBeVisible();
+  });
+
+  test('apuntes: diagramas de POO y casos de uso', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('#materias-list .materia-card').nth(2).click(); // ASW
+    await abrirMasModos(page);
+    await page.getByRole('button', { name: /Apuntes/ }).click();
+    await page.locator('[data-id="AP-ASW-01"]').click();
+    await expect(page.locator('figure.apunte-diagrama svg')).toBeVisible();
+    await page.goto('/');
+
+    await page.locator('#materias-list .materia-card').nth(1).click(); // ISW
+    await abrirMasModos(page);
+    await page.getByRole('button', { name: /Apuntes/ }).click();
+    await page.locator('[data-id="AP-ISW-07"]').click();
+    await expect(page.locator('figure.apunte-diagrama svg')).toBeVisible();
   });
 
   test('contrarreloj y supervivencia inician con sus indicadores', async ({ page }) => {
