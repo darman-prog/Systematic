@@ -1,5 +1,4 @@
-// Apuntes de bd2. Generado por scripts/_rebuild-apuntes.mjs;
-// el contenido vive en los .md del manifiesto.
+// Apuntes de bd2. Contenido curado; los diagramas usan fences ~~~mermaid.
 const apuntes = [
   {
     id: "AP-BD2-01",

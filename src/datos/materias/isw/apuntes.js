@@ -1,5 +1,4 @@
-// Apuntes de isw. Generado por scripts/_rebuild-apuntes.mjs;
-// el contenido vive en los .md del manifiesto.
+// Apuntes de isw. Contenido curado; los diagramas usan fences ~~~mermaid.
 const apuntes = [
   {
     id: "AP-ISW-01",
