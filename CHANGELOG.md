@@ -5,6 +5,11 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 
 ## Sin publicar (pre-deploy)
 
+- Remediación de arquitectura (feature 019): SDK de Firebase en chunk bajo demanda
+  (JS inicial 1.218 kB → 460 kB), `diagramas.js` y `stats.js` divididos en módulos con
+  tests de caracterización, almacenamiento `sys.*` movido de `core` a `student` y lint
+  de límites entre capas ([ADR 014](docs/adr/014-lint-de-limites.md)).
+
 - Contenido ASW + BD2 NoSQL (feature 018): 3 PDFs de arquitectura convertidos con
   MarkItDown y curados (`BancoDeInformacion/ArquitecturaDeSoftware/13–15`); ASW
   suma Hexagonal, Evolución de arquitecturas y Microservicios (45 preguntas,
