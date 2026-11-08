@@ -68,7 +68,8 @@ El contenido vive en `src/datos/materias/<materia>/` (y `src/datos/lenguajes/<le
   lienzo para ese subtipo (el validador lo verifica, comparando sin acentos).
 
 Otras estructuras: `glosario` (`{ categorias, terminos, tips }`), `apuntes`
-(`{ id, tema, titulo, contenido, fuente }`), `escenarios`
+(`{ id, tema, titulo, contenido, fuente }`; el contenido admite fences `~~~mermaid`
+que el visor renderiza bajo demanda), `escenarios`
 (`{ id, titulo, tema, intro, pasos, finales }`) y `casos`
 (`{ id, titulo, tema, caso, diagrama, finales }`, con `diagrama` del schema anterior en
 versión standalone sin `id`).

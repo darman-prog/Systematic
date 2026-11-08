@@ -56,8 +56,8 @@ contenido curado y validado por el schema del repo.
 
 ## Decisiones
 
-- BD2 sin apuntes: se respeta el vacío intencional (spec 010); la profundidad NoSQL
-  vive en `exp` + `ref` a la documentación oficial por pregunta.
+- BD2 sin apuntes por entonces; la feature 021 agrega 7 apuntes con diagramas. La
+  profundidad NoSQL vive en `exp` + `ref` a la documentación oficial por pregunta.
 - Todo el contenido nuevo usa `parcial: "Parcial 1"`, igual que el 100% existente.
 - `ref` de las preguntas NoSQL apunta a `mongodb.com/docs` y `neo4j.com/docs`
   (verificado el 2026-10-27); el validador no exige que `ref` exista como archivo.

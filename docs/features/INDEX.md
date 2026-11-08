@@ -12,3 +12,4 @@
 | 018 | Hexagonal + Microservicios (ASW) y NoSQL MongoDB/Neo4j (BD2) | cerrada | [018](018-contenido-hexagonal-microservicios-nosql.md) |
 | 019 | Remediación de arquitectura | cerrada | [019](019-remediacion-arquitectura.md) |
 | 020 | Preguntas y apunte de arquitecturas móviles | cerrada | [020](020-preguntas-apunte-arquitecturas-moviles.md) |
+| 021 | Apuntes explícitos con diagramas (ola 1) | activa | [021](021-apuntes-explicitos-con-diagramas.md) |

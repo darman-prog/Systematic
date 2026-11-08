@@ -19,7 +19,7 @@ Configurar `no-restricted-imports` y `no-restricted-syntax` por carpeta en `esli
 |---|---|---|
 | `src/core/` | `ui`, `student`, `orquestacion`, `datos` (estático y dinámico) | tests |
 | `src/student/` | `ui`, `orquestacion`, `datos` | `contenido.js` (único dueño de las rutas de datos) |
-| `src/ui/` | `student`, `orquestacion`, `datos` (estático y dinámico) | tests |
+| `src/ui/` | `student`, `orquestacion`, `datos` (estático y dinámico) | tests; `aprendizaje/mermaid.js` (SDK lazy) |
 | `src/datos/` | `core`, `student`, `ui`, `orquestacion` (estático y dinámico) | tests |
 
 `orquestacion/` y `app.js` quedan libres: son adaptadores y composition root. Los tests quedan
@@ -29,8 +29,8 @@ fuera para poder usar fixtures de otras capas sin acoplar producción.
 
 - **Positivas**: una fuga de capas falla en `npm run lint`, antes de CI; el mensaje de la regla
   explica la capa y la excepción; no agrega dependencias nuevas.
-- **Negativas**: hay que mantener las excepciones (`student/contenido.js`) y ampliar la regla si
-  aparece un caso legítimo.
+- **Negativas**: hay que mantener las excepciones (`student/contenido.js` y
+  `ui/aprendizaje/mermaid.js`) y ampliar la regla si aparece un caso legítimo.
 - **Riesgos**: `no-restricted-imports` no cubre `import()`; se compensa con `no-restricted-syntax`
   sobre `ImportExpression` en core, student, ui y datos.
 
