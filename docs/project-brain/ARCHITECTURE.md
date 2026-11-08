@@ -43,6 +43,7 @@ la ubicación del contenido.
 - `core/` no importa `student/`, `ui/`, `orquestacion/` ni `src/datos/` en producción.
 - `student/` no importa `ui/`; `ui/` no importa `student/` ni `src/datos/` ni `localStorage`.
 - `orquestacion/` puede usar `student/`, `ui/` y `core/`.
+- `npm run lint` bloquea imports estáticos y dinámicos entre capas (ADR 014).
 - `app.js` solo compone; `orquestacion/acciones/` falla ante claves duplicadas y un test verifica
   que todo `data-action` estático de `index.html` exista.
 - Los formatos persistidos (`sys.*`, snapshot `nube-1`) y los textos de UI no cambiaron con el

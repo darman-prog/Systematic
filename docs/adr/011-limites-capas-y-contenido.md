@@ -42,7 +42,9 @@ pregunta nuevo obligue a tocar UI, dominio y validador.
 - **Negativas**: más módulos y una migración de imports en `track`, `home`, scripts y tests.
 - **Riesgos**: diferencias sutiles en evaluación (normalización, textos repetidos), cálculo de
   stats sin tests previos y chunks de Vite al mover los `import()`.
-- **Deuda restante**: no hay contratos tipados ni lint de límites. El mezclador no cableado
+- **Deuda restante**: no hay contratos tipados ni lint de límites. Actualización 2026-11-08: el
+  lint de límites se resolvió en [ADR 014](014-lint-de-limites.md); los contratos tipados siguen
+  pendientes. El mezclador no cableado
   se retiró en [ADR 012](012-retiro-mezclador.md);
   [docs/features/015-desacople-app-js-y-limites.md](../features/015-desacople-app-js-y-limites.md)
   conserva el registro del desacople.
