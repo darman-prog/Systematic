@@ -119,4 +119,66 @@ describe("ui/componentes/diagramas (tap-tap y scroll)", () => {
     expect(panelNodos.classList.contains("panel-oculto-movil")).toBe(true);
     expect(panelMiembros.classList.contains("panel-oculto-movil")).toBe(false);
   });
+
+  // Caracterización antes de dividir el módulo: coloca una pieza del pool con el
+  // flujo pointerdown + pointerup (puntero fino) y devuelve el nodo montado.
+  function colocarPieza(nombre) {
+    const pieza = /** @type {HTMLElement} */ (area.querySelector('#pool-diagrama [data-nodo="' + nombre + '"]'));
+    pieza.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientX: 20, clientY: 20 }));
+    window.dispatchEvent(new MouseEvent("pointerup", { bubbles: true, clientX: 20, clientY: 20 }));
+    return /** @type {HTMLElement} */ (area.querySelector('.nodo-puesto[data-label="' + nombre + '"]'));
+  }
+
+  function tocarNodo(nombre) {
+    const nodo = /** @type {HTMLElement} */ (area.querySelector('.nodo-puesto[data-label="' + nombre + '"]'));
+    nodo.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientX: 40, clientY: 40 }));
+    nodo.dispatchEvent(new MouseEvent("pointerup", { bubbles: true, clientX: 40, clientY: 40 }));
+  }
+
+  it("conecta dos nodos eligiendo el tipo de relación", () => {
+    configurarMatchMedia(false);
+    ui.renderDiagrama(preguntaDemo, area);
+    colocarPieza("MetodoPago");
+    colocarPieza("TarjetaCredito");
+
+    tocarNodo("TarjetaCredito");
+    tocarNodo("MetodoPago");
+    const tipo = /** @type {HTMLElement} */ (area.querySelector('[data-arista="herencia"]'));
+    expect(tipo).not.toBeNull();
+    tipo.click();
+
+    expect(estadoActual.conexiones).toEqual([
+      { de: "TarjetaCredito", a: "MetodoPago", tipo: "herencia" }
+    ]);
+    expect(area.querySelectorAll(".etiqueta-arista").length).toBe(1);
+  });
+
+  it("asigna un miembro a su clase con tap-tap", () => {
+    configurarMatchMedia(false);
+    ui.renderDiagrama(preguntaDemo, area);
+    colocarPieza("MetodoPago");
+
+    const miembro = /** @type {HTMLElement} */ (area.querySelector('[data-miembro="pagar()"]'));
+    miembro.dispatchEvent(new MouseEvent("pointerdown", { bubbles: true, clientX: 20, clientY: 20 }));
+    window.dispatchEvent(new MouseEvent("pointerup", { bubbles: true, clientX: 20, clientY: 20 }));
+    expect(miembro.getAttribute("aria-pressed")).toBe("true");
+
+    tocarNodo("MetodoPago");
+    expect(estadoActual.miembros["pagar()"]).toBe("MetodoPago");
+    expect(area.querySelector("#contador-miembros").textContent).toBe("1/1");
+  });
+
+  it("quita un nodo colocado con el botón × y actualiza contadores", () => {
+    configurarMatchMedia(false);
+    ui.renderDiagrama(preguntaDemo, area);
+    colocarPieza("MetodoPago");
+    expect(area.querySelector("#contador-nodos").textContent).toBe("1/2");
+
+    const quitar = /** @type {HTMLElement} */ (area.querySelector('.nodo-puesto[data-label="MetodoPago"] .nodo-quitar'));
+    quitar.click();
+
+    expect(estadoActual.nodosColocados).not.toContain("MetodoPago");
+    expect(estadoActual.nodosDisponibles).toContain("MetodoPago");
+    expect(area.querySelector("#contador-nodos").textContent).toBe("0/2");
+  });
 });
