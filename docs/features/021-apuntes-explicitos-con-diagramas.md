@@ -55,7 +55,7 @@ ni lector con TOC. BD2 tenía 0 apuntes por decisión de spec 010/018. La ola 1 
 | Criterio | Fecha | Comando | Exit | Commit |
 |---|---|---|---|---|
 | 1-2 | 2026-11-08 | `build` + `vitest` de apuntes/mermaid | 0 | `f0bbb31` |
-| 3-4 | 2026-11-08 | E2E `apuntes:` (3 pruebas) | 0 | `ca0d13b` |
+| 3-4 | 2026-11-08 | E2E `apuntes:` (4 pruebas; 15 diagramas) | 0 | `ca0d13b` |
 | 5 | 2026-11-08 | `validar` (789) + `revision` (ASW/ISW/BD2 sin avisos) | 0 | `e01e7d8` |
 | 6 | 2026-11-08 | `lint` + `typecheck` + 482 unitarios + `build` + axe `apunte` | 0 | `2f72538` |
 
