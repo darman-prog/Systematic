@@ -10,7 +10,11 @@ export default defineConfig({
       output: {
         // Separa el vendor (marked, dompurify) del código de la app: cambia menos
         // y se cachea aparte. El resto (app + datos por track) lo particiona Vite.
+        // Firebase va en su propio chunk porque se carga con import() dinámico
+        // (student/firebase.js): sin esta separación, manualChunks lo arrastra al
+        // vendor inicial y la app paga el SDK aunque no tenga claves configuradas.
         manualChunks(id) {
+          if (id.includes("node_modules/firebase") || id.includes("node_modules/@firebase")) return "firebase";
           if (id.includes("node_modules")) return "vendor";
         }
       }
