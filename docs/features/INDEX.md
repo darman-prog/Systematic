@@ -10,3 +10,4 @@
 | 016 | Dashboard con catálogo real | cerrada | [016](016-dashboard-catalogo-real.md) |
 | 017 | Cierre de deuda pre-main | cerrada | [017](017-cierre-deuda-pre-main.md) |
 | 018 | Hexagonal + Microservicios (ASW) y NoSQL MongoDB/Neo4j (BD2) | cerrada | [018](018-contenido-hexagonal-microservicios-nosql.md) |
+| 019 | Remediación de arquitectura | activa | [019](019-remediacion-arquitectura.md) |
