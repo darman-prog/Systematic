@@ -1,66 +1,7 @@
-// Progreso del estudiante en localStorage con namespace por materia.
-// Todas las funciones reciben `storage` para poder testearlas sin DOM.
+// Reglas de progreso del estudiante (Leitner): entradas, aciertos, debilidad, vencimiento
+// y racha. El acceso al almacenamiento y las claves persistidas viven en student/almacenamiento.js.
 
 export const INTERVALOS_DIAS = [0, 1, 3, 7, 16];
-export const FLAG_MIGRACION = "sys.migracion.v1";
-
-const LEGACY = {
-  progreso: "quizBD2.progreso",
-  historial: "quizBD2.historial",
-  actividad: "quizBD2.actividad",
-  meta: "quizBD2.meta"
-};
-
-export function claves(materiaId) {
-  return {
-    progreso: "sys.progreso." + materiaId,
-    historial: "sys.historial." + materiaId,
-    actividad: "sys.actividad." + materiaId,
-    meta: "sys.meta." + materiaId
-  };
-}
-
-// Migra una sola vez las claves legacy de la app anterior (quizBD2.*) al namespace sys.*
-// de la materia indicada. El id de materia es obligatorio: el core no conoce materias
-// concretas. No borra las claves viejas: si algo sale mal, el progreso original sigue ahí.
-export function migrarClavesLegacy(storage, materiaId) {
-  if (!storage || !materiaId) return false;
-  try {
-    if (storage.getItem(FLAG_MIGRACION)) return false;
-    const destino = claves(materiaId);
-    Object.keys(LEGACY).forEach(k => {
-      const valor = storage.getItem(LEGACY[k]);
-      if (valor !== null && storage.getItem(destino[k]) === null) {
-        storage.setItem(destino[k], valor);
-      }
-    });
-    storage.setItem(FLAG_MIGRACION, new Date().toISOString());
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function leerJSON(storage, clave, porDefecto) {
-  try {
-    const bruto = storage.getItem(clave);
-    if (bruto === null) return porDefecto;
-    const valor = JSON.parse(bruto);
-    return valor === null || valor === undefined ? porDefecto : valor;
-  } catch {
-    return porDefecto;
-  }
-}
-
-export function escribirJSON(storage, clave, valor) {
-  try {
-    storage.setItem(clave, JSON.stringify(valor));
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export function entradaVacia() {
   return { ok: 0, fail: 0, box: 1, last: null, lastOk: null, marked: false };
 }

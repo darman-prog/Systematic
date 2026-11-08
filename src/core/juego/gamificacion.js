@@ -1,5 +1,5 @@
 // Gamificación amable (spec 003): XP, niveles y logros.
-// Funciones puras: la persistencia (sys.xp, sys.logros, sys.xp-eventos) vive en app.js.
+// Funciones puras: la persistencia (XP, logros y eventos) vive en student/persistencia.js.
 
 export const XP_EVENTOS = {
   acierto: 10,
