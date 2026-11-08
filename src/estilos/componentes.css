@@ -54,6 +54,23 @@ h1, h2 { font-family: var(--fuente-display); letter-spacing: -0.01em; }
 .apunte-tema { @apply text-xs font-bold uppercase tracking-wide text-slate-400 mb-1; }
 .apunte-titulo { @apply text-lg font-bold text-sky-300 mb-2; }
 .apunte-fuente { @apply text-xs text-slate-500 mt-3 pt-3 border-t border-slate-700; }
+.apunte-resumen { @apply text-sm text-slate-400 mb-3 leading-relaxed; }
+
+/* Lector de apuntes: lista compacta y detalle con TOC. */
+.apunte-lectura-top { @apply flex items-center justify-between gap-3 flex-wrap mb-3; }
+.apunte-lectura-tema { @apply text-xs font-bold uppercase tracking-wide text-slate-400; }
+.apunte-lectura-titulo { @apply text-2xl font-bold text-sky-300 mb-3; outline: none; }
+.apunte-toc { @apply flex flex-col gap-1 mb-5 p-3 rounded-xl border border-slate-700 bg-slate-900; }
+.apunte-toc-link { @apply text-sm text-slate-300 hover:text-sky-300; }
+.apunte-toc-h3 { @apply pl-4 text-slate-400; }
+.apunte-lectura-contenido { @apply text-sm sm:text-base leading-relaxed text-slate-300; }
+.apunte-lectura-acciones { @apply mt-6 pt-4 border-t border-slate-700; }
+.apunte-diagrama { @apply my-5 p-3 rounded-xl border border-slate-700 bg-slate-950 overflow-x-auto; }
+.apunte-diagrama figcaption { @apply text-xs text-slate-400 mt-2; }
+.apunte-diagrama-fuente { @apply mt-3 text-xs text-slate-500; }
+.apunte-diagrama-fuente summary { @apply cursor-pointer; }
+.apunte-diagrama-fuente pre { @apply mt-2 overflow-x-auto; }
+.apunte-diagrama-error { @apply my-4 p-3 rounded-xl border border-amber-700 bg-amber-950/40 text-sm text-amber-100; }
 
 /* Single study atmosphere: calm contrast, no pure white/black, and quiet browser surfaces. */
 .brand-title { color: var(--study-accent); font-size: var(--tipo-3xl); line-height: 1.15; }

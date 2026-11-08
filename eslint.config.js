@@ -82,6 +82,12 @@ export default [
     }
   },
   {
+    // Único módulo de ui que carga un SDK bajo demanda: Mermaid pesa y solo se
+    // necesita cuando el apunte tiene un diagrama (ADR 014).
+    files: ["src/ui/aprendizaje/mermaid.js"],
+    rules: { "no-restricted-syntax": "off" }
+  },
+  {
     files: ["src/datos/**/*.js"],
     ignores: ["src/datos/**/*.test.js"],
     rules: {

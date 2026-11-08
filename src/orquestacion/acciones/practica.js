@@ -50,6 +50,8 @@ export function accionesPractica({
     // ---- Estudio y referencia ----
     startApuntes: () => apuntesUI.startApuntes(),
     cambiarApunteTema: el => apuntesUI.cambiarApunteTema(el.dataset.tema),
+    leerApunte: el => apuntesUI.abrirApunte(el.dataset.id),
+    volverApuntes: () => apuntesUI.volverApuntes(),
     startStudy: () => estudio.startStudy(),
     cambiarEstudioTipo: el => estudio.cambiarEstudioTipo(el.dataset.tipo),
     toggleMarcadaEstudio: el => estudio.toggleMarcadaEstudio(el.dataset.id),

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from "vitest";
-import { apunteAHTML, filtrarApuntes } from "./apuntes.js";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { apunteAHTML, filtrarApuntes, resumenApunte, crearApuntesUI } from "./apuntes.js";
 
 describe("apunteAHTML", () => {
   it("renderiza markdown a HTML", () => {
@@ -47,5 +47,60 @@ describe("filtrarApuntes", () => {
 
   it("tolera entrada vacía", () => {
     expect(filtrarApuntes(null, "x", "todos")).toEqual([]);
+  });
+});
+
+describe("resumenApunte", () => {
+  it("quita fences de diagrama y marcas de markdown", () => {
+    const texto = resumenApunte("## Título\n\nTexto **fuerte**.\n\n~~~mermaid\nflowchart LR\nA-->B\n~~~");
+    expect(texto).toContain("Título");
+    expect(texto).toContain("Texto");
+    expect(texto).not.toContain("flowchart");
+    expect(texto).not.toContain("**");
+    expect(texto.length).toBeLessThanOrEqual(220);
+  });
+});
+
+describe("lector de apuntes", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <section id="screen-apuntes">
+        <div id="apuntes-lista-wrap">
+          <input id="apuntes-search">
+          <div id="apuntes-filtros"></div>
+          <p id="apuntes-count"></p>
+          <div id="apuntes-list"></div>
+        </div>
+        <div id="apunte-lectura" class="hidden">
+          <span id="apunte-lectura-tema"></span>
+          <h2 id="apunte-lectura-titulo" tabindex="-1"></h2>
+          <nav id="apunte-toc"></nav>
+          <div id="apunte-lectura-contenido"></div>
+          <p id="apunte-lectura-fuente"></p>
+        </div>
+      </section>`;
+  });
+
+  it("abre un apunte, arma el TOC y vuelve a la lista", async () => {
+    const apuntes = [{
+      id: "AP-X",
+      tema: "Tema",
+      titulo: "Título",
+      fuente: "fuente.md",
+      contenido: "## Sección\n\nTexto del apunte."
+    }];
+    const ui = crearApuntesUI({ getMateria: () => ({ apuntes }), mostrarPantalla: vi.fn() });
+
+    await ui.abrirApunte("AP-X");
+
+    expect(document.getElementById("apunte-lectura").classList.contains("hidden")).toBe(false);
+    expect(document.getElementById("apuntes-lista-wrap").classList.contains("hidden")).toBe(true);
+    expect(document.querySelectorAll("#apunte-toc a")).toHaveLength(1);
+    expect(document.getElementById("apunte-lectura-contenido").textContent).toContain("Texto del apunte.");
+    expect(document.getElementById("apunte-lectura-fuente").textContent).toContain("fuente.md");
+
+    ui.volverApuntes();
+    expect(document.getElementById("apunte-lectura").classList.contains("hidden")).toBe(true);
+    expect(document.getElementById("apuntes-lista-wrap").classList.contains("hidden")).toBe(false);
   });
 });
