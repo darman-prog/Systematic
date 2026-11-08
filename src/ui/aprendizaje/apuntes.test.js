@@ -20,6 +20,13 @@ describe("apunteAHTML", () => {
     expect(apunteAHTML("")).toBe("");
     expect(apunteAHTML(null)).toBe("");
   });
+
+  it("renderiza las tablas GFM de los apuntes", () => {
+    const html = apunteAHTML("| A | B |\n|---|---|\n| 1 | 2 |");
+    expect(html).toContain("<table>");
+    expect(html).toContain("<th>A</th>");
+    expect(html).toContain("<td>1</td>");
+  });
 });
 
 describe("filtrarApuntes", () => {

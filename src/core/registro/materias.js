@@ -32,8 +32,8 @@ export const MATERIAS = [
     color: "#FA9B9B",
     accentText: "#101418",
     tipo: "materia",
-    // Lote 020: +15 preguntas de arquitecturas móviles (ASW-131–145); apunte móvil en el siguiente commit.
-    conteo: { preguntas: 145, terminos: 51, apuntes: 11, escenarios: 3, casos: 2 }
+    // Lote 020: +15 preguntas (ASW-131–145) y +1 apunte móvil (AP-ASW-12).
+    conteo: { preguntas: 145, terminos: 51, apuntes: 12, escenarios: 3, casos: 2 }
   },
   {
     id: "infra",
