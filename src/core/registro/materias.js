@@ -11,8 +11,8 @@ export const MATERIAS = [
     color: "#9FC5DA",
     accentText: "#101418",
     tipo: "materia",
-    // Lote 018: +30 preguntas (MongoDB P1-081–095, Neo4j P1-096–110) y +16 términos NoSQL.
-    conteo: { preguntas: 120, terminos: 58, apuntes: 0, escenarios: 1, casos: 2 }
+    // Lote 021: 7 apuntes de BD2 con diagramas (AP-BD2-01–07).
+    conteo: { preguntas: 120, terminos: 58, apuntes: 7, escenarios: 1, casos: 2 }
   },
   {
     id: "isw",

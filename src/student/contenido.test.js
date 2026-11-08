@@ -20,10 +20,12 @@ describe("contenido (carga lazy)", () => {
     }
   });
 
-  it("no falla si una pieza viene vacia", async () => {
-    const c = await cargarContenido(getMateria("bd2"));
-    expect(c.apuntes).toEqual([]);
-    expect(c.preguntas.length).toBeGreaterThan(0);
+  it("carga los apuntes de BD2 y tolera piezas vacías en lenguajes", async () => {
+    const bd2 = await cargarContenido(getMateria("bd2"));
+    expect(bd2.apuntes.length).toBe(7);
+    const ts = await cargarContenido(getLenguaje("lenguaje-ts"));
+    expect(ts.apuntes).toEqual([]);
+    expect(bd2.preguntas.length).toBeGreaterThan(0);
   });
 
   it("adjunta la presentacion de BD2 y de los lenguajes", async () => {
