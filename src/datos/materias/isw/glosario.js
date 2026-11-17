@@ -61,20 +61,20 @@ const glosario = {
     {
       termino: "Scrum",
       categoria: "scrum",
-      definicion: "Metodología ágil cuyo nombre proviene de una jugada de Rugby. Guía el desarrollo mediante sprints, un retraso priorizado, reuniones diarias y demostraciones al cliente, ideal para plazos cortos y requerimientos cambiantes.",
+      definicion: "Metodología ágil cuyo nombre proviene de una jugada de Rugby. Guía el desarrollo mediante sprints, una pila de producto (backlog) priorizada, reuniones diarias y demostraciones al cliente, ideal para plazos cortos y requerimientos cambiantes.",
       ejemplo: "Un equipo con entregas cada 30 días y demos al final de cada sprint para validar con el cliente."
     },
     {
       termino: "Sprint",
       categoria: "scrum",
-      definicion: "Unidad de trabajo para alcanzar un requerimiento del retraso, ajustada a una caja de tiempo predefinida de 30 días. Durante el sprint no se introducen cambios.",
+      definicion: "Unidad de trabajo para alcanzar un requerimiento de la pila de producto (backlog), ajustada a una caja de tiempo predefinida de 30 días. Durante el sprint no se introducen cambios.",
       ejemplo: "El equipo implementa el módulo de facturación durante el sprint; cualquier idea nueva entra al backlog, no al sprint actual."
     },
     {
-      termino: "Backlog (retraso)",
+      termino: "Pila de producto (Product Backlog)",
       categoria: "scrum",
       definicion: "Lista priorizada de los requerimientos o características del proyecto que dan valor de negocio al cliente. Puede recibir nuevos elementos en cualquier momento y sus prioridades se actualizan.",
-      ejemplo: "El cliente pide exportar reportes a PDF; el gerente inserta esa característica en la posición 3 del backlog."
+      ejemplo: "El cliente pide exportar reportes a PDF; el Product Owner inserta esa característica en la posición 3 del backlog."
     },
     {
       termino: "Scrum Master",

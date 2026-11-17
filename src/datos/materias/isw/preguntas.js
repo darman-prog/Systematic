@@ -12,29 +12,34 @@ const preguntas = [
   {
     id: "ISW-002", parcial: "Parcial 1", tema: "Scrum", dificultad: "facil", tipo: "multiple",
     q: "¿Cuál de las siguientes es una de las tres preguntas clave de la reunión diaria de Scrum?",
-    options: ["¿Cuánto presupuesto queda por gastar?", "¿Qué obstáculos estás encontrando?", "¿Quién es el responsable del retraso?", "¿Qué producto competidor estamos imitando?"],
+    options: ["¿Cuánto presupuesto queda por gastar?", "¿Qué obstáculos estás encontrando?", "¿Quién es el responsable de las desviaciones?", "¿Qué producto competidor estamos imitando?"],
     correct: 1,
     exp: "Las tres preguntas son: <b>qué hiciste desde la última reunión</b>, <b>qué obstáculos encuentras</b> y <b>qué planeas hacer</b> hasta la siguiente. La reunión dura unos 15 minutos y la dirige el maestro Scrum."
   },
   {
     id: "ISW-003", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "multiple",
-    q: "En Scrum, el retraso (backlog) es:",
-    options: ["el contrato legal entre el cliente y el proveedor", "una lista priorizada de requerimientos o características que dan valor de negocio al cliente", "el diagrama de clases del sistema", "una prueba de rendimiento obligatoria al final del proyecto"],
+    q: "En Scrum, la pila de producto (Product Backlog) se define como:",
+    options: [
+      "El contrato legal y alcance cerrado pactado formalmente entre el cliente y el proveedor",
+      "La lista priorizada de requerimientos y funcionalidades que aportan valor de negocio al cliente",
+      "La arquitectura técnica y el conjunto de diagramas de clases que modelan la base del sistema",
+      "El plan de pruebas de integración y carga que se ejecuta al cierre definitivo del proyecto"
+    ],
     correct: 1,
-    exp: "El retraso es la <b>lista priorizada de requerimientos</b> que dan valor de negocio al cliente. Se pueden agregar aspectos en cualquier momento y el gerente del proyecto la evalúa y actualiza las prioridades según se requiera."
+    exp: "La <b>pila de producto (Product Backlog)</b> es la lista priorizada de requerimientos que dan valor de negocio al cliente. Se pueden agregar aspectos en cualquier momento y el dueño del producto la evalúa y actualiza prioridades según se requiera."
   },
   {
     id: "ISW-004", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "multi",
     q: "¿Cuáles de las siguientes son acciones de desarrollo del proceso Scrum?",
-    options: ["Retraso (lista priorizada de requerimientos)", "Sprints con caja de tiempo predefinida", "Reuniones breves diarias dirigidas por el maestro Scrum", "Pruebas de estrés trimestrales obligatorias"],
+    options: ["Pila de producto (lista priorizada de requerimientos)", "Sprints con caja de tiempo predefinida", "Reuniones breves diarias dirigidas por el maestro Scrum", "Pruebas de estrés trimestrales obligatorias"],
     correctos: [0, 1, 2],
-    exp: "Las acciones de Scrum son el <b>retraso</b>, los <b>sprints</b>, las <b>reuniones diarias</b> y las <b>demostraciones preliminares</b> del incremento al cliente. Las pruebas de estrés trimestrales no forman parte de las acciones descritas."
+    exp: "Las acciones de Scrum son la <b>pila de producto (backlog)</b>, los <b>sprints</b>, las <b>reuniones diarias</b> y las <b>demostraciones preliminares</b> del incremento al cliente. Las pruebas de estrés trimestrales no forman parte de las acciones descritas."
   },
   {
     id: "ISW-005", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "vf",
     q: "Durante un sprint en curso se pueden introducir cambios al trabajo planificado siempre que el cliente lo apruebe.",
     options: ["Verdadero", "Falso"], correct: 1,
-    exp: "<b>Falso</b>: durante el sprint <b>no se introducen cambios</b>, precisamente para que el equipo trabaje en un ambiente de corto plazo pero estable. Los cambios se agregan al retraso y se priorizan para sprints siguientes."
+    exp: "<b>Falso</b>: durante el sprint <b>no se introducen cambios</b>, precisamente para que el equipo trabaje en un ambiente de corto plazo pero estable. Los cambios se agregan a la pila de producto (backlog) y se priorizan para sprints siguientes."
   },
   {
     id: "ISW-006", parcial: "Parcial 1", tema: "Software y sus categorías", dificultad: "facil", tipo: "multiple",
@@ -98,9 +103,14 @@ const preguntas = [
   {
     id: "ISW-014", parcial: "Parcial 1", tema: "Modelos de proceso", dificultad: "media", tipo: "multiple",
     q: "El modelo de proceso incremental es especialmente útil cuando:",
-    options: ["el cliente ignora por completo los detalles de lo que necesita", "no se cuenta con personal para la implementación completa en el plazo establecido por el negocio", "los requerimientos nunca cambian", "el proyecto no requiere entregas operables"],
+    options: [
+      "El cliente desconoce los requerimientos detallados y requiere explorar interfaces",
+      "Falta personal suficiente para abordar la entrega completa en el plazo establecido",
+      "Los requerimientos están completamente congelados y no admiten ninguna variación",
+      "El usuario final rechaza recibir versiones operativas tempranas antes del cierre"
+    ],
     correct: 1,
-    exp: "El modelo incremental entrega <b>avances (incrementos) que son productos operables</b>; es útil cuando falta personal para implementar todo en el plazo del negocio. El caso del cliente que ignora los detalles corresponde al prototipo."
+    exp: "El modelo incremental entrega <b>incrementos operables tempranos</b>; es especialmente útil cuando falta personal para implementar todo en el plazo del negocio y se debe priorizar un núcleo funcional."
   },
   {
     id: "ISW-015", parcial: "Parcial 1", tema: "Modelos de proceso", dificultad: "media", tipo: "multiple",
@@ -123,7 +133,7 @@ const preguntas = [
     exp: "El PU avanza de <b>concepción</b> (requerimientos del negocio y plan) a <b>elaboración</b> (casos de uso y arquitectura ampliada), <b>construcción</b> (componentes operativos), <b>transición</b> (pruebas beta y entrega) y <b>producción</b> (soporte y evaluación de cambios)."
   },
   {
-    id: "ISW-018", parcial: "Parcial 1", tema: "Scrum", dificultad: "facil", tipo: "multiple",
+    id: "ISW-018", parcial: "Parcial 1", tema: "Metodologías ágiles", dificultad: "facil", tipo: "multiple",
     q: "En el Manifiesto Ágil, ¿qué se valora por encima de apegarse a un plan?",
     options: ["La documentación exhaustiva", "Responder al cambio", "La negociación del contrato", "Los procesos y las herramientas"],
     correct: 1,
@@ -146,7 +156,12 @@ const preguntas = [
   {
     id: "ISW-021", parcial: "Parcial 1", tema: "Historias de usuario", dificultad: "facil", tipo: "multiple",
     q: "Una historia de usuario se caracteriza por ser:",
-    options: ["el contrato formal del proyecto", "una explicación general e informal de una función, escrita desde la perspectiva del usuario final", "un diagrama técnico de base de datos", "la especificación detallada de la interfaz gráfica"],
+    options: [
+      "El contrato legal vinculante que fija las cláusulas de entrega final",
+      "Una explicación breve de una función desde la perspectiva del usuario final",
+      "El modelo relacional detallado de tablas y restricciones de la base de datos",
+      "La especificación técnica cerrada de los componentes de la interfaz de usuario"
+    ],
     correct: 1,
     exp: "Una historia de usuario es una <b>explicación general e informal</b> de una función de software, escrita desde la perspectiva del usuario final, cuyo propósito es articular cómo esa función dará <b>valor al cliente</b>. Es la unidad de trabajo más pequeña del marco ágil."
   },
@@ -192,7 +207,12 @@ const preguntas = [
   {
     id: "ISW-027", parcial: "Parcial 1", tema: "UML y casos de uso", dificultad: "media", tipo: "multiple",
     q: "En el análisis de casos de uso, un escenario secundario (excepción) describe:",
-    options: ["la secuencia ideal de pasos sin alternativas", "una situación, condición de falla o alternativa elegida por el actor que provoca un comportamiento distinto del sistema", "la lista de requerimientos no funcionales", "el plan de pruebas del sistema"],
+    options: [
+      "La secuencia lineal y óptima de pasos que culmina con éxito sin ninguna desviación",
+      "Una condición de falla o camino alternativo que hace que el sistema varíe su conducta",
+      "El catálogo completo de requerimientos no funcionales y atributos de calidad esperados",
+      "El plan de pruebas unitarias y de integración definido para validar la implementación"
+    ],
     correct: 1,
     exp: "Un <b>escenario secundario o excepción</b> describe una condición de falla o una alternativa elegida por el actor que hace que el sistema <b>exhiba un comportamiento distinto</b>. Cada paso del escenario principal debe evaluarse considerando sus alternativas."
   },
@@ -226,14 +246,24 @@ const preguntas = [
   {
     id: "ISW-032", parcial: "Parcial 1", tema: "Diseño de software", dificultad: "media", tipo: "multiple",
     q: "Durante la evaluación del diseño, el equipo verifica el modelo para detectar:",
-    options: ["solo errores de sintaxis del código", "errores, inconsistencias, omisiones, cumplimiento de restricciones de costo y tiempo, y viabilidad técnica", "la opinión del cliente sobre los colores de la interfaz", "la cantidad de líneas de código producidas"],
+    options: [
+      "Defectos de sintaxis, variables sin tipar y advertencias del compilador en el código",
+      "Inconsistencias, omisiones, viabilidad técnica y cumplimiento de costo y tiempo",
+      "Preferencias estéticas subjetivas del cliente sobre la paleta de colores del prototipo",
+      "Métricas brutas de productividad basadas en volumen de líneas de código producidas"
+    ],
     correct: 1,
     exp: "La evaluación del diseño verifica <b>errores, inconsistencias y omisiones</b>, el cumplimiento de <b>restricciones de costo y tiempo</b> y la <b>viabilidad técnica</b>. Es una revisión del modelo, no del código."
   },
   {
     id: "ISW-033", parcial: "Parcial 1", tema: "Diseño de software", dificultad: "dificil", tipo: "multiple",
     q: "En el diseño de software, la diversificación y la convergencia consisten respectivamente en:",
-    options: ["copiar diseños existentes y eliminar la documentación", "generar múltiples alternativas de diseño y evaluarlas para seleccionar la mejor según los requerimientos funcionales y no funcionales", "agregar más funcionalidades y reducir las pruebas", "aumentar la deuda técnica y luego pagarla"],
+    options: [
+      "Reutilizar patrones preexistentes sin modificaciones y descartar el modelado de arquitectura",
+      "Crear múltiples alternativas de diseño y evaluarlas para elegir la solución más adecuada",
+      "Ampliar el catálogo de funcionalidades del sistema suprimiendo las etapas de verificación",
+      "Aceptar atajos rápidos para acelerar el desarrollo y aplazar la refactorización para el cierre"
+    ],
     correct: 1,
     exp: "<b>Diversificar</b> es generar múltiples alternativas de diseño; <b>converger</b> es evaluarlas y seleccionar la mejor solución según los requerimientos funcionales y no funcionales. Juntas equilibran creatividad y decisión técnica."
   },
@@ -254,7 +284,7 @@ const preguntas = [
   {
     id: "ISW-036",
     parcial: "Parcial 1",
-    tema: "Casos de Uso",
+    tema: "UML y casos de uso",
     dificultad: "media",
     tipo: "diagrama",
     subtipo: "casos-uso",
@@ -270,7 +300,7 @@ const preguntas = [
   {
     id: "ISW-037",
     parcial: "Parcial 1",
-    tema: "Diagramas de Actividad",
+    tema: "UML y casos de uso",
     dificultad: "dificil",
     tipo: "diagrama",
     subtipo: "actividades",
@@ -373,7 +403,7 @@ const preguntas = [
     q: "En Scrum, ¿en qué consisten las \"demostraciones preliminares\"?",
     options: ["En presentar el acta de constitución del proyecto al comité directivo", "En entregar el incremento de software al cliente para demostrar y evaluar la funcionalidad implementada", "En mostrar el diagrama de Gantt actualizado cada fin de mes", "En ejecutar las pruebas beta con usuarios externos antes del lanzamiento"],
     correct: 1,
-    exp: "Las demostraciones preliminares <b>entregan el incremento de software al cliente</b> para que la funcionalidad que se va implementando pueda <b>demostrarse y evaluarse</b>. Son una de las cuatro acciones de desarrollo de Scrum junto con el retraso, los sprints y las reuniones diarias."
+    exp: "Las demostraciones preliminares <b>entregan el incremento de software al cliente</b> para que la funcionalidad que se va implementando pueda <b>demostrarse y evaluarse</b>. Son una de las cuatro acciones de desarrollo de Scrum junto con la pila de producto (backlog), los sprints y las reuniones diarias."
   },
   {
     id: "ISW-050", parcial: "Parcial 1", tema: "Modelos de proceso", dificultad: "dificil", tipo: "multiple",
@@ -406,16 +436,16 @@ const preguntas = [
   },
   {
     id: "ISW-054", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "multiple",
-    q: "¿Quién es responsable de ordenar y priorizar los elementos del retraso (backlog) del producto para maximizar su valor?",
+    q: "¿Quién es responsable de ordenar y priorizar los elementos de la pila de producto (Product Backlog) para maximizar su valor?",
     options: ["El maestro Scrum", "El dueño del producto (Product Owner)", "Cada desarrollador según su criterio", "El gerente de calidad al cierre del sprint"],
     correct: 1,
-    exp: "El <b>dueño del producto</b> representa los intereses del cliente y es quien ordena y prioriza el retraso para maximizar el valor del producto. El maestro Scrum facilita el proceso y el equipo de desarrollo construye el incremento."
+    exp: "El <b>dueño del producto</b> representa los intereses del cliente y es quien ordena y prioriza la pila de producto (Product Backlog) para maximizar el valor del producto. El maestro Scrum facilita el proceso y el equipo de desarrollo construye el incremento."
   },
   {
     id: "ISW-055", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "ordenar",
     q: "Ordena los eventos de un sprint de Scrum desde su inicio hasta su cierre.",
     bloques: ["Planeación del sprint", "Reuniones diarias durante el sprint", "Revisión del sprint (demostración del incremento)", "Retrospectiva del sprint"],
-    exp: "El sprint arranca con la <b>planeación</b> (se elige el trabajo del retraso que se abordará), continúa con las <b>reuniones diarias</b> durante el desarrollo y termina con la <b>revisión</b> (demostración del incremento al cliente) y la <b>retrospectiva</b> (mejora del propio proceso del equipo)."
+    exp: "El sprint arranca con la <b>planeación</b> (se elige el trabajo de la pila de producto que se abordará), continúa con las <b>reuniones diarias</b> durante el desarrollo y termina con la <b>revisión</b> (demostración del incremento al cliente) y la <b>retrospectiva</b> (mejora del propio proceso del equipo)."
   },
   {
     id: "ISW-056", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "vf",
@@ -425,16 +455,16 @@ const preguntas = [
   },
   {
     id: "ISW-057", parcial: "Parcial 1", tema: "Scrum", dificultad: "dificil", tipo: "multi",
-    q: "¿Cuáles de las siguientes afirmaciones sobre el retraso (backlog) del producto son correctas?",
-    options: ["Es una lista priorizada de lo que necesita el producto", "Puede actualizarse y reordenarse durante el proyecto", "Los elementos de mayor prioridad deben estar más claros y detallados que los de menor prioridad", "Queda congelado después del primer sprint y no admite cambios"],
+    q: "¿Cuáles de las siguientes afirmaciones sobre la pila de producto (Product Backlog) son correctas?",
+    options: ["Es una lista priorizada de lo que necesita el producto", "Puede actualizarse y reordenarse durante el proyecto", "Los elementos de mayor prioridad deben estar más claros y detallados que los de menor prioridad", "Queda congelada después del primer sprint y no admite cambios"],
     correctos: [0, 1, 2],
-    exp: "El retraso es una lista <b>viva y priorizada</b>: se puede actualizar y reordenar a lo largo del proyecto, y los elementos más prioritarios se detallan más porque serán los primeros en trabajarse. No se congela tras el primer sprint: su flexibilidad es justamente lo que permite responder al cambio."
+    exp: "La pila de producto (Product Backlog) es una lista <b>viva y priorizada</b>: se puede actualizar y reordenar a lo largo del proyecto, y los elementos más prioritarios se detallan más porque serán los primeros en trabajarse. No se congela tras el primer sprint: su flexibilidad es justamente lo que permite responder al cambio."
   },
   {
     id: "ISW-058", parcial: "Parcial 1", tema: "Scrum", dificultad: "media", tipo: "desarrollo",
     q: "Describe los tres roles del equipo Scrum (dueño del producto, maestro Scrum y equipo de desarrollo) y la responsabilidad principal de cada uno.",
-    solucion: "El dueño del producto (Product Owner) representa los intereses del cliente y de los interesados, y es responsable de gestionar y priorizar el retraso (backlog) para maximizar el valor del producto. El maestro Scrum (Scrum Master) facilita el proceso, dirige las reuniones y ayuda a eliminar los obstáculos del equipo. El equipo de desarrollo es un grupo autoorganizado y multidisciplinario que construye el incremento de software en cada sprint.",
-    claves: ["dueño del producto", "maestro scrum", "equipo de desarrollo", "retraso"],
+    solucion: "El dueño del producto (Product Owner) representa los intereses del cliente y de los interesados, y es responsable de gestionar y priorizar la pila de producto (Product Backlog) para maximizar el valor del producto. El maestro Scrum (Scrum Master) facilita el proceso, dirige las reuniones y ayuda a eliminar los obstáculos del equipo. El equipo de desarrollo es un grupo autoorganizado y multidisciplinario que construye el incremento de software en cada sprint.",
+    claves: ["dueño del producto", "maestro scrum", "equipo de desarrollo", "pila de producto", "backlog"],
     exp: "Los tres roles se complementan: el <b>dueño del producto</b> decide <i>qué</i> construir y en qué orden, el <b>equipo de desarrollo</b> decide <i>cómo</i> construirlo y el <b>maestro Scrum</b> cuida que el proceso funcione y que los obstáculos se eliminen."
   },
   {
@@ -726,7 +756,7 @@ const preguntas = [
   {
     id: "ISW-097",
     parcial: "Parcial 1",
-    tema: "Casos de Uso",
+    tema: "UML y casos de uso",
     dificultad: "media",
     tipo: "diagrama",
     subtipo: "casos-uso",
@@ -743,7 +773,7 @@ const preguntas = [
   {
     id: "ISW-098",
     parcial: "Parcial 1",
-    tema: "Diagramas de Actividad",
+    tema: "UML y casos de uso",
     dificultad: "dificil",
     tipo: "diagrama",
     subtipo: "actividades",
@@ -764,7 +794,7 @@ const preguntas = [
   {
     id: "ISW-099",
     parcial: "Parcial 1",
-    tema: "Casos de Uso",
+    tema: "UML y casos de uso",
     dificultad: "media",
     tipo: "multiple",
     q: "En un diagrama de casos de uso UML, ¿cuál es la diferencia fundamental entre una relación «include» y una relación «extend»?",
@@ -781,7 +811,7 @@ const preguntas = [
   {
     id: "ISW-100",
     parcial: "Parcial 1",
-    tema: "Diagramas de Actividad",
+    tema: "UML y casos de uso",
     dificultad: "media",
     tipo: "multiple",
     q: "En un diagrama de actividades UML, ¿qué representan las barras de sincronización (Fork y Join)?",
