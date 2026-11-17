@@ -32,8 +32,54 @@ export function indicesCorrectos(p) {
   return [];
 }
 
+// Detecta sesgos y defectos pedagógicos en preguntas de selección múltiple:
+// desbalance extremo de longitud, distractores cliché o traducciones erróneas.
+export function auditarCalidadOpciones(p) {
+  const avisos = [];
+  if (!p) return avisos;
+
+  // Sesgo de longitud en selección múltiple: si la opción más larga triplica a la más corta
+  // en textos de más de 10 caracteres, suele ser una pista involuntaria de la respuesta.
+  if (esArreglo(p.options) && p.options.length >= 3) {
+    const lens = p.options.map(o => sinHtml(o).trim().length).filter(l => l > 0);
+    if (lens.length === p.options.length) {
+      const min = Math.min(...lens);
+      const max = Math.max(...lens);
+      if (min >= 10 && max / min >= 2.8) {
+        avisos.push({
+          nivel: "aviso",
+          id: p.id,
+          msg: `desbalance de longitud en opciones (ratio ${Math.round((max / min) * 10) / 10}x: min ${min}c, max ${max}c)`
+        });
+      }
+    }
+
+    // Opciones trampa o de descarte fácil que empobrecen la evaluación formativa.
+    for (const opt of p.options) {
+      const txt = normalizar(opt);
+      if (/^(todas|ninguna)\s+(de\s+las\s+|las\s+)?anteriores\b/i.test(txt)) {
+        avisos.push({ nivel: "aviso", id: p.id, msg: `contiene opción cliché ("${opt}")` });
+      }
+    }
+  }
+
+  // Traducción defectuosa de 'backlog' como 'el retraso' en temas de gestión ágil.
+  const todoTexto = normalizar([p.q, ...(p.options || []), p.exp].join(" "));
+  if (/\b(el|del|un)\s+retraso\b/i.test(todoTexto) && /\b(scrum|sprint|agil|ágil|product\s+owner)\b/i.test(todoTexto)) {
+    avisos.push({ nivel: "aviso", id: p.id, msg: "usa traducción errónea de backlog como 'retraso'" });
+  }
+
+  // Preguntas dependientes de diapositivas o manuales específicos en lugar de conceptos universales.
+  if (/en\s+el\s+paso\s+\d+/i.test(normalizar(p.q))) {
+    avisos.push({ nivel: "aviso", id: p.id, msg: "enunciado acoplado a numeración de pasos de manual o diapositiva" });
+  }
+
+  return avisos;
+}
+
 // Análisis de calidad de una materia. Devuelve avisos con { nivel, id, msg }.
-export function analizarMateria(materia) {
+// estrictoCalidad activa los avisos de balance de distractores y terminología.
+export function analizarMateria(materia, { estrictoCalidad = false } = {}) {
   const avisos = [];
   const preguntas = esArreglo(materia.preguntas) ? materia.preguntas : [];
   const add = (nivel, id, msg) => avisos.push({ nivel, id, msg });
@@ -81,6 +127,11 @@ export function analizarMateria(materia) {
     }
     if (sinHtml(p.exp).trim().length < MIN_EXP) {
       add("aviso", p.id, `explicación muy corta (${sinHtml(p.exp).trim().length} caracteres); se esperan al menos ${MIN_EXP}`);
+    }
+    // Chequeos pedagógicos optativos de selección múltiple (sesgo de longitud, clichés y traducción).
+    if (estrictoCalidad) {
+      const fallas = auditarCalidadOpciones(p);
+      for (const f of fallas) add(f.nivel, f.id, f.msg);
     }
   }
 
