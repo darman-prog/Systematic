@@ -2,7 +2,7 @@ const preguntas = [
   {
     id: "P1-001",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "multiple",
     q: "Si necesitas borrar un registro de la tabla 'Profesor' y quieres que automáticamente se borren sus registros vinculados en la tabla 'Horas', ¿qué regla debes usar?",
@@ -30,7 +30,7 @@ const preguntas = [
   {
     id: "P1-003",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Cuál de las siguientes afirmaciones sobre los ÍNDICES en bases de datos es FALSA?",
@@ -46,7 +46,7 @@ const preguntas = [
   {
     id: "P1-004",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "facil",
     tipo: "multiple",
     q: "¿Cuál es una afirmación VERDADERA sobre el uso de Índices?",
@@ -208,7 +208,7 @@ const preguntas = [
   {
     id: "P1-015",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "facil",
     tipo: "multiple",
     q: "¿Qué garantiza una PRIMARY KEY sobre una columna?",
@@ -224,7 +224,7 @@ const preguntas = [
   {
     id: "P1-016",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "multiple",
     diagrama: true,
@@ -390,7 +390,7 @@ const preguntas = [
   {
     id: "P1-027",
     parcial: "Parcial 1",
-    tema: "DDL",
+    tema: "DML",
     dificultad: "facil",
     tipo: "vf",
     q: "El comando DELETE elimina la estructura de la tabla además de sus filas.",
@@ -402,7 +402,7 @@ const preguntas = [
   {
     id: "P1-028",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "media",
     tipo: "vf",
     q: "Un índice acelera las consultas SELECT, pero puede ralentizar los INSERT y UPDATE.",
@@ -414,7 +414,7 @@ const preguntas = [
   {
     id: "P1-029",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "vf",
     q: "ON DELETE CASCADE elimina automáticamente los registros hijos cuando se borra el registro padre.",
@@ -606,7 +606,7 @@ const preguntas = [
   {
     id: "P1-043",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "dragdrop",
     diagrama: true,
@@ -667,7 +667,7 @@ const preguntas = [
   {
     id: "P1-047",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "relacionar",
     diagrama: true,
@@ -754,7 +754,7 @@ const preguntas = [
   {
     id: "P1-052",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "multiple",
     diagrama: true,
@@ -810,9 +810,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Cuál es la diferencia principal entre DELETE y TRUNCATE?",
     options: [
-      "DELETE borra filas y admite WHERE; TRUNCATE vacía la tabla completa de una sola vez y no permite filtrar.",
-      "TRUNCATE borra una fila a la vez y DELETE borra toda la tabla.",
-      "Son exactamente sinónimos."
+      "DELETE elimina filas filtrando con WHERE; TRUNCATE reinicia el almacenamiento vaciando la tabla sin filtrar.",
+      "TRUNCATE elimina filas filtrando con WHERE; DELETE reinicia la estructura de la tabla y borra las columnas.",
+      "DELETE preserva el historial de transacciones fila por fila; TRUNCATE convierte la tabla en una vista de solo lectura."
     ],
     correct: 0,
     exp: "<code>DELETE</code> permite filtrar con <code>WHERE</code> y registra cada borrado; <code>TRUNCATE</code> vacía la tabla completa rápidamente y no acepta filtros de filas.",
@@ -833,7 +833,7 @@ const preguntas = [
   {
     id: "P1-057",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "facil",
     tipo: "vf",
     q: "Un índice acelera las búsquedas por esa columna, pero ocupa espacio adicional en disco.",
@@ -1024,7 +1024,7 @@ const preguntas = [
   {
     id: "P1-070",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "media",
     tipo: "multiple",
     caso: "Una consulta que filtra por ID_Profesor tarda mucho porque recorre toda la tabla Horas fila por fila.",
@@ -1092,7 +1092,7 @@ const preguntas = [
   {
     id: "P1-074",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "multiple",
     q: "Si intentas borrar un profesor que tiene horarios asociados y la llave foránea no tiene ON DELETE CASCADE, ¿qué ocurre?",
@@ -1108,7 +1108,7 @@ const preguntas = [
   {
     id: "P1-075",
     parcial: "Parcial 1",
-    tema: "Integridad",
+    tema: "Integridad y relaciones",
     dificultad: "media",
     tipo: "vf",
     q: "Una llave foránea puede apuntar a cualquier columna de otra tabla, aunque no sea única.",
@@ -1150,10 +1150,10 @@ const preguntas = [
     real: true,
     q: "Una consulta en una base de datos es:",
     options: [
-      "Ninguna de las anteriores",
+      "Un mecanismo de almacenamiento persistente que define el esquema físico en disco",
       "Una manera de seleccionar información de una o más tablas, visualizada como otra tabla",
-      "Una presentación de los datos en la vista de impresión",
-      "Una pantalla de introducción, consulta o modificación de datos en una o varias tablas"
+      "Una presentación formateada de datos diseñada para la vista de impresión o reporte",
+      "Una interfaz interactiva de introducción y modificación directa de datos en tablas"
     ],
     correct: 1,
     exp: "Una <b>consulta</b> (SELECT) toma datos de una o más tablas y los devuelve <i>como una tabla nueva</i>. La pantalla de introducción describe un formulario y la presentación en vista de impresión describe un reporte.",
@@ -1239,7 +1239,7 @@ const preguntas = [
   {
     id: "PR-06",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "facil",
     tipo: "multiple",
     real: true,
@@ -1252,7 +1252,7 @@ const preguntas = [
   {
     id: "PR-07",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "media",
     tipo: "multi",
     real: true,
@@ -1308,7 +1308,7 @@ const preguntas = [
   {
     id: "PR-10",
     parcial: "Parcial 1",
-    tema: "Índices",
+    tema: "Índices y rendimiento",
     dificultad: "dificil",
     tipo: "multi",
     real: true,
@@ -1565,9 +1565,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es un replica set en MongoDB?",
     options: [
-      "Un conjunto de nodos con los mismos datos (primario + secundarios) que da alta disponibilidad: si cae el primario, uno secundario toma su lugar",
-      "Una copia de seguridad manual en un archivo .bak",
-      "Un tipo de índice compuesto por varias columnas"
+      "Un clúster con primario y secundarios que garantiza alta disponibilidad con failover automático",
+      "Un proceso de respaldo en segundo plano que genera volcados periódicos del motor en disco",
+      "Una partición horizontal de colecciones distribuidas entre múltiples servidores de lectura"
     ],
     correct: 0,
     exp: "Replica set = <b>redundancia automática</b>. Escrituras al primario, lecturas replicadas, <b>failover</b> sin intervención. Disponibilidad, no escalado de escritura (eso es sharding)."
@@ -1580,9 +1580,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es el sharding y cuándo lo necesitas?",
     options: [
-      "Particionar los datos en fragmentos (shards) repartidos entre servidores cuando el volumen o el tráfico superan a un solo nodo",
-      "Fragmentar los documentos para que ocupen menos espacio en disco",
-      "Dividir la base en dos: una relacional y una documental"
+      "Distribuir fragmentos de datos entre varios servidores para escalar almacenamiento y operaciones",
+      "Comprimir y fragmentar documentos en disco para reducir el uso de memoria RAM en el nodo primario",
+      "Replicar colecciones completas en servidores espejo para duplicar la capacidad de escritura simultánea"
     ],
     correct: 0,
     exp: "Sharding = <b>escalado horizontal</b>: la shard key decide qué fragmento guarda cada dato. Potente pero con costo operativo; primero agota <b>índices y replica sets</b>."
@@ -1595,9 +1595,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es el _id y el ObjectId en un documento MongoDB?",
     options: [
-      "La clave primaria obligatoria del documento; el ObjectId es su valor por defecto: un identificador único de 12 bytes con marca de tiempo",
-      "Un comentario opcional que describe el documento",
-      "La contraseña de acceso a la colección"
+      "La clave primaria única del documento; el ObjectId es su valor por defecto de 12 bytes con timestamp",
+      "Un metadato mutable que almacena la ruta de almacenamiento físico del documento en los bloques del disco",
+      "Un hash criptográfico generado por el cliente para verificar la firma de autenticación en la colección"
     ],
     correct: 0,
     exp: "Todo documento tiene <b>_id único</b> (como el PRIMARY KEY). El <b>ObjectId</b> se genera solo, es globalmente único y hasta dice <b>cuándo</b> se creó el documento."
