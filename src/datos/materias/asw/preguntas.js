@@ -79,9 +79,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿En qué se diferencia la composición de la agregación?",
     options: [
-      "En la composición el componente solo puede existir como parte del contenedor; en la agregación puede existir sin él",
-      "En la agregación el contenedor gestiona el ciclo de vida del componente; en la composición no",
-      "No hay diferencia, son sinónimos en UML"
+      "En la composición el componente solo existe dentro del contenedor; en la agregación puede existir sin él",
+      "En la agregación el contenedor destruye al componente al cerrarse; en la composición sobrevive fuera",
+      "No hay diferencia semántica entre ambas relaciones; en UML son equivalentes para modelar pertenencia"
     ],
     correct: 0,
     exp: "En la <b>composición</b> rige la regla de «vivir o morir»: el componente no existe fuera del contenedor y este <b>gestiona su ciclo de vida</b>. En la <b>agregación</b> el componente es independiente: puede sobrevivir al contenedor e incluso vincularse a varios a la vez."
@@ -150,9 +150,9 @@ const preguntas = [
     tipo: "multiple",
     q: "Si la clase Cat depende de la interfaz Food en lugar de la clase concreta Sausage, ¿cuál es la ventaja principal?",
     options: [
-      "El programa compila más rápido",
-      "Mañana puedes crear Fish o Meat que implementen Food y el gato podrá usarlas sin modificar la clase Cat",
-      "Cat podrá comer cualquier clase de Java automáticamente"
+      "El compilador optimiza las llamadas polimórficas y reduce a la mitad el tiempo de ejecución del programa",
+      "Puedes crear nuevas clases como Fish o Meat que implementen Food sin tener que modificar el código de Cat",
+      "Cat hereda de forma automática los métodos privados de cualquier clase del paquete sin declararlos en Food"
     ],
     correct: 1,
     exp: "Depender de la abstracción <b>Food</b> desacopla a <b>Cat</b> de cualquier alimento concreto: nuevas implementaciones como <b>Fish</b> o <b>Meat</b> se integran sin tocar el código del gato. Eso es exactamente lo que persigue el principio de <b>programar a una interfaz</b>."
@@ -322,9 +322,9 @@ const preguntas = [
     tipo: "multiple",
     q: "En un sistema de archivos con archivos y carpetas anidadas, ¿qué propone el patrón Composite para calcular el tamaño total sin bucles if/isinstance?",
     options: [
-      "Crear un Proxy que calcule el tamaño antes de abrir cada archivo",
-      "Guardar el tamaño de cada carpeta en una base de datos",
-      "Tratar elementos simples (Leaves) y compuestos (Composite) con una interfaz común, de modo que el contenedor recorra a sus hijos y les pida la misma operación"
+      "Interponer un Proxy por cada archivo para interceptar la lectura del tamaño antes de abrir el descriptor",
+      "Centralizar el peso de cada carpeta en una tabla auxiliar que se recalcula tras cada escritura en disco",
+      "Unificar archivos y carpetas bajo una interfaz común para que el contenedor pida la operación a sus hijos"
     ],
     correct: 2,
     exp: "<b>Composite</b> unifica hojas y contenedores bajo la <b>misma interfaz</b>: si el hijo es un archivo devuelve su tamaño y si es una carpeta el cálculo se hace recursivamente. El contenedor ya no necesita saber qué tiene dentro, solo pedir la operación a todos sus hijos."
@@ -337,9 +337,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es un Proxy en el diseño de software?",
     options: [
-      "Un patrón creacional para clonar objetos costosos",
-      "Un sustituto o intermediario que controla el acceso a otro objeto y puede realizar tareas adicionales antes o después de delegar la petición",
-      "Un método de clase base que define el esqueleto de un algoritmo"
+      "Un patrón creacional encargado de clonar prototipos costosos en memoria para evitar su instanciación directa",
+      "Un intermediario con la misma interfaz del objeto real que controla su acceso y ejecuta lógica antes o después",
+      "Un método plantilla en una clase base que fija el esqueleto de un algoritmo para que lo completen las subclases"
     ],
     correct: 1,
     exp: "Un <b>Proxy</b> es un intermediario que implementa la <b>misma interfaz</b> que el objeto real: el cliente cree hablar con el original, pero el Proxy intercepta las llamadas para hacer validación, caché, logs o carga diferida, y solo cuando es necesario delega al objeto real."
@@ -486,10 +486,10 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué problema aparece si creas e inicializas de inmediato, al arrancar la aplicación, un objeto que consume muchos recursos (una consulta pesada a base de datos o la descarga de un archivo grande)?",
     options: [
-      "El objeto real pierde su interfaz y el cliente ya no puede llamarlo",
-      "Se desperdician memoria y recursos si el usuario finalmente no usa esa funcionalidad, y no hay un lugar limpio para verificar permisos, aplicar caché o registrar auditorías antes de la operación",
-      "El objeto se clona automáticamente y provoca una explosión de clases",
-      "El compilador duplica el constructor y la aplicación tarda más en iniciar"
+      "El objeto real pierde su interfaz pública en tiempo de ejecución y los clientes quedan acoplados a la BD",
+      "Se desperdicia memoria si nunca se usa y falta un punto limpio para aplicar caché, permisos o auditoría",
+      "El objeto se clona de manera recursiva en cada petición hasta provocar un desbordamiento de memoria",
+      "El compilador duplica los constructores heredados y bloquea el arranque de otros módulos independientes"
     ],
     correct: 1,
     exp: "Crear un objeto costoso al arrancar <b>desperdicia recursos</b> si nunca se usa y deja sin punto de control para <b>permisos, caché o auditoría</b>. El <b>Proxy</b> resuelve ambas cosas: intercepta las llamadas y delega al objeto real solo cuando es necesario."
@@ -539,10 +539,10 @@ const preguntas = [
     tipo: "multiple",
     q: "El primer principio de diseño (\"encapsula lo que varía\") puede aplicarse a dos niveles. ¿Cuáles?",
     options: [
-      "A nivel de paquete y a nivel de módulo",
-      "A nivel de base de datos y a nivel de red",
-      "A nivel de método (extraer el comportamiento que cambia a un método separado) y a nivel de clase (aislar lo que varía en unas pocas clases)",
-      "A nivel de compilación y a nivel de ejecución"
+      "A nivel de paquete de despliegue y a nivel de módulo de compilación independiente",
+      "A nivel de esquema de base de datos y a nivel de protocolo de transporte de red",
+      "A nivel de método (extraer la lógica variable) y de clase (aislarla en estrategias)",
+      "A nivel de análisis estático previo y a nivel de optimización en tiempo de ejecución"
     ],
     correct: 2,
     exp: "La separación se hace a nivel de <b>método</b> (el algoritmo general queda estable) o a nivel de <b>clase</b> (se puede cambiar la estrategia sin tocar las clases cliente), aislando las partes volátiles del resto del sistema."
@@ -555,10 +555,10 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Por qué conviene componer comportamientos mediante delegación en lugar de construir jerarquías de herencia profundas?",
     options: [
-      "Porque la herencia está prohibida en los lenguajes orientados a objetos",
-      "Porque la composición permite cambiar el comportamiento en tiempo de ejecución, combinar responsabilidades con flexibilidad y evita la fragilidad de las jerarquías, donde un cambio en la clase padre puede romper a todas las subclases",
-      "Porque la composición elimina la necesidad de escribir interfaces",
-      "Porque la herencia impide que las subclases sobrescriban métodos"
+      "Porque la herencia de clases está restringida en los lenguajes modernos orientados a objetos",
+      "Porque permite cambiar comportamientos en ejecución y evita jerarquías rígidas y frágiles",
+      "Porque la composición elimina la necesidad de definir interfaces o contratos entre objetos",
+      "Porque la herencia impide que las subclases sobrescriban métodos de su clase padre directa"
     ],
     correct: 1,
     exp: "Componer es más flexible: permite <b>cambiar el comportamiento en tiempo de ejecución</b> y evita la <b>fragilidad</b> de las jerarquías rígidas. La herencia sigue siendo útil para expresar <b>\"es-un\"</b>, pero para compartir comportamiento reutilizable (<b>\"tiene-un\"</b>) la composición es la opción más segura."
@@ -617,7 +617,7 @@ const preguntas = [
       "Que todas las clases del programa hereden de una única clase raíz",
       "Que un objeto pueda cambiar de clase durante la ejecución del programa",
       "Que los métodos privados puedan invocarse desde cualquier otra clase",
-      "Que objetos de clases distintas puedan tratarse de forma uniforme a través de una misma interfaz o clase base, y que el objeto concreto decida en tiempo de ejecución cómo responder a cada mensaje"
+      "Tratar objetos distintos bajo una misma interfaz con respuesta propia"
     ],
     correct: 3,
     exp: "El <b>polimorfismo</b> permite operar sobre una abstracción (por ejemplo, una interfaz <b>Forma</b>) y que el objeto concreto decida <b>en tiempo de ejecución</b> cómo responder a cada mensaje. No cambia de clase ni expone métodos privados."
@@ -661,10 +661,10 @@ const preguntas = [
     tipo: "multiple",
     q: "Una clase ya funciona y está probada. Según el Open/Closed Principle, ¿cómo se le agregan nuevos comportamientos?",
     options: [
-      "Modificando directamente su código interno para cubrir los nuevos casos",
-      "Haciendo públicos todos sus atributos para facilitar los cambios futuros",
-      "Mediante herencia, decoradores o composición, sin modificar su código interno; algunos lenguajes incluso permiten restringir la extensión con palabras clave como final",
-      "Renombrando la clase y publicándola de nuevo como versión 2"
+      "Editando directamente el cuerpo de sus métodos actuales para añadir las nuevas ramas lógicas",
+      "Exponiendo como públicos todos sus atributos internos para permitir ajustes desde fuera",
+      "Mediante herencia, decoradores o composición sin tocar el código original ya probado",
+      "Renombrando la clase existente y manteniendo copias paralelas por cada versión nueva"
     ],
     correct: 2,
     exp: "Una clase está <b>abierta</b> si puedes extenderla (subclases, nuevos métodos o campos, sobrescribir comportamiento) y <b>cerrada</b> a la modificación de su código ya probado. Palabras clave como <b>final</b> permiten incluso restringir la extensión."
@@ -811,7 +811,7 @@ const preguntas = [
   {
     id: "ASW-057",
     parcial: "Parcial 1",
-    tema: "N-Tier",
+    tema: "MVC y variantes",
     dificultad: "facil",
     tipo: "multiple",
     q: "En el patrón MVC, ¿cuál es la responsabilidad del Controller?",
@@ -826,7 +826,7 @@ const preguntas = [
   {
     id: "ASW-058",
     parcial: "Parcial 1",
-    tema: "N-Tier",
+    tema: "Arquitecturas móviles",
     dificultad: "media",
     tipo: "multiple",
     q: "Una empresa atiende Web, iOS, Android e IoT con un solo API y sufre over-fetching y under-fetching. ¿Qué patrón la ayuda y cómo?",
@@ -1004,9 +1004,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Cuándo conviene event-driven y cuál es su riesgo?",
     options: [
-      "Carga en ráfagas con productores y consumidores desacoplados por un broker; riesgo de flujo de control invisible",
-      "CRUD simple con una tabla; riesgo de SQL lento",
-      "Apps de consola; riesgo de teclado roto"
+      "Carga en ráfagas con productores y consumidores desacoplados por un broker; riesgo de flujo invisible",
+      "CRUD simple con una tabla relacional; riesgo de consultas SQL sin índices y bloqueo de filas",
+      "Procesos batch locales de consola; riesgo de pérdida de estado al reiniciar el proceso único"
     ],
     correct: 0,
     exp: "Event-driven <b>desacopla con un broker</b> y absorbe picos. El precio: nadie ve el <b>flujo completo</b> mirando un solo servicio; hay que rastrear eventos."
@@ -1019,9 +1019,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Para qué brilla serverless/FaaS y qué lo castiga?",
     options: [
-      "Tráfico constante alto; lo castiga el precio fijo",
-      "Trabajo esporádico disparado por eventos; lo castigan los arranques en frío y el costo a escala",
-      "Videojuegos 3D; lo castiga la GPU"
+      "Tráfico constante y predecible; lo castiga tener que pagar por instancias fijas infrautilizadas",
+      "Trabajo esporádico por eventos; lo castigan los arranques en frío (cold starts) y el costo a escala",
+      "Cargas de cómputo continuo con estado en GPU; lo castiga la falta de almacenamiento compartido"
     ],
     correct: 1,
     exp: "Serverless = <b>funciones bajo demanda, cero servidores que administrar</b>. Ideal para picos esporádicos; con tráfico sostenido los <b>cold starts y la factura</b> duelen."
@@ -1077,11 +1077,11 @@ const preguntas = [
     tema: "API REST",
     dificultad: "facil",
     tipo: "multiple",
-    q: "¿Qué es un recurso en REST?",
+    q: "En el modelo de madurez de Richardson para APIs REST, ¿qué representa exactamente un recurso?",
     options: [
-      "Un servidor muy potente",
-      "Cada cosa direccionable con su propia URI, como el pedido #42",
-      "Un único endpoint para todas las operaciones"
+      "Una máquina física o contenedor encargado de procesar las peticiones entrantes",
+      "Toda entidad o concepto direccionable con su propia URI, como `/pedidos/42`",
+      "Un único endpoint centralizado tipo RPC que recibe el nombre del método en el cuerpo"
     ],
     correct: 1,
     exp: "En REST todo lo importante es un <b>recurso con dirección propia</b> (`/pedidos/42`). Un solo endpoint para todo es <b>Nivel 0</b>: RPC tunelizado, no REST."
@@ -1092,11 +1092,11 @@ const preguntas = [
     tema: "API REST",
     dificultad: "facil",
     tipo: "multiple",
-    q: "¿Por qué GET es especial en REST?",
+    q: "¿Por qué el método HTTP GET tiene un tratamiento especial en la arquitectura REST frente a POST?",
     options: [
-      "Porque es el más rápido de todos",
-      "Porque es seguro: no cambia nada, así que es repetible y cacheable",
-      "Porque solo funciona con JSON"
+      "Porque comprime la carga útil automáticamente y reduce la latencia de red",
+      "Porque es seguro e idempotente: no altera estado y admite caché intermedia",
+      "Porque es el único verbo del protocolo HTTP que soporta respuestas en formato JSON"
     ],
     correct: 1,
     exp: "<b>GET no modifica estado</b>: se puede invocar mil veces en cualquier orden con igual resultado. Esa seguridad permite <b>caché</b> en cada intermediario, clave del rendimiento web."
@@ -1180,9 +1180,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué indica `@RestController` en Spring?",
     options: [
-      "Que la clase es la vista HTML",
-      "Que lo que devuelve cada método va directo al cuerpo de la respuesta, no a una plantilla",
-      "Que la clase se conecta sola a la base de datos"
+      "Que la clase renderiza directamente la vista HTML mediante plantillas del servidor",
+      "Que cada método escribe su retorno directo en el cuerpo HTTP, sin buscar plantilla",
+      "Que la clase gestiona automáticamente las transacciones y consultas con la base de datos"
     ],
     correct: 1,
     exp: "`@RestController` = <b>datos, no vistas</b>. Cada `@GetMapping`/`@PostMapping` escribe su retorno en el <b>cuerpo HTTP</b>; la BD llega por el repositorio inyectado, no por magia de la anotación."
@@ -1206,9 +1206,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué aporta MVVM frente a MVC?",
     options: [
-      "Elimina la necesidad de modelo",
+      "Elimina por completo el modelo de dominio y guarda los datos dentro de la vista",
       "Enlace declarativo (binding) entre la Vista y un ViewModel con el estado presentable",
-      "Compila más rápido que cualquier otro patrón"
+      "Sustituye el controlador por llamadas directas desde el HTML hacia la base de datos"
     ],
     correct: 1,
     exp: "MVVM = <b>binding bidireccional Vista ↔ ViewModel</b>. La vista declara qué mostrar y el framework sincroniza; brilla donde hay <b>enlace declarativo</b> (WPF, SwiftUI, front reactivo)."
@@ -1499,7 +1499,7 @@ const preguntas = [
   {
     id: "ASW-104",
     parcial: "Parcial 1",
-    tema: "Evolución de arquitecturas",
+    tema: "N-Tier",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Cuál es el principio clave de la arquitectura N-Tier por capas?",
@@ -1514,14 +1514,14 @@ const preguntas = [
   {
     id: "ASW-105",
     parcial: "Parcial 1",
-    tema: "Evolución de arquitecturas",
+    tema: "N-Tier",
     dificultad: "dificil",
     tipo: "multiple",
     q: "¿Qué permite una capa declarada como ABIERTA (open) en N-Tier?",
     options: [
-      "Que cualquier capa la ignore por completo sin consecuencias",
-      "Que la capa superior consuma sus utilidades o la atraviese directo (fast-lane) sin penalización estructural, como una capa de servicios compartidos",
-      "Que la capa deje de validar los contratos con la inferior"
+      "Que las capas superiores la omitan arbitrariamente incluso en capas cerradas vecinas",
+      "Que una petición la atraviese directo hacia la inferior (fast-lane) sin romper diseño",
+      "Que sus componentes dejen de respetar los contratos e interfaces definidos abajo"
     ],
     correct: 1,
     exp: "La capa abierta da <b>flexibilidad pragmática</b>: pasar directo está permitido ahí. En capas <b>cerradas</b>, el fast-lane rompe el aislamiento y acopla el sistema."
@@ -1529,14 +1529,14 @@ const preguntas = [
   {
     id: "ASW-106",
     parcial: "Parcial 1",
-    tema: "Evolución de arquitecturas",
+    tema: "N-Tier",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué es el antipatrón Architecture Sinkhole?",
     options: [
-      "Peticiones que atraviesan todas las capas como simples conductos (pass-through), sin ejecutar lógica, sumando costo sin valor",
-      "Un agujero de seguridad en la capa de presentación",
-      "Una base de datos que se hunde por falta de índices"
+      "Peticiones que atraviesan capas como meros conductos pass-through sin aportar lógica",
+      "Una vulnerabilidad de inyección que expone la base desde la capa de presentación",
+      "Una degradación severa de consultas cuando faltan índices en la capa de persistencia"
     ],
     correct: 0,
     exp: "El sumidero <b>gasta CPU/memoria en puro tránsito</b>: objetos instanciados solo para pasar el mensaje. Estructura que cuesta y no aporta."
@@ -1544,14 +1544,14 @@ const preguntas = [
   {
     id: "ASW-107",
     parcial: "Parcial 1",
-    tema: "Evolución de arquitecturas",
+    tema: "N-Tier",
     dificultad: "media",
     tipo: "multiple",
     q: "¿Qué dice la regla del 80/20 frente al Architecture Sinkhole?",
     options: [
-      "Que el 80% del código debe estar en la UI y el 20% en la BD",
-      "Aceptable si solo el 20% de las peticiones son conductos directos; si el 80% son sinkholes, el patrón N-Tier es el equivocado",
-      "Que hay que reescribir el sistema cuando el 20% de los tests falla"
+      "Que el 80% de las validaciones deben vivir en la UI y el 20% en procedimientos almacenados",
+      "Que es tolerable hasta 20% de pass-through; si llega al 80%, N-Tier es el patrón errado",
+      "Que conviene migrar a microservicios en cuanto el 20% de las rutas superan el segundo"
     ],
     correct: 1,
     exp: "Un poco de pass-through es normal. Si <b>casi todo</b> atraviesa sin aportar lógica, las capas <b>estorban</b>: ese sistema no necesitaba N-Tier."
@@ -1564,9 +1564,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué diferencia un corte horizontal de uno vertical?",
     options: [
-      "El horizontal organiza por roles técnicos (presentación/lógica/datos) y un cambio de negocio toca todas las capas; el vertical organiza por flujos de dominio (Catálogo, Checkout, Pagos) y el cambio queda encapsulado",
-      "El horizontal es para monolitos y el vertical solo para mainframes",
-      "No hay diferencia: son dos nombres del mismo particionamiento"
+      "El horizontal agrupa por roles técnicos (UI/lógica/datos); el vertical por flujos de dominio",
+      "El horizontal aplica a aplicaciones web modernas y el vertical solo a sistemas legacy",
+      "No existe diferencia real: ambos describen la misma separación física entre servidores"
     ],
     correct: 0,
     exp: "Horizontal = <b>técnica</b> (domain smearing: el Checkout untado en todas las capas). Vertical = <b>dominio/DDD</b> (cada módulo lleva su propia pila). Ese es el punto de inflexión."
@@ -1579,9 +1579,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es un quantum arquitectónico y qué lo diferencia entre monolito y distribuido?",
     options: [
-      "Un artefacto desplegable independiente con alta cohesión: en el monolito Quantum = 1 (todo comparte perfil operativo) y en lo distribuido Quantum = N (cada servicio escala y despliega solo)",
-      "Una unidad de medida del código espagueti en el Big Ball of Mud",
-      "El número de capas que tiene el sistema"
+      "Una unidad desplegable autónoma: en monolito Quantum = 1; en distribuido Quantum = N",
+      "Una métrica de deuda técnica para medir código acoplado en un Big Ball of Mud",
+      "La cantidad exacta de capas técnicas que atraviesa una petición de usuario"
     ],
     correct: 0,
     exp: "Quantum = <b>lo que se despliega junto</b>. Monolito: no puedes escalar Pagos sin escalar Reportes. Distribuido: cada servicio con <b>perfil operativo propio</b>."
@@ -1609,9 +1609,9 @@ const preguntas = [
     tipo: "multiple",
     q: "En tolerancia a fallos (MTTR), ¿qué cambia del monolito al distribuido?",
     options: [
-      "Nada: ambos se caen completos ante cualquier error",
-      "En el monolito un error fatal derriba la aplicación; en redes distribuidas el fallo se aísla en un nodo y se preserva la disponibilidad global",
-      "El distribuido elimina todos los errores posibles"
+      "Nada esencial: ambos estilos colapsan por completo ante cualquier excepción no capturada",
+      "En el monolito un fallo fatal derriba todo el proceso; en lo distribuido se aísla por nodo",
+      "El sistema distribuido previene automáticamente cualquier fallo de red o base de datos"
     ],
     correct: 1,
     exp: "<b>Aislamiento de fallos</b>: el error queda contenido en un nodo. Por eso lo distribuido gana en el radar de tolerancia, aunque pierda en simplicidad."
@@ -1650,9 +1650,9 @@ const preguntas = [
     tipo: "multiple",
     q: "Falacia 5: «la topología nunca cambia». ¿Cuál es la realidad en sistemas distribuidos?",
     options: [
-      "Que los servidores físicos nunca se apagan",
-      "Los contenedores suben y bajan dinámicamente: la arquitectura requiere descubrimiento de servicios (Service Registries)",
-      "Que la topología la fija el programador una sola vez"
+      "Que los servidores físicos y direcciones IP permanecen inmutables tras el despliegue",
+      "Los contenedores nacen y mueren de forma dinámica, exigiendo Service Registries",
+      "Que la topología queda fijada de forma estática por el arquitecto en tiempo de compilación"
     ],
     correct: 1,
     exp: "En la nube <b>nada es estático</b>: los nodos nacen y mueren. Sin <b>service discovery</b>, los servicios pierden de vista a sus vecinos."
@@ -1682,9 +1682,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es la arquitectura de microservicios?",
     options: [
-      "Un monolito dividido en tres niveles físicos",
-      "Un enfoque donde una aplicación grande se construye como un conjunto de servicios independientes y especializados, cada uno autónomo con su propia base de datos",
-      "Una técnica para escribir todo el sistema en un solo archivo desplegable"
+      "Un monolito dividido en tres capas físicas sobre servidores separados con base única",
+      "Servicios autónomos y especializados por dominio, cada uno con su propia base de datos",
+      "Una técnica de empaquetado para desplegar todo el backend dentro de un único binario"
     ],
     correct: 1,
     exp: "Microservicios = <b>servicios autónomos por dominio</b> (usuarios, pedidos, pagos...), cada uno con su BD. Lo opuesto al <b>bloque único</b> con BD compartida."
@@ -1713,9 +1713,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué es un Bounded Context (DDD) y qué rol juega en microservicios?",
     options: [
-      "Un límite de memoria que no puede superar cada servicio",
-      "La frontera explícita del modelo de dominio que define la responsabilidad exacta de cada microservicio, con lenguaje ubicuo sin ambigüedades",
-      "Un tipo de balanceador de carga entre servicios"
+      "Un límite estricto de memoria RAM asignado a cada contenedor en producción",
+      "La frontera explícita del modelo de dominio y lenguaje ubicuo de cada microservicio",
+      "Un algoritmo de balanceo de carga que reparte el tráfico entre réplicas activas"
     ],
     correct: 1,
     exp: "El Bounded Context <b>dibuja la frontera</b>: qué es de este servicio y qué no. Sin fronteras explícitas, los servicios se pisan y el lenguaje se vuelve ambiguo."
@@ -1786,11 +1786,11 @@ const preguntas = [
     tema: "Microservicios",
     dificultad: "dificil",
     tipo: "multiple",
-    q: "¿Qué es CQRS?",
+    q: "En sistemas distribuidos y orientados a eventos, ¿qué propone el patrón CQRS?",
     options: [
-      "Un protocolo de red para comunicar microservicios",
-      "La segregación de responsabilidades entre comandos y consultas: separar el modelo de lectura optimizada del modelo de escritura",
-      "Una técnica de respaldo incremental de bases de datos"
+      "Un protocolo binario de red para acelerar llamadas síncronas entre microservicios",
+      "Separar los modelos de escritura (comandos) y lectura (consultas) para escalarlos aparte",
+      "Una estrategia de respaldo incremental para replicar tablas entre regiones geográficas"
     ],
     correct: 1,
     exp: "CQRS = <b>leer y escribir por modelos distintos</b>. Las lecturas van a vistas optimizadas; las escrituras al modelo de dominio. Escala cada lado por separado."
@@ -1801,11 +1801,11 @@ const preguntas = [
     tema: "Microservicios",
     dificultad: "dificil",
     tipo: "multiple",
-    q: "¿Qué es Event Sourcing?",
+    q: "¿En qué consiste el patrón Event Sourcing dentro de una arquitectura de microservicios?",
     options: [
-      "Persistir los cambios como una secuencia inmutable de eventos en lugar de actualizar el estado actual",
-      "Enviar correos de notificación cada vez que cambia un dato",
-      "Guardar el estado actual y borrar el historial para ahorrar espacio"
+      "Persistir los cambios como secuencia inmutable de eventos en vez de sobrescribir el estado",
+      "Enviar notificaciones por correo o webhook cada vez que un usuario actualiza un registro",
+      "Guardar únicamente la fotografía del estado actual y purgar el historial de auditoría"
     ],
     correct: 0,
     exp: "Event Sourcing = <b>el historial es la verdad</b>. El estado se reconstruye rejugando eventos. Auditoría gratis y viaje en el tiempo; cuesta vistas de lectura."
@@ -1818,9 +1818,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿En qué se diferencian orquestación y coreografía?",
     options: [
-      "Son sinónimos: ambas usan un orquestador central",
-      "Orquestación: un coordinador central dirige paso a paso (visible, pero riesgo de monolito distribuido). Coreografía: cada servicio escucha eventos y reacciona solo (máximo desacople, pero difícil de rastrear)",
-      "La coreografía solo sirve para procesos síncronos simples"
+      "Son sinónimos en microservicios: ambos exigen un coordinante central que ejecute cada paso",
+      "Orquestación usa coordinador central; coreografía reacciona a eventos con mayor desacople",
+      "La coreografía solo aplica a procesos síncronos REST donde un servicio espera al otro"
     ],
     correct: 1,
     exp: "Orquestador = <b>director de orquesta</b> (claro pero centralizado). Coreografía = <b>baile sin director</b> (escalable pero difícil de depurar). Elige según el proceso."
@@ -1833,9 +1833,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Cómo gestiona el patrón Saga una transacción distribuida?",
     options: [
-      "Bloqueando todas las bases con un ACID global hasta terminar",
-      "Como secuencia de transacciones locales: cada servicio ejecuta la suya y publica el evento que dispara la siguiente; si un paso falla, transacciones compensatorias en orden inverso deshacen lo hecho",
-      "Evitando las transacciones por completo y aceptando datos corruptos"
+      "Bloqueando todas las bases de datos distribuidas bajo un protocolo ACID global de dos fases",
+      "Con transacciones locales encadenadas por eventos y acciones compensatorias si alguna falla",
+      "Omitiendo las transacciones por completo y tolerando registros inconsistentes sin reversión"
     ],
     correct: 1,
     exp: "Saga = <b>consistencia eventual con plan B</b>. Sin bloqueos globales (rápido y disponible), pero cada paso necesita su <b>acción de reversión</b>."
@@ -1863,9 +1863,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué hace Data Liberation con CDC (ej. Debezium)?",
     options: [
-      "Borra los datos legacy para liberar espacio",
-      "Captura cambios directos en la BD del monolito y publica eventos en tiempo real al broker, alimentando los nuevos servicios sin modificar el código legacy",
-      "Libera a los desarrolladores de escribir pruebas de integración"
+      "Depura y elimina registros antiguos del sistema legacy para reducir el tamaño del esquema",
+      "Captura cambios de la BD legacy y publica eventos al broker sin tocar el código original",
+      "Genera mocks automáticos para reemplazar pruebas de integración contra la base heredada"
     ],
     correct: 1,
     exp: "CDC = <b>espiar la BD vieja sin tocarla</b>. Cada cambio se vuelve evento y los servicios nuevos se alimentan frescos mientras el legacy sigue vivo."
