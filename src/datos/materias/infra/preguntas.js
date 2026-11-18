@@ -35,10 +35,15 @@ const preguntas = [
     tema: "Linux: máquina virtual e instalación",
     dificultad: "facil",
     tipo: "multiple",
-    q: "¿Qué tamaño de memoria RAM asigna el manual a la máquina virtual de Fedora Server?",
-    options: ["256 MB", "512 MB", "1024 MB", "2048 MB"],
-    correct: 2,
-    exp: "El manual asigna <b>1024 MB</b>, un valor suficiente para una instalación mínima sin entorno gráfico. Aconseja además que la RAM de la máquina anfitriona sea lo bastante grande como para que funcionen bien la máquina real y la virtual a la vez."
+    q: "¿Qué criterio técnico conviene aplicar al asignar memoria RAM a una máquina virtual Linux Server sin entorno gráfico?",
+    options: [
+      "Asignar toda la RAM física del equipo anfitrión para maximizar el rendimiento del invitado",
+      "Reservar al menos 1024 MB dejando margen suficiente para que el anfitrión opere estable",
+      "Limitarla siempre a 128 MB porque una terminal de Linux nunca supera ese consumo base",
+      "Asignar el doble de la RAM física usando únicamente memoria swap en disco desde el inicio"
+    ],
+    correct: 1,
+    exp: "Un servidor Linux sin entorno gráfico funciona con soltura desde <b>1024 MB de RAM</b>, pero siempre debe dejarse memoria libre para que el sistema anfitrión y el invitado convivan sin paginación excesiva."
   },
   {
     id: "INF-004",
@@ -46,15 +51,15 @@ const preguntas = [
     tema: "Linux: máquina virtual e instalación",
     dificultad: "facil",
     tipo: "multiple",
-    q: "¿Qué tamaño y qué tipo de crecimiento tiene el disco virtual creado en el manual?",
+    q: "¿Cuál es la principal diferencia entre un disco virtual de crecimiento dinámico y uno de tamaño fijo?",
     options: [
-      "80 GB con crecimiento dinámico",
-      "40 GB de tamaño fijo",
-      "80 GB de tamaño fijo",
-      "20 GB con crecimiento dinámico"
+      "El dinámico ocupa espacio real conforme se escriben datos; el fijo lo reserva todo al crearse",
+      "El dinámico limita la capacidad máxima a 20 GB; el fijo permite ampliarla en caliente sin formato",
+      "El dinámico solo funciona en sistemas Linux; el fijo es obligatorio para máquinas con Windows",
+      "El dinámico guarda los datos únicamente en RAM; el fijo escribe directamente sobre el disco físico"
     ],
     correct: 0,
-    exp: "<b>80 GB de crecimiento dinámico.</b> El disco empieza pequeño y se va ajustando durante la instalación según se usa, en lugar de reservar los 80 GB desde el inicio (tamaño fijo). 80 GB es suficiente para la mayoría de los sistemas operativos."
+    exp: "Un disco de <b>crecimiento dinámico</b> arranca ocupando pocos megabytes y crece hasta el tope configurado según se usa; el de <b>tamaño fijo</b> reserva todo el espacio en disco desde el momento de su creación."
   },
   {
     id: "INF-005",
@@ -62,15 +67,15 @@ const preguntas = [
     tema: "Linux: máquina virtual e instalación",
     dificultad: "media",
     tipo: "multiple",
-    q: "En el paso 12 del manual se configura la tarjeta de red en modo NAT. ¿Qué significa esto para la máquina virtual?",
+    q: "Al configurar la tarjeta de red de una máquina virtual en modo NAT, ¿qué comportamiento de red obtiene?",
     options: [
-      "Obtiene una IP en un rango distinto al de la máquina real, asignada dinámicamente por DHCP",
-      "Recibe la misma IP que el equipo anfitrón",
-      "Queda aislada: no puede comunicarse con el anfitrón ni con internet",
-      "Debe configurarse la IP a mano con ifconfig antes de arrancar"
+      "Obtiene una IP en una subred virtual distinta por DHCP y sale a internet vía el anfitrión",
+      "Recibe exactamente la misma dirección IP física que tiene asignada la tarjeta del anfitrión",
+      "Queda completamente aislada en modo solo-anfitrión sin salida posible hacia internet",
+      "Exige configurar manualmente una dirección IP estática antes de poder encender la máquina"
     ],
     correct: 0,
-    exp: "<b>NAT (Network Address Translation).</b> La máquina virtual sale a internet a través del anfitrón con una IP en un rango diferente, asignada por DHCP. No recibe la misma IP, no queda aislada y no hace falta configurar la IP a mano."
+    exp: "<b>NAT (Network Address Translation).</b> La máquina virtual recibe por DHCP una IP privada en una red interna del hipervisor y traduce su tráfico a través del anfitrión para salir a internet."
   },
   {
     id: "INF-006",
@@ -730,7 +735,12 @@ const preguntas = [
     dificultad: "media",
     tipo: "multiple",
     q: "Dentro de la consola psql, ¿qué comando cambia la contraseña de un usuario de PostgreSQL?",
-    options: ["ALTER USER usuario WITH PASSWORD 'clave'", "SET PASSWORD usuario = 'clave'", "UPDATE pg_user SET password", "passwd usuario"],
+    options: [
+      "ALTER USER usuario WITH PASSWORD 'clave'",
+      "SET PASSWORD FOR usuario = 'clave'",
+      "UPDATE pg_user SET password = 'clave'",
+      "passwd usuario --postgres"
+    ],
     correct: 0,
     exp: "<b>ALTER USER postgres WITH PASSWORD 'clave';</b> cambia la contraseña dentro de psql. «passwd» es el comando del sistema operativo, no de PostgreSQL."
   },
@@ -804,8 +814,8 @@ const preguntas = [
   },
   {
     id: "INF-105",
-    parcial: "Linux",
-    tema: "Linux: usuarios y grupos",
+    parcial: "Redes",
+    tema: "Redes: direcciones IP y máscaras",
     dificultad: "media",
     tipo: "multi",
     q: "¿Cuáles de estas son direcciones IP privadas según RFC 1918? (seleccioná todas las correctas)",
@@ -827,7 +837,7 @@ const preguntas = [
   {
     id: "INF-107",
     parcial: "Linux",
-    tema: "Linux: SSH",
+    tema: "Linux: comandos básicos",
     dificultad: "facil",
     tipo: "multi",
     q: "¿Cuáles de estos son servicios de Linux? (seleccioná todas las correctas)",
@@ -1270,9 +1280,9 @@ const preguntasRedes = [
     q: "¿Qué ventaja tiene la caché DNS de un host?",
     options: [
       "Evita volver a consultar el servidor DNS para nombres ya resueltos recientemente",
-      "Asigna direcciones IP automáticamente",
-      "Cifra las consultas DNS",
-      "Bloquea el acceso a dominios desconocidos"
+      "Asigna direcciones IP dinámicas a los equipos nuevos que se conectan a la red",
+      "Cifra automáticamente todas las consultas DNS salientes con certificados TLS",
+      "Bloquea el acceso a dominios desconocidos sin necesidad de configurar firewall"
     ],
     correct: 0,
     exp: "La <b>caché DNS</b> guarda las resoluciones recientes (con su TTL) para no repetir la consulta al servidor, acelerando la navegación y reduciendo tráfico."
@@ -1302,9 +1312,9 @@ const preguntasRedes = [
     q: "¿Qué es una VLAN?",
     options: [
       "Una red lógica independiente creada dentro de un mismo switch físico",
-      "Un tipo de cable de red",
-      "Un protocolo de enrutamiento",
-      "Una dirección IP reservada para el administrador"
+      "Un tipo de cableado estructurado blindado para enlaces troncales de red",
+      "Un protocolo de enrutamiento dinámico entre sistemas autónomos externos",
+      "Una dirección IP pública reservada para el administrador de infraestructura"
     ],
     correct: 0,
     exp: "Una <b>VLAN</b> (Virtual LAN) divide un switch físico en varias redes lógicas independientes: los puertos de una VLAN no ven el tráfico de otra, aunque estén en el mismo equipo."
@@ -1366,9 +1376,9 @@ const preguntasRedes = [
     q: "¿Qué es una ACL en un router?",
     options: [
       "Una lista de reglas que permite o deniega tráfico según criterios como IP o puerto",
-      "Un protocolo para asignar direcciones IP",
-      "Un tipo de cable blindado",
-      "Una tabla de direcciones MAC"
+      "Un protocolo dinámico para asignar direcciones IP y máscaras de forma automática",
+      "Un tipo de cableado blindado diseñado para evitar interferencias electromagnéticas",
+      "Una tabla interna donde el switch asocia direcciones MAC con puertos físicos"
     ],
     correct: 0,
     exp: "Una <b>ACL</b> (Access Control List) filtra el tráfico: cada regla «permit» o «deny» evalúa origen, destino, protocolo y puerto. Se aplica sobre una interfaz, en entrada o salida."
@@ -1426,9 +1436,9 @@ const preguntasRedes = [
     q: "¿Qué es NAT/PAT en un router?",
     options: [
       "Traducir direcciones IP privadas a una IP pública (o a un puerto) para salir a internet",
-      "Asignar direcciones IP a los equipos de la red",
-      "Crear VLAN de forma automática",
-      "Cifrar el tráfico que pasa por el router"
+      "Asignar direcciones IP privadas, máscara y gateway a los equipos de la red local",
+      "Crear y propagar VLANs de forma automática entre varios switches interconectados",
+      "Cifrar todo el tráfico de usuario que atraviesa las interfaces del router principal"
     ],
     correct: 0,
     exp: "<b>NAT</b> (Network Address Translation) traduce IP privadas a una IP pública. <b>PAT</b> (Port Address Translation) usa el puerto para distinguir varios equipos internos que comparten la misma IP pública."
@@ -1495,10 +1505,10 @@ const preguntasRedes = [
     tipo: "multiple",
     q: "¿Qué se puede comprobar a simple vista ante un equipo que no tiene red?",
     options: [
-      "Que el cable esté conectado y las luces del puerto estén activas",
-      "Que la tabla ARP esté vacía",
-      "Que el DNS sea 8.8.8.8",
-      "Que la máscara sea 255.255.255.0"
+      "Que el cable esté conectado y las luces de enlace del puerto estén activas",
+      "Que la tabla ARP del router se haya vaciado tras reiniciar el servicio",
+      "Que el servidor DNS configurado responda al dominio externo 8.8.8.8",
+      "Que la máscara de subred del equipo sea exactamente 255.255.255.0"
     ],
     correct: 0,
     exp: "Lo primero es lo físico: <b>cable conectado y luces del puerto</b> (enlace). Sin capa física no hay red, así que se descarta todo lo demás."
