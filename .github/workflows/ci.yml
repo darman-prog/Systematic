@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancela corridas obsoletas en PRs, pero deja terminar siempre la validación de main.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   calidad:
@@ -32,7 +33,7 @@ jobs:
 
   e2e:
     name: E2E
-    if: github.event_name == 'pull_request'
+    # Corre tanto en PRs como en push directo a main tras superar la fase estática y unitaria.
     needs: calidad
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -45,3 +46,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
+      # Conserva trazas y contextos de error cuando un test E2E falla en el runner efímero.
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && failure() }}
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 7
