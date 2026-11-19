@@ -21,9 +21,13 @@ describe("revisión de contenido", () => {
     expect(errores).toEqual([]);
   });
 
-  // Tras la fase de calidad y enriquecimiento, el banco real no debe dejar avisos pendientes.
+  // Tras la fase de calidad y enriquecimiento, las materias no deben dejar avisos de calidad ni de balance.
   it("no deja avisos de calidad en el banco real", async () => {
-    const avisos = (await cargadas()).flatMap(m => analizarMateria(m).avisos);
+    const esMateria = new Set(MATERIAS.map(m => m.id));
+    // Aplicamos auditoría estricta de distractores a las 4 materias de ingeniería intervenidas.
+    const avisos = (await cargadas()).flatMap(m =>
+      analizarMateria(m, { estrictoCalidad: esMateria.has(m.id) }).avisos
+    );
     expect(avisos).toEqual([]);
   });
 

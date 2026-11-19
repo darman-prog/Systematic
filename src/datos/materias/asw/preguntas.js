@@ -1077,7 +1077,7 @@ const preguntas = [
     tema: "API REST",
     dificultad: "facil",
     tipo: "multiple",
-    q: "En el modelo de madurez de Richardson para APIs REST, ¿qué representa exactamente un recurso?",
+    q: "En una API REST, ¿qué representa exactamente un recurso?",
     options: [
       "Una máquina física o contenedor encargado de procesar las peticiones entrantes",
       "Toda entidad o concepto direccionable con su propia URI, como `/pedidos/42`",

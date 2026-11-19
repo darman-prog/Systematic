@@ -1259,9 +1259,9 @@ const preguntas = [
     q: "Las siguientes afirmaciones sobre los índices son ciertas: (seleccione una o más de una)",
     options: [
       "Para crear un índice ordinario al mismo tiempo que creamos la tabla se usa la opción INDEX",
-      "Después de crear la tabla no se pueden crear índices en una tabla",
-      "El índice tiene un funcionamiento similar al índice de un libro, guardando parejas de elementos: el elemento que se desea indexar y su posición en la base de datos",
-      "Un índice que no es primario permite valores duplicados"
+      "Después de crear la tabla ya no es posible añadir índices secundarios sobre ella",
+      "El índice funciona como el de un libro: guarda parejas de valor indexado y posición en disco",
+      "Un índice que no es primario ni único permite almacenar valores repetidos en la columna"
     ],
     correctos: [0, 2, 3],
     exp: "La falsa es la segunda: después de crear la tabla SÍ se pueden crear índices con <code>CREATE INDEX</code>. Las demás son correctas: opción INDEX en el CREATE TABLE, parejas (valor, posición) como el índice de un libro y índice no primario admite duplicados.",
@@ -1318,7 +1318,7 @@ const preguntas = [
       "No crees un índice que se va a usar muy poco. Ejemplo del informe que se saca una vez al año",
       "Simplifica los índices duplicados porque contengan la parte izquierda común",
       "Elimina los índices que no se usan que no sean de maestros",
-      "Crea muchos índices complejos"
+      "Crea la mayor cantidad posible de índices compuestos sobre todas las tablas"
     ],
     correctos: [0, 1, 2, 3],
     exp: "Las cuatro primeras son correctas: evaluar el costo de cada índice, evitar índices poco usados, simplificar índices duplicados con prefijo común y eliminar índices no utilizados salvo los de tablas maestras. La opción e es falsa: acumular muchos índices complejos castiga las escrituras.",
@@ -1660,9 +1660,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué hace CREATE (s:Persona {nombre:'Ana'})-[r:CONOCE_A]->(l:Persona {nombre:'Luis'})?",
     options: [
-      "Crea dos nodos Persona con sus nombres y una relación CONOCE_A entre ellos, devolviéndolos con RETURN",
-      "Solo consulta si Ana conoce a Luis sin crear nada",
-      "Crea una tabla Persona con dos filas"
+      "Crea dos nodos Persona con sus propiedades y una relación CONOCE_A dirigida entre ellos",
+      "Solo consulta si existe la relación entre Ana y Luis sin insertar ningún nodo nuevo",
+      "Crea una tabla relacional llamada Persona con dos filas independientes sin enlaces"
     ],
     correct: 0,
     exp: "<code>CREATE</code> = <b>escribe el patrón</b> tal cual lo dibujas: nodos con propiedades entre llaves y relación dirigida. Un solo comando crea el mini-grafo completo."
@@ -1675,9 +1675,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué son las etiquetas (labels) como :Persona o :Empresa en Neo4j?",
     options: [
-      "Etiquetas que agrupan nodos por tipo, como las tablas agrupan filas: permiten filtrar y optimizan la consulta",
-      "Comentarios que el motor ignora por completo",
-      "Contraseñas de acceso a cada nodo"
+      "Etiquetas que agrupan nodos por tipo como tablas para filtrar y optimizar consultas",
+      "Comentarios descriptivos que el motor de grafos ignora al ejecutar cada búsqueda",
+      "Claves de acceso internas usadas para cifrar las propiedades de cada nodo individual"
     ],
     correct: 0,
     exp: "El label es el <b>«tabla» del grafo</b>: <code>(p:Persona)</code> equivale a buscar en la tabla Persona. Sin label, Cypher revisa <b>todos los nodos</b> (lento en grafos grandes)."
@@ -1690,9 +1690,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué significan (a)-[:LE_GUSTA]->(b), (a)<-[:LE_GUSTA]-(b) y (a)-[:LE_GUSTA]-(b)?",
     options: [
-      "Son tres consultas idénticas sin diferencia",
-      "Relación de izquierda a derecha, de derecha a izquierda, y sin dirección (se recorre en ambos sentidos, útil si no conoces la dirección)",
-      "La tercera es un error de sintaxis porque toda relación debe llevar flecha"
+      "Son tres consultas equivalentes que devuelven exactamente los mismos caminos",
+      "De izquierda a derecha, de derecha a izquierda y bidireccional sin dirección",
+      "La tercera da error de sintaxis porque toda relación debe indicar una flecha"
     ],
     correct: 1,
     exp: "Las relaciones <b>siempre tienen dirección guardada</b>, pero al consultar puedes omitirla. Ojo: sin dirección Cypher recorre <b>ambos sentidos</b> (doble trabajo).",
@@ -1706,9 +1706,9 @@ const preguntas = [
     tipo: "multiple",
     q: "En MATCH (p:Persona)-[r:LE_GUSTA]->(t:Tecnologia) RETURN p, r, t, ¿qué son p, r y t?",
     options: [
-      "Variables que enlazan los nodos y la relación para reutilizarlos en el resto de la consulta (aquí, en el RETURN)",
-      "Los nombres reales guardados en la base de datos",
-      "Tipos de dato como VARCHAR2 o NUMBER"
+      "Variables temporales que enlazan nodos y relación para reutilizarlos luego",
+      "Los valores literales reales almacenados en cada propiedad del grafo",
+      "Tipos de dato reservados equivalentes a VARCHAR2 o NUMBER en SQL"
     ],
     correct: 0,
     exp: "Las variables son <b>amarres temporales</b>: nombras lo que matcheas para usarlo después (filtrar, devolver, seguir navegando). Minúsculas por convención."
@@ -1778,9 +1778,9 @@ const preguntas = [
     tipo: "multiple",
     q: "¿Qué hace MERGE (p:Persona {nombre:'Ana'})?",
     options: [
-      "Busca el patrón y lo crea solo si no existe (el «obtén-o-crea» del grafo, ideal para cargas sin duplicados)",
-      "Fusiona dos bases de datos en una sola",
-      "Mezcla todas las personas en un único nodo"
+      "Busca el patrón y lo crea solo si no existe (obtén-o-crea sin duplicados)",
+      "Fusiona dos bases de datos independientes dentro de una misma instancia",
+      "Combina todas las propiedades de los nodos Persona en un único nodo"
     ],
     correct: 0,
     exp: "<code>MERGE</code> = <b>MATCH + CREATE condicional</b>. Cargas el mismo script diez veces y sigues con una sola Ana. El mejor amigo de las importaciones idempotentes."
