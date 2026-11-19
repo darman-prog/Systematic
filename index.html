@@ -280,16 +280,20 @@
   <section id="screen-results" class="card hidden"></section>
 
   <section id="screen-study" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-2">
       <h1 class="screen-titulo">Modo Estudio</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
-    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, intenta responder mentalmente y pulsa "Mostrar respuesta". Usa la estrella para marcar las que quieras priorizar.</p>
+    <p class="text-sm text-slate-400 mb-4">Lee la pregunta, piensa tu respuesta y despliega la solución cuando estés listo. Usa la estrella (★) para guardar las que quieras repasar.</p>
     <label class="sr-only" for="study-search">Buscar en Modo Estudio</label>
-    <input class="search-input" id="study-search" type="search" placeholder="Buscar por texto, tema, código o explicación..." aria-controls="study-list">
-    <div id="study-filtros" class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Filtrar preguntas por tipo"></div>
-    <p class="text-xs text-slate-500 mb-3" id="study-count"></p>
-    <div id="study-list"></div>
+    <input class="search-input" id="study-search" type="search" placeholder="Buscar por enunciado, tema, código o explicación..." aria-controls="study-list">
+    <div id="study-filtros" class="flex flex-wrap gap-2 mb-2.5" role="group" aria-label="Filtrar preguntas por tipo"></div>
+    <div id="study-temas" class="flex flex-wrap gap-1.5 mb-3" role="group" aria-label="Filtrar preguntas por tema o marcadas"></div>
+    <div class="study-toolbar-meta mb-3">
+      <p class="text-xs text-slate-400 m-0" id="study-count"></p>
+      <button type="button" id="study-toggle-all" class="btn btn-ghost btn-sm" data-action="toggleRevelarTodas">Revelar todas</button>
+    </div>
+    <div id="study-list" class="study-list"></div>
   </section>
 
   <section id="screen-apuntes" class="card hidden">
