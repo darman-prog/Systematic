@@ -7,8 +7,8 @@ const PANTALLAS = [
   "flashcards", "glosario", "lenguaje", "cuenta", "perfil"
 ];
 
-// Ancho extendido: flashcards y talentos necesitan más superficie horizontal.
-const PANTALLAS_ANCHA = ["flashcards", "talentos"];
+// Ancho extendido: flashcards, talentos y glosario aprovechan más superficie horizontal.
+const PANTALLAS_ANCHA = ["flashcards", "talentos", "glosario"];
 // El dashboard y el workbench de casos de diagramación usan ancho extendido (72rem).
 const PANTALLAS_DASHBOARD = ["materias", "caso"];
 

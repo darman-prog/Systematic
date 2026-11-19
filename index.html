@@ -410,16 +410,19 @@
   </section>
 
   <section id="screen-glosario" class="card hidden">
-    <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
+    <div class="flex items-center justify-between gap-3 flex-wrap mb-2">
       <h1 class="screen-titulo" id="glosario-titulo">Glosario</h1>
       <button class="btn btn-ghost btn-sm" data-action="goHome">← Inicio</button>
     </div>
-    <p class="text-sm text-slate-400 mb-4">Consulta los términos por categoría. Cada uno incluye definición y ejemplo.</p>
+    <p class="text-sm text-slate-400 mb-4">Diccionario técnico de la materia. Filtra por categoría, inicial o palabra clave.</p>
     <label class="sr-only" for="glosario-search">Buscar en el glosario</label>
     <input class="search-input" id="glosario-search" type="search" placeholder="Buscar término, definición o ejemplo..." aria-controls="glosario-list">
     <div id="glosario-filtros" class="flex flex-wrap gap-2 mb-3" role="group" aria-label="Filtrar términos por categoría"></div>
-    <p class="text-xs text-slate-500 mb-3" id="glosario-count"></p>
-    <div id="glosario-list"></div>
+    <div id="glosario-letras" class="glosario-letras mb-3" role="group" aria-label="Filtrar términos por inicial"></div>
+    <div class="flex items-center justify-between gap-2 mb-3">
+      <p class="text-xs text-slate-400" id="glosario-count"></p>
+    </div>
+    <div id="glosario-list" class="glosario-grid"></div>
   </section>
 
   <section id="screen-perfil" class="card hidden" aria-labelledby="perfil-titulo">

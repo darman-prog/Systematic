@@ -58,6 +58,8 @@ export function accionesPractica({
     toggleStudy: el => estudio.toggleStudy(el),
     startGlosario: () => glosarioUI.startGlosario(),
     cambiarGlosarioCat: el => glosarioUI.cambiarGlosarioCat(el.dataset.id),
+    cambiarGlosarioLetra: el => glosarioUI.cambiarGlosarioLetra(el.dataset.letra),
+    limpiarGlosarioFiltros: () => glosarioUI.limpiarGlosarioFiltros(),
     startFlashcards: () => flashcards.startFlashcards(),
     responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
     saltarFlash: () => flashcards.saltarFlash(),
