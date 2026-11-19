@@ -62,3 +62,14 @@ Rollback: en Vercel, *Deployments → Instant Rollback*; en el repo, `git revert
   PDF/PPTX/DOCX no se versionan, solo los `.md` convertidos).
 - Toda pregunta/apunte/glosario debe pasar `npm run validar` antes de commitear.
 - Ids: BD2 conserva `P1-*` / `PR-*`; materias nuevas usan `ISW-*` / `ASW-*` / `INF-*` (apuntes `AP-ISW-*` / `AP-ASW-*` / `AP-INF-*`).
+
+## Autor
+
+Desarrollado y mantenido por **Diego Andres Meza Rodriguez** — Ingeniero en Sistemas.
+- GitHub: [@darman-prog](https://github.com/darman-prog)
+- Repositorio: [Systematic](https://github.com/darman-prog/Systematic)
+
+## Licencia
+
+Este proyecto está disponible bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
+

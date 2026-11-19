@@ -4,6 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "description": "App de estudio para materias de ingeniería (quiz, simulacro, estudio, flashcards, glosario y apuntes).",
+  "author": "Diego Andres Meza Rodriguez (Ingeniero en Sistemas) <https://github.com/darman-prog>",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
