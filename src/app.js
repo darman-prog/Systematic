@@ -277,7 +277,7 @@ instalarDelegacion(ACCIONES);
 
 // Atajos globales: teclado del quiz, auto-pausa y búsquedas estáticas.
 instalarAtajos({
-  $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, importarDatos
+  $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, flashcards, importarDatos
 });
 
 // Cuenta (ADR 008): decide la pantalla inicial una vez instaladas acciones y atajos.

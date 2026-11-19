@@ -1709,17 +1709,143 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   font-weight: 600;
 }
 
-/* ===== FLASHCARD FLIP 3D (mejora 6) ===== */
-.flash-card-container {
-  perspective: 1000px;
-  width: 100%;
+/* ===== FLASHCARD MAZO APILADO Y PASO DE TARJETAS ===== */
+.flash-temas-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
+.flash-progress-track {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--study-surface-2);
+  border: 1px solid color-mix(in srgb, var(--study-border) 75%, transparent);
+  overflow: hidden;
+}
+.flash-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--study-accent);
+  transition: width 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.flash-score-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid var(--study-border);
+  background: var(--study-surface-2);
+}
+.flash-score-pill--ok {
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.35);
+}
+.flash-score-pill--bad {
+  color: #fda4af;
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+/* Evita que animaciones de descarte lateral o bloques anchos generen scroll horizontal en móvil */
+#flash-area {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Mazo físico apilado en CSS Grid: minmax(0, 1fr) impide que <pre> o tablas estiren el ancho en móvil */
+.flash-deck-stack {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding-bottom: 24px;
+}
+.flash-card-under,
+.flash-card-container,
+.flash-card-discard {
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+.flash-card-under {
+  pointer-events: none;
+  background: var(--study-surface-2);
+  border: 1px solid var(--study-border);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 280ms cubic-bezier(0.25, 0.8, 0.25, 1), opacity 240ms ease-out;
+}
+.flash-card-under[data-depth="1"] {
+  z-index: 1;
+  transform: translateY(11px) scale(0.955);
+  opacity: 0.78;
+}
+.flash-card-under[data-depth="2"] {
+  z-index: 0;
+  transform: translateY(21px) scale(0.91);
+  opacity: 0.48;
+}
+
+.flash-card-container {
+  position: relative;
+  z-index: 2;
+  perspective: 1300px;
+}
+
+/* Tarjeta fantasma que sale volando lateralmente al responder Sabía / No sabía */
+.flash-card-discard {
+  position: relative;
+  z-index: 20;
+  pointer-events: none;
+  min-height: 16rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.45);
+}
+.flash-discard--ok {
+  border-color: rgba(16, 185, 129, 0.8);
+  animation: flashDiscardOk 480ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+.flash-discard--bad {
+  border-color: rgba(244, 63, 94, 0.8);
+  animation: flashDiscardBad 480ms cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+@keyframes flashDiscardOk {
+  0% { opacity: 1; transform: translateX(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateX(115%) rotate(13deg); }
+}
+@keyframes flashDiscardBad {
+  0% { opacity: 1; transform: translateX(0) rotate(0deg); }
+  100% { opacity: 0; transform: translateX(-115%) rotate(-13deg); }
+}
+
+/* La nueva tarjeta sube desde el primer nivel de la pila para continuar el movimiento */
+@keyframes flashPassRise {
+  0% { opacity: 0.82; transform: translateY(11px) scale(0.955); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes flashPassNext {
+  0% { opacity: 0; transform: translateY(14px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes flashPassPrev {
+  0% { opacity: 0; transform: translateX(-24px) scale(0.98); }
+  100% { opacity: 1; transform: translateX(0) scale(1); }
+}
+.flash-card-container.flash-pass-ok { animation: flashPassRise 320ms cubic-bezier(0.25, 0.8, 0.25, 1); }
+.flash-card-container.flash-pass-bad { animation: flashPassRise 320ms cubic-bezier(0.25, 0.8, 0.25, 1); }
+.flash-card-container.flash-pass-next { animation: flashPassNext 240ms cubic-bezier(0.22, 1, 0.36, 1); }
+.flash-card-container.flash-pass-prev { animation: flashPassPrev 240ms cubic-bezier(0.22, 1, 0.36, 1); }
 
 .flash-card-inner {
   position: relative;
   width: 100%;
-  min-height: 16rem;
-  transition: height var(--mov-base) var(--mov-ease), transform var(--mov-enfasis) var(--mov-ease);
+  min-height: 13.5rem;
+  cursor: pointer;
+  transition: height 320ms cubic-bezier(0.25, 0.8, 0.25, 1), transform 520ms cubic-bezier(0.3, 0.7, 0.2, 1);
   transform-style: preserve-3d;
 }
 
@@ -1730,55 +1856,309 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 .flash-card-front,
 .flash-card-back {
   width: 100%;
-  min-height: 16rem;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 13.5rem;
+  overflow-wrap: break-word;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 1rem;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+  transition: border-color 160ms ease-out;
+}
+/* Contiene bloques de código, frases dragdrop y tablas dentro del ancho móvil de la tarjeta */
+.flash-card .code-block {
+  max-width: 100%;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  overflow-x: auto;
+}
+.flash-card .data-table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.flash-card-inner:hover .flash-card-front,
+.flash-card-inner:hover .flash-card-back {
+  border-color: color-mix(in srgb, var(--study-accent) 48%, var(--study-border));
 }
 
-.flash-card-front {
+/* La cara activa permanece en flujo normal para que la card sea compacta en el frente y se expanda al voltear sin desbordar */
+.flash-card-inner:not(.flipped) .flash-card-front {
   position: relative;
+  z-index: 2;
+}
+.flash-card-inner:not(.flipped) .flash-card-back {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.flash-card-inner.flipped .flash-card-back {
+  position: relative;
+  z-index: 2;
+}
+.flash-card-inner.flipped .flash-card-front {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .flash-card-back {
-  position: absolute;
-  inset: 0;
   transform: rotateY(180deg);
-  overflow-y: auto;
+  border-color: color-mix(in srgb, var(--study-accent) 55%, var(--study-border));
 }
 
-/* El reverso es la cara más alta (pregunta + respuesta + explicación): JS le fija
-   --flash-alto al contenido real y el contenedor crece hasta ahí, para que el
-   texto largo se lea completo sin scroll interno. */
-.flash-card-container[data-altura] .flash-card-back {
-  height: auto;
-  overflow-y: visible;
+.flash-face-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
-.flash-card-container[data-altura="auto"] .flash-card-inner {
-  height: var(--flash-alto, 16rem);
-  min-height: 16rem;
+.flash-face-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--study-accent);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--study-accent) 14%, transparent);
+}
+.flash-question-text {
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #f8fafc;
+  margin: auto 0;
+  padding: 0.5rem 0;
+}
+/* Preguntas de solo enunciado ganan presencia tipográfica en la tarjeta compacta */
+.flash-card-front.flash-front-simple .flash-question-text {
+  font-size: 1.22rem;
+  line-height: 1.55;
+  text-align: center;
+  max-width: 54ch;
+  margin: auto;
+  padding: 1.25rem 0.5rem;
+}
+.flash-back-prompt {
+  margin: 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--study-border) 65%, transparent);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--study-muted);
+}
+.flash-back-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.flash-answer-box {
+  padding: 0.9rem 1.05rem;
+  border-radius: 0.75rem;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.flash-card-back .study-exp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1.05rem;
+  border-radius: 0.75rem;
+  background: var(--study-surface-2);
+  border: 1px solid color-mix(in srgb, var(--study-border) 75%, transparent);
+}
+.flash-card-back .study-exp-body {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: #e2e8f0;
 }
 
-@media (max-width: 767.5px) {
-  /* En pantallas chicas el apilado absoluto recortaba la tarjeta: cada cara
-     fluye en su propio bloque y la página hace scroll si hace falta. */
-  .flash-card-inner { min-height: 0; height: auto !important; }
-  .flash-card-inner.flipped { transform: none; }
-  .flash-card-back {
-    position: static;
-    height: auto;
-    transform: none;
-    overflow-y: visible;
-    margin-top: 0.75rem;
-  }
-  .flash-card-front { display: none; }
-  .flash-card-inner:not(.flipped) .flash-card-back { display: none; }
-  .flash-card-inner:not(.flipped) .flash-card-front { display: flex; }
+/* Bloques interactivos para preguntas de tipo ordenar dentro del frente */
+.flash-order-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.flash-order-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  background: var(--study-surface-2);
+  border: 1px solid var(--study-border);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out, transform 140ms ease-out;
+}
+.flash-order-item:hover {
+  border-color: color-mix(in srgb, var(--study-accent) 55%, var(--study-border));
+}
+.flash-order-item:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: 2px;
+}
+.flash-order-item.is-dragging {
+  cursor: grabbing;
+  border-color: #34d399;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  transform: scale(1.01);
+}
+.flash-order-grip {
+  color: var(--study-muted);
+  font-weight: 800;
+  letter-spacing: -2px;
+  flex-shrink: 0;
+}
+.flash-order-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.flash-order-feedback:empty {
+  display: none;
+}
+.flash-order-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.flash-order-check.is-ok {
+  color: #6ee7b7;
+}
+.flash-order-check.is-bad {
+  color: #fda4af;
+}
+
+.flash-flip-hint {
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px dashed color-mix(in srgb, var(--study-border) 60%, transparent);
+  font-size: 0.74rem;
+  color: var(--study-muted);
+  text-align: center;
+}
+.flash-flip-hint kbd,
+.flash-controls-main kbd {
+  padding: 0.1rem 0.38rem;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  font-size: 0.7rem;
+  font-family: ui-monospace, monospace;
+  opacity: 0.82;
+}
+.flash-flip-hint kbd {
+  border-color: var(--study-border);
+  background: var(--study-surface-2);
+  opacity: 1;
+}
+
+.flash-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.flash-controls-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-width: 14rem;
+}
+.flash-btn-flip,
+.flash-btn-ok,
+.flash-btn-bad {
+  flex: 1;
+  max-width: 15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.flash-btn-ok {
+  background: #059669;
+  border-color: #10b981;
+  color: #ecfdf5;
+}
+.flash-btn-ok:hover {
+  background: #047857;
+}
+.flash-btn-bad {
+  background: rgba(225, 29, 72, 0.16);
+  border-color: rgba(244, 63, 94, 0.55);
+  color: #fecdd3;
+}
+.flash-btn-bad:hover {
+  background: rgba(225, 29, 72, 0.28);
+}
+.flash-summary-metrics {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+.flash-metric {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--study-border);
+  background: var(--study-surface-2);
+  font-size: 0.9rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flash-card-inner {
-    transition: none;
+  .flash-card-under,
+  .flash-card-inner,
+  .flash-card-discard,
+  .flash-card-container {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
+}
+
+@media (max-width: 767.5px) {
+  .flash-card-inner { min-height: 0; }
+  .flash-card-inner.flipped { transform: none; }
+  .flash-card-back { transform: none; }
+  .flash-card-front { display: none; }
+  .flash-card-inner:not(.flipped) .flash-card-back { display: none; }
+  .flash-card-inner:not(.flipped) .flash-card-front { display: flex; }
+  .flash-controls-main { order: -1; width: 100%; flex-basis: 100%; }
+  .flash-controls-main kbd,
+  .flash-kbd-only { display: none; }
+}
+
+/* Oculta pistas de teclado también en tablets o móviles horizontales puramente táctiles */
+@media (hover: none) and (pointer: coarse) {
+  .flash-controls-main kbd,
+  .flash-kbd-only { display: none; }
 }
 
 /* ===== ONBOARDING PASOS (mejora 7) ===== */

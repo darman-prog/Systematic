@@ -65,8 +65,11 @@ export function accionesPractica({
     cambiarGlosarioLetra: el => glosarioUI.cambiarGlosarioLetra(el.dataset.letra),
     limpiarGlosarioFiltros: () => glosarioUI.limpiarGlosarioFiltros(),
     startFlashcards: () => flashcards.startFlashcards(),
+    cambiarFlashTema: el => flashcards.cambiarFlashTema(el.dataset.tema),
+    repasarFalladasFlash: () => flashcards.repasarFalladasFlash(),
     responderFlash: el => flashcards.responderFlash(el.dataset.ok === "true"),
     saltarFlash: () => flashcards.saltarFlash(),
+    anteriorFlash: () => flashcards.anteriorFlash(),
     voltearFlash: () => flashcards.voltearFlash()
   };
 }

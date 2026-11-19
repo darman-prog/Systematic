@@ -1,13 +1,19 @@
 // Atajos globales del shell: teclado del quiz, auto-pausa al ocultar la pestaña y
 // listeners de inputs estáticos fuera de la delegación de click.
 export function instalarAtajos({
-  $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, importarDatos
+  $, sesiones, quiz, next, alternarPausa, config, estudio, apuntesUI, glosarioUI, flashcards = null, importarDatos
 }) {
   function onKeydown(e) {
-    const s = sesiones.sesion;
-    if ($("screen-quiz").classList.contains("hidden") || !s) return;
     const t = e.target;
     if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)) return;
+    // Si la pantalla de flashcards está activa, delega los atajos del mazo.
+    const screenFlash = $("screen-flashcards");
+    if (screenFlash && !screenFlash.classList.contains("hidden") && flashcards && typeof flashcards.manejarTecla === "function") {
+      flashcards.manejarTecla(e);
+      return;
+    }
+    const s = sesiones.sesion;
+    if ($("screen-quiz").classList.contains("hidden") || !s) return;
     const item = s.items[s.idx];
     const answered = !!s.answers[s.idx];
     if (answered) {
