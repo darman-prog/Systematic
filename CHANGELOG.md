@@ -5,6 +5,9 @@ Historial legible de cambios relevantes de Systematic. El detalle por commit viv
 
 ## Sin publicar (pre-deploy)
 
+- Dashboard principal (feature 022): réplica de los elementos nuevos del prototipo (saludo con
+  nombre, continuidad con pregunta, KPI de materias/precisión con tendencia/racha, CTA por card);
+  búsqueda/filtros con anuncio de resultados y vacío accionable; `student/resumen.js` con tests.
 - ASW móvil (feature 020): 15 preguntas de decisión (MVI, BFF, API Gateway, GraphQL,
   offline-first, MBaaS, SDUI, nativo vs multiplataforma) y el apunte `AP-ASW-12`
   con el contenido del PDF 16; la feature 021 le suma diagramas.

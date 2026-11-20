@@ -135,22 +135,35 @@ El home (`#screen-materias.home-dashboard`) usa un layout wide dentro de `.app-d
 (máx. 72rem) y muestra solo el catálogo real: 4 materias y 3 lenguajes. El resto de las
 pantallas conserva el ancho de lectura.
 
+- **Resumen real (prototipo):** saludo grande con el nombre en itálica de acento; `#home-resumen`
+  debajo. La tarjeta “Continuá donde te quedaste” muestra el track de la última actividad,
+  “Pregunta N de total · Última actividad”, barra de avance, “X respondidas · Y% completado” y
+  CTA “Continuar”. Al lado van tres KPI: “Respondidas en materias” (suma de las 4 materias sobre
+  489), “Precisión · N intentos” con tendencia semanal, y “Racha de estudio” con enlace
+  “Repasar N preguntas”. Datos de `student/resumen.js`; sin métricas inventadas.
 - **Cards:** `<button>` de card completa, superficie tonal con glass sutil, icono en tile con
-  acento por materia, progreso/competencia y conteos. Sin pill de estado: el avance se comunica
-  con la barra y su texto, y `data-estado` queda solo para el filtro. Hover cambia borde,
-  fondo y sombra; no traslada la card. Foco visible de 2px.
+  acento por materia, progreso/competencia y conteos. Materias muestran “X de Y respondidas” y
+  pie “N términos” + CTA “Continuar/Empezar”; lenguajes muestran “X de 5 etapas” y pie
+  “N preguntas” + CTA. Sin pill de estado: el avance se comunica con la barra y su texto, y
+  `data-estado` queda solo para el filtro. Hover cambia borde, fondo y sombra; no traslada la
+  card. Foco visible de 2px.
 - **Materias:** la barra “X de Y respondidas” sale de `persistencia.progreso(id)`; el estado
   “En curso” se calcula para el filtro, no como etiqueta visible.
 - **Lenguajes:** `barraDeCompetencia` real (“X de 5 etapas”), CTA visual “Continuar”/“Iniciar”
   dentro del mismo botón; `data-estado` alimenta el filtro sin pill visible.
-- **Búsqueda:** label visible para lectores (sr-only), filtro por nombre/descripción, botón
-  limpiar y estado vacío con `role="status"`; no promete buscar dentro de preguntas.
-- **Filtros:** `Todas (7)`, `Materias (4)`, `Lenguajes (3)`, `En curso (N)`; `aria-pressed` y
-  conteos dinámicos. Sin categorías/niveles que no existan en el registro.
+- **Búsqueda:** label visible para lectores (sr-only), placeholder corto, filtro por
+  nombre/descripción y botón limpiar. Se conserva la barra de búsqueda/filtros aunque el prototipo
+  no la muestre: eliminarla sería una regresión. `#catalogo-resultado` anuncia “Mostrando X de 7”
+  y el vacío ofrece “Limpiar búsqueda” o “Ver todas”; no promete buscar dentro de preguntas.
+- **Filtros:** `Todas (7)`, `Materias (4)`, `Lenguajes (3)`, `En curso (N)`; `aria-pressed`,
+  conteos dinámicos y targets de 44px. En móvil se ordenan 2x2. Sin categorías/niveles que no
+  existan en el registro.
 - **Motion de filtros:** al cambiar una opción, las cards visibles se reaniman con fade + 6px y
   stagger de 24ms (tope 120ms); la búsqueda no anima y `prefers-reduced-motion` las muestra directo.
-- **Responsive:** 1 columna móvil, 2 en tablet, 3 desde `≥1024px` y 4 para materias en
-  `≥1280px`; lenguajes 3 desde `≥768px`. Cards y controles con foco y targets ≥44px.
+- **Responsive:** resumen apilado en móvil (continuar + tres KPI), KPI en tres columnas en tablet
+  y continuar + tres KPI apilados en escritorio; cards 1 columna móvil, 2 en tablet, 3 desde
+  `≥1024px` y 4 para materias en `≥1280px`; lenguajes 3 desde `≥768px`. Cards y controles con
+  foco y targets ≥44px.
 - **Prohibido:** niveles/“Nuevo”/“Recomendado”/“Sandbox”/“94%” ficticios, “Guía curricular”
   muerta, Material Symbols/CDN o un logo distinto al “S” de Systematic.
 
