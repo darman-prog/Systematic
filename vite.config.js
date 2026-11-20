@@ -23,6 +23,8 @@ export default defineConfig({
   },
   test: {
     // Solo unitarios del core y de scripts; los E2E de Playwright viven en e2e/ (npm run e2e).
-    include: ['src/**/*.test.{js,ts}', 'scripts/*.test.{js,ts}']
+    include: ['src/**/*.test.{js,ts}', 'scripts/*.test.{js,ts}'],
+    // Un punto por test mantiene la TUI legible; para depurar usar `--reporter=verbose`.
+    reporters: ['dot']
   }
 });

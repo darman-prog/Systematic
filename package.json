@@ -11,12 +11,15 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:dashboard": "vitest run src/student/resumen.test.js src/ui/dashboard/home.test.js",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "validar": "node scripts/validar-datos.mjs",
     "revision": "node scripts/revision-contenido.mjs",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:home": "playwright test e2e/home-dashboard.spec.js --reporter=dot",
+    "e2e:quiet": "playwright test --reporter=dot"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

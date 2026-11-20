@@ -50,7 +50,16 @@ desplegado en Vercel.
 - `npm run validar` — valida el schema de datos de todos los tracks.
 - `npm run revision` — revisión de calidad de contenido (avisos, no bloquea).
 - `npm run test` — Vitest (unitario).
+- `npm run test:dashboard` — unitarios del resumen y del home.
 - `npm run e2e` — Playwright (E2E sobre el build).
+- `npm run e2e:home` — E2E del home con reporter compacto.
+- `npm run e2e:quiet` — suite E2E completa con reporter compacto; reservar para el cierre.
+
+## Tests y TUI
+
+- Durante el desarrollo, correr solo el archivo/spec tocado; la suite completa se reserva para el cierre.
+- La salida larga va a `%TEMP%` y se lee el tail; no streamear la suite completa a la TUI.
+- `PW_REUSE=1` reutiliza un `npm run preview` ya levantado en local; si cambió el código, rebuildear antes.
 
 ## Skill Gate (obligatorio antes de leer, buscar o editar)
 
