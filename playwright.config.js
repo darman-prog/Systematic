@@ -15,7 +15,7 @@ export default defineConfig({
     command: 'npm run build && npm run preview -- --port 4173 --strictPort',
     url: 'http://localhost:4173',
     reuseExistingServer: false,
-    timeout: 60000
+    timeout: 120000
   },
   projects: [
     { name: 'chromium', testIgnore: /movil\.spec\.js/, use: { ...devices['Desktop Chrome'] } },

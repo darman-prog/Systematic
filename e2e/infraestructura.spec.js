@@ -20,7 +20,7 @@ test.describe('Infraestructura', () => {
     await page.goto('/');
     const card = page.locator('#materias-list .materia-card').nth(3);
     await expect(card).toContainText('Infraestructura');
-    await expect(card).toContainText(infraPreguntas.length + ' preguntas');
+    await expect(card).toContainText('de ' + infraPreguntas.length + ' respondidas');
 
     await card.click();
     await expect(page.locator('#screen-start').locator('h1')).toContainText('Infraestructura');

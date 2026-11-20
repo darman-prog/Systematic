@@ -18,15 +18,16 @@ test.describe('Systematic — smoke', () => {
     const cards = page.locator('#materias-list .materia-card');
     await expect(cards).toHaveCount(4);
     await expect(cards.nth(0)).toContainText('Base de Datos 2');
-    await expect(cards.nth(0)).toContainText(bd2Preguntas.length + ' preguntas');
+    // El prototipo quitó el conteo redundante del pie; el total sigue en la barra de avance.
+    await expect(cards.nth(0)).toContainText('de ' + bd2Preguntas.length + ' respondidas');
     await expect(cards.nth(1)).toContainText('Ingeniería de Software');
-    await expect(cards.nth(1)).toContainText(iswPreguntas.length + ' preguntas');
+    await expect(cards.nth(1)).toContainText('de ' + iswPreguntas.length + ' respondidas');
     await expect(cards.nth(1)).not.toContainText('Contenido en preparación');
     await expect(cards.nth(2)).toContainText('Arquitectura de Software');
-    await expect(cards.nth(2)).toContainText(aswPreguntas.length + ' preguntas');
+    await expect(cards.nth(2)).toContainText('de ' + aswPreguntas.length + ' respondidas');
     await expect(cards.nth(2)).not.toContainText('Contenido en preparación');
     await expect(cards.nth(3)).toContainText('Infraestructura');
-    await expect(cards.nth(3)).toContainText(infraPreguntas.length + ' preguntas');
+    await expect(cards.nth(3)).toContainText('de ' + infraPreguntas.length + ' respondidas');
     await expect(cards.nth(3)).not.toContainText('Contenido en preparación');
   });
 

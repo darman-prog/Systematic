@@ -35,7 +35,7 @@ test('constructor de diagramas visible y funcional con tap-tap en 360x740, 768x1
     // Abrir un caso de diagramación con tap()
     await page.locator('#screen-start [data-action="startCasos"]').tap();
     await expect(page.locator('#screen-casos')).toBeVisible();
-    await page.locator('#casos-lista [data-action="elegirCaso"]').first().tap();
+    await page.locator('#casos-lista [data-action="jugarCaso"]').first().tap();
     await expect(page.locator('#lienzo-diagrama')).toBeVisible();
 
     const sinDesbordeCaso = await page.evaluate(
@@ -59,17 +59,18 @@ test('hit-area >= 44x44 y coordenadas exactas al colocar pieza con el papel scro
   await irAMateria(page, 2); // ASW
 
   await page.locator('#screen-start [data-action="startCasos"]').tap();
-  await page.locator('#casos-lista [data-action="elegirCaso"]').first().tap();
+  await page.locator('#casos-lista [data-action="jugarCaso"]').first().tap();
   await expect(page.locator('#lienzo-diagrama')).toBeVisible();
 
   // Validar hit-area >= 44x44 en piezas del pool y botones del constructor
   const piezaBox = await page.locator('#pool-diagrama .pieza').first().boundingBox();
-  expect(piezaBox.width).toBeGreaterThanOrEqual(44);
-  expect(piezaBox.height).toBeGreaterThanOrEqual(44);
+  // Chromium puede devolver 43.9999 por subpíxeles: se redondea antes de comparar.
+  expect(Math.round(piezaBox.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(piezaBox.height)).toBeGreaterThanOrEqual(44);
 
   const btnExpandirBox = await page.locator('#btn-expandir-lienzo').boundingBox();
-  expect(btnExpandirBox.width).toBeGreaterThanOrEqual(44);
-  expect(btnExpandirBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(btnExpandirBox.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(btnExpandirBox.height)).toBeGreaterThanOrEqual(44);
 
   // Scrollear internamente el papel antes de colocar una pieza
   await page.locator('#lienzo-diagrama').evaluate(el => {
@@ -107,12 +108,12 @@ test('hit-area >= 44x44 y coordenadas exactas al colocar pieza con el papel scro
 
   // Validar hit-area >= 44x44 en el nodo colocado y en su botón de quitar
   const nodoBox = await nodo.boundingBox();
-  expect(nodoBox.width).toBeGreaterThanOrEqual(44);
-  expect(nodoBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(nodoBox.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(nodoBox.height)).toBeGreaterThanOrEqual(44);
 
   const quitarBox = await nodo.locator('.nodo-quitar').boundingBox();
-  expect(quitarBox.width).toBeGreaterThanOrEqual(44);
-  expect(quitarBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(quitarBox.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(quitarBox.height)).toBeGreaterThanOrEqual(44);
 
   const sinDesborde = await page.evaluate(
     () => document.documentElement.scrollWidth <= document.documentElement.clientWidth
@@ -156,8 +157,8 @@ test('accesibilidad táctil y prevención de zoom iOS en móvil', async ({ page 
 
   // Estrella de marcar con área táctil accesible (mínimo 44px de alto y ancho, WCAG 2.5.8)
   const starBox = await page.locator('#star-btn').boundingBox();
-  expect(starBox.width).toBeGreaterThanOrEqual(44);
-  expect(starBox.height).toBeGreaterThanOrEqual(44);
+  expect(Math.round(starBox.width)).toBeGreaterThanOrEqual(44);
+  expect(Math.round(starBox.height)).toBeGreaterThanOrEqual(44);
 
   // Atajos de teclado físico ocultos en vista móvil
   await expect(page.locator('#screen-quiz p:has-text("Atajos:")')).toBeHidden();
