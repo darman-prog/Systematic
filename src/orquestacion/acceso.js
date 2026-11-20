@@ -41,6 +41,14 @@ export function crearAcceso({
     cache.email = null;
   }
 
+  // La cuenta de Google puede traer el nombre visible. Se usa una sola vez si el navegador
+  // todavía no tiene nombre local; nunca pisa una elección previa del estudiante.
+  function recordarNombreDeCuenta(usuario) {
+    if (!usuario?.nombre || persistencia.nombre()) return false;
+    persistencia.guardarNombre(usuario.nombre);
+    return true;
+  }
+
   // Onboarding local (primera impresión sin cuenta): pide el nombre una sola vez.
   function mostrarOnboardingLocal() {
     show("onboarding");
@@ -72,6 +80,9 @@ export function crearAcceso({
   async function entrarConCuenta(usuario) {
     cuentaUI.pintar(usuario);
     if (await ofrecerRestauracion(usuario)) return;
+    // Va después de ofrecerRestauracion: si se guardara antes, el nombre local haría
+    // que la app creyera que ya hay identidad y no ofreciera el respaldo de la nube.
+    recordarNombreDeCuenta(usuario);
     if (!persistencia.onboardingHecho()) persistencia.guardarOnboardingHecho();
     mostrarMaterias();
   }

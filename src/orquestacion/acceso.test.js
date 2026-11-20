@@ -179,6 +179,26 @@ describe("crearAcceso restauración y perfil", () => {
     expect(acceso.datosPerfil().cuentaEstado).toBe("invitado");
   });
 
+  it("toma el nombre de la cuenta si el navegador no tiene nombre local", async () => {
+    const { acceso, persistencia } = montar();
+    await acceso.entrarConCuenta({ uid: "u1", email: "a@b.c", nombre: "Diego" });
+    expect(persistencia.guardarNombre).toHaveBeenCalledWith("Diego");
+  });
+
+  it("no pisa el nombre local con el nombre de la cuenta", async () => {
+    const { acceso, persistencia } = montar({
+      persistencia: { nombre: vi.fn(() => "Ana") }
+    });
+    await acceso.entrarConCuenta({ uid: "u1", email: "a@b.c", nombre: "Diego" });
+    expect(persistencia.guardarNombre).not.toHaveBeenCalled();
+  });
+
+  it("no guarda nombre si la cuenta no lo trae", async () => {
+    const { acceso, persistencia } = montar();
+    await acceso.entrarConCuenta({ uid: "u1", email: "a@b.c" });
+    expect(persistencia.guardarNombre).not.toHaveBeenCalled();
+  });
+
   it("el callback de invitado respeta el onboarding y el nombre", async () => {
     const { crearAuthUI, deps, persistencia } = montar();
     const config = crearAuthUI.mock.calls[0][0];
