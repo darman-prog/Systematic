@@ -6,7 +6,7 @@ import { barraCompetencia } from "../componentes/competencia.js";
 import { escapar, saludoSegunHora } from "../helpers.js";
 import { observarScrollReveal } from "../componentes/scroll-suave.js";
 
-export function crearHome({ persistencia, cargarRoadmap }) {
+export function crearHome({ persistencia, cargarRoadmap, resumen }) {
   /** @type {(id: string) => any} */
   const $ = id => document.getElementById(id);
 
@@ -54,11 +54,104 @@ export function crearHome({ persistencia, cargarRoadmap }) {
     );
   }
 
+  // Traduce la diferencia en días a la copia del resumen; el cálculo vive en student/resumen.
+  function textoDias(dias) {
+    const n = Number(dias) || 0;
+    if (n <= 0) return "hoy";
+    if (n === 1) return "ayer";
+    return "hace " + n + " días";
+  }
+
+  // El saludo del prototipo: tramo en texto normal y nombre en itálica de acento.
+  // Google devuelve el nombre completo; el saludo usa solo el primer token.
+  function renderSaludo() {
+    const el = $("saludo-home");
+    if (!el) return;
+    const nombre = persistencia.nombre();
+    const primerNombre = nombre ? String(nombre).trim().split(/\s+/)[0] : "";
+    el.innerHTML = escapar(saludoSegunHora("")) +
+      (primerNombre ? ', <em>' + escapar(primerNombre) + "</em>" : "");
+  }
+
+  // El resumen replica el prototipo: continuidad del último track + tres KPI.
+  // La búsqueda y los filtros existentes se conservan; el prototipo no los reemplaza.
+  function renderResumen() {
+    const cont = $("home-resumen-contenido");
+    if (!cont || !resumen) return;
+    const datos = resumen.actual();
+    if (!datos) return;
+
+    const continuar = datos.continuar;
+    const bloqueContinuar = continuar
+      ? '<div class="resumen-continuar">' +
+          '<p class="resumen-eyebrow">Continuá donde te quedaste</p>' +
+          '<p class="resumen-continuar-titulo">' + escapar(continuar.nombre) + '</p>' +
+          '<p class="resumen-continuar-meta">' +
+            (continuar.pregunta ? 'Pregunta ' + continuar.pregunta + ' de ' + continuar.preguntas.total + ' · ' : '') +
+            'Última actividad: ' + textoDias(continuar.dias) +
+          '</p>' +
+          '<div class="resumen-progreso" aria-hidden="true"><span style="--pct:' +
+            continuar.preguntas.pct + '"></span></div>' +
+          '<div class="resumen-continuar-pie">' +
+            '<p class="resumen-continuar-sub">' + continuar.preguntas.respondidas +
+              ' respondidas · ' + continuar.preguntas.pct + '% completado</p>' +
+            '<button class="btn btn-primary btn-sm resumen-cta" data-action="' +
+              (continuar.tipo === "lenguaje" ? "seleccionarLenguaje" : "seleccionarMateria") +
+              '" data-' + (continuar.tipo === "lenguaje" ? "lenguaje" : "materia") + '="' +
+              escapar(continuar.id) + '">Continuar <span aria-hidden="true">→</span></button>' +
+          '</div>' +
+        '</div>'
+      : '<div class="resumen-continuar resumen-continuar--vacio">' +
+          '<p class="resumen-eyebrow">Continuá donde te quedaste</p>' +
+          '<p class="resumen-continuar-titulo">Todavía no hay actividad</p>' +
+          '<p class="resumen-continuar-sub">Elegí una materia o un lenguaje para empezar. Tu avance aparecerá acá.</p>' +
+        '</div>';
+
+    const materias = '<div class="resumen-kpi" id="resumen-materias">' +
+      '<p class="resumen-kpi-label">Respondidas en materias</p>' +
+      '<p class="resumen-kpi-valor"><b>' + datos.materias.respondidas + '</b> <span>de ' +
+        datos.materias.total + '</span></p>' +
+      '</div>';
+
+    const etiquetaPrecision = datos.precision
+      ? 'Precisión <span class="resumen-kpi-label-suave">· ' + datos.precision.intentos + ' intentos</span>'
+      : 'Precisión';
+    const tendencia = datos.precision && datos.tendencia
+      ? '<span class="resumen-tendencia ' + (datos.tendencia.sube ? 'is-up' : 'is-down') + '">' +
+          (datos.tendencia.sube ? '▲' : '▼') + ' ' + Math.abs(datos.tendencia.delta) + '% esta semana</span>'
+      : '';
+    const precision = '<div class="resumen-kpi" id="resumen-precision">' +
+      '<p class="resumen-kpi-label">' + etiquetaPrecision + '</p>' +
+      '<p class="resumen-kpi-valor"><b>' + (datos.precision ? datos.precision.pct + '%' : '—') + '</b>' +
+        tendencia + '</p>' +
+      (datos.precision ? '' : '<p class="resumen-kpi-sub">Sin intentos todavía</p>') +
+      '</div>';
+
+    const repaso = datos.repaso
+      ? '<button type="button" class="resumen-repasar" data-action="' +
+          (datos.repaso.tipo === "lenguaje" ? "seleccionarLenguaje" : "seleccionarMateria") +
+          '" data-' + (datos.repaso.tipo === "lenguaje" ? "lenguaje" : "materia") + '="' +
+          escapar(datos.repaso.id) + '">Repasar ' + datos.repaso.total +
+          (datos.repaso.total === 1 ? ' pregunta' : ' preguntas') +
+          ' <span aria-hidden="true">→</span></button>'
+      : '';
+    const racha = '<div class="resumen-kpi resumen-kpi--racha" id="resumen-racha">' +
+      '<div class="resumen-kpi-head">' +
+        '<p class="resumen-kpi-label">Racha de estudio</p>' + repaso +
+      '</div>' +
+      '<p class="resumen-kpi-valor"><b>' + datos.racha + '</b> <span>' +
+        (datos.racha === 1 ? 'día' : 'días') + '</span></p>' +
+      '</div>';
+
+    cont.innerHTML = bloqueContinuar +
+      '<div class="resumen-kpis">' + materias + precision + racha + '</div>';
+  }
+
   function renderMaterias() {
     const cont = $("materias-list");
     if (!cont) return;
-    const saludo = $("saludo-home");
-    if (saludo) saludo.textContent = saludoSegunHora(persistencia.nombre());
+    renderSaludo();
+    renderResumen();
 
     cont.innerHTML = MATERIAS.map(m => {
       const e = estadoMateria(m);
@@ -84,9 +177,11 @@ export function crearHome({ persistencia, cargarRoadmap }) {
             <span class="materia-progreso-texto">${e.respondidas} de ${e.total} respondidas</span>
           </span>
           <span class="materia-stats">
-            <span>${e.total} preguntas</span>
             <span>${m.conteo?.terminos ?? 0} términos</span>
-            <span class="materia-arrow" aria-hidden="true">→</span>
+            <span class="materia-cta" aria-hidden="true">
+              <span>${e.enCurso ? "Continuar" : "Empezar"}</span>
+              <span class="materia-cta-flecha">→</span>
+            </span>
           </span>
         </button>`;
     }).join("");
@@ -122,10 +217,11 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       const enCurso = estadoLenguaje(barra, competencia);
       const total = barra.total;
       const preguntas = l.conteo?.preguntas ?? 0;
-      const detalles = `${preguntas} preguntas · ${total} etapas`;
-      const competenciaTexto = `${barra.aprobadas} de ${total} ${total === 1 ? "etapa" : "etapas"} aprobadas`;
-      const ariaDesc = `${l.descripcion}. ${detalles}. Competencia: ${competenciaTexto}. ${
-        enCurso ? "Presiona para continuar." : "Presiona para iniciar."
+      const etapas = `${total} ${total === 1 ? "etapa" : "etapas"}`;
+      const detalles = `${preguntas} preguntas`;
+      const competenciaTexto = `${barra.aprobadas} de ${etapas} aprobadas`;
+      const ariaDesc = `${l.descripcion}. ${detalles} · ${etapas}. Competencia: ${competenciaTexto}. ${
+        enCurso ? "Presiona para continuar." : "Presiona para empezar."
       }`;
 
       return `
@@ -142,9 +238,14 @@ export function crearHome({ persistencia, cargarRoadmap }) {
           <span class="materia-desc">${escapar(l.descripcion)}</span>
           <span class="materia-stats materia-stats--lenguaje">
             ${barraCompetencia({ ...barra, color: l.color })}
-            <span class="materia-stats-texto">${detalles}</span>
+            <span class="materia-stats-pie">
+              <span class="materia-stats-texto">${detalles}</span>
+              <span class="materia-cta" aria-hidden="true">
+                <span>${enCurso ? "Continuar" : "Empezar"}</span>
+                <span class="materia-cta-flecha">→</span>
+              </span>
+            </span>
           </span>
-          <span class="materia-cta" aria-hidden="true">${enCurso ? "Continuar" : "Iniciar"} <span aria-hidden="true">→</span></span>
           <span id="lenguaje-desc-${l.id}" class="sr-only">${escapar(ariaDesc)}</span>
         </button>`;
     }));
@@ -195,6 +296,42 @@ export function crearHome({ persistencia, cargarRoadmap }) {
     });
   }
 
+  // El vacío no es un callejón: ofrece la acción exacta que devuelve al catálogo según
+  // si el problema es la búsqueda o el filtro activo.
+  function renderVacio(visibles) {
+    const vacio = $("catalogo-vacio");
+    if (!vacio) return;
+    if (visibles.length) {
+      vacio.classList.add("hidden");
+      vacio.innerHTML = "";
+      return;
+    }
+
+    const hayBusqueda = busqueda.trim().length > 0;
+    const acciones = [];
+    if (hayBusqueda) {
+      acciones.push('<button type="button" class="btn btn-secondary btn-sm" data-vacio="busqueda">Limpiar búsqueda</button>');
+    }
+    if (filtroActivo !== "todas") {
+      acciones.push('<button type="button" class="btn btn-ghost btn-sm" data-vacio="filtro">Ver todas</button>');
+    }
+
+    vacio.innerHTML = '<p class="catalogo-vacio-titulo">No encontramos resultados</p>' +
+      '<p class="catalogo-vacio-texto">' +
+        (hayBusqueda ? "Probá con otro nombre o limpiá la búsqueda." : "No hay tracks en curso todavía.") +
+      '</p>' +
+      (acciones.length ? '<div class="catalogo-vacio-acciones">' + acciones.join("") + '</div>' : "");
+    vacio.classList.remove("hidden");
+  }
+
+  function anunciarResultados(visibles, total) {
+    const resultado = $("catalogo-resultado");
+    if (!resultado) return;
+    const texto = "Mostrando " + visibles + " de " + total;
+    // Solo se escribe si cambió: el lector de pantalla no repite el mismo conteo en cada tecla.
+    if (resultado.textContent !== texto) resultado.textContent = texto;
+  }
+
   function aplicarFiltros({ animar = false } = {}) {
     const q = busqueda.trim().toLowerCase();
     const cards = elementos("#materias-list .materia-card, #lenguajes-list .materia-card");
@@ -217,7 +354,8 @@ export function crearHome({ persistencia, cargarRoadmap }) {
     const hayLenguajes = cards.some(c => c.dataset.tipo === "lenguaje" && !c.classList.contains("hidden"));
     $("materias-seccion")?.classList.toggle("hidden", !hayMaterias);
     $("lenguajes-seccion")?.classList.toggle("hidden", !hayLenguajes);
-    $("catalogo-vacio")?.classList.toggle("hidden", visiblesCards.length > 0);
+    renderVacio(visiblesCards);
+    anunciarResultados(visiblesCards.length, cards.length);
     if (animar) animarEntrada(visiblesCards);
   }
 
@@ -248,6 +386,25 @@ export function crearHome({ persistencia, cargarRoadmap }) {
       busqueda = "";
       clear.classList.add("hidden");
       aplicarFiltros();
+      input.focus();
+    });
+
+    // Delegación dentro del vacío: el HTML se regenera en cada filtro y los botones
+    // no deben perder su listener.
+    $("catalogo-vacio")?.addEventListener("click", e => {
+      const objetivo = /** @type {HTMLElement} */ (e.target);
+      const boton = /** @type {HTMLElement | null} */ (objetivo.closest("[data-vacio]"));
+      if (!boton) return;
+
+      if (boton.dataset.vacio === "busqueda") {
+        input.value = "";
+        busqueda = "";
+        clear?.classList.add("hidden");
+      } else {
+        filtroActivo = "todas";
+        actualizarTabs();
+      }
+      aplicarFiltros({ animar: true });
       input.focus();
     });
 

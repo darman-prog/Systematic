@@ -9,6 +9,10 @@ function montarDom() {
     <section id="screen-materias" aria-labelledby="home-titulo">
       <h1 id="home-titulo">Systematic</h1>
       <p id="saludo-home"></p>
+      <section id="home-resumen" aria-labelledby="home-resumen-titulo">
+        <h2 id="home-resumen-titulo" class="sr-only">Tu progreso</h2>
+        <div id="home-resumen-contenido" class="home-resumen-grid"></div>
+      </section>
       <div class="catalogo-barra">
         <label class="sr-only" for="catalog-search">Buscar materias y lenguajes</label>
         <input id="catalog-search" type="search">
@@ -21,6 +25,7 @@ function montarDom() {
           <button class="catalogo-tab" data-filtro="en-curso" aria-pressed="false">En curso (<span id="filtro-curso-count">0</span>)</button>
         </div>
       </div>
+      <p id="catalogo-resultado" class="sr-only" role="status" aria-live="polite"></p>
       <section id="materias-seccion">
         <span id="materias-count">4 materias</span>
         <div id="materias-list"></div>
@@ -33,7 +38,21 @@ function montarDom() {
     </section>`;
 }
 
-function montar() {
+function resumenFake(datos = {}) {
+  return {
+    actual: () => ({
+      continuar: null,
+      materias: { respondidas: 0, total: 489, pct: 0 },
+      precision: null,
+      tendencia: null,
+      racha: 0,
+      repaso: null,
+      ...datos
+    })
+  };
+}
+
+function montar(datosResumen = {}) {
   montarDom();
   const persistencia = {
     nombre: () => "Ana",
@@ -47,7 +66,7 @@ function montar() {
   };
   const etapas = Array.from({ length: 5 }, (_, i) => ({ id: "e" + (i + 1), examen: { version: 1 } }));
   const cargarRoadmap = vi.fn(async () => ({ etapas }));
-  const home = crearHome({ persistencia, cargarRoadmap });
+  const home = crearHome({ persistencia, cargarRoadmap, resumen: resumenFake(datosResumen) });
   return { home, persistencia, cargarRoadmap };
 }
 
@@ -55,6 +74,14 @@ const visibles = selector => [...document.querySelectorAll(selector)]
   .filter(el => !el.classList.contains("hidden"));
 
 describe("ui/dashboard/home", () => {
+  it("saluda con el nombre del estudiante en el hero", async () => {
+    const { home } = montar();
+    await home.renderMaterias();
+    const saludo = document.getElementById("saludo-home");
+    expect(saludo.textContent).toContain("Ana");
+    expect(saludo.querySelector("em").textContent).toBe("Ana");
+  });
+
   it("renderiza solo las 4 materias y 3 lenguajes reales", async () => {
     const { home } = montar();
     await home.renderMaterias();
@@ -155,5 +182,105 @@ describe("ui/dashboard/home", () => {
     expect(lenguaje.tagName).toBe("BUTTON");
     expect(lenguaje.dataset.action).toBe("seleccionarLenguaje");
     expect(lenguaje.dataset.lenguaje).toBe("lenguaje-ts");
+  });
+
+  it("pinta la continuidad y los tres KPI del prototipo", async () => {
+    const { home } = montar({
+      continuar: {
+        tipo: "materia",
+        id: "bd2",
+        nombre: "Arquitectura de Software",
+        dias: 0,
+        pregunta: 34,
+        preguntas: { respondidas: 33, total: 145, pct: 23 },
+        precision: { pct: 78, intentos: 42 }
+      },
+      materias: { respondidas: 89, total: 489, pct: 18 },
+      precision: { pct: 71, intentos: 55 },
+      tendencia: { delta: 4, sube: true },
+      racha: 4,
+      repaso: { total: 8, tipo: "materia", id: "bd2", nombre: "Base de Datos 2" }
+    });
+    await home.renderMaterias();
+
+    const resumen = document.getElementById("home-resumen-contenido");
+    expect(resumen.textContent).toContain("Continuá donde te quedaste");
+    expect(resumen.textContent).toContain("Arquitectura de Software");
+    expect(resumen.textContent).toContain("Pregunta 34 de 145");
+    expect(resumen.textContent).toContain("33 respondidas · 23% completado");
+    expect(resumen.textContent).toContain("hoy");
+    expect(document.getElementById("resumen-materias").textContent).toContain("89");
+    expect(document.getElementById("resumen-materias").textContent).toContain("489");
+    expect(document.getElementById("resumen-precision").textContent).toContain("71%");
+    expect(document.getElementById("resumen-precision").textContent).toContain("55 intentos");
+    expect(document.getElementById("resumen-precision").textContent).toContain("▲ 4% esta semana");
+    expect(document.getElementById("resumen-racha").textContent).toContain("4");
+    expect(document.getElementById("resumen-racha").textContent).toContain("días");
+    expect(document.getElementById("resumen-racha").textContent).toContain("Repasar 8 preguntas");
+
+    const cta = resumen.querySelector('.resumen-continuar [data-action="seleccionarMateria"]');
+    expect(cta).not.toBeNull();
+    expect(cta.dataset.materia).toBe("bd2");
+    const repaso = document.querySelector('#resumen-racha [data-action="seleccionarMateria"]');
+    expect(repaso).not.toBeNull();
+    expect(repaso.dataset.materia).toBe("bd2");
+  });
+
+  it("sin actividad muestra un estado vacío sin métricas inventadas", async () => {
+    const { home } = montar();
+    await home.renderMaterias();
+
+    const resumen = document.getElementById("home-resumen-contenido");
+    expect(resumen.textContent).toContain("Todavía no hay actividad");
+    expect(resumen.textContent).toContain("Sin intentos todavía");
+    expect(document.getElementById("resumen-materias").textContent).toContain("0");
+    expect(document.getElementById("resumen-materias").textContent).toContain("489");
+    expect(document.getElementById("resumen-racha").textContent).toContain("0");
+    expect(resumen.querySelector('[data-action="seleccionarMateria"]')).toBeNull();
+    expect(resumen.querySelector('[data-action="seleccionarLenguaje"]')).toBeNull();
+  });
+
+  it("el CTA de continuar usa la acción del lenguaje", async () => {
+    const { home } = montar({
+      continuar: {
+        tipo: "lenguaje",
+        id: "lenguaje-ts",
+        nombre: "TypeScript",
+        dias: 1,
+        pregunta: 1,
+        preguntas: { respondidas: 0, total: 100, pct: 0 },
+        precision: null
+      }
+    });
+    await home.renderMaterias();
+
+    const cta = document.querySelector('.resumen-continuar [data-action="seleccionarLenguaje"]');
+    expect(cta).not.toBeNull();
+    expect(cta.dataset.lenguaje).toBe("lenguaje-ts");
+    expect(document.getElementById("home-resumen").textContent).toContain("ayer");
+    expect(document.getElementById("home-resumen").textContent).toContain("Pregunta 1 de 100");
+  });
+
+  it("anuncia los resultados y el vacío devuelve al catálogo", async () => {
+    const { home } = montar();
+    await home.renderMaterias();
+    const resultado = document.getElementById("catalogo-resultado");
+    expect(resultado.textContent).toBe("Mostrando 7 de 7");
+
+    const input = document.getElementById("catalog-search");
+    input.value = "zzz";
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+
+    const vacio = document.getElementById("catalogo-vacio");
+    expect(vacio.classList.contains("hidden")).toBe(false);
+    expect(vacio.textContent).toContain("No encontramos resultados");
+    const limpiar = vacio.querySelector('[data-vacio="busqueda"]');
+    expect(limpiar).not.toBeNull();
+
+    limpiar.click();
+    expect(input.value).toBe("");
+    expect(vacio.classList.contains("hidden")).toBe(true);
+    expect(document.activeElement).toBe(input);
+    expect(resultado.textContent).toBe("Mostrando 7 de 7");
   });
 });

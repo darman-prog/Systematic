@@ -2295,8 +2295,19 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 
 .home-saludo {
   margin: 0 0 0.35rem;
-  color: var(--study-muted);
-  font-size: 0.85rem;
+  color: var(--study-text);
+  font-family: var(--fuente-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* El nombre del estudiante es el acento tipográfico del saludo (prototipo). */
+.home-saludo em {
+  color: var(--study-accent);
+  font-style: italic;
+  font-weight: 400;
 }
 
 .home-dashboard .subtitle {
@@ -2401,8 +2412,8 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
 }
 
 .catalogo-tab {
-  min-height: 36px;
-  padding: 0.4rem 0.7rem;
+  min-height: 44px;
+  padding: 0.45rem 0.75rem;
   border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
@@ -2488,6 +2499,29 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   color: var(--study-muted);
   font-size: var(--tipo-sm);
   text-align: center;
+}
+
+.catalogo-vacio-titulo {
+  margin: 0 0 0.3rem;
+  color: var(--study-text);
+  font-family: var(--fuente-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.catalogo-vacio-texto {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.catalogo-vacio-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
 }
 
 /* Card de catálogo: vidrio tonal, sin traslación en hover (DESIGN.md) */
@@ -2651,23 +2685,40 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   flex-direction: column;
   align-items: stretch;
   gap: 0.5rem;
+  margin-top: auto;
   padding-top: 0;
   border-top: 0;
 }
 
 .home-dashboard .materia-stats--lenguaje .competencia-texto { font-size: 0.72rem; }
 
-.materia-cta {
+/* Pie de la card de lenguaje: preguntas a la izquierda, CTA a la derecha. */
+.materia-stats-pie {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-top: auto;
   padding-top: 0.65rem;
   border-top: 1px solid var(--study-border);
+}
+
+.materia-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
   color: var(--study-accent);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.materia-cta-flecha {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.home-dashboard .materia-card:hover:not(:disabled) .materia-cta {
+  color: var(--materia-color, var(--study-accent));
 }
 
 @media (min-width: 640px) {
@@ -2693,6 +2744,240 @@ section.card:not(.hidden) { animation: fadeInUp var(--mov-base) var(--mov-ease);
   #catalog-search { padding-right: 2.8rem; }
   .catalogo-clear { right: 0.35rem; }
   .catalogo-titulo { font-size: var(--tipo-xl); }
+  /* Cuatro filtros en una fila no entran en 390px: 2x2 se lee mejor que 3+1. */
+  .catalogo-filtros {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem;
+  }
+  .catalogo-tab { width: 100%; text-align: center; }
   .home-dashboard .materia-card,
   .home-dashboard .materia-card--lenguaje { padding: 1rem; }
+}
+
+/* ===== RESUMEN DEL HOME (prototipo) =====
+   Continuidad grande + tres KPI apilados. En móvil todo se apila; en tablet los KPI
+   pasan a tres columnas; en escritorio el resumen vuelve a dos columnas (continuar + KPI). */
+.home-resumen {
+  margin-top: 1.25rem;
+}
+
+.home-resumen-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.resumen-kpis {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.resumen-continuar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1.5rem;
+  border: 1px solid var(--study-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--study-surface-2) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* Sin actividad no hay CTA: el borde punteado evita que parezca una card accionable. */
+.resumen-continuar--vacio {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.resumen-eyebrow {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.resumen-continuar-titulo {
+  margin: 0;
+  color: var(--study-text);
+  font-family: var(--fuente-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.resumen-continuar-meta {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.resumen-progreso {
+  width: 100%;
+  height: 0.4rem;
+  margin-top: 0.5rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--study-surface-3);
+}
+
+.resumen-progreso > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--study-accent);
+  transform: scaleX(calc(var(--pct, 0) / 100));
+  transform-origin: left center;
+  transition: transform var(--mov-base) var(--mov-ease);
+}
+
+/* El pie se pega al fondo cuando la card se estira al alto de los tres KPI. */
+.resumen-continuar-pie {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 0.75rem;
+}
+
+.resumen-continuar-sub {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.resumen-cta {
+  margin: 0;
+}
+
+.resumen-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--study-border);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--study-surface-2) 75%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.resumen-kpi--racha {
+  justify-content: space-between;
+}
+
+.resumen-kpi-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.resumen-kpi-label {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.resumen-kpi-label-suave {
+  color: var(--study-muted);
+  font-weight: 400;
+}
+
+.resumen-kpi-valor {
+  margin: 0;
+  color: var(--study-text);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.resumen-kpi-valor b {
+  font-weight: 700;
+}
+
+.resumen-kpi-valor span {
+  color: var(--study-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.resumen-kpi-sub {
+  margin: 0;
+  color: var(--study-muted);
+  font-size: 0.72rem;
+}
+
+/* La tendencia se colorea después de la regla genérica de `span` para ganar la cascada. */
+.resumen-tendencia {
+  margin-left: 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resumen-tendencia.is-up { color: var(--study-success); }
+.resumen-tendencia.is-down { color: var(--study-error); }
+
+.resumen-repasar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0;
+  border: 0;
+  background: none;
+  color: var(--study-accent);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+  cursor: pointer;
+}
+
+.resumen-repasar:hover { text-decoration: underline; }
+
+.resumen-repasar:focus-visible {
+  outline: 2px solid var(--study-accent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 640px) {
+  .resumen-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  .home-resumen-grid {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+  .resumen-kpis { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 639px) {
+  .resumen-cta { width: 100%; justify-content: center; }
+  .resumen-continuar-pie { align-items: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resumen-progreso > span { transition: none; }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .resumen-continuar,
+  .resumen-kpi { background: var(--study-surface-2); }
 }

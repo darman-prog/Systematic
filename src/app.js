@@ -35,6 +35,7 @@ import { crearAvance } from "./student/avance.js";
 import { crearRondas } from "./student/rondas.js";
 import { cargarRoadmap } from "./student/contenido.js";
 import { crearGamificacion } from "./student/gamificacion.js";
+import { crearResumen } from "./student/resumen.js";
 import { crearTrack } from "./student/track.js";
 import { crearSesiones } from "./student/session.js";
 import { fusionarMision } from "./student/registros.js";
@@ -84,7 +85,8 @@ const rondas = crearRondas({ obtenerP: avance.obtenerP });
 const conNombre = texto => conNombreUI(persistencia.nombre(), texto);
 const gamificacion = crearGamificacion({
   persistencia,
-  materias: MATERIAS,
+  // La racha y los logros son globales: incluyen materias y lenguajes, igual que el home.
+  materias: [...MATERIAS, ...LENGUAJES],
   alSubirNivel: nivel => {
     toast(icono("nivel", "icono-sm") + conNombre("¡Nivel " + nivel + ", @!"));
     confeti();
@@ -94,8 +96,18 @@ const gamificacion = crearGamificacion({
   alCambiarPerfil: () => acceso?.repintarPerfil()
 });
 
+// Resumen global del home: cobertura, precisión y última actividad de todos los tracks.
+// Se compone aquí para que la UI reciba datos ya resueltos (ADR 001/007).
+const resumen = crearResumen({
+  persistencia,
+  materias: MATERIAS,
+  lenguajes: LENGUAJES,
+  // Misma fuente de racha que el perfil: una sola verdad para el estudiante.
+  racha: () => gamificacion.perfil().racha
+});
+
 // Renderers del home (materias y lenguajes) extraídos a ui/dashboard (ADR 007).
-const home = crearHome({ persistencia, cargarRoadmap });
+const home = crearHome({ persistencia, cargarRoadmap, resumen });
 
 // Track activo (materia o lenguaje): estado, filtros y carga de contenido (student/track.js).
 const track = crearTrack({

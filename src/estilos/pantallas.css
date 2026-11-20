@@ -796,8 +796,10 @@ button.talento-req:hover {
     opacity: 0;
   }
 
-  /* Animación de una sola vez; al terminar suelta opacity/translate */
-  .js-reveal .scroll-reveal.is-revealed {
+  /* Animación de una sola vez; al terminar suelta opacity/translate.
+     El catálogo del home tiene su propia entrada al filtrar: si ambas clases conviven,
+     la animación de filtro debe ganar para que el cambio se perciba. */
+  .js-reveal .scroll-reveal.is-revealed:not(.catalogo-entra) {
     animation: reveal-entrada 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards;
     animation-delay: calc(var(--i, 0) * 40ms);
   }
