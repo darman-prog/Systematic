@@ -182,7 +182,7 @@ test.describe('Systematic — smoke', () => {
     await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
     await expect(page.locator('#screen-escenarios')).toBeVisible();
     await expect(page.locator('#escenarios-lista .apunte-card').first()).toBeVisible();
-    await page.getByRole('button', { name: /Jugar escenario/ }).first().click();
+    await page.getByRole('button', { name: 'Estudio', exact: true }).first().click();
     await expect(page.locator('#screen-escenario')).toBeVisible();
     await page.locator('#escenario-escena .option').first().click();
     await expect(page.locator('#escenario-escena')).toContainText('Continuar');
@@ -505,7 +505,7 @@ test.describe('Systematic — smoke', () => {
     });
 
     await page.locator('#materias-list .materia-card').first().click(); // BD2
-    await expect(page.locator('#stat-total')).toHaveText('90');
+    await expect(page.locator('#stat-total')).toHaveText('120');
 
     // Tras abrir BD2, ningún chunk de otro track (isw/asw/infra) debió descargarse.
     for (const u of assetsRequests) {

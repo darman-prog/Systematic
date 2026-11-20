@@ -438,7 +438,7 @@ test.describe('Auditoría de funcionalidad — flujos faltantes', () => {
     await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
     await expect(page.locator('#screen-escenarios')).toBeVisible();
 
-    await page.getByRole('button', { name: /Jugar escenario/ }).first().click();
+    await page.getByRole('button', { name: 'Estudio', exact: true }).first().click();
     await expect(page.locator('#screen-escenario')).toBeVisible();
     expect(errores).toEqual([]);
   });

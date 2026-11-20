@@ -93,7 +93,7 @@ async function irAPantalla(page, nombre) {
       await page.locator('#materias-list .materia-card').first().click();
       await abrirMasModos(page);
       await page.locator('#screen-start').getByRole('button', { name: /Escenarios/ }).click();
-      await page.getByRole('button', { name: /Jugar escenario/ }).first().click();
+      await page.getByRole('button', { name: 'Estudio', exact: true }).first().click();
       break;
     case 'casos':
       await page.locator('#materias-list .materia-card').first().click();

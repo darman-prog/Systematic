@@ -46,6 +46,12 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run e2e
+        # Claves de prueba para ejercitar en CI la misma ruta de cuenta/onboarding que producción sin exponer secretos.
+        env:
+          VITE_FIREBASE_API_KEY: demo-api-key-ci
+          VITE_FIREBASE_AUTH_DOMAIN: systematic-ci.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: systematic-ci
+          VITE_FIREBASE_APP_ID: 1:000000000000:web:ci0000000000
       # Conserva trazas y contextos de error cuando un test E2E falla en el runner efímero.
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && failure() }}

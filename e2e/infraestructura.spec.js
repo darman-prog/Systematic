@@ -88,7 +88,7 @@ test.describe('Infraestructura', () => {
     await expect(page.locator('#screen-escenarios')).toBeVisible();
     await expect(page.locator('#escenarios-lista .apunte-card')).toHaveCount(infraEscenarios.length);
 
-    await page.getByRole('button', { name: /Jugar escenario/ }).first().click();
+    await page.getByRole('button', { name: 'Estudio', exact: true }).first().click();
     await expect(page.locator('#screen-escenario')).toBeVisible();
     await page.locator('#escenario-escena .option').first().click();
     await expect(page.locator('#escenario-escena')).toContainText('Continuar');

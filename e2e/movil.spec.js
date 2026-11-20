@@ -24,7 +24,7 @@ test('constructor de diagramas visible y funcional con tap-tap en 360x740, 768x1
     await irAMateria(page, 2); // ASW: materia con casos y preguntas de diagramación
 
     // Entradas de casos y chip de diagrama disponibles en todos los tamaños táctiles
-    await expect(page.locator('[data-action="startCasos"]')).toBeVisible();
+    await expect(page.locator('#screen-start [data-action="startCasos"]')).toBeVisible();
     await expect(page.locator('#tipos-panel [data-tipo="diagrama"]')).toBeVisible();
 
     const sinDesbordeHome = await page.evaluate(
@@ -33,7 +33,7 @@ test('constructor de diagramas visible y funcional con tap-tap en 360x740, 768x1
     expect(sinDesbordeHome).toBe(true);
 
     // Abrir un caso de diagramación con tap()
-    await page.locator('[data-action="startCasos"]').tap();
+    await page.locator('#screen-start [data-action="startCasos"]').tap();
     await expect(page.locator('#screen-casos')).toBeVisible();
     await page.locator('#casos-lista [data-action="elegirCaso"]').first().tap();
     await expect(page.locator('#lienzo-diagrama')).toBeVisible();
@@ -58,7 +58,7 @@ test('hit-area >= 44x44 y coordenadas exactas al colocar pieza con el papel scro
   await page.setViewportSize({ width: 360, height: 740 });
   await irAMateria(page, 2); // ASW
 
-  await page.locator('[data-action="startCasos"]').tap();
+  await page.locator('#screen-start [data-action="startCasos"]').tap();
   await page.locator('#casos-lista [data-action="elegirCaso"]').first().tap();
   await expect(page.locator('#lienzo-diagrama')).toBeVisible();
 
